@@ -3,7 +3,7 @@
 Contributions to systemlink-OpenAPI-documents are welcome from all!
 
 systemlink-OpenAPI-documents is managed via [git](https://git-scm.com), with the canonical upstream
-repository hosted on [GitHub](http://developercertificate.org/).
+repository hosted on [GitHub](https://github.com/ni/systemlink-OpenAPI-documents/).
 
 systemlink-OpenAPI-documents follows a pull-request model for development.  If you wish to
 contribute, you will need to create a GitHub account, fork this project, push a
@@ -13,7 +13,7 @@ See [GitHub's official documentation](https://help.github.com/articles/using-pul
 
 # Testing
 
-Before making a pull request, ensure that there are no syntax errors in your document by pasting it into editor.swagger.io.
+Before making a pull request, ensure that there are no syntax errors in your document by pasting it into [editor.swagger.io](https://editor.swagger.io).
 
 # Developer Certificate of Origin (DCO)
 
@@ -43,7 +43,7 @@ Before making a pull request, ensure that there are no syntax errors in your doc
        maintained indefinitely and may be redistributed consistent with
        this project or the open source license(s) involved.
 
-(taken from [developercertificate.org](http://developercertificate.org/))
+(taken from [developercertificate.org](https://developercertificate.org/))
 
 See [LICENSE](https://github.com/ni/systemlink-OpenAPI-documents/blob/master/LICENSE)
 for details about how systemlink-OpenAPI-documents is licensed.
