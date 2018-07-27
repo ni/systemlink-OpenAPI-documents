@@ -1,6 +1,6 @@
 # SystemLink OpenAPI Documents
 
-This repository contains OpenAPI documents which describe some of the HTTP APIs exposed by web services in SystemLink and SystemLink Cloud.
+This repository contains OpenAPI documents which describe some of the HTTP APIs provided by web services in SystemLink and SystemLink Cloud.
 
 ## Using an OpenAPI document to generate a client
 
