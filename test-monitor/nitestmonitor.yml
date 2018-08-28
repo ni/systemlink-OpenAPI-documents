@@ -305,6 +305,8 @@ definitions:
   TestResultResponseObject:
     description: A test result response object
     type: object
+    required:
+      - id
     properties:
       status:
         $ref: '#/definitions/StatusObject'
