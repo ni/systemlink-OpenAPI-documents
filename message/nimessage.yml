@@ -312,8 +312,8 @@ definitions:
     type: object
     title: Topic and Message
     required:
-      - message
       - topic
+      - message
     properties:
       topic:
         description: Topic name
@@ -322,6 +322,9 @@ definitions:
         description: Message content
         type: string
     description: The topic and message content
+    example:
+      topic: systemHealth
+      message: System A has crashed
   Topic:
     type: object
     title: Topic
@@ -332,6 +335,8 @@ definitions:
         description: Topic name
         type: string
     description: Topic name
+    example:
+      topic: systemHealth
   SessionToken:
     type: object
     title: Session Token
@@ -342,6 +347,8 @@ definitions:
         description: Unique session ID
         type: string
     description: Unique session ID
+    example:
+      token: BAB2AFFA-7AFA-4C79-BD41-00F25E3B8F61
   QueueSizeBytes:
     type: object
     title: Current Queue Size
@@ -352,6 +359,8 @@ definitions:
         description: Current queue size (in bytes)
         type: integer
     description: Current queue size (in bytes)
+    example:
+      queueSizeBytes: 100
   MaxQueueSizeBytes:
     type: object
     title: Maximum Queue Size
@@ -362,6 +371,8 @@ definitions:
         description: Maximum queue size (in bytes)
         type: integer
     description: Maximum queue size (in bytes)
+    example:
+      maxQueueSizeBytes: -1
   WebSocketPublish:
     type: object
     title: WebSocket Publish Action
@@ -381,6 +392,10 @@ definitions:
       message:
         description: Message to publish
         type: string
+    example:
+      action: publish
+      topic: systemHealth
+      message: System A has crashed
   WebSocketSubscribe:
     type: object
     title: WebSocket Subscribe Action
@@ -396,6 +411,9 @@ definitions:
       topic:
         description: Topic to subscribe to
         type: string
+    example:
+      action: subscribe
+      topic: systemHealth
   WebSocketUnsubscribe:
     type: object
     title: WebSocket Unsubscribe Action
@@ -411,3 +429,6 @@ definitions:
       topic:
         description: Topic to unsubscribe from
         type: string
+    example:
+      action: unsubscribe
+      topic: systemHealth
