@@ -162,7 +162,7 @@ paths:
       parameters:
         - in: query
           name: timeoutMilliseconds
-          description: Amount of time, in milliseconds, to keep the messaging connection open.
+          description: Amount of time, in milliseconds, to keep the messaging connection open. May be overridden by a maximum value that the server administrator allows.
           type: integer
           required: false
       responses:
