@@ -52,7 +52,7 @@ paths:
   /v1/sessions:
     post:
       tags:
-        - Sessions
+        - sessions
       summary: Create a session
       description: Creates a message session with the server to send and receive messages.
       operationId: CreateSession
@@ -72,7 +72,7 @@ paths:
       - $ref: '#/parameters/Token'
     delete:
       tags:
-        - Sessions
+        - sessions
       summary: Delete a session
       description: Terminates the message session. If you do not delete the message session, the message service deletes the sesssion after five minutes of inactivity
       operationId: DeleteSession
@@ -88,7 +88,7 @@ paths:
       - $ref: '#/parameters/Token'
     post:
       tags:
-        - Topics
+        - topics
       summary: Subscribe to a topic
       description: Subscribes to a topic to receive all messages broadcast with that topic name.
       operationId: SubscribeToTopic
@@ -111,7 +111,7 @@ paths:
       - $ref: '#/parameters/Token'
     post:
       tags:
-        - Topics
+        - topics
       summary: Unsubscribe from a topic
       description: Unsubscribes from a topic to stop receiving messages for that topic.
       operationId: UnsubscribeFromTopic
@@ -135,7 +135,7 @@ paths:
       - $ref: '#/parameters/Token'
     post:
       tags:
-        - Message Queue
+        - message queue
       summary: Publish a message
       description: Broadcasts a message to a topic. Subscribers of a topic receive every message published to the topic.
       operationId: PublishMessage
@@ -155,7 +155,7 @@ paths:
           $ref: '#/responses/Error'
     get:
       tags:
-        - Message Queue
+        - message queue
       summary: Read a message from the queue
       description: Returns a message from the queue. To read a message, subscribe to a topic first.
       operationId: ReadMessage
@@ -178,7 +178,7 @@ paths:
           $ref: '#/responses/Error'
     delete:
       tags:
-        - Message Queue
+        - message queue
       summary: Flush the message queue
       description: Clears all messages from the session queue without reading them.
       operationId: DeleteMessages
@@ -194,7 +194,7 @@ paths:
       - $ref: '#/parameters/Token'
     get:
       tags:
-        - Message Queue
+        - message queue
       summary: Get the current queue size
       description: Returns the size (in bytes) of the message queue associated with this session. This is helpful for determining the amount of memory that unread messages are consuming.
       operationId: GetCurrentQueueSize
@@ -212,7 +212,7 @@ paths:
       - $ref: '#/parameters/Token'
     get:
       tags:
-        - Message Queue
+        - message queue
       summary: Get the maximum queue size
       description: Returns the maximum size (in bytes) of the message queue associated with this session. This is helpful for determining how much total memory is available for storing messages.
       operationId: GetMaximumQueueSize
@@ -228,7 +228,7 @@ paths:
   /v1/websocket:
     get:
       tags:
-        - WebSocket (SystemLink Server only)
+        - webSocket (SystemLink Server only)
       summary: Open a WebSocket session
       description: Opens a persistent connection to the web server that allows two-way communication using a JSON
                    protocol. Once the connection is open, you can publish, subscribe, or unsubscribe. Refer to the *Models* section to access
