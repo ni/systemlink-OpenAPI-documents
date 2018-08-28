@@ -28,7 +28,7 @@ responses:
     description: Not authorized
     headers:
       WWW_Authenticate:
-        description: Information for how to authenticate (only sent by SystemLink Server).
+        description: Information for how to authenticate (sent only from SystemLink Server).
         type: string
   Error:
     description: Error
@@ -44,7 +44,7 @@ parameters:
   Token:
     in: path
     name: token
-    description: The unique session ID
+    description: Unique session ID
     type: string
     required: true
 
@@ -54,7 +54,7 @@ paths:
       tags:
         - Sessions
       summary: Create a session
-      description: Creates a unique messaging session that can send and receive messages.
+      description: Creates a message session with the server to send and receive messages.
       operationId: CreateSession
       responses:
         200:
@@ -74,7 +74,7 @@ paths:
       tags:
         - Sessions
       summary: Delete a session
-      description: Deletes a messaging session. Messaging sessions that are not explicitly deleted are automatically cleaned up after five minutes of inactivity.
+      description: Terminates the message session. If you do not delete the message session, the message service deletes the sesssion after five minutes of inactivity
       operationId: DeleteSession
       responses:
         204:
@@ -118,7 +118,7 @@ paths:
       parameters:
         - in: body
           name: topic
-          description: The topic to unsubscribe from
+          description: Topic to unsubscribe from
           required: true
           schema:
             $ref: '#/definitions/Topic'
@@ -137,7 +137,7 @@ paths:
       tags:
         - Message Queue
       summary: Publish a message
-      description: Publishes a broadcast message to a specific topic. All of the topic's subscribers will receive a copy of the message.
+      description: Broadcasts a message to a topic. Subscribers of a topic receive every message published to the topic.
       operationId: PublishMessage
       parameters:
         - in: body
@@ -157,12 +157,12 @@ paths:
       tags:
         - Message Queue
       summary: Read a message from the queue
-      description: Read a single message from the queue, if any.
+      description: Returns a message from the queue. To read a message, subscribe to a topic first.
       operationId: ReadMessage
       parameters:
         - in: query
           name: timeoutMilliseconds
-          description: The time to keep the connection open while waiting for a message
+          description: Amount of time, in milliseconds, to keep the messaging connection open.
           type: integer
           required: false
       responses:
@@ -180,7 +180,7 @@ paths:
       tags:
         - Message Queue
       summary: Flush the message queue
-      description: Flushes the queue of received messages, discarding all messages without reading them.
+      description: Clears all messages from the session queue without reading them.
       operationId: DeleteMessages
       responses:
         200:
@@ -196,7 +196,7 @@ paths:
       tags:
         - Message Queue
       summary: Get the current queue size
-      description: Gets the current queue size (in bytes). This is helpful for determining the amount of memory that unread messages are consuming.
+      description: Returns the size (in bytes) of the message queue associated with this session. This is helpful for determining the amount of memory that unread messages are consuming.
       operationId: GetCurrentQueueSize
       responses:
         200:
@@ -214,7 +214,7 @@ paths:
       tags:
         - Message Queue
       summary: Get the maximum queue size
-      description: Gets the maximum queue size (in bytes). This is helpful for determining how much total memory is available for storing messages.
+      description: Returns the maximum size (in bytes) of the message queue associated with this session. This is helpful for determining how much total memory is available for storing messages.
       operationId: GetMaximumQueueSize
       responses:
         200:
@@ -230,10 +230,9 @@ paths:
       tags:
         - WebSocket (SystemLink Server only)
       summary: Open a WebSocket session
-      description: Opens a persistent connection to the web server that allows bi-directional communication using a JSON
-                   formatted protocol. Once the connection is open, available actions include the WebSocket Publish Action,
-                   WebSocket Subscribe Action, and WebSocket Unsubscribe Action. The schema for these actions is defined in
-                   the *Models* section. Note that WebSocket functionality is currently only supported in SystemLink Server.
+      description: Opens a persistent connection to the web server that allows two-way communication using a JSON
+                   protocol. Once the connection is open, you can publish, subscribe, or unsubscribe. Refer to the *Models* section to access
+                   the schema for these actions. SystemLink Cloud does not support WebSocket connections.
       operationId: OpenWebSocketSession
       parameters:
         - in: header
@@ -248,14 +247,13 @@ paths:
           x-example: Upgrade
         - in: header
           name: Sec-WebSocket-Version
-          description: A value used in the WebSocket opening handshake. Indicates the protocol version of the connection.
+          description: Protocol version of the WebSocket connection.
           type: string
           required: true
           x-example: 13
         - in: header
           name: Sec-WebSocket-Key
-          description: A value used in the WebSocket opening handshake. Provides part of the information used by the server
-             to prove that it received a valid WebSocket opening handshake.
+          description: Randomly selected sixteen-byte base64-encoded string. Used to confirm a valid WebSocket handshake. Must be selected randomly for each new connection.
           type: string
           required: true
           x-example: dGhlIHNhbXBsZSBub25jZQ==
@@ -275,19 +273,19 @@ definitions:
     type: object
     properties:
       name:
-        description: The string error code
+        description: String error code
         type: string
       code:
         description: Numeric error code
         type: integer
       resourceType:
-        description: The type of resource associated with the error
+        description: Type of resource associated with the error
         type: string
       resourceId:
-        description: The identifier of the resource associated with the error
+        description: Identifier of the resource associated with the error
         type: string
       message:
-        description: The filled in error message
+        description: Complete error message
         type: string
       args:
         description: Positional argument values for the error code
@@ -318,10 +316,10 @@ definitions:
       - topic
     properties:
       topic:
-        description: The topic name
+        description: Topic name
         type: string
       message:
-        description: The message content
+        description: Message content
         type: string
     description: The topic and message content
   Topic:
@@ -331,9 +329,9 @@ definitions:
       - topic
     properties:
       topic:
-        description: The topic name
+        description: Topic name
         type: string
-    description: The topic name
+    description: Topic name
   SessionToken:
     type: object
     title: Session Token
@@ -341,9 +339,9 @@ definitions:
       - token
     properties:
       token:
-        description: A unique session ID
+        description: Unique session ID
         type: string
-    description: A unique session ID
+    description: Unique session ID
   QueueSizeBytes:
     type: object
     title: Current Queue Size
@@ -351,9 +349,9 @@ definitions:
       - queueSizeBytes
     properties:
       queueSizeBytes:
-        description: The current queue size (in bytes)
+        description: Current queue size (in bytes)
         type: integer
-    description: The current queue size (in bytes)
+    description: Current queue size (in bytes)
   MaxQueueSizeBytes:
     type: object
     title: Maximum Queue Size
@@ -361,9 +359,9 @@ definitions:
       - maxQueueSizeBytes
     properties:
       maxQueueSizeBytes:
-        description: The maximum queue size (in bytes)
+        description: Maximum queue size (in bytes)
         type: integer
-    description: The maximum queue size (in bytes)
+    description: Maximum queue size (in bytes)
   WebSocketPublish:
     type: object
     title: WebSocket Publish Action
@@ -378,10 +376,10 @@ definitions:
         enum: ['publish']
         example: publish
       topic:
-        description: The topic to publish a message to
+        description: Topic to publish a message to
         type: string
       message:
-        description: The message to publish
+        description: Message to publish
         type: string
   WebSocketSubscribe:
     type: object
@@ -391,12 +389,12 @@ definitions:
       - topic
     properties:
       action:
-        description: The action to perform. Must be set to "subscribe".
+        description: Action to perform. Must be set to "subscribe".
         type: string
         enum: ['subscribe']
         example: subscribe
       topic:
-        description: The topic to subscribe to
+        description: Topic to subscribe to
         type: string
   WebSocketUnsubscribe:
     type: object
@@ -406,10 +404,10 @@ definitions:
       - topic
     properties:
       action:
-        description: The action to perform. Must be set to "unsubscribe".
+        description: Action to perform. Must be set to "unsubscribe".
         type: string
         enum: ['unsubscribe']
         example: unsubscribe
       topic:
-        description: The topic to unsubscribe from
+        description: Topic to unsubscribe from
         type: string
