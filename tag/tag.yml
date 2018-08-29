@@ -22,6 +22,24 @@ securityDefinitions:
 security:
   - apiKeyAuth: []
   - basicAuth: []
+
+responses:
+  Unauthorized:
+    description: Not authorized
+    headers:
+      WWW_Authenticate:
+        description: Information for how to authenticate (sent only from SystemLink Server).
+        type: string
+  Error:
+    description: Error
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
 paths:
   /nitag/v2/tags-rpc/subscriptions/query-values:
     post:
@@ -29,13 +47,13 @@ paths:
         - Subscriptions
       summary: ''
       responses:
-        '200':
+        200:
           schema:
             $ref: '#/definitions/SubscriptionUpdates'
           description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
           description: Subscription with the given id not found
       parameters:
         - schema:
@@ -1187,6 +1205,46 @@ paths:
       operationId: get-tag-values-current-value
       description: Get tag current value
 definitions:
+  Error:
+    description: Contains error information
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+      resourceType:
+        description: Type of resource associated with the error
+        type: string
+      resourceId:
+        description: Identifier of the resource associated with the error
+        type: string
+      message:
+        description: Complete error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+      innerErrors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+    example:
+      name: Skyline.OneOrMoreErrorsOccurred
+      code: -251040
+      message: One or more errors occurred. See the contained list for details of each error.
+      args: []
+      innerErrors:
+        - name: Message.SessionTokenNotFound
+          code: -251608
+          resourceType:
+          resourceId:
+          message: Session token 'f755d531-2403-433f-a0b7-463ccb8f2b9' not found.
+          args: ['f755d531-2403-433f-a0b7-463ccb8f2b9']
   TagsWithValues:
     type: object
     title: Tag List with current values
