@@ -231,8 +231,8 @@ paths:
         - webSocket (SystemLink Server only)
       summary: Open a WebSocket session
       description: Opens a persistent connection to the web server that allows two-way communication using a JSON
-                   protocol. Once the connection is open, you can publish, subscribe, or unsubscribe. Refer to the *Models* section to access
-                   the schema for these actions. SystemLink Cloud does not support WebSocket connections.
+                   protocol. After you open a connection, you can publish messages and subscribe or unsubscribe to topics.
+                   Refer to the *Models* section to access the schema for these actions. SystemLink Cloud does not support WebSocket connections.
       operationId: OpenWebSocketSession
       parameters:
         - in: header
