@@ -253,123 +253,51 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v2/selections/{id}/values/aggregates/mean:
-    get:
+  /v2/selections:
+    post:
       tags:
         - selections
-      summary: 'Get the mean aggregate values for a selection'
-      description: Get the mean values from a selection's aggregates
-      operationId: GetSelectionMeanValues
+      summary: 'Create selection'
+      description: Create a selection containing a collection of tags to perform subsequent operations on.
+      operationId: CreateSelection
       parameters:
-        - in: path
-          name: id
-          description: Selection ID
-          type: string
-          required: true
+        - in: body
+          name: selection
+          description: The selection to create
+          schema:
+            $ref: '#/definitions/Selection'
+          required: false
       responses:
         200:
           description: Success
           schema:
-            description: Array containing the mean values from the aggregates for each tag in the selection.
-            type: array
-            items:
-              type: object
-              title: Tag Path and Mean Value
-              properties:
-                path:
-                  description: The tag path
-                  type: string
-                mean:
-                  description: Mean value from the tag's aggregates
-                  type: number
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
-        default:
-          $ref: '#/responses/Error'
-  /v2/tags/{path}:
-    put:
-      tags:
-        - tags
-      summary: 'Create or replace tag'
-      description: 'Replace the tag at <path>, or create one if one doesn''t exist. A complete resource representation must be sent (no partial updates).'
-      operationId: CreateOrReplaceTag
-      parameters:
-        - in: path
-          name: path
-          description: Tag path
-          type: string
-          required: true
-        - in: body
-          name: tag
-          description: Tag to create or replace
-          schema:
-            $ref: '#/definitions/Tag'
-          required: true
-      responses:
-        201:
-          description: 'Created: Tag created successfully'
-        204:
-          description: 'No Content: Tag replaced successfully'
+            $ref: '#/definitions/Selection'
+        400:
+          description: Bad Request
         401:
           $ref: '#/responses/Unauthorized'
         409:
-          description: 'Conflict: Type change not supported'
-    get:
-      tags:
-        - tags
-      summary: 'Get tag'
-      description: Get the metadata of a single tag.
-      operationId: GetTag
-      parameters:
-        - in: path
-          name: path
-          description: The tag path
-          type: string
-          required: true
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: '#/definitions/Tag'
-        401:
-          $ref: '#/responses/Unauthorized'
+          description: Duplicate selection
         default:
           $ref: '#/responses/Error'
-  /v2/selections/{id}/values/aggregates/min:
     get:
       tags:
         - selections
-      summary: 'Get the minimum aggregate values for a selection'
-      description: Get the minimum values from a selection's aggregates
-      operationId: GetSelectionMinValues
-      parameters:
-        - in: path
-          name: id
-          description: The selection ID
-          type: string
-          required: true
+      summary: 'Get all selections'
+      description: Get all selections.
+      operationId: GetSelections
+      parameters: []
       responses:
         200:
-          description: Success
           schema:
-            description: Array containing the minimum values from the aggregates for each tag in the selection.
             type: array
             items:
-              type: object
-              title: Tag Paths and Count Values
-              properties:
-                path:
-                  description: Tag path
-                  type: string
-                min:
-                  description: Countum value from the tag's aggregates
-                  type: number
+              $ref: '#/definitions/Selection'
+          description: Success
         401:
           $ref: '#/responses/Unauthorized'
         404:
-          description: Selection with the given ID was not found
+          description: Selection with the given ID not found
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}:
@@ -446,6 +374,320 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           description: Selection with the given ID was not found
+  /v2/selections/{id}/tags-with-values:
+    get:
+      tags:
+        - selections
+      summary: 'Get current values in selection'
+      description: Get the current values and aggregates of the tags in a selection.
+      operationId: GetSelectionTagsWithValues
+      parameters:
+        - in: path
+          name: id
+          description: The selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TagsWithValues'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given id not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/tags:
+    get:
+      tags:
+        - selections
+      summary: 'Get the tags in a selection'
+      # TODO: in the description, mention if the selections have current values
+      description: Get the tags in a selection.
+      operationId: GetSelectionTags
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Tag'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags:
+        - selections
+      summary: 'Delete all of the tags in a selection'
+      description: Delete all of the tags in a seletion
+      operationId: DeleteSelectionTags
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        204:
+          description: Successfully deleted
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+
+  /v2/selections/{id}/values:
+    get:
+      tags:
+        - selections
+      summary: 'Get the values of the tags in a selection'
+      description: Get the current values of the tags in a given selection
+      operationId: GetSelectionValues
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TagPathCurrentAndAggregateValue'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/values/current:
+    get:
+      tags:
+        - selections
+      summary: 'Get the current times values of the tags in a selection with timestamps'
+      description: Get the current values of the tags in a selection with timestamps
+      operationId: GetSelectionCurrentTimestampedValues
+      parameters:
+        - in: path
+          name: id
+          description: The selection id
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              description: Tag path with current value (timestamped)
+              type: object
+              title: Tag Path With Current Value
+              properties:
+                path:
+                  type: string
+                  description: Tag path
+                current:
+                  $ref: '#/definitions/TagCurrentValue'
+                  # TODO: should be TagCurrentTimestampedValue
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/values/current/value:
+    get:
+      tags:
+        - selections
+      summary: 'Get the current values of the tags in a selection (without timestamps)'
+      description: Get the current timestamped values of the tags in a selection
+      operationId: GetSelectionCurrentValues
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              description: Tag path with timestamped value
+              type: object
+              title: Tag Path With Value
+              properties:
+                path:
+                  type: string
+                  description: Tag path
+                current:
+                  $ref: '#/definitions/TagValue'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/values/current/timestamp:
+    get:
+      tags:
+        - selections
+      summary: 'Get the current value timestamps for the tags in a selection'
+      # TODO: is it really the current value timestamp here?
+      description: Get the current value timestamps for the tags in a selection
+      operationId: GetSelectionValuesCurrentTimestamp
+      parameters:
+        - in: path
+          name: id
+          description: The selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            description: Array containing the paths of the tags in the selection, along with the timestamp of their current values.
+            type: array
+            # TODO: verify this is really an array.. cloud called it an object initially
+            title: Tag Paths With Timestamps
+            items:
+              type: object
+              title: Tag Path and Timestamp
+              description: A tag path and the timestamp of it's current value
+              properties:
+                timestamp:
+                  description: The current value's timestamp
+                  type: string
+                path:
+                  description: The tag path
+                  type: string
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/values/aggregates/min:
+    get:
+      tags:
+        - selections
+      summary: 'Get the minimum aggregate values for a selection'
+      description: Get the minimum values from a selection's aggregates
+      operationId: GetSelectionMinValues
+      parameters:
+        - in: path
+          name: id
+          description: The selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            description: Array containing the minimum values from the aggregates for each tag in the selection.
+            type: array
+            items:
+              type: object
+              title: Tag Paths and Count Values
+              properties:
+                path:
+                  description: Tag path
+                  type: string
+                min:
+                  description: Countum value from the tag's aggregates
+                  type: number
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/values/aggregates/max:
+    get:
+      tags:
+        - selections
+      summary: 'Get the maximum value from the aggregates of a selection''s tags'
+      description: Get the maximum value from the aggregates of a selection's tags
+      operationId: GetSelectionMaxAggregates
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              description: The tag path with the maximum value from its aggregates
+              type: object
+              title: Tag Path With Aggregate Max
+              properties:
+                path:
+                  description: Tag path
+                  type: string
+                max:
+                  description: Maximum value from the tag's aggregates
+                  type: number
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/values/aggregates/mean:
+    get:
+      tags:
+        - selections
+      summary: 'Get the mean aggregate values for a selection'
+      description: Get the mean values from a selection's aggregates
+      operationId: GetSelectionMeanValues
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            description: Array containing the mean values from the aggregates for each tag in the selection.
+            type: array
+            items:
+              type: object
+              title: Tag Path and Mean Value
+              properties:
+                path:
+                  description: The tag path
+                  type: string
+                mean:
+                  description: Mean value from the tag's aggregates
+                  type: number
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
   /v2/selections/{id}/values/aggregates/count:
     get:
       tags:
@@ -479,6 +721,77 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/reset-aggregates:
+    post:
+      tags:
+        - selections
+      summary: 'Reset the aggregates of all tags in a selection'
+      description: Reset the aggregates of all tags in a selection
+      operationId: ResetSelectionAggregates
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        204:
+          description: No Content
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{path}:
+    put:
+      tags:
+        - tags
+      summary: 'Create or replace tag'
+      description: 'Replace the tag at <path>, or create one if one doesn''t exist. A complete resource representation must be sent (no partial updates).'
+      operationId: CreateOrReplaceTag
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+        - in: body
+          name: tag
+          description: Tag to create or replace
+          schema:
+            $ref: '#/definitions/Tag'
+          required: true
+      responses:
+        201:
+          description: 'Created: Tag created successfully'
+        204:
+          description: 'No Content: Tag replaced successfully'
+        401:
+          $ref: '#/responses/Unauthorized'
+        409:
+          description: 'Conflict: Type change not supported'
+    get:
+      tags:
+        - tags
+      summary: 'Get tag'
+      description: Get the metadata of a single tag.
+      operationId: GetTag
+      parameters:
+        - in: path
+          name: path
+          description: The tag path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Tag'
+        401:
+          $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
   /v2/tags-count:
@@ -566,71 +879,6 @@ paths:
           description: Used for pagination. Specfies the number of entries to include in the response list. Typically used in combination with the skip parameter.
           type: integer
           required: false
-  /v2/selections/{id}/tags-with-values:
-    get:
-      tags:
-        - selections
-      summary: 'Get current values in selection'
-      description: Get the current values and aggregates of the tags in a selection.
-      operationId: GetSelectionTagsWithValues
-      parameters:
-        - in: path
-          name: id
-          description: The selection ID
-          type: string
-          required: true
-      responses:
-        200:
-          description: Success
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/TagsWithValues'
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given id not found
-        default:
-          $ref: '#/responses/Error'
-  /v2/selections/{id}/values/current/timestamp:
-    get:
-      tags:
-        - selections
-      summary: 'Get the current value timestamps for the tags in a selection'
-      # TODO: is it really the current value timestamp here?
-      description: Get the current value timestamps for the tags in a selection
-      operationId: GetSelectionValuesCurrentTimestamp
-      parameters:
-        - in: path
-          name: id
-          description: The selection ID
-          type: string
-          required: true
-      responses:
-        200:
-          description: Success
-          schema:
-            description: Array containing the paths of the tags in the selection, along with the timestamp of their current values.
-            type: array
-            # TODO: verify this is really an array.. cloud called it an object initially
-            title: Tag Paths With Timestamps
-            items:
-              type: object
-              title: Tag Path and Timestamp
-              description: A tag path and the timestamp of it's current value
-              properties:
-                timestamp:
-                  description: The current value's timestamp
-                  type: string
-                path:
-                  description: The tag path
-                  type: string
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
-        default:
-          $ref: '#/responses/Error'
   /v2/tags-rpc/update-current-values:
     post:
       tags:
@@ -779,67 +1027,6 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v2/selections/{id}/values:
-    get:
-      tags:
-        - selections
-      summary: 'Get the values of the tags in a selection'
-      description: Get the current values of the tags in a given selection
-      operationId: GetSelectionValues
-      parameters:
-        - in: path
-          name: id
-          description: Selection ID
-          type: string
-          required: true
-      responses:
-        200:
-          description: Success
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/TagPathCurrentAndAggregateValue'
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
-        default:
-          $ref: '#/responses/Error'
-  /v2/selections/{id}/values/current:
-    get:
-      tags:
-        - selections
-      summary: 'Get the current times values of the tags in a selection with timestamps'
-      description: Get the current values of the tags in a selection with timestamps
-      operationId: GetSelectionCurrentTimestampedValues
-      parameters:
-        - in: path
-          name: id
-          description: The selection id
-          type: string
-          required: true
-      responses:
-        200:
-          description: Success
-          schema:
-            type: array
-            items:
-              description: Tag path with current value (timestamped)
-              type: object
-              title: Tag Path With Current Value
-              properties:
-                path:
-                  type: string
-                  description: Tag path
-                current:
-                  $ref: '#/definitions/TagCurrentValue'
-                  # TODO: should be TagCurrentTimestampedValue
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
-        default:
-          $ref: '#/responses/Error'
   /v2/tags/{path}/values/aggregates/min:
     get:
       tags:
@@ -888,75 +1075,6 @@ paths:
           description: Bad Request
         401:
           $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-  /v2/selections/{id}/values/aggregates/max:
-    get:
-      tags:
-        - selections
-      summary: 'Get the maximum value from the aggregates of a selection''s tags'
-      description: Get the maximum value from the aggregates of a selection's tags
-      operationId: GetSelectionMaxAggregates
-      parameters:
-        - in: path
-          name: id
-          description: Selection ID
-          type: string
-          required: true
-      responses:
-        200:
-          description: Success
-          schema:
-            type: array
-            items:
-              description: The tag path with the maximum value from its aggregates
-              type: object
-              title: Tag Path With Aggregate Max
-              properties:
-                path:
-                  description: Tag path
-                  type: string
-                max:
-                  description: Maximum value from the tag's aggregates
-                  type: number
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
-        default:
-          $ref: '#/responses/Error'
-  /v2/selections/{id}/values/current/value:
-    get:
-      tags:
-        - selections
-      summary: 'Get the current values of the tags in a selection (without timestamps)'
-      description: Get the current timestamped values of the tags in a selection
-      operationId: GetSelectionCurrentValues
-      parameters:
-        - in: path
-          name: id
-          description: Selection ID
-          type: string
-          required: true
-      responses:
-        200:
-          description: Success
-          schema:
-            type: array
-            items:
-              description: Tag path with timestamped value
-              type: object
-              title: Tag Path With Value
-              properties:
-                path:
-                  type: string
-                  description: Tag path
-                current:
-                  $ref: '#/definitions/TagValue'
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/tags-rpc/subscriptions/heartbeat:
@@ -1025,75 +1143,6 @@ paths:
             items:
               $ref: '#/definitions/TagCurrentValue'
           required: true
-  /v2/selections:
-    post:
-      tags:
-        - selections
-      summary: 'Create selection'
-      description: Create a selection containing a collection of tags to perform subsequent operations on.
-      operationId: CreateSelection
-      parameters:
-        - in: body
-          name: selection
-          description: The selection to create
-          schema:
-            $ref: '#/definitions/Selection'
-          required: false
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: '#/definitions/Selection'
-        400:
-          description: Bad Request
-        401:
-          $ref: '#/responses/Unauthorized'
-        409:
-          description: Duplicate selection
-        default:
-          $ref: '#/responses/Error'
-    get:
-      tags:
-        - selections
-      summary: 'Get all selections'
-      description: Get all selections.
-      operationId: GetSelections
-      parameters: []
-      responses:
-        200:
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Selection'
-          description: Success
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID not found
-        default:
-          $ref: '#/responses/Error'
-  /v2/selections/{id}/reset-aggregates:
-    post:
-      tags:
-        - selections
-      summary: 'Reset the aggregates of all tags in a selection'
-      description: Reset the aggregates of all tags in a selection
-      operationId: ResetSelectionAggregates
-      parameters:
-        - in: path
-          name: id
-          description: Selection ID
-          type: string
-          required: true
-      responses:
-        204:
-          description: No Content
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID not found
-        default:
-          $ref: '#/responses/Error'
   /v2/tags/{path}/values/current:
     put:
       tags:
@@ -1199,54 +1248,6 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           description: Tag with the given path not found
-        default:
-          $ref: '#/responses/Error'
-  /v2/selections/{id}/tags:
-    get:
-      tags:
-        - selections
-      summary: 'Get the tags in a selection'
-      # TODO: in the description, mention if the selections have current values
-      description: Get the tags in a selection.
-      operationId: GetSelectionTags
-      parameters:
-        - in: path
-          name: id
-          description: Selection ID
-          type: string
-          required: true
-      responses:
-        200:
-          description: Success
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Tag'
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
-        default:
-          $ref: '#/responses/Error'
-    delete:
-      tags:
-        - selections
-      summary: 'Delete all of the tags in a selection'
-      description: Delete all of the tags in a seletion
-      operationId: DeleteSelectionTags
-      parameters:
-        - in: path
-          name: id
-          description: Selection ID
-          type: string
-          required: true
-      responses:
-        204:
-          description: Successfully deleted
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/update-tags:
