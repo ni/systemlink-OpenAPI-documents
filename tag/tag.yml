@@ -882,6 +882,21 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+  /v2/tags-count:
+    get:
+      tags:
+        - tags
+      summary: 'Get the total number of tags'
+      description: Get a count of the total number of tags.
+      operationId: GetTagCount
+      parameters: []
+      responses:
+        200:
+          description: Contains the number of tags
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v2/tags-with-values:
     get:
       tags:
@@ -1136,7 +1151,7 @@ paths:
   /v2/tags/{path}/values/aggregates/min:
     get:
       tags:
-        - tags
+        - tagAggregates
       # TODO: should this be tagCurrentValueAggregates?
       summary: 'Get the minimum value from a tag''s aggregates'
       description: Get the minimum value from a tag's aggregates
@@ -1161,7 +1176,7 @@ paths:
   /v2/tags/{path}/values/aggregates/max:
     get:
       tags:
-        - tags
+        - tagAggregates
       # TODO: should the tag be tagCurrentValueAggregates?
       summary: 'Get the maximum value from a tag''s aggregates'
       description: Get the maximum value from a tag''s aggregates'
@@ -1184,10 +1199,36 @@ paths:
           description: Tag path
           type: string
           required: true
+  /v2/tags/{path}/values/aggregates/mean:
+    get:
+      tags:
+        - tagAggregates
+      # TODO: should the tag be tagCurrentValueAggregates?
+      summary: 'Get the mean value from a tag''s aggregates'
+      description: Get the mean value from a tag''s aggregates'
+      operationId: GetTagMeanAggregate
+      responses:
+        200:
+          description: Aggregate value
+          # TODO: for this and other 200 responses which don't have a schema but return something, we should probably have a schema!
+        204:
+          description: No aggregate value found
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Tag with the given path not found
+        default:
+          $ref: '#/responses/Error'
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
   /v2/tags/{path}/values/aggregates/count:
     get:
       tags:
-        - tags
+        - tagAggregates
         # TODO: should this be tagsCurrentValueAggregates?
       summary: 'Get the count value from a tag''s aggregates'
       # TODO: maybe "Get the value of a tag's 'count' aggregate"
@@ -1213,7 +1254,7 @@ paths:
   /v2/tags/{path}/reset-aggregates:
     post:
       tags:
-        - tags
+        - tagAggregates
       # TODO: tag with tagsCurrentValueAggregates or tags?
       summary: 'Reset the aggregates of a tag'
       description: Reset tag aggregates
@@ -1296,22 +1337,6 @@ paths:
             items:
               $ref: '#/definitions/TagCurrentValue'
           required: true
-  /v2/tags-count:
-    get:
-      tags:
-        - tags
-      summary: 'Get the total number of tags'
-      description: Get a count of the total number of tags.
-      operationId: GetTagCount
-      parameters: []
-      responses:
-        200:
-          description: Contains the number of tags
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-
 
 definitions:
   Error:
