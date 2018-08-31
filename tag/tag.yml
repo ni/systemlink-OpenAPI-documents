@@ -1374,25 +1374,28 @@ definitions:
       args: []
       innerErrors:
         - name: Message.SessionTokenNotFound
+          # TODO: tag-specific example
           code: -251608
           resourceType:
           resourceId:
           message: Session token 'f755d531-2403-433f-a0b7-463ccb8f2b9' not found.
           args: ['f755d531-2403-433f-a0b7-463ccb8f2b9']
+  # TODO: examples for all of these guys
   TagsWithValues:
+    description: A list of tags with current values and the total count
     type: object
-    title: Tag List with current values
+    title: Tag List with Current Values
     properties:
       totalCount:
-        type: integer
         description: The total tag count
+        type: integer
       tagsWithValues:
+        description: A list of tags with their
         type: array
         items:
           $ref: '#/definitions/TagWithValue'
-        description: A list of tags with their
-    description: A list of tags with current values and the total count
   TagWithValue:
+    description: The tag and its current value
     type: object
     title: Tag with value
     properties:
@@ -1402,18 +1405,17 @@ definitions:
         $ref: '#/definitions/TagCurrentValue'
       aggregates:
         $ref: '#/definitions/TagAggregates'
-    description: The tag and its current value
   TagValue:
+    description: The value of a tag
     type: object
     title: Tag Value
     properties:
       value:
-        type: string
         description: Tag value
-      type:
         type: string
+      type:
         description: Tag type
-    description: The value of a tag
+        type: string
   TagPathCurrentAndAggregateValue:
     type: object
     title: Tag Path Current And Aggregate Value
