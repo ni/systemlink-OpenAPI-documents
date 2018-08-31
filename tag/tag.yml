@@ -146,7 +146,7 @@ paths:
         401:
           $ref: '#/responses/Unauthorized'
         404:
-          description: Subscription with the given id not found
+          description: Subscription with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/subscriptions/{id}/heartbeat:
@@ -430,7 +430,7 @@ paths:
         401:
           $ref: '#/responses/Unauthorized'
         404:
-          description: Selection with the given id not found
+          description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}/tags:
@@ -517,7 +517,7 @@ paths:
       parameters:
         - in: path
           name: id
-          description: The selection id
+          description: The selection ID
           type: string
           required: true
       responses:
@@ -1513,7 +1513,7 @@ definitions:
         type: array
         items:
           type: string
-        description: The list of invalid subscription ids
+        description: The list of invalid subscription IDs
     description: The updates for a list of subscriptions
   SubscriptionUpdate:
     type: object
@@ -1596,5 +1596,5 @@ definitions:
         description: The inactivity timeout
       id:
         type: string
-        description: The selection id
+        description: The selection ID
     description: The selection details
