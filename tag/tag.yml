@@ -193,6 +193,39 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+  /v2/tags-rpc/subscriptions/heartbeat:
+    post:
+      tags:
+        - subscriptions
+      summary: 'Update the heartbeat timer of multiple subscriptions'
+      description: Updates the heartbeat timers of multiple subscriptions
+      operationId: UpdateSubscriptionHeartbeats
+      parameters:
+        - in: body
+          name: subscriptionIds
+          description: Subscription IDs
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            description: The update subscriptions heartbeat response
+            type: object
+            title: Update Subscriptions Heartbeat Response
+            properties:
+              invalidSubscriptionIds:
+                description: List of invalid subscription IDs
+                type: array
+                items:
+                  type: string
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v2/tags-rpc/subscriptions/query-values:
     post:
       tags:
@@ -448,7 +481,6 @@ paths:
           description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
-
   /v2/selections/{id}/values:
     get:
       tags:
@@ -745,218 +777,41 @@ paths:
           description: Selection with the given ID not found
         default:
           $ref: '#/responses/Error'
-  /v2/tags/{path}:
-    put:
+  /v2/update-tags:
+    post:
       tags:
         - tags
-      summary: 'Create or replace tag'
-      description: 'Replace the tag at <path>, or create one if one doesn''t exist. A complete resource representation must be sent (no partial updates).'
-      operationId: CreateOrReplaceTag
+      summary: 'Create or update multiple tags'
+      description: Create or update multiple tags in one request.
+      operationId: CreateOrUpdateTags
       parameters:
-        - in: path
-          name: path
-          description: Tag path
-          type: string
-          required: true
         - in: body
-          name: tag
-          description: Tag to create or replace
+          name: tagsAndMerge
+          description: The tags to create or update, and a flag specifying whether keywords and properties should be merged for updates.
           schema:
-            $ref: '#/definitions/Tag'
+            type: array
+            items:
+              type: object
+              title: Tag List and Merge Flag
+              properties:
+                tags:
+                  description: A list of tags
+                  type: array
+                  items:
+                    $ref: '#/definitions/Tag'
+                merge:
+                  description: 'If set, performs a merge of any specified Keywords or Properties.'
+                  type: boolean
           required: true
       responses:
         201:
-          description: 'Created: Tag created successfully'
-        204:
-          description: 'No Content: Tag replaced successfully'
+          description: Created
+        400:
+          description: Bad Request
         401:
           $ref: '#/responses/Unauthorized'
         409:
           description: 'Conflict: Type change not supported'
-    get:
-      tags:
-        - tags
-      summary: 'Get tag'
-      description: Get the metadata of a single tag.
-      operationId: GetTag
-      parameters:
-        - in: path
-          name: path
-          description: The tag path
-          type: string
-          required: true
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: '#/definitions/Tag'
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-  /v2/tags-count:
-    get:
-      tags:
-        - tags
-      summary: 'Get the total number of tags'
-      description: Get a count of the total number of tags.
-      operationId: GetTagCount
-      parameters: []
-      responses:
-        200:
-          description: Contains the number of tags
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-  /v2/tags/{path}/reset-aggregates:
-    post:
-      tags:
-        - tags
-      # TODO: tag with tagsCurrentValueAggregates or tags?
-      summary: 'Reset tag aggregates'
-      description: Reset tag aggregates
-      operationId: ResetTagAggregates
-      parameters:
-        - in: path
-          name: path
-          description: The tag path
-          type: string
-          required: true
-      responses:
-        200:
-          description: Success
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Tag with the given path not found
-        default:
-          $ref: '#/responses/Error'
-  /v2/tags-with-values:
-    get:
-      tags:
-        - tags
-      # TODO: tag with tagCurrentValue or tags?
-      summary: 'Get current values'
-      responses:
-        200:
-          schema:
-            $ref: '#/definitions/TagsWithValues'
-          description: Success
-        400:
-          description: Bad Request
-        401:
-          $ref: '#/responses/Unauthorized'
-        409:
-          description: Conflict
-        default:
-          $ref: '#/responses/Error'
-      description: 'Get a list of tags with their values in a single request, filtered based on the provided query parameters.'
-      operationId: GetTagsWithValues
-      parameters:
-        - in: query
-          name: path
-          description: Comma-separated list of tag paths. May include glob-style wildcards.
-          type: string
-          required: false
-        - in: query
-          name: keywords
-          description: Comma-separated list of case-sensitive keywords
-          type: string
-          required: false
-        - in: query
-          name: properties
-          description: Comma-separated list of key/value property pairs
-          type: string
-          required: false
-        - in: query
-          name: skip
-          description: Used for pagination. Specifies the number of entries to skip in the response list. Typically used in combination with the take parameter.
-          type: integer
-          required: false
-        - in: query
-          name: take
-          description: Used for pagination. Specfies the number of entries to include in the response list. Typically used in combination with the skip parameter.
-          type: integer
-          required: false
-  /v2/tags-rpc/update-current-values:
-    post:
-      tags:
-        - tags
-      # TODO: should this be tagged with tagsRpc?
-      summary: 'Update the current values of multiple tags'
-      description: Push multiple current value updates to multiple tags in one request.
-      operationId: UpdateTagCurrentValues
-      parameters: []
-      responses:
-        200:
-          description: Success
-          schema:
-            type: object
-            title: Tag Updates
-            properties:
-              updates:
-                description: Updates to apply
-                type: array
-                items:
-                  $ref: '#/definitions/TagCurrentAndAggregateValue'
-              path:
-                type: string
-                description: Tag path
-        400:
-          description: Bad Request
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-  /v2/tags/{path}/values/current/timestamp:
-    get:
-      tags:
-        - tags
-      # TODO: should this be tagged with tagsCurrentValue?
-      summary: 'Get current value timestamp'
-      description: Get tag most recent timestamp.
-      operationId: get-tag-values-current-timestamp
-      parameters:
-        - in: path
-          name: path
-          description: The tag path
-          type: string
-          required: true
-      responses:
-        200:
-          description: Timestamp
-        204:
-          description: No timestamped value found
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Tag not found
-        default:
-          $ref: '#/responses/Error'
-  /v2/tags/{path}/values:
-    get:
-      tags:
-        - tags
-      # TODO: should this be tagsCurrentValue?
-      summary: 'Get current value'
-      description: Get the current and aggregate values for the tag at <path>.
-      operationId: get-tag-values
-      parameters:
-        - in: path
-          name: path
-          description: Tag path
-          type: string
-          required: true
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: '#/definitions/TagCurrentAndAggregateValue'
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Tag not found
         default:
           $ref: '#/responses/Error'
   /v2/tags:
@@ -1027,37 +882,59 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v2/tags/{path}/values/aggregates/min:
+  /v2/tags-with-values:
     get:
       tags:
         - tags
-      # TODO: should this be tagCurrentValueAggregates?
-      summary: 'Get the minimum value from a tag''s aggregates'
-      description: Get the minimum value from a tag's aggregates
-      operationId: GetTagMinimum
-      parameters:
-        - in: path
-          name: path
-          description: The tag path
-          type: string
-          required: true
+      # TODO: tag with tagCurrentValue or tags?
+      summary: 'Get the current values of multiple tags'
       responses:
         200:
-          description: The aggregate value
-        204:
-          description: No aggregate value found
+          schema:
+            $ref: '#/definitions/TagsWithValues'
+          description: Success
+        400:
+          description: Bad Request
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Tag with the given path not found
+        409:
+          description: Conflict
         default:
           $ref: '#/responses/Error'
+      description: 'Get a list of tags with their values in a single request, filtered based on the provided query parameters.'
+      operationId: GetTagsWithValues
+      parameters:
+        - in: query
+          name: path
+          description: Comma-separated list of tag paths. May include glob-style wildcards.
+          type: string
+          required: false
+        - in: query
+          name: keywords
+          description: Comma-separated list of case-sensitive keywords
+          type: string
+          required: false
+        - in: query
+          name: properties
+          description: Comma-separated list of key/value property pairs
+          type: string
+          required: false
+        - in: query
+          name: skip
+          description: Used for pagination. Specifies the number of entries to skip in the response list. Typically used in combination with the take parameter.
+          type: integer
+          required: false
+        - in: query
+          name: take
+          description: Used for pagination. Specfies the number of entries to include in the response list. Typically used in combination with the skip parameter.
+          type: integer
+          required: false
   /v2/tags-with-values/{path}:
     get:
       tags:
         - tags
       # TODO: should this be tagsCurrentValue?
-      summary: 'Get a tag and its value'
+      summary: 'Get a tag and its current value'
       description: Get a tag and its value
       operationId: GetTagWithValue
       parameters:
@@ -1077,58 +954,13 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v2/tags-rpc/subscriptions/heartbeat:
-    post:
-      tags:
-        - subscriptions
-      summary: 'Update the heartbeat timer of multiple subscriptions'
-      description: Updates the heartbeat timers of multiple subscriptions
-      operationId: UpdateSubscriptionHeartbeats
-      parameters:
-        - in: body
-          name: subscriptionIds
-          description: Subscription IDs
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-      responses:
-        200:
-          description: Success
-          schema:
-            description: The update subscriptions heartbeat response
-            type: object
-            title: Update Subscriptions Heartbeat Response
-            properties:
-              invalidSubscriptionIds:
-                description: List of invalid subscription IDs
-                type: array
-                items:
-                  type: string
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-  /v2/tags/{path}/update-values:
-    post:
+  /v2/tags/{path}:
+    put:
       tags:
         - tags
-      # TODDO: should this be tagscurrentvalue?
-      summary: 'Send multiple value updates to a tag'
-      description: Push a list of current value update objects to update the value of the tag at <path> multiple times. This can be used to send value history in bulk.
-      operationId: update-tag-values
-      responses:
-        200:
-          description: Tag Values Updated
-        400:
-          description: Bad Request
-        401:
-          $ref: '#/responses/Unauthorized'
-        409:
-          description: Conflict
-        default:
-          $ref: '#/responses/Error'
+      summary: 'Create or replace a tag'
+      description: 'Replace the tag at <path>, or create one if one doesn''t exist. A complete resource representation must be sent (no partial updates).'
+      operationId: CreateOrReplaceTag
       parameters:
         - in: path
           name: path
@@ -1136,14 +968,91 @@ paths:
           type: string
           required: true
         - in: body
-          name: tagValues
-          description: Timestamped values
+          name: tag
+          description: Tag to create or replace
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/TagCurrentValue'
+            $ref: '#/definitions/Tag'
           required: true
+      responses:
+        201:
+          description: 'Created: Tag created successfully'
+        204:
+          description: 'No Content: Tag replaced successfully'
+        401:
+          $ref: '#/responses/Unauthorized'
+        409:
+          description: 'Conflict: Type change not supported'
+    get:
+      tags:
+        - tags
+      summary: 'Get a tag'
+      description: Get the metadata of a single tag.
+      operationId: GetTag
+      parameters:
+        - in: path
+          name: path
+          description: The tag path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Tag'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{path}/values:
+    get:
+      tags:
+        - tags
+      # TODO: should this be tagsCurrentValue?
+      summary: 'Get the aggregates and current value of a tag'
+      description: Get the current and aggregate values for the tag at <path>.
+      operationId: get-tag-values
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/TagCurrentAndAggregateValue'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Tag not found
+        default:
+          $ref: '#/responses/Error'
   /v2/tags/{path}/values/current:
+    get:
+      tags:
+        - tags
+      # TODO: should this be tagsCurrentValue?
+      summary: 'Get the current value of a tag'
+      description: Get the current value of the tag at <path>.
+      operationId: get-tag-values-current
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/TagCurrentValue'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Tag not found
+        default:
+          $ref: '#/responses/Error'
     put:
       tags:
         - tags
@@ -1174,28 +1083,79 @@ paths:
           schema:
             $ref: '#/definitions/TagCurrentValue'
           required: true
+  /v2/tags/{path}/values/current/timestamp:
     get:
       tags:
         - tags
-      # TODO: should this be tagsCurrentValue?
-      summary: 'Get the current value of a tag'
-      description: Get the current value of the tag at <path>.
-      operationId: get-tag-values-current
+      # TODO: should this be tagged with tagsCurrentValue?
+      summary: 'Get the timestamp of a tag''s current value'
+      description: Get tag most recent timestamp.
+      operationId: get-tag-values-current-timestamp
       parameters:
         - in: path
           name: path
-          description: Tag path
+          description: The tag path
           type: string
           required: true
       responses:
         200:
-          description: Success
-          schema:
-            $ref: '#/definitions/TagCurrentValue'
+          description: Timestamp
+        204:
+          description: No timestamped value found
         401:
           $ref: '#/responses/Unauthorized'
         404:
           description: Tag not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{path}/values/current/value:
+    get:
+      tags:
+        - tags
+      # TODO: should this be tagsCurrentValue?
+      summary: 'Get the current value of a tag without its timestamp'
+      description: Get the current value of a tag
+      operationId: GetTagCurrentValue
+      parameters:
+        - in: path
+          name: path
+          description: The tag path
+          type: string
+          required: true
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/TagValue'
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Tag not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{path}/values/aggregates/min:
+    get:
+      tags:
+        - tags
+      # TODO: should this be tagCurrentValueAggregates?
+      summary: 'Get the minimum value from a tag''s aggregates'
+      description: Get the minimum value from a tag's aggregates
+      operationId: GetTagMinimum
+      parameters:
+        - in: path
+          name: path
+          description: The tag path
+          type: string
+          required: true
+      responses:
+        200:
+          description: The aggregate value
+        204:
+          description: No aggregate value found
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Tag with the given path not found
         default:
           $ref: '#/responses/Error'
   /v2/tags/{path}/values/aggregates/max:
@@ -1250,51 +1210,14 @@ paths:
           description: Tag with the given path not found
         default:
           $ref: '#/responses/Error'
-  /v2/update-tags:
+  /v2/tags/{path}/reset-aggregates:
     post:
       tags:
         - tags
-      summary: 'Create or update multiple tags'
-      description: Create or update multiple tags in one request.
-      operationId: CreateOrUpdateTags
-      parameters:
-        - in: body
-          name: tagsAndMerge
-          description: The tags to create or update, and a flag specifying whether keywords and properties should be merged for updates.
-          schema:
-            type: array
-            items:
-              type: object
-              title: Tag List and Merge Flag
-              properties:
-                tags:
-                  description: A list of tags
-                  type: array
-                  items:
-                    $ref: '#/definitions/Tag'
-                merge:
-                  description: 'If set, performs a merge of any specified Keywords or Properties.'
-                  type: boolean
-          required: true
-      responses:
-        201:
-          description: Created
-        400:
-          description: Bad Request
-        401:
-          $ref: '#/responses/Unauthorized'
-        409:
-          description: 'Conflict: Type change not supported'
-        default:
-          $ref: '#/responses/Error'
-  /v2/tags/{path}/values/current/value:
-    get:
-      tags:
-        - tags
-      # TODO: should this be tagsCurrentValue?
-      summary: 'Get the current value of a tag'
-      description: Get the current value of a tag
-      operationId: GetTagCurrentValue
+      # TODO: tag with tagsCurrentValueAggregates or tags?
+      summary: 'Reset the aggregates of a tag'
+      description: Reset tag aggregates
+      operationId: ResetTagAggregates
       parameters:
         - in: path
           name: path
@@ -1303,15 +1226,93 @@ paths:
           required: true
       responses:
         200:
-          schema:
-            $ref: '#/definitions/TagValue'
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
         404:
-          description: Tag not found
+          description: Tag with the given path not found
         default:
           $ref: '#/responses/Error'
+  /v2/tags-rpc/update-current-values:
+    post:
+      tags:
+        - tags
+      # TODO: should this be tagged with tagsRpc?
+      summary: 'Update the current values of multiple tags'
+      description: Push multiple current value updates to multiple tags in one request.
+      operationId: UpdateTagCurrentValues
+      parameters: []
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            title: Tag Updates
+            properties:
+              updates:
+                description: Updates to apply
+                type: array
+                items:
+                  $ref: '#/definitions/TagCurrentAndAggregateValue'
+              path:
+                type: string
+                description: Tag path
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{path}/update-values:
+    post:
+      tags:
+        - tags
+      # TODDO: should this be tagscurrentvalue?
+      summary: 'Send multiple value updates to a tag'
+      description: Push a list of current value update objects to update the value of the tag at <path> multiple times. This can be used to send value history in bulk.
+      operationId: update-tag-values
+      responses:
+        200:
+          description: Tag Values Updated
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        409:
+          description: Conflict
+        default:
+          $ref: '#/responses/Error'
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+        - in: body
+          name: tagValues
+          description: Timestamped values
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TagCurrentValue'
+          required: true
+  /v2/tags-count:
+    get:
+      tags:
+        - tags
+      summary: 'Get the total number of tags'
+      description: Get a count of the total number of tags.
+      operationId: GetTagCount
+      parameters: []
+      responses:
+        200:
+          description: Contains the number of tags
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+
+
 definitions:
   Error:
     description: Contains error information
