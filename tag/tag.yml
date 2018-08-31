@@ -31,7 +31,7 @@ responses:
         description: Information for how to authenticate (sent only from SystemLink Server).
         type: string
   Error:
-    description: Error
+    description: Error (sent only from SystemLink Server)
     schema:
       description: Error response
       title: ErrorResponse
@@ -41,11 +41,1205 @@ responses:
           $ref: '#/definitions/Error'
 
 paths:
-  /nitag/v2/tags-rpc/subscriptions/query-values:
+  /v2/tags-rpc/subscriptions/query-values:
     post:
       tags:
-        - Subscriptions
-      summary: ''
+        - subscriptions
+      summary: 'Get subscription values'
+      description: Get the current values for all tags in multiple subscriptions
+      operationId: GetSubscriptionsTagValues
+      parameters:
+        - in: body
+          name: subscriptionIds
+          description: Subscription IDs
+          schema:
+            type: array
+            items:
+              type: string
+          required: false
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/SubscriptionUpdates'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Subscription with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags-rpc/subscriptions/delete:
+    post:
+      tags:
+        - subscriptions
+      summary: 'Delete multiple subscriptions'
+      description: Delete one or more subscriptions based on the request body.
+      operationId: DeleteSubscriptions
+      parameters:
+        - in: body
+          name: subscriptionIds
+          description: Subscription IDs
+          schema:
+            type: array
+            items:
+              type: string
+          required: false
+      responses:
+        200:
+          description: Success
+          schema:
+            description: Response for deleting subscriptions
+            type: object
+            title: Delete Subscriptions Response
+            properties:
+              invalidSubscriptionIds:
+                description: List of invalid subscription IDs
+                type: array
+                items:
+                  type: string
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/values/aggregates/mean:
+    get:
+      tags:
+        - selections
+      summary: 'Get the mean aggregate values for a selection'
+      description: Get the mean values from a selection's aggregates
+      operationId: GetSelectionMeanValues
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            description: Array containing the mean values from the aggregates for each tag in the selection.
+            type: array
+            items:
+              type: object
+              title: Tag Path and Mean Value
+              properties:
+                path:
+                  description: The tag path
+                  type: string
+                mean:
+                  description: Mean value from the tag's aggregates
+                  type: number
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{path}:
+    put:
+      tags:
+        - tags
+      summary: 'Create or replace tag'
+      description: 'Replace the tag at <path>, or create one if one doesn''t exist. A complete resource representation must be sent (no partial updates).'
+      operationId: CreateOrReplaceTag
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+        - in: body
+          name: tag
+          description: Tag to create or replace
+          schema:
+            $ref: '#/definitions/Tag'
+          required: true
+      responses:
+        201:
+          description: 'Created: Tag created successfully'
+        204:
+          description: 'No Content: Tag replaced successfully'
+        401:
+          $ref: '#/responses/Unauthorized'
+        409:
+          description: 'Conflict: Type change not supported'
+    get:
+      tags:
+        - tags
+      summary: 'Get tag'
+      description: Get the metadata of a single tag.
+      operationId: GetTag
+      parameters:
+        - in: path
+          name: path
+          description: The tag path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Tag'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/values/aggregates/min:
+    get:
+      tags:
+        - selections
+      summary: 'Get the minimum aggregate values for a selection'
+      description: Get the minimum values from a selection's aggregates
+      operationId: GetSelectionMinValues
+      parameters:
+        - in: path
+          name: id
+          description: The selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            description: Array containing the minimum values from the aggregates for each tag in the selection.
+            type: array
+            items:
+              type: object
+              title: Tag Paths and Count Values
+              properties:
+                path:
+                  description: Tag path
+                  type: string
+                min:
+                  description: Countum value from the tag's aggregates
+                  type: number
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}:
+    put:
+      tags:
+        - selections
+      summary: 'Update selection'
+      description: Modify a selection
+      operationId: UpdateSelection
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+        - in: body
+          name: selection
+          description: Selection to replace the existing selection with
+          schema:
+            $ref: '#/definitions/Selection'
+          required: false
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/Selection'
+          description: Success
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+    get:
+      tags:
+        - selections
+      summary: 'Get selection'
+      description: Get a selection's metadata.
+      operationId: GetSelection
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/Selection'
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags:
+        - selections
+      summary: 'Delete selection'
+      description: Delete a selection
+      operationId: DeleteSelection
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        204:
+          description: Successfully deleted
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+  /v2/selections/{id}/values/aggregates/count:
+    get:
+      tags:
+        - selections
+      summary: 'Get the count aggregate values for a selection'
+      description: Get the count aggregate values from a selection's aggregates
+      operationId: GetSelectionCountValues
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            description: Array containing the count values from the aggregates for each tag in the selection.
+            type: array
+            items:
+              type: object
+              title: Tag Paths and Count Values
+              properties:
+                path:
+                  description: Tag path
+                  type: string
+                count:
+                  description: Count value from the tag's aggregates
+                  type: number
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags-count:
+    get:
+      tags:
+        - tags
+      summary: 'Get the total number of tags'
+      description: Get a count of the total number of tags.
+      operationId: GetTagCount
+      parameters: []
+      responses:
+        200:
+          description: Contains the number of tags
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{path}/reset-aggregates:
+    post:
+      tags:
+        - tags
+      # TODO: tag with tagsCurrentValueAggregates or tags?
+      summary: 'Reset tag aggregates'
+      description: Reset tag aggregates
+      operationId: ResetTagAggregates
+      parameters:
+        - in: path
+          name: path
+          description: The tag path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Tag with the given path not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags-with-values:
+    get:
+      tags:
+        - tags
+      # TODO: tag with tagCurrentValue or tags?
+      summary: 'Get current values'
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/TagsWithValues'
+          description: Success
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        409:
+          description: Conflict
+        default:
+          $ref: '#/responses/Error'
+      description: 'Get a list of tags with their values in a single request, filtered based on the provided query parameters.'
+      operationId: GetTagsWithValues
+      parameters:
+        - in: query
+          name: path
+          description: Comma-separated list of tag paths. May include glob-style wildcards.
+          type: string
+          required: false
+        - in: query
+          name: keywords
+          description: Comma-separated list of case-sensitive keywords
+          type: string
+          required: false
+        - in: query
+          name: properties
+          description: Comma-separated list of key/value property pairs
+          type: string
+          required: false
+        - in: query
+          name: skip
+          description: Used for pagination. Specifies the number of entries to skip in the response list. Typically used in combination with the take parameter.
+          type: integer
+          required: false
+        - in: query
+          name: take
+          description: Used for pagination. Specfies the number of entries to include in the response list. Typically used in combination with the skip parameter.
+          type: integer
+          required: false
+  /v2/selections/{id}/tags-with-values:
+    get:
+      tags:
+        - selections
+      summary: 'Get current values in selection'
+      description: Get the current values and aggregates of the tags in a selection.
+      operationId: GetSelectionTagsWithValues
+      parameters:
+        - in: path
+          name: id
+          description: The selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TagsWithValues'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given id not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/subscriptions:
+    post:
+      tags:
+        - subscriptions
+      summary: 'Create subscription'
+      description: Create a subscription for a list of tags to get notifications when the tags change.
+      operationId: CreateSubscription
+      parameters:
+        - in: body
+          name: subscription
+          description: The subscription to create
+          schema:
+            $ref: '#/definitions/Subscription'
+          required: false
+      responses:
+        200:
+          description: Success
+          schema:
+            description: The response for creating a subscription
+            type: object
+            title: Create Subscription Response
+            properties:
+              subscriptionId:
+                description: The unique identifier of the subscription
+                type: string
+              nonexistentTags:
+                description: A list of tags which did not exist
+                type: array
+                items:
+                  type: string
+              alias:
+                type: string
+                description: The name of the subscription
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    get:
+      tags:
+        - subscriptions
+      summary: 'Get active subscription IDs'
+      description: Get a list of all active subscription IDs
+      operationId: GetSubscriptions
+      parameters: []
+      responses:
+        200:
+          description: Success
+          schema:
+            description: Get subscriptions response
+            type: object
+            title: Get Subscriptions Response
+            properties:
+              subscriptionIds:
+                description: List of all the active subscription IDs
+                type: array
+                items:
+                  type: string
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/values/current/timestamp:
+    get:
+      tags:
+        - selections
+      summary: 'Get the current value timestamps for the tags in a selection'
+      # TODO: is it really the current value timestamp here?
+      description: Get the current value timestamps for the tags in a selection
+      operationId: GetSelectionValuesCurrentTimestamp
+      parameters:
+        - in: path
+          name: id
+          description: The selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            description: Array containing the paths of the tags in the selection, along with the timestamp of their current values.
+            type: array
+            # TODO: verify this is really an array.. cloud called it an object initially
+            title: Tag Paths With Timestamps
+            items:
+              type: object
+              title: Tag Path and Timestamp
+              description: A tag path and the timestamp of it's current value
+              properties:
+                timestamp:
+                  description: The current value's timestamp
+                  type: string
+                path:
+                  description: The tag path
+                  type: string
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags-rpc/update-current-values:
+    post:
+      tags:
+        - tags
+      # TODO: should this be tagged with tagsRpc?
+      summary: 'Update the current values of multiple tags'
+      description: Push multiple current value updates to multiple tags in one request.
+      operationId: UpdateTagCurrentValues
+      parameters: []
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            title: Tag Updates
+            properties:
+              updates:
+                description: Updates to apply
+                type: array
+                items:
+                  $ref: '#/definitions/TagCurrentAndAggregateValue'
+              path:
+                type: string
+                description: Tag path
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{path}/values/current/timestamp:
+    get:
+      tags:
+        - tags
+      # TODO: should this be tagged with tagsCurrentValue?
+      summary: 'Get current value timestamp'
+      description: Get tag most recent timestamp.
+      operationId: get-tag-values-current-timestamp
+      parameters:
+        - in: path
+          name: path
+          description: The tag path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Timestamp
+        204:
+          description: No timestamped value found
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Tag not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/subscriptions/{id}:
+    get:
+      tags:
+        - subscriptions
+      summary: 'Get subscription'
+      description: Get a subscription's metadata
+      operationId: GetSubscription
+      parameters:
+        - in: path
+          name: id
+          description: Subscription ID
+          type: string
+          required: true
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/Subscription'
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Subscription with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags:
+        - subscriptions
+      summary: 'Delete a subscription'
+      description: Delete a specific subscription.
+      operationId: DeleteSubscription
+      parameters:
+        - in: path
+          name: id
+          description: Subscription ID
+          type: string
+          required: true
+      responses:
+        204:
+          description: Successfully deleted
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Subscription with the given id not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{path}/values:
+    get:
+      tags:
+        - tags
+      # TODO: should this be tagsCurrentValue?
+      summary: 'Get current value'
+      description: Get the current and aggregate values for the tag at <path>.
+      operationId: get-tag-values
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/TagCurrentAndAggregateValue'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Tag not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags:
+    post:
+      tags:
+        - tags
+      summary: 'Create or update a tag'
+      description: Create or update single tag. Performs a merge of any specified Keywords or Properties. Changing a tag's type is not supported.
+      operationId: CreateTag
+      parameters:
+        - in: body
+          name: tags
+          description: Tag to create
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Tag'
+          required: true
+      responses:
+        201:
+          description: 'Created: Tag created successfully'
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        409:
+          description: 'Conflict: Type change not supported'
+        default:
+          $ref: '#/responses/Error'
+    get:
+      tags:
+        - tags
+      summary: 'Get multiple tags'
+      description: 'Get a list of tags, filtered based on the provided query parameters.'
+      operationId: GetTags
+      parameters:
+        - in: query
+          name: path
+          description: Comma-separated list of tag paths. May include glob-style wildcards
+          type: string
+          required: false
+        - in: query
+          name: keywords
+          description: Comma-separated list of case-sensitive keywords.
+          type: string
+          required: false
+        - in: query
+          name: properties
+          description: Comma-separated list of key/value property pairs.
+          type: string
+          required: false
+        - in: query
+          name: skip
+          description: Used for pagination. Specifies the number of entries to skip in the response list. Typically used in combination with the take parameter.
+          type: integer
+          required: false
+        - in: query
+          name: take
+          description: Used for pagination. Specfies the number of entries to include in the response list. Typically used in combination with the skip parameter.
+          type: integer
+          required: false
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/TagList'
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/values:
+    get:
+      tags:
+        - selections
+      summary: 'Get the values of the tags in a selection'
+      description: Get the current values of the tags in a given selection
+      operationId: GetSelectionValues
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TagPathCurrentAndAggregateValue'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/values/current:
+    get:
+      tags:
+        - selections
+      summary: 'Get the current times values of the tags in a selection with timestamps'
+      description: Get the current values of the tags in a selection with timestamps
+      operationId: GetSelectionCurrentTimestampedValues
+      parameters:
+        - in: path
+          name: id
+          description: The selection id
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              description: Tag path with current value (timestamped)
+              type: object
+              title: Tag Path With Current Value
+              properties:
+                path:
+                  type: string
+                  description: Tag path
+                current:
+                  $ref: '#/definitions/TagCurrentValue'
+                  # TODO: should be TagCurrentTimestampedValue
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{path}/values/aggregates/min:
+    get:
+      tags:
+        - tags
+      # TODO: should this be tagCurrentValueAggregates?
+      summary: 'Get the minimum value from a tag''s aggregates'
+      description: Get the minimum value from a tag's aggregates
+      operationId: GetTagMinimum
+      parameters:
+        - in: path
+          name: path
+          description: The tag path
+          type: string
+          required: true
+      responses:
+        200:
+          description: The aggregate value
+        204:
+          description: No aggregate value found
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Tag with the given path not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags-with-values/{path}:
+    get:
+      tags:
+        - tags
+      # TODO: should this be tagsCurrentValue?
+      summary: 'Get a tag and its value'
+      description: Get a tag and its value
+      operationId: GetTagWithValue
+      parameters:
+        - in: path
+          name: path
+          description: The tag path
+          type: string
+          required: true
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/TagWithValue'
+          description: Success
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/values/aggregates/max:
+    get:
+      tags:
+        - selections
+      summary: 'Get the maximum value from the aggregates of a selection''s tags'
+      description: Get the maximum value from the aggregates of a selection's tags
+      operationId: GetSelectionMaxAggregates
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              description: The tag path with the maximum value from its aggregates
+              type: object
+              title: Tag Path With Aggregate Max
+              properties:
+                path:
+                  description: Tag path
+                  type: string
+                max:
+                  description: Maximum value from the tag's aggregates
+                  type: number
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/values/current/value:
+    get:
+      tags:
+        - selections
+      summary: 'Get the current values of the tags in a selection (without timestamps)'
+      description: Get the current timestamped values of the tags in a selection
+      operationId: GetSelectionCurrentValues
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              description: Tag path with timestamped value
+              type: object
+              title: Tag Path With Value
+              properties:
+                path:
+                  type: string
+                  description: Tag path
+                current:
+                  $ref: '#/definitions/TagValue'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags-rpc/subscriptions/heartbeat:
+    post:
+      tags:
+        - subscriptions
+      summary: 'Update heartbeat timer'
+      description: Updates the heartbeat timers of multiple subscriptions
+      operationId: UpdateSubscriptionHeartbeats
+      parameters:
+        - in: body
+          name: subscriptionIds
+          description: Subscription IDs
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            description: The update subscriptions heartbeat response
+            type: object
+            title: Update Subscriptions Heartbeat Response
+            properties:
+              invalidSubscriptionIds:
+                description: List of invalid subscription IDs
+                type: array
+                items:
+                  type: string
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{path}/update-values:
+    post:
+      tags:
+        - tags
+      # TODDO: should this be tagscurrentvalue?
+      summary: 'Send multiple value updates to a tag'
+      description: Push a list of current value update objects to update the value of the tag at <path> multiple times. This can be used to send value history in bulk.
+      operationId: update-tag-values
+      responses:
+        200:
+          description: Tag Values Updated
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        409:
+          description: Conflict
+        default:
+          $ref: '#/responses/Error'
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+        - in: body
+          name: tagValues
+          description: Timestamped values
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TagCurrentValue'
+          required: true
+  /v2/selections:
+    post:
+      tags:
+        - selections
+      summary: 'Create selection'
+      description: Create a selection containing a collection of tags to perform subsequent operations on.
+      operationId: CreateSelection
+      parameters:
+        - in: body
+          name: selection
+          description: The selection to create
+          schema:
+            $ref: '#/definitions/Selection'
+          required: false
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Selection'
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        409:
+          description: Duplicate selection
+        default:
+          $ref: '#/responses/Error'
+    get:
+      tags:
+        - selections
+      summary: 'Get all selections'
+      description: Get all selections.
+      operationId: GetSelections
+      parameters: []
+      responses:
+        200:
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Selection'
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/reset-aggregates:
+    post:
+      tags:
+        - selections
+      summary: 'Reset the aggregates of all tags in a selection'
+      description: Reset the aggregates of all tags in a selection
+      operationId: ResetSelectionAggregates
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        204:
+          description: No Content
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{path}/values/current:
+    put:
+      tags:
+        - tags
+      # TODO: shold the tag be tagsCurrentValue?
+      summary: 'Update the current value of a tag'
+      description: Update the current value of the tag at <path>.
+      operationId: UpdateTagCurrentValue
+      responses:
+        200:
+          description: Tag Value Updated
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        409:
+          description: Conflict
+        default:
+          $ref: '#/responses/Error'
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+        - in: body
+          name: tagValue
+          description: The timestamped value
+          schema:
+            $ref: '#/definitions/TagCurrentValue'
+          required: true
+    get:
+      tags:
+        - tags
+      # TODO: should this be tagsCurrentValue?
+      summary: 'Get the current value of a tag'
+      description: Get the current value of the tag at <path>.
+      operationId: get-tag-values-current
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/TagCurrentValue'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Tag not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{path}/values/aggregates/max:
+    get:
+      tags:
+        - tags
+      # TODO: should the tag be tagCurrentValueAggregates?
+      summary: 'Get the maximum value from a tag''s aggregates'
+      description: Get the maximum value from a tag''s aggregates'
+      operationId: GetTagMaxAggregate
+      responses:
+        200:
+          description: Aggregate value
+          # TODO: for this and other 200 responses which don't have a schema but return something, we should probably have a schema!
+        204:
+          description: No aggregate value found
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Tag with the given path not found
+        default:
+          $ref: '#/responses/Error'
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+  /v2/tags/{path}/values/aggregates/count:
+    get:
+      tags:
+        - tags
+        # TODO: should this be tagsCurrentValueAggregates?
+      summary: 'Get the count value from a tag''s aggregates'
+      # TODO: maybe "Get the value of a tag's 'count' aggregate"
+      description: Get the count value from a tag''s aggregates'
+      operationId: GetTagCountAggregate
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Aggregate value
+        204:
+          description: No aggregate value found
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Tag with the given path not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/subscriptions/{id}/heartbeat:
+    put:
+      tags:
+        - subscriptions
+      summary: 'Update the heartbeat timer for a subscription'
+      description: Update the heartbeat timer for the specified subscription
+      operationId: UpdateSubscriptionHeartbeat
+      parameters:
+        - in: path
+          name: id
+          description: The subscription ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Subscription with the given ID not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/selections/{id}/tags:
+    get:
+      tags:
+        - selections
+      summary: 'Get the tags in a selection'
+      # TODO: in the description, mention if the selections have current values
+      description: Get the tags in a selection.
+      operationId: GetSelectionTags
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Tag'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags:
+        - selections
+      summary: 'Delete all of the tags in a selection'
+      description: Delete all of the tags in a seletion
+      operationId: DeleteSelectionTags
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
+      responses:
+        204:
+          description: Successfully deleted
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/subscriptions/{id}/values/current:
+    get:
+      tags:
+        - subscriptions
+      summary: 'Get the current values for the tags in a subscription'
+      description: Get the current values for tags in the subscription (either all or changed only based on a query parameter).
+      operationId: GetSubscriptionTagValues
+      parameters:
+        - in: path
+          name: id
+          description: Subscription ID
+          type: string
+          required: true
       responses:
         200:
           schema:
@@ -53,1157 +1247,70 @@ paths:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Subscription with the given id not found
-      parameters:
-        - schema:
-            type: array
-            items:
-              type: string
-          required: false
-          name: subscriptionIds
-          in: body
-          description: The subscription ids
-      operationId: get-subscriptions-tag-values
-      description: Get the current values for all tags in multiple subscriptions
-  /nitag/v2/tags-rpc/subscriptions/delete:
+        default:
+          $ref: '#/responses/Error'
+  /v2/update-tags:
     post:
       tags:
-        - Subscriptions
-      summary: ''
-      responses:
-        '200':
+        - tags
+      summary: 'Create or update multiple tags'
+      description: Create or update multiple tags in one request.
+      operationId: CreateOrUpdateTags
+      parameters:
+        - in: body
+          name: tagsAndMerge
+          description: The tags to create or update, and a flag specifying whether keywords and properties should be merged for updates.
           schema:
-            type: object
-            title: Delete Subscriptions Response
-            properties:
-              invalidSubscriptionIds:
-                type: array
-                items:
-                  type: string
-                description: The list of invalid subscription IDs
-            description: The response for deleting subscriptions
-          description: Success
-        '401':
-          description: API key is missing or invalid
-      parameters:
-        - schema:
-            type: array
-            items:
-              type: string
-          required: false
-          name: subscriptionIds
-          in: body
-          description: The subscription ids
-      operationId: delete-subscriptions
-      description: Delete one or more subscriptions based on the request body.
-  '/nitag/v2/selections/{id}/values/aggregates/mean':
-    get:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '200':
-          schema:
-            type: array
-            items:
-              type: object
-              title: Tag Path With Aggregate Mean
-              properties:
-                path:
-                  type: string
-                  description: The tag path
-                mean:
-                  type: number
-                  description: The aggregation mean
-              description: The tag path with aggregation mean
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The selection id
-      operationId: get-selection-values-aggregates-mean
-      description: Get the aggregation mean values for the selection
-  '/nitag/v2/tags/{path}':
-    put:
-      tags:
-        - Tags
-      summary: ''
-      responses:
-        '201':
-          description: 'Created: Tag created successfully'
-        '204':
-          description: 'No Content: Tag updated successfully'
-        '401':
-          description: API key is missing or invalid
-        '409':
-          description: 'Conflict: Type change not supported'
-      parameters:
-        - type: string
-          required: true
-          name: path
-          in: path
-          description: The tag path
-        - schema:
-            $ref: '#/definitions/Tag'
-          required: true
-          name: tag
-          in: body
-          description: The tag to create or update
-      operationId: update-tag
-      description: 'Update the tag at <path>, or create one if it doesn''t exist. A complete resource representation must be sent (no partial updates).'
-    get:
-      tags:
-        - Tags
-      summary: ''
-      responses:
-        '200':
-          schema:
-            $ref: '#/definitions/Tag'
-          description: Success
-        '401':
-          description: API key is missing or invalid
-      parameters:
-        - type: string
-          required: true
-          name: path
-          in: path
-          description: The tag path
-      operationId: get-tag
-      description: Get metadata of a single tag.
-  '/nitag/v2/selections/{id}/values/aggregates/min':
-    get:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '200':
-          schema:
-            type: array
-            items:
-              type: object
-              title: Tag Path With Aggregate Min
-              properties:
-                path:
-                  type: string
-                  description: The tag path
-                min:
-                  type: number
-                  description: The aggregation min
-              description: The tag path with aggregation min
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The selection id
-      operationId: get-selection-values-aggregates-min
-      description: Get the aggregation min values for the selection
-  '/nitag/v2/selections/{id}':
-    put:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '200':
-          schema:
-            $ref: '#/definitions/Selection'
-          description: Success
-        '400':
-          description: Bad Request
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The selection id
-        - schema:
-            $ref: '#/definitions/Selection'
-          required: false
-          name: selection
-          in: body
-          description: The selection to create
-      operationId: update-selection
-      description: Updates the tag collection and inactivity timeout of a selection.
-    get:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '200':
-          schema:
-            $ref: '#/definitions/Selection'
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The identifier of the selection
-      operationId: get-selection
-      description: Get the details about a selection.
-    delete:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '204':
-          description: Successfully deleted
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The identifier of the selection
-      operationId: delete-selection
-      description: Get the details about all selections.
-  '/nitag/v2/selections/{id}/values/aggregates/count':
-    get:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '200':
-          schema:
-            type: array
-            items:
-              type: object
-              title: Tag Path With Aggregate Count
-              properties:
-                path:
-                  type: string
-                  description: The tag path
-                count:
-                  type: integer
-                  description: The aggregation count
-              description: The tag path with aggregation count
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The selection id
-      operationId: get-selection-values-aggregates-count
-      description: Get the aggregation count values for the selection
-  /nitag/v2/tags-count:
-    get:
-      tags:
-        - Tags
-      summary: ''
-      responses:
-        '200':
-          description: Plain integer value
-        '401':
-          description: API key is missing or invalid
-      parameters: []
-      operationId: get-tag-count
-      description: Get a count of the total number of tags.
-  '/nitag/v2/tags/{path}/reset-aggregates':
-    post:
-      tags:
-        - TagsCurrentValueAggregates
-      summary: ''
-      responses:
-        '200':
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Tag with the given path not found
-      parameters:
-        - type: string
-          required: true
-          name: path
-          in: path
-          description: The tag path
-      operationId: reset-tag-aggregates
-      description: Reset tag aggregates.
-  /nitag/v2/tags-with-values:
-    get:
-      tags:
-        - TagsCurrentValue
-      summary: ''
-      responses:
-        '200':
-          schema:
-            $ref: '#/definitions/TagsWithValues'
-          description: Success
-        '400':
-          description: Bad Request
-        '401':
-          description: API key is missing or invalid
-        '409':
-          description: Conflict
-      parameters:
-        - type: string
-          required: false
-          name: path
-          in: query
-          description: a comma-separated list of tag paths.  May include glob-style wildcards.
-        - type: string
-          required: false
-          name: keywords
-          in: query
-          description: a comma-separated list of case-sensitive keywords
-        - type: string
-          required: false
-          name: properties
-          in: query
-          description: a comma-separated list of name/value property values.
-        - type: integer
-          required: false
-          name: skip
-          in: query
-          description: Used for pagination. Skip this integer number of entries in the response list. Must be used in combination with the take parameter.
-        - type: integer
-          required: false
-          name: take
-          in: query
-          description: Used for pagination.  Specified the integer number of entries to include in the response list. Must be used with skip as well.
-      operationId: get-tags-with-values
-      description: 'Get a list of tags with their values in a single request, filtered based on the provided query parameters.'
-  '/nitag/v2/selections/{id}/tags-with-values':
-    get:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '200':
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/TagsWithValues'
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The selection id
-      operationId: get-selection-tags-with-values
-      description: Get the tags with their current values and aggregates
-  /nitag/v2/subscriptions:
-    post:
-      tags:
-        - Subscriptions
-      summary: ''
-      responses:
-        '200':
-          schema:
-            type: object
-            title: Create Subscription Response
-            properties:
-              subscriptionId:
-                type: string
-                description: The unique identifier of the subscription
-              nonexistentTags:
-                type: array
-                items:
-                  type: string
-                description: A list of tags which did not exist
-              alias:
-                type: string
-                description: The name of the subscription
-            description: The response for creating a subscription
-          description: Success
-        '400':
-          description: Bad Request
-        '401':
-          description: API key is missing or invalid
-      parameters:
-        - schema:
-            $ref: '#/definitions/Subscription'
-          required: false
-          name: subscription
-          in: body
-          description: The subscription to create
-      operationId: create-subscription
-      description: Create a subscription for a list of tags
-    get:
-      tags:
-        - Subscriptions
-      summary: ''
-      responses:
-        '200':
-          schema:
-            type: object
-            title: Get Subscriptions Response
-            properties:
-              subscriptionIds:
-                type: array
-                items:
-                  type: string
-                description: The list of all the active subscription IDs
-            description: The get subscriptions response
-          description: Success
-        '401':
-          description: API key is missing or invalid
-      parameters: []
-      operationId: get-subscriptions
-      description: Get a list of all the active subscription IDs
-  '/nitag/v2/selections/{id}/values/current/timestamp':
-    get:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '200':
-          schema:
-            type: object
-            title: Tag Path With Timestamp
-            properties:
-              timestamp:
-                type: string
-                description: The updated value timestamp
-              path:
-                type: string
-                description: The tag path
-            description: The tag path with timestamp
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The selection id
-      operationId: get-selection-values-current-timestamp
-      description: Get the selection tags timestamp
-  /nitag/v2/tags-rpc/update-current-values:
-    post:
-      tags:
-        - TagsRpc
-      summary: ''
-      responses:
-        '200':
-          schema:
-            type: object
-            title: Tag Values Update
-            properties:
-              updates:
-                type: array
-                items:
-                  $ref: '#/definitions/TagCurrentAndAggregateValue'
-                description: The tag values to update
-              path:
-                type: string
-                description: Tag path
-            description: Tag Path and multiple updates
-          description: Success
-        '400':
-          description: Bad Request
-        '401':
-          description: API key is missing or invalid
-      parameters: []
-      operationId: update-current-tag-values
-      description: Push multiple current value updates to multiple tags in one request.
-  '/nitag/v2/tags/{path}/values/current/timestamp':
-    get:
-      tags:
-        - TagsCurrentValue
-      summary: ''
-      responses:
-        '200':
-          description: The plain timestamp
-        '204':
-          description: No timestamped value found
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Tag not found
-      parameters:
-        - type: string
-          required: true
-          name: path
-          in: path
-          description: The tag path
-      operationId: get-tag-values-current-timestamp
-      description: Get tag most recent timestamp.
-  '/nitag/v2/subscriptions/{id}':
-    get:
-      tags:
-        - Subscriptions
-      summary: ''
-      responses:
-        '200':
-          schema:
-            $ref: '#/definitions/Subscription'
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Subscription with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The subscription id
-      operationId: get-subscription
-      description: Get a list of all the tags in the subscription
-    delete:
-      tags:
-        - Subscriptions
-      summary: ''
-      responses:
-        '204':
-          description: Successfully deleted
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Subscription with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The subscription id
-      operationId: delete-subscription
-      description: Delete a specific subscription.
-  '/nitag/v2/tags/{path}/values':
-    get:
-      tags:
-        - TagsCurrentValue
-      summary: ''
-      responses:
-        '200':
-          schema:
-            $ref: '#/definitions/TagCurrentAndAggregateValue'
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Tag not found
-      parameters:
-        - type: string
-          required: true
-          name: path
-          in: path
-          description: The tag path
-      operationId: get-tag-values
-      description: Get the current and aggregate values for the tag at <path>.
-  /nitag/v2/tags:
-    post:
-      tags:
-        - Tags
-      summary: ''
-      responses:
-        '201':
-          description: 'Created: Tag created successfully'
-        '400':
-          description: Bad Request
-        '401':
-          description: API key is missing or invalid
-        '409':
-          description: 'Conflict: Type change not supported'
-      parameters:
-        - schema:
-            type: array
-            items:
-              $ref: '#/definitions/Tag'
-          required: true
-          name: tags
-          in: body
-          description: The tag to create
-      operationId: create-tag
-      description: Create or update single tag. Performs a merge of any specified Keywords or Properties. Changing a tag's type is not supported.
-    get:
-      tags:
-        - Tags
-      summary: ''
-      responses:
-        '200':
-          schema:
-            $ref: '#/definitions/TagList'
-          description: Success
-        '401':
-          description: API key is missing or invalid
-      parameters:
-        - type: string
-          required: false
-          name: path
-          in: query
-          description: a comma-separated list of tag paths.  May include glob-style wildcards
-        - type: string
-          required: false
-          name: keywords
-          in: query
-          description: a comma-separated list of case-sensitive keywords.
-        - type: string
-          required: false
-          name: properties
-          in: query
-          description: comma-separated list of name=value property values.
-        - type: integer
-          required: false
-          name: skip
-          in: query
-          description: Used for pagination. Skip this integer number of entries in the response list.  Must be used in combination with the take parameter.
-        - type: integer
-          required: false
-          name: take
-          in: query
-          description: Used for pagination. Specified the integer number of entries to include in the response list.  Must be used with skip as well
-      operationId: get-tags
-      description: 'Get a list of tags, filtered based on the provided query parameters.'
-  '/nitag/v2/selections/{id}/values':
-    get:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '200':
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/TagPathCurrentAndAggregateValue'
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The selection id
-      operationId: get-selection-values
-      description: Get selections tag values
-  '/nitag/v2/selections/{id}/values/current':
-    get:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '200':
-          schema:
-            type: array
-            items:
-              type: object
-              title: Tag Path With Current Value
-              properties:
-                path:
-                  type: string
-                  description: The tag path
-                current:
-                  $ref: '#/definitions/TagCurrentValue'
-              description: The tag path with current value
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The selection id
-      operationId: get-selection-values-current
-      description: Get the selection current tag timestamped value
-  '/nitag/v2/tags/{path}/values/aggregates/min':
-    get:
-      tags:
-        - TagsCurrentValueAggregates
-      summary: ''
-      responses:
-        '200':
-          description: The aggregate value
-        '204':
-          description: No aggregate value found
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Tag with the given path not found
-      parameters:
-        - type: string
-          required: true
-          name: path
-          in: path
-          description: The tag path
-      operationId: get-tag-aggregate-min
-      description: Get tag minimum aggregate
-  '/nitag/v2/tags-with-values/{path}':
-    get:
-      tags:
-        - TagsCurrentValue
-      summary: ''
-      responses:
-        '200':
-          schema:
-            $ref: '#/definitions/TagWithValue'
-          description: Success
-        '400':
-          description: Bad Request
-        '401':
-          description: API key is missing or invalid
-      parameters:
-        - type: string
-          required: true
-          name: path
-          in: path
-          description: The tag path
-      operationId: get-tag-with-value
-      description: Get a single tag with the value
-  '/nitag/v2/selections/{id}/values/aggregates/max':
-    get:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '200':
-          schema:
-            type: array
-            items:
-              type: object
-              title: Tag Path With Aggregate Max
-              properties:
-                path:
-                  type: string
-                  description: The tag path
-                max:
-                  type: number
-                  description: The aggregation max
-              description: The tag path with aggregation max
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The selection id
-      operationId: get-selection-values-aggregates-max
-      description: Get the aggregation max values for the selection
-  '/nitag/v2/selections/{id}/values/current/value':
-    get:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '200':
-          schema:
-            type: array
-            items:
-              type: object
-              title: Tag Path With Value
-              properties:
-                path:
-                  type: string
-                  description: The tag path
-                current:
-                  $ref: '#/definitions/TagValue'
-              description: The tag path with value
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The selection id
-      operationId: get-selection-values-current-value
-      description: Get the selection current tag value
-  /nitag/v2/tags-rpc/subscriptions/heartbeat:
-    post:
-      tags:
-        - Subscriptions
-      summary: ''
-      responses:
-        '200':
-          schema:
-            type: object
-            title: Update Subscriptions Heartbeat Response
-            properties:
-              invalidSubscriptionIds:
-                type: array
-                items:
-                  type: string
-                description: The list of invalid subscription IDs
-            description: The update subscriptions heartbeat response
-          description: Success
-        '401':
-          description: API key is missing or invalid
-      parameters:
-        - schema:
-            type: array
-            items:
-              type: string
-          required: false
-          name: subscriptionIds
-          in: body
-          description: The subscription ids
-      operationId: update-subscriptions-heartbeat
-      description: Pings the heartbeat timers of the specified subscriptions
-  '/nitag/v2/tags/{path}/update-values':
-    post:
-      tags:
-        - TagsCurrentValue
-      summary: ''
-      responses:
-        '200':
-          description: Tag Values Updated
-        '400':
-          description: Bad Request
-        '401':
-          description: API key is missing or invalid
-        '409':
-          description: Conflict
-      parameters:
-        - type: string
-          required: true
-          name: path
-          in: path
-          description: The tag path
-        - schema:
-            type: array
-            items:
-              $ref: '#/definitions/TagCurrentValue'
-          required: true
-          name: tagValues
-          in: body
-          description: The timestamped values
-      operationId: update-tag-values
-      description: Push a list of current value update objects to update the value of the tag at <path> multiple times. This can be used to send value history in bulk.
-  /nitag/v2/selections:
-    post:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '200':
-          schema:
-            $ref: '#/definitions/Selection'
-          description: Success
-        '400':
-          description: Bad Request
-        '401':
-          description: API key is missing or invalid
-        '409':
-          description: Duplicate selection
-      parameters:
-        - schema:
-            $ref: '#/definitions/Selection'
-          required: false
-          name: selection
-          in: body
-          description: The selection to create
-      operationId: create-selection
-      description: Create a selection containing a collection of tags to perform subsequent operations on.
-    get:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '200':
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Selection'
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters: []
-      operationId: get-selections
-      description: Get the details about all selections.
-  '/nitag/v2/selections/{id}/reset-aggregates':
-    post:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '204':
-          description: No Content
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The selection id
-      operationId: reset-selection-aggregates
-      description: Reset aggregates for a selection
-  '/nitag/v2/tags/{path}/values/current':
-    put:
-      tags:
-        - TagsCurrentValue
-      summary: ''
-      responses:
-        '200':
-          description: Tag Value Updated
-        '400':
-          description: Bad Request
-        '401':
-          description: API key is missing or invalid
-        '409':
-          description: Conflict
-      parameters:
-        - type: string
-          required: true
-          name: path
-          in: path
-          description: The tag path
-        - schema:
-            $ref: '#/definitions/TagCurrentValue'
-          required: true
-          name: tagValue
-          in: body
-          description: The timestamped value
-      operationId: update-tag-values-current
-      description: Update the current value of the tag at <path>.
-    get:
-      tags:
-        - TagsCurrentValue
-      summary: ''
-      responses:
-        '200':
-          schema:
-            $ref: '#/definitions/TagCurrentValue'
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Tag not found
-      parameters:
-        - type: string
-          required: true
-          name: path
-          in: path
-          description: The tag path
-      operationId: get-tag-values-current
-      description: Get the current value of the tag at <path>.
-  '/nitag/v2/tags/{path}/values/aggregates/max':
-    get:
-      tags:
-        - TagsCurrentValueAggregates
-      summary: ''
-      responses:
-        '200':
-          description: The aggregate value
-        '204':
-          description: No aggregate value found
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Tag with the given path not found
-      parameters:
-        - type: string
-          required: true
-          name: path
-          in: path
-          description: The tag path
-      operationId: get-tag-aggregate-max
-      description: Get tag maximum aggregate
-  '/nitag/v2/tags/{path}/values/aggregates/count':
-    get:
-      tags:
-        - TagsCurrentValueAggregates
-      summary: ''
-      responses:
-        '200':
-          description: The aggregate value
-        '204':
-          description: No aggregate value found
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Tag with the given path not found
-      parameters:
-        - type: string
-          required: true
-          name: path
-          in: path
-          description: The tag path
-      operationId: get-tag-aggregate-count
-      description: Get tag count aggregate
-  '/nitag/v2/subscriptions/{id}/heartbeat':
-    put:
-      tags:
-        - Subscriptions
-      summary: ''
-      responses:
-        '200':
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Subscription with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The subscription id
-      operationId: update-subscription-heartbeat
-      description: Updates the heartbeat timer for the specified subscription
-  '/nitag/v2/selections/{id}/tags':
-    get:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '200':
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Tag'
-          description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The selection id
-      operationId: get-selection-tags
-      description: Get selections tags
-    delete:
-      tags:
-        - Selections
-      summary: ''
-      responses:
-        '204':
-          description: Successfully deleted
-        '401':
-          description: API key is missing or invalid
-        '404':
-          description: Selection with the given id not found
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The selection id
-      operationId: delete-selection-tags
-      description: Deletes all the tags in the selection
-  '/nitag/v2/subscriptions/{id}/values/current':
-    get:
-      tags:
-        - Subscriptions
-      summary: ''
-      responses:
-        '200':
-          schema:
-            $ref: '#/definitions/SubscriptionUpdates'
-          description: Success
-        '401':
-          description: API key is missing or invalid
-      parameters:
-        - type: string
-          required: true
-          name: id
-          in: path
-          description: The subscription id
-      operationId: get-subscription-tag-values
-      description: Get the current values for tags in the subscription (either all or changed only based on query parameter)
-  /nitag/v2/update-tags:
-    post:
-      tags:
-        - Tags
-      summary: ''
-      responses:
-        '201':
-          description: Created
-        '400':
-          description: Bad Request
-        '401':
-          description: API key is missing or invalid
-        '409':
-          description: 'Conflict: Type change not supported'
-      parameters:
-        - schema:
             type: array
             items:
               type: object
               title: Tag List and Merge Flag
               properties:
                 tags:
+                  description: A list of tags
                   type: array
                   items:
                     $ref: '#/definitions/Tag'
-                  description: A list of tags
                 merge:
-                  type: boolean
                   description: 'If set, performs a merge of any specified Keywords or Properties.'
-              description: A list of tags and the total count
+                  type: boolean
           required: true
-          name: tagsAndMerge
-          in: body
-          description: The tags to create
-      operationId: update-tags
-      description: Create or update multiple tags in one request.
-  '/nitag/v2/tags/{path}/values/current/value':
+      responses:
+        201:
+          description: Created
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        409:
+          description: 'Conflict: Type change not supported'
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{path}/values/current/value:
     get:
       tags:
-        - TagsCurrentValue
-      summary: ''
+        - tags
+      # TODO: should this be tagsCurrentValue?
+      summary: 'Get the current value of a tag'
+      description: Get the current value of a tag
+      operationId: GetTagCurrentValue
+      parameters:
+        - in: path
+          name: path
+          description: The tag path
+          type: string
+          required: true
       responses:
-        '200':
+        200:
           schema:
             $ref: '#/definitions/TagValue'
           description: Success
-        '401':
-          description: API key is missing or invalid
-        '404':
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
           description: Tag not found
-      parameters:
-        - type: string
-          required: true
-          name: path
-          in: path
-          description: The tag path
-      operationId: get-tag-values-current-value
-      description: Get tag current value
+        default:
+          $ref: '#/responses/Error'
 definitions:
   Error:
     description: Contains error information
