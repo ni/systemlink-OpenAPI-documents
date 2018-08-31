@@ -41,11 +41,163 @@ responses:
           $ref: '#/definitions/Error'
 
 paths:
+  /v2/subscriptions:
+    post:
+      tags:
+        - subscriptions
+      summary: 'Create subscription'
+      description: Create a subscription for a list of tags to get notifications when the tags change.
+      operationId: CreateSubscription
+      parameters:
+        - in: body
+          name: subscription
+          description: The subscription to create
+          schema:
+            $ref: '#/definitions/Subscription'
+          required: false
+      responses:
+        200:
+          description: Success
+          schema:
+            description: The response for creating a subscription
+            type: object
+            title: Create Subscription Response
+            properties:
+              subscriptionId:
+                description: The unique identifier of the subscription
+                type: string
+              nonexistentTags:
+                description: A list of tags which did not exist
+                type: array
+                items:
+                  type: string
+              alias:
+                type: string
+                description: The name of the subscription
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    get:
+      tags:
+        - subscriptions
+      summary: 'Get active subscription IDs'
+      description: Get a list of all active subscription IDs
+      operationId: GetSubscriptions
+      parameters: []
+      responses:
+        200:
+          description: Success
+          schema:
+            description: Get subscriptions response
+            type: object
+            title: Get Subscriptions Response
+            properties:
+              subscriptionIds:
+                description: List of all the active subscription IDs
+                type: array
+                items:
+                  type: string
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/subscriptions/{id}:
+    get:
+      tags:
+        - subscriptions
+      summary: 'Get subscription'
+      description: Get a subscription's metadata
+      operationId: GetSubscription
+      parameters:
+        - in: path
+          name: id
+          description: Subscription ID
+          type: string
+          required: true
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/Subscription'
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Subscription with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags:
+        - subscriptions
+      summary: 'Delete a subscription'
+      description: Delete a specific subscription.
+      operationId: DeleteSubscription
+      parameters:
+        - in: path
+          name: id
+          description: Subscription ID
+          type: string
+          required: true
+      responses:
+        204:
+          description: Successfully deleted
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Subscription with the given id not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/subscriptions/{id}/heartbeat:
+    put:
+      tags:
+        - subscriptions
+      summary: 'Update the heartbeat timer for a subscription'
+      description: Update the heartbeat timer for the specified subscription
+      operationId: UpdateSubscriptionHeartbeat
+      parameters:
+        - in: path
+          name: id
+          description: The subscription ID
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Subscription with the given ID not found
+        default:
+          $ref: '#/responses/Error'
+  /v2/subscriptions/{id}/values/current:
+    get:
+      tags:
+        - subscriptions
+      summary: 'Get the current values for the tags in a subscription'
+      description: Get the current values for tags in the subscription (either all or changed only based on a query parameter).
+      operationId: GetSubscriptionTagValues
+      parameters:
+        - in: path
+          name: id
+          description: Subscription ID
+          type: string
+          required: true
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/SubscriptionUpdates'
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v2/tags-rpc/subscriptions/query-values:
     post:
       tags:
         - subscriptions
-      summary: 'Get subscription values'
+      summary: 'Get the current values for the tags from multiple subscriptions'
       description: Get the current values for all tags in multiple subscriptions
       operationId: GetSubscriptionsTagValues
       parameters:
@@ -440,69 +592,6 @@ paths:
           description: Selection with the given id not found
         default:
           $ref: '#/responses/Error'
-  /v2/subscriptions:
-    post:
-      tags:
-        - subscriptions
-      summary: 'Create subscription'
-      description: Create a subscription for a list of tags to get notifications when the tags change.
-      operationId: CreateSubscription
-      parameters:
-        - in: body
-          name: subscription
-          description: The subscription to create
-          schema:
-            $ref: '#/definitions/Subscription'
-          required: false
-      responses:
-        200:
-          description: Success
-          schema:
-            description: The response for creating a subscription
-            type: object
-            title: Create Subscription Response
-            properties:
-              subscriptionId:
-                description: The unique identifier of the subscription
-                type: string
-              nonexistentTags:
-                description: A list of tags which did not exist
-                type: array
-                items:
-                  type: string
-              alias:
-                type: string
-                description: The name of the subscription
-        400:
-          description: Bad Request
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-    get:
-      tags:
-        - subscriptions
-      summary: 'Get active subscription IDs'
-      description: Get a list of all active subscription IDs
-      operationId: GetSubscriptions
-      parameters: []
-      responses:
-        200:
-          description: Success
-          schema:
-            description: Get subscriptions response
-            type: object
-            title: Get Subscriptions Response
-            properties:
-              subscriptionIds:
-                description: List of all the active subscription IDs
-                type: array
-                items:
-                  type: string
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
   /v2/selections/{id}/values/current/timestamp:
     get:
       tags:
@@ -595,51 +684,6 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           description: Tag not found
-        default:
-          $ref: '#/responses/Error'
-  /v2/subscriptions/{id}:
-    get:
-      tags:
-        - subscriptions
-      summary: 'Get subscription'
-      description: Get a subscription's metadata
-      operationId: GetSubscription
-      parameters:
-        - in: path
-          name: id
-          description: Subscription ID
-          type: string
-          required: true
-      responses:
-        200:
-          schema:
-            $ref: '#/definitions/Subscription'
-          description: Success
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Subscription with the given ID was not found
-        default:
-          $ref: '#/responses/Error'
-    delete:
-      tags:
-        - subscriptions
-      summary: 'Delete a subscription'
-      description: Delete a specific subscription.
-      operationId: DeleteSubscription
-      parameters:
-        - in: path
-          name: id
-          description: Subscription ID
-          type: string
-          required: true
-      responses:
-        204:
-          description: Successfully deleted
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Subscription with the given id not found
         default:
           $ref: '#/responses/Error'
   /v2/tags/{path}/values:
@@ -919,7 +963,7 @@ paths:
     post:
       tags:
         - subscriptions
-      summary: 'Update heartbeat timer'
+      summary: 'Update the heartbeat timer of multiple subscriptions'
       description: Updates the heartbeat timers of multiple subscriptions
       operationId: UpdateSubscriptionHeartbeats
       parameters:
@@ -1157,28 +1201,6 @@ paths:
           description: Tag with the given path not found
         default:
           $ref: '#/responses/Error'
-  /v2/subscriptions/{id}/heartbeat:
-    put:
-      tags:
-        - subscriptions
-      summary: 'Update the heartbeat timer for a subscription'
-      description: Update the heartbeat timer for the specified subscription
-      operationId: UpdateSubscriptionHeartbeat
-      parameters:
-        - in: path
-          name: id
-          description: The subscription ID
-          type: string
-          required: true
-      responses:
-        200:
-          description: Success
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          description: Subscription with the given ID not found
-        default:
-          $ref: '#/responses/Error'
   /v2/selections/{id}/tags:
     get:
       tags:
@@ -1225,28 +1247,6 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           description: Selection with the given ID was not found
-        default:
-          $ref: '#/responses/Error'
-  /v2/subscriptions/{id}/values/current:
-    get:
-      tags:
-        - subscriptions
-      summary: 'Get the current values for the tags in a subscription'
-      description: Get the current values for tags in the subscription (either all or changed only based on a query parameter).
-      operationId: GetSubscriptionTagValues
-      parameters:
-        - in: path
-          name: id
-          description: Subscription ID
-          type: string
-          required: true
-      responses:
-        200:
-          schema:
-            $ref: '#/definitions/SubscriptionUpdates'
-          description: Success
-        401:
-          $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
   /v2/update-tags:
