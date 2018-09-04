@@ -29,7 +29,7 @@ definitions:
     type: object
     properties:
       name:
-        description: The string error code
+        description: String error code
         type: string
         example: Skyline.OneOrMoreErrorsOccurred
       code:
@@ -37,15 +37,15 @@ definitions:
         type: integer
         example: -251040
       resourceType:
-        description: The type of resource associated with the error
+        description: Type of resource associated with the error
         type: string
         example: TestResult
       resourceId:
-        description: The identifier of the resource associated with the error
+        description: Identifier of the resource associated with the error
         type: string
         example: 4afb2ce3741fe11d88838cc9
       message:
-        description: The filled in error message
+        description: Filled in error message
         type: string
         example: >-
           One or more errors occurred. See the contained list for details of
@@ -82,7 +82,7 @@ definitions:
           message: Invalid Id.
           args: []
   Operation:
-    description: An operation provided by the API
+    description: Operation provided by the API
     type: object
     properties:
       available:
@@ -90,12 +90,13 @@ definitions:
         description: Whether the operation is available to the caller
       version:
         type: integer
-        description: The version of the available operation
+        description: Version of the available operation
     required: [available]
     example:
       available: true
       version: 1
   V1Operations:
+    title: V1 Operations
     description: V1 operations
     type: object
     properties:
@@ -145,13 +146,14 @@ definitions:
           deleteManySteps:
             $ref: '#/definitions/Operation'
   StatusObject:
-    description: A status object
+    title: Status Object
+    description: Status object comprised of a type and display name
     type: object
     required:
       - statusType
     properties:
       statusType:
-        description: The status type
+        description: Status type enum
         type: string
         enum:
           - LOOPING
@@ -167,11 +169,12 @@ definitions:
           - TIMED_OUT
         example: PASSED
       statusName:
-        description: The status name
+        description: Status name
         type: string
         example: Passed
   ResultField:
-    description: A result field enum
+    title: Result Field
+    description: Result field enum
     type: string
     enum:
       - ID
@@ -187,7 +190,8 @@ definitions:
       - PROPERTIES
       - FILE_IDS
   StepField:
-    description: A step field enum
+    title: Step Field
+    description: Step field enum
     type: string
     enum:
       - NAME
@@ -205,7 +209,8 @@ definitions:
       - DATA_MODEL
       - DATA
   ResultSortDefinitionObject:
-    description: A result sort definition object
+    title: Result Sort Definition
+    description: Defines the field and direction for sorting test results.
     type: object
     required:
       - field
@@ -216,7 +221,8 @@ definitions:
         type: boolean
         default: false
   StepSortDefinitionObject:
-    description: A step sort definition object
+    title: Step Sort Definition
+    description: Defines the field and direction for sorting test steps.
     type: object
     required:
       - field
@@ -227,14 +233,15 @@ definitions:
         type: boolean
         default: false
   TimeQueryObject:
-    description: A time query object
+    title: Time Query
+    description: Time query object
     type: object
     required:
       - operation
       - comparisonValue
     properties:
       operation: 
-        description: The operation enum value
+        description: Operation enum
         type: string
         enum:
           - EQUAL
@@ -244,26 +251,26 @@ definitions:
           - LESS_THAN_OR_EQUAL
           - GREATER_THAN_OR_EQUAL
       comparisonValue: 
-        description: An ISO-8601 formatted timestamp value to compare 
+        description: ISO-8601 formatted timestamp value to compare
         type: string
         format: iso-date-time
         example: '2017-11-14T15:41:06.106Z'
   TestResultRequestObject:
-    description: A test result request object
+    title: Test Result Request
     type: object
     properties:
       programName:
-        description: The program name
+        description: Program name
         type: string
         example: My Program Name
       status:
         $ref: '#/definitions/StatusObject'
       systemId:
-        description: The system id
+        description: System id
         type: string
         example: my-system
       properties:
-        description: The test result properties
+        description: Test result properties
         type: object
         additionalProperties:
           type: string
@@ -278,32 +285,32 @@ definitions:
           - keyword1
           - keyword2
       serialNumber:
-        description: The serial number
+        description: Serial number
         type: string
         example: 123-456
       operator:
-        description: The operator
+        description: Operator
         type: string
         example: admin
       fileIds:
-        description: The file ids attached to the test result
+        description: Array of file ids attached to the test result
         type: array
         items:
           type: string
         example: df1b63da-4fd8-4466-b721-5a28de036f56
       startedAt:
-        description: An ISO-8601 formatted timestamp indicating when the result was started
+        description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
         format: iso-date-time
         example: '2018-05-07T18:58:05.219692Z'
       totalTimeInSeconds:
-        description: The total run-time of the test in seconds
+        description: Total run-time of the test in seconds
         type: number
         format: double
         default: 0
         example: 29.9
   TestResultResponseObject:
-    description: A test result response object
+    title: Test Result Response
     type: object
     required:
       - id
@@ -311,37 +318,37 @@ definitions:
       status:
         $ref: '#/definitions/StatusObject'
       startedAt:
-        description: An ISO-8601 formatted timestamp indicating when the result was started
+        description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
         format: iso-date-time
         example: '2018-05-07T18:58:05.219692Z'
       updatedAt:
-        description: An ISO-8601 formatted timestamp indicating when the result was last updated
+        description: ISO-8601 formatted timestamp indicating when the result was last updated
         type: string
         format: iso-date-time
         example: '2018-05-09T15:07:42.527921Z'
       programName:
-        description: The program name
+        description: Program name
         type: string
         example: My test program
       id:
-        description: The id of the test result
+        description: Id of the test result
         type: string
         example: df1b63da-4fd8-4466-b721-5a28de036f56
       systemId:
-        description: The id of the system
+        description: Id of the system
         type: string
         example: sedwards-dt2
       operator:
-        description: The name of the operator running the test
+        description: Name of the operator running the test
         type: string
         example: admin
       serialNumber:
-        description: The sequential number of the device under test
+        description: Sequential number of the device under test
         type: string
         example: abc-123
       totalTimeInSeconds:
-        description: The total run-time of the test in seconds
+        description: Total run-time of the test in seconds
         type: number
         format: double
         example: 29.9
@@ -354,40 +361,40 @@ definitions:
           - keyword1
           - keyword2
       properties:
-        description: The test result properties
+        description: Test result properties
         type: object
         additionalProperties:
           type: string
         example:
           key1: value1
       fileIds:
-        description: A list of attached file ids
+        description: Array of file ids attached to the test result
         type: array
         items:
           type: string
         example: []
   TestResultUpdateRequestObject:
-    description: A test result update request object
+    title: Test Result Update
     type: object
     required:
       - id
     properties:
       id:
-        description: The test result id to update
+        description: Test result id to update
         type: string
         example: df1b63da-4fd8-4466-b721-5a28de036f56
       programName:
-        description: The program name
+        description: Program name
         type: string
         example: My Program Name
       status:
         $ref: '#/definitions/StatusObject'
       systemId:
-        description: The system id
+        description: System id
         type: string
         example: my-system
       properties:
-        description: The test result properties
+        description: Test result properties
         type: object
         additionalProperties:
           type: string
@@ -402,72 +409,71 @@ definitions:
           - keyword1
           - keyword2
       serialNumber:
-        description: The serial number
+        description: Serial number
         type: string
         example: 123-456
       operator:
-        description: The operator
+        description: Operator
         type: string
         example: admin
       fileIds:
-        description: The file ids attached to the test result
+        description: Array of file ids attached to the test result
         type: array
         items:
           type: string
         example: df1b63da-4fd8-4466-b721-5a28de036f56
       startedAt:
-        description: An ISO-8601 formatted timestamp indicating when the result was started
+        description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
         format: iso-date-time
         example: '2018-05-07T18:58:05.219692Z'
       totalTimeInSeconds:
-        description: The total run-time of the test in seconds
+        description: Total run-time of the test in seconds
         type: number
         format: double
         default: 0
         example: 29.9
   TestResultQueryObject:
-    description: A result query object
-    title: TestResultQueryObject
+    title: Test Result Query
     type: object
     properties:
       ids:
-        description: An array of test result ids
+        description: Array of test result ids
         type: array
         items:
           type: string
         example:
           - 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
       programNames:
-        description: An array of program names
+        description: Array of program names
         type: array
         items:
           type: string
         example:
           - Result Creation Test
       operators:
-        description: An array of operators
+        description: Array of operators
         type: array
         items:
           type: string
         example:
           - admin
       serialNumbers:
-        description: An array of serial numbers
+        description: Array of serial numbers
         type: array
         items:
           type: string
         example:
           - 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
       systemIds:
-        description: An array of system ids
+        description: Array of system ids
         type: array
         items:
           type: string
         example:
           - 9c75f1b5-5882-490e-a2e2-1c14123d68b2
       keywords:
-        description: An array of keywords
+        description: Array of keywords
         type: array
         items:
           type: string
@@ -475,31 +481,31 @@ definitions:
           - keyword1
           - keyword2
       properties:
-        description: A dictionary of key-value property pairs
+        description: Dictionary of key-value property pairs
         type: object
         additionalProperties:
           type: string
           example:
             key1: value1
       updatedAtQuery:
-        description: A time query object
+        description: Time query object for the test result's last updated timestamp
         type: array
         items:
           $ref: '#/definitions/TimeQueryObject'
       startedAtQuery:
-        description: A time query object
+        description: Time query object for the test result's started at timestamp
         type: array
         items:
           $ref: '#/definitions/TimeQueryObject'
       fileIds:
-        description: An array of file ids
+        description: Array of file ids
         type: array
         items:
           type: string
         example:
           - 5982002b5d67371430c80e73
       statuses:
-        description: An array of resulkt statuses
+        description: Array of result statuses
         type: array
         items:
           $ref: '#/definitions/StatusObject'
@@ -508,8 +514,7 @@ definitions:
         items:
           $ref: '#/definitions/ResultSortDefinitionObject'
   StepIdResultIdPair:
-    description: A pair of step id and result id
-    title: StepIdResultIdPair
+    title: Step Id / Result Id Pair
     type: object
     required:
       - stepId
@@ -522,79 +527,78 @@ definitions:
         type: string
         example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
   StepDataObject:
-    description: The data returned by the test step
+    title: Step Data
+    description: Data returned by the test step
     type: object
     properties:
       text:
-        description: A text string describing the output data
+        description: Text string describing the output data
         type: string
         example: My output string
       parameters:
-        description: An array of properties objects
+        description: Array of properties objects
         type: array
         items:
-          description: A dictionary of key-value property pairs
+          description: Dictionary of key-value property pairs
           type: object
           additionalProperties:
             type: string
             example:
               key1: value1
   TestStepsDeleteRequest:
-    description: A test steps delete request
-    title: DeleteStepsRequest
+    title: Test Steps Delete Request
     type: object
     required:
       - steps
     properties:
       steps:
-        description: An array of test step id and result id pairs to delete
+        description: Array of test step id and result id pairs to delete
         type: array
         items:
           $ref: '#/definitions/StepIdResultIdPair'
   TestStepQueryObject:
-    description: A test step query object
-    title: TestStepQueryObject
+    title: Test Step Query
     type: object
     properties:
       excludeFields:
-        description: An array of step field names to exclude
+        description: Array of step field names to exclude
         type: array
         items:
           $ref: '#/definitions/StepField'
       names:
-        description: An array of test step names
+        description: Array of test step names
         type: array
         items:
           type: string
         example:
           - My Test Step
       stepIds:
-        description: An array of step ids
+        description: Array of step ids
         type: array
         items:
           type: string
         example:
           - 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
       parentIds:
-        description: An array of parent step ids
+        description: Array of parent step ids
         type: array
         items:
           type: string
         example:
           - 9c75f1b5-5882-490e-a2e2-1c14123d68b2
       resultIds:
-        description: An array of result ids
+        description: Array of result ids
         type: array
         items:
           type: string
         example:
           - 9c75f1b5-5882-490e-a2e2-1c14123d68b2
       path:
-        description: A step path
+        description: Step path
         type: string
         example: root.step1.step2
       pathIds:
-        description: An array of path ids
+        description: Array of path ids
         type: array
         items:
           type: string
@@ -602,17 +606,17 @@ definitions:
           - 9c75f1b5-5882-490e-a2e2-1c14123d68b2
           - 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
       statuses:
-        description: An array of step statuses
+        description: Array of step statuses
         type: array
         items:
           $ref: '#/definitions/StatusObject'
       startedAtQuery:
-        description: A time query object
+        description: Time query object
         type: array
         items:
           $ref: '#/definitions/TimeQueryObject'
       updatedAtQuery:
-        description: A time query object
+        description: Time query object
         type: array
         items:
           $ref: '#/definitions/TimeQueryObject'
@@ -621,19 +625,19 @@ definitions:
         items:
           $ref: '#/definitions/StepSortDefinitionObject'
   TestStepRequestObject:
-    description: A test step object
+    title: Test Step Request
     type: object
     properties:
       stepId:
-        description: The step id
+        description: Step id
         type: string
         example: Step1
       parentId:
-        description: The parent step id
+        description: Parent step id
         type: string
         example: Step0
       resultId:
-        description: The result id
+        description: Result id
         type: string
         example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
       children:
@@ -644,71 +648,71 @@ definitions:
       data:
         $ref: '#/definitions/StepDataObject'
       dataModel:
-        description: The step data model
+        description: Data model for the step
         type: string
         example: TestStand
       name:
-        description: The step name
+        description: Step name
         type: string
         example: My Step
       startedAt:
-        description: An ISO-8601 formatted timestamp indicating when the result was started
+        description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
         format: iso-date-time
         example: '2018-05-07T18:58:05.219692Z'
       status:
         $ref: '#/definitions/StatusObject'
       stepType:
-        description: The step type
+        description: Step type
         type: string
         example: NumericLimitTest
       totalTimeInSeconds:
-        description: The total number of seconds the step took to execute
+        description: Total number of seconds the step took to execute
         type: number
         format: double
         default: 0
         example: 29.9
   TestStepCreateOrUpdateRequestObject:
-    description: A test step request object
+    title: Test Step Create or Update Request
     type: object
     required:
       - steps
     properties:
       steps:
-        description: An array of test steps to create
+        description: Array of test steps to create
         type: array
         items:
           $ref: '#/definitions/TestStepRequestObject'
   TestStepResponseObject:
-    description: A test step response object
+    title: Test Step Response
     type: object
     properties:
       name:
-        description: The step name
+        description: Step name
         type: string
         example: My Step Name
       stepType:
-        description: The step type
+        description: Step type
         type: string
         example: null
       stepId:
-        description: The step id
+        description: Step id
         type: string
         example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
       parentId:
-        description: The parent step id
+        description: Parent step id
         type: string
         example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
       resultId:
-        description: The result id
+        description: Result id
         type: string
         example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
       path:
-        description: The step path
+        description: Step path
         type: string
         example: root.step1
       pathIds:
-        description: The ids of the steps in the path
+        description: Ids of the steps in the path
         type: array
         items:
           type: string
@@ -717,22 +721,22 @@ definitions:
       status:
         $ref: '#/definitions/StatusObject'
       totalTimeInSeconds:
-        description: The total number of seconds the step took to execute
+        description: Total number of seconds the step took to execute
         type: number
         format: double
         example: 0
       startedAt:
-        description: An ISO-8601 formatted timestamp indicating when the result was started
+        description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
         format: iso-date-time
         example: '2018-05-07T18:58:05.219692Z'
       updatedAt:
-        description: An ISO-8601 formatted timestamp indicating when the result was last updated
+        description: ISO-8601 formatted timestamp indicating when the result was last updated
         type: string
         format: iso-date-time
         example: '2018-05-09T15:07:42.527921Z'
       dataModel:
-        description: A custom string defining the model of the data object
+        description: Custom string defining the model of the data object
         type: string
         example: SOFTWARE
       data:
@@ -764,12 +768,12 @@ responses:
         - totalCount
       properties:
         results:
-          description: An array of test results
+          description: Array of test results
           type: array
           items:
             $ref: '#/definitions/TestResultResponseObject'
         totalCount:
-          description: The total count of matching test results
+          description: Number of matching test results
           type: integer
   ResultsPartialSuccessResponse:
     description: Test Results Partial Success Response
@@ -783,12 +787,12 @@ responses:
         - error
       properties:
         results:
-          description: An array of test results
+          description: Array of test results
           type: array
           items:
             $ref: '#/definitions/TestResultResponseObject'
         failed:
-          description: An array of test result requests that failed
+          description: Array of test result requests that failed
           type: array
           items:
             $ref: '#/definitions/TestResultRequestObject'
@@ -806,12 +810,12 @@ responses:
         - error
       properties:
         ids:
-          description: An array of test result ids to delete
+          description: Array of test result ids to delete
           type: array
           items:
             type: string
         failed:
-          description: An array of test result ids that failed to delete
+          description: Array of test result ids that failed to delete
           type: array
           items:
             type: string
@@ -828,12 +832,12 @@ responses:
         - totalCount
       properties:
         results:
-          description: An array of test results
+          description: Array of test results
           type: array
           items:
             $ref: '#/definitions/TestResultResponseObject'
         totalCount:
-          description: The total count of matching test results
+          description: Number of matching test results
           type: integer
   StepsSuccessResponse:
     description: Test Steps Success Response
@@ -845,7 +849,7 @@ responses:
         - steps
       properties:
         steps:
-          description: An array of test steps
+          description: Array of test steps
           type: array
           items:
             $ref: '#/definitions/TestStepResponseObject'
@@ -861,12 +865,12 @@ responses:
         - error
       properties:
         steps:
-          description: An array of test steps
+          description: Array of test steps
           type: array
           items:
             $ref: '#/definitions/TestStepResponseObject'
         failed:
-          description: An array of test step requests that failed
+          description: Array of test step requests that failed
           type: array
           items:
             $ref: '#/definitions/TestStepRequestObject'
@@ -883,12 +887,12 @@ responses:
         - totalCount
       properties:
         steps:
-          description: An array of test steps
+          description: Array of test steps
           type: array
           items:
             $ref: '#/definitions/TestStepResponseObject'
         totalCount:
-          description: The total count of matching test steps
+          description: Number of matching test steps
           type: integer
   StepsDeletePartialSuccessResponse:
     description: Delete Test Steps Partial Success Response
@@ -898,12 +902,12 @@ responses:
       type: object
       properties:
         steps:
-          description: An array of test step id result id paris that were deleted
+          description: Array of test step id result id pairs that were deleted
           type: array
           items:
             $ref: '#/definitions/StepIdResultIdPair'
         failed:
-          description: An array of test step id result id paris that failed to delete
+          description: Array of test step id result id pairs that failed to delete
           type: array
           items:
             $ref: '#/definitions/StepIdResultIdPair'
@@ -929,13 +933,13 @@ paths:
               v1:
                 $ref: '#/definitions/V1Operations'
               version:
-                description: The implementation version of the web service
+                description: Implementation version of the web service
                 type: string
   /{version}:
     parameters:
       - in: path
         name: version
-        description: The version of the API to retrieve operations.
+        description: Version of the API to retrieve operations.
         type: string
         required: true
     get:
@@ -960,13 +964,13 @@ paths:
       x-ni-operation: queryResults
       x-ni-privilege: Read
       summary: Queries test results
-      description: Queries test results
+      description: Uses input criteria to filter and return test results.  An empty request body queries all test results.
       tags:
         - results
       parameters:
         - in: body
           name: postBody
-          description: A result query object
+          description: Result query object
           required: false
           schema:
             $ref: '#/definitions/TestResultQueryObject'
@@ -990,24 +994,24 @@ paths:
       operationId: update-results
       x-ni-operation: updateResults
       x-ni-privilege: Write
-      summary: Update test results
-      description: Update test results
+      summary: Updates existing test results
+      description: Updates existing test results by merging or replacing values.
       tags:
         - results
       parameters:
         - in: body
           name: requestBody
-          description: A list of test results to update
+          description: Array of test results to update
           required: true
           schema:
-            description: A list of test results to update
+            description: Array of test results to update
             title: UpdateTestResultsRequest
             type: object
             required:
               - results
             properties:
               results:
-                description: An array of test results to update
+                description: Array of test results to update
                 type: array
                 items:
                   $ref: '#/definitions/TestResultUpdateRequestObject'
@@ -1030,24 +1034,24 @@ paths:
       operationId: create-results
       x-ni-operation: createResults
       x-ni-privilege: Write
-      summary: Create test results
-      description: Create test results
+      summary: Creates new test results
+      description: Creates new test results from the supplied models.  The server automatically generates the result ids.  The server will populate the start time if one is not provided.
       tags:
         - results
       parameters:
         - in: body
           name: requestBody
-          description: A result object
+          description: Result object
           required: true
           schema:
-            description: A list of test results to create
+            description: Array of test results to create
             title: CreateTestResultsRequest
             type: object
             required:
               - results
             properties:
               results:
-                description: An array of test results to create
+                description: Array of test results to create
                 type: array
                 items:
                   $ref: '#/definitions/TestResultRequestObject'
@@ -1066,19 +1070,18 @@ paths:
       x-ni-operation: deleteResult
       x-ni-privilege: Write
       summary: Deletes a test result
-      description: >-
-        Deletes a test result
+      description: Deletes the test result with the specified id.  The request succeeds for result ids that do not exist.
       tags: 
         - results
       parameters:
         - in: path
           name: resultId
-          description: The id of the test result to delete
+          description: Id of the test result to delete
           type: string
           required: true
         - in: query
           name: deleteSteps
-          description: Delete the test steps associated with the test result
+          description: Indicates whether to delete the test steps associated with the test result
           type: boolean
           default: true
       responses:
@@ -1093,30 +1096,30 @@ paths:
       operationId: delete-results
       x-ni-operation: deleteResults
       x-ni-privilege: Write
-      summary: Delete test results
-      description: Delete test results
+      summary: Deletes test results
+      description: Deletes multiple test results in a single request.
       tags:
         - results
       parameters:
         - in: body
           name: requestBody
-          description: A list of test result ids
+          description: Array of test result ids
           required: true
           schema:
-            description: A list of test result ids
+            description: Array of test result ids
             title: DeleteResultsRequest
             type: object
             required:
               - ids
             properties:
               ids:
-                description: An array of test result ids to delete
+                description: Array of test result ids to delete
                 type: array
                 items:
                   type: string
                   example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
               deleteSteps:
-                description: Delete the test steps associated with the test result
+                description: Indicates whether to delete the test steps associated with the test result
                 type: boolean
                 default: true
       responses:
@@ -1134,13 +1137,13 @@ paths:
       x-ni-operation: querySteps
       x-ni-privilege: Read
       summary: Queries test steps
-      description: Queries test steps
+      description: Uses input criteria to filter and return test steps.  An empty request body queries all test steps.
       tags:
         - steps
       parameters:
         - in: body
           name: postBody
-          description: A step query object
+          description: Step query object
           required: false
           schema:
             $ref: '#/definitions/TestStepQueryObject'
@@ -1165,13 +1168,13 @@ paths:
       x-ni-operation: updateSteps
       x-ni-privilege: Write
       summary: Update test steps
-      description: Update test steps
+      description: Updates existing test steps by replacing values for the specified fields.
       tags:
         - steps
       parameters:
         - in: body
           name: requestBody
-          description: A list of test steps
+          description: Array of test steps
           required: true
           schema:
             $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
@@ -1187,13 +1190,13 @@ paths:
       x-ni-operation: createSteps
       x-ni-privilege: Write
       summary: Create test steps
-      description: Create test steps
+      description: Creates new test steps from the supplied models.  The result associated with the step must exist prior to step creation.  The server automatically generates step ids if not supplied.
       tags:
         - steps
       parameters:
         - in: body
           name: requestBody
-          description: A test step object
+          description: Test step object
           required: true
           schema:
             $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
@@ -1212,19 +1215,18 @@ paths:
       x-ni-operation: deleteStep
       x-ni-privilege: Write
       summary: Deletes a test step
-      description: >-
-        Deletes a test step
+      description: Deletes the test step with the specified id.  The request succeeds for step ids that do not exist.
       tags: 
        - steps
       parameters:
         - in: path
           name: resultId
-          description: The id of the test result the step belongs to
+          description: Id of the test result the step belongs to
           type: string
           required: true
         - in: path
           name: stepId
-          description: The id of the test step to delete
+          description: Id of the test step to delete
           type: string
           required: true
       responses:
@@ -1239,14 +1241,14 @@ paths:
       operationId: delete-steps
       x-ni-operation: deleteSteps
       x-ni-privilege: Write
-      summary: Delete test steps
-      description: Delete test steps
+      summary: Deletes test steps
+      description: Deletes multiple test steps in a single request.
       tags:
         - steps
       parameters:
         - in: body
           name: requestBody
-          description: A delete steps request
+          description: Delete steps request
           required: true
           schema:
             $ref: '#/definitions/TestStepsDeleteRequest'
@@ -1264,8 +1266,8 @@ paths:
       operationId: ping
       x-ni-privilege: Read
       deprecated: true
-      summary: Ping the test monitor service
-      description: Ping the test monitor service
+      summary: Pings the test monitor service
+      description: Deprecated.  Pings the test monitor service to ensure that it is online.
       tags:
         - deprecated
       responses:
