@@ -426,7 +426,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/TagsWithValues'
+              $ref: '#/definitions/TagsWithValuesAndTotalCount'
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -500,7 +500,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/TagPathCurrentAndAggregateValue'
+              $ref: '#/definitions/TagPathWithCurrentAndAggregateValue'
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -906,7 +906,7 @@ paths:
       responses:
         200:
           schema:
-            $ref: '#/definitions/TagsWithValues'
+            $ref: '#/definitions/TagsWithValuesAndTotalCount'
           description: Success
         400:
           description: Bad Request
@@ -1381,21 +1381,21 @@ definitions:
           message: Session token 'f755d531-2403-433f-a0b7-463ccb8f2b9' not found.
           args: ['f755d531-2403-433f-a0b7-463ccb8f2b9']
   # TODO: examples for all of these guys
-  TagsWithValues:
+  TagsWithValuesAndTotalCount:
     description: A list of tags with current values and the total count
     type: object
     title: Tag List with Current Values
     properties:
       totalCount:
-        description: The total tag count
+        description: Total number of tags in a query response
         type: integer
       tagsWithValues:
-        description: A list of tags with their
+        description: List of tags with their values
         type: array
         items:
           $ref: '#/definitions/TagWithValue'
   TagWithValue:
-    description: The tag and its current value
+    description: A tag and its current value
     type: object
     title: Tag with value
     properties:
@@ -1406,7 +1406,7 @@ definitions:
       aggregates:
         $ref: '#/definitions/TagAggregates'
   TagValue:
-    description: The value of a tag
+    description: Value of a tag
     type: object
     title: Tag Value
     properties:
@@ -1416,42 +1416,43 @@ definitions:
       type:
         description: Tag type
         type: string
-  TagPathCurrentAndAggregateValue:
+  TagPathWithCurrentAndAggregateValue:
+    description: Tag path with its current value and aggregates
     type: object
     title: Tag Path Current And Aggregate Value
     properties:
       path:
         type: string
-        description: The tag path
+        description: Tag path
       current:
         $ref: '#/definitions/TagCurrentValue'
       aggregates:
         $ref: '#/definitions/TagAggregates'
-    description: The tag path with current value and aggregates
   TagList:
+    description: A list of tags without current values
     type: object
     title: Tag List
     properties:
       totalCount:
         type: integer
-        description: The total tag count
+        description: Total number of tags which match a given query
       tags:
+        description: List of tags
         type: array
         items:
           $ref: '#/definitions/Tag'
-        description: A list of tags
-    description: A list of tags and the total count
   TagCurrentValue:
+    description: The current value of a tag
     type: object
     title: Tag Current Value
     properties:
       value:
         $ref: '#/definitions/TagValue'
       timestamp:
+        description: The timestamp associated with the value
         type: string
-        description: Last updated time stamp
-    description: The current value of a tag
   TagCurrentAndAggregateValue:
+    description: The current and aggregate values for a tag
     type: object
     title: Tag Current And Aggregate Value
     properties:
@@ -1459,105 +1460,105 @@ definitions:
         $ref: '#/definitions/TagCurrentValue'
       aggregates:
         $ref: '#/definitions/TagAggregates'
-    description: The current and aggregate values for a tag
   TagAggregates:
+    description: The aggregate values of a tag
     type: object
     title: Tag Aggregate Value
     properties:
       sum:
         type: number
-        description: Aggregate Sum
+        description: Sum aggregate value
       min:
         type: number
-        description: Aggregate Minimum
+        description: Minimum aggregate value
       max:
         type: number
-        description: Aggregate Maximum
+        description: Maximum aggregate value
       count:
         type: integer
-        description: Aggregate Count
+        description: Count aggregate value
       avg:
         type: number
-        description: Aggregate Average
-    description: The aggregate values of a tag
+        description: Average aggregate value
   Tag:
+    description: Object containing a tag's metadata, without its current or aggregate values
     type: object
     title: Tag
     properties:
       type:
         type: string
-        description: Tag type
+        description: Type
       properties:
         type: object
-        description: Tag properties
+        description: Properties
       path:
         type: string
-        description: Tag path
+        description: Path
       keywords:
         type: array
         items:
           type: string
-        description: Tag keywords
+        description: Keywords
       collectAggregates:
-        type: boolean
         description: Whether to collect aggregates
-    description: A tag
+        type: boolean
   SubscriptionUpdates:
+    description: Updates for a list of subscriptions
     type: object
     title: Subscription Updates
     properties:
       subscriptionUpdates:
+        description: Subscription updates
         type: array
         items:
           $ref: '#/definitions/SubscriptionUpdate'
-        description: The subscription updates
       invalidSubscriptionIds:
+        description: List of invalid subscription IDs
         type: array
         items:
           type: string
-        description: The list of invalid subscription IDs
-    description: The updates for a list of subscriptions
   SubscriptionUpdate:
+    description: Updates for a subscriptions
     type: object
     title: Subscription Update
     properties:
       updates:
+        description: List of updates
         type: array
         items:
           $ref: '#/definitions/SubscriptionTagUpdate'
-        description: A list of updates
       subscriptionId:
+        description: Unique identifier of the subscription
         type: string
-        description: The unique identifier of the subscription
       nonexistentTags:
+        description: List of tags which did not exist
         type: array
         items:
           type: string
-        description: A list of tags which did not exist
       deletedTags:
+        description: List of tags which have been deleted
         type: array
         items:
           type: string
-        description: A list of tags which have been deleted
       createdTags:
+        description: List of tags which have been created
         type: array
         items:
           type: string
-        description: A list of tags which have been created
       alias:
+        description: Name of the subscription
         type: string
-        description: The name of the subscription
-    description: The updates for a subscriptions
   SubscriptionTagUpdate:
+    description: Update details for a tag subscription
     type: object
     title: Subscription Tag Update
     properties:
       value:
         type: string
-        description: The updated tag value
+        description: Updated tag value
       type:
         type: string
-        description: The tag type
+        description: Tag type
       timestamp:
         type: string
         description: The updated timestamp
@@ -1565,38 +1566,37 @@ definitions:
         $ref: '#/definitions/Tag'
       aggregates:
         $ref: '#/definitions/TagAggregates'
-    description: The update details for a tag subscription
   Subscription:
+    description: Object describing a subscription's metadata
     type: object
     title: Get Subscription Response
     properties:
       updatesOnly:
-        type: boolean
         description: Whether to notify only about updates
+        type: boolean
       tags:
+        description: List of subscribed tags
         type: array
         items:
           type: string
-        description: The list of subscribed tags
       alias:
+        description: Name of the subscription
         type: string
-        description: The name of the subscription
-    description: The get subscription details response
   Selection:
+    description: Object describing a selection's metadata
     type: object
     title: Selection
     required:
       - searchPaths
     properties:
       searchPaths:
+        description: Tag search paths
         type: array
         items:
           type: string
-        description: The tag search paths
       inactivityTimeout:
+        description: Inactivity timeout
         type: integer
-        description: The inactivity timeout
       id:
         type: string
-        description: The selection ID
-    description: The selection details
+        description: Selection ID
