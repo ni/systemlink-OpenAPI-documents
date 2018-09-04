@@ -39,13 +39,51 @@ responses:
       properties:
         error:
           $ref: '#/definitions/Error'
+  GetTagsWithValuesResponse:
+    description: List of tags, including their current and aggregate values
+    schema:
+      properties:
+        totalCount:
+          description: Total number of tags which match a given query
+          type: integer
+        tagsWithValues:
+          description: List of tags with their current and aggregate values
+          type: array
+          items:
+            $ref: '#/definitions/TagWithValue'
+  GetTagsResponse:
+    description: List of tags, excluding current and aggregate values
+    schema:
+      properties:
+        totalCount:
+          type: integer
+          description: Total number of tags which match a given query
+        tags:
+          description: List of tags
+          type: array
+          items:
+            $ref: '#/definitions/Tag'
+  GetSubscriptionUpdatesResponse:
+    description: List of subscription updates
+    schema:
+      properties:
+        subscriptionUpdates:
+          description: Subscription updates
+          type: array
+          items:
+            $ref: '#/definitions/SubscriptionUpdate'
+        invalidSubscriptionIds:
+          description: List of invalid subscription IDs
+          type: array
+          items:
+            type: string
 
 paths:
   /v2/subscriptions:
     post:
       tags:
         - subscriptions
-      summary: 'Create subscription'
+      summary: Create a subscription
       description: Create a subscription for a list of tags to get notifications when the tags change.
       operationId: CreateSubscription
       parameters:
@@ -83,7 +121,7 @@ paths:
     get:
       tags:
         - subscriptions
-      summary: 'Get active subscription IDs'
+      summary: Get active subscription IDs
       description: Get a list of all active subscription IDs
       operationId: GetSubscriptions
       parameters: []
@@ -105,18 +143,18 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v2/subscriptions/{id}:
+    parameters:
+    - in: path
+      name: id
+      description: Subscription ID
+      type: string
+      required: true
     get:
       tags:
         - subscriptions
-      summary: 'Get subscription'
+      summary: Get a subscription
       description: Get a subscription's metadata
       operationId: GetSubscription
-      parameters:
-        - in: path
-          name: id
-          description: Subscription ID
-          type: string
-          required: true
       responses:
         200:
           schema:
@@ -131,15 +169,9 @@ paths:
     delete:
       tags:
         - subscriptions
-      summary: 'Delete a subscription'
+      summary: Delete a subscription
       description: Delete a specific subscription.
       operationId: DeleteSubscription
-      parameters:
-        - in: path
-          name: id
-          description: Subscription ID
-          type: string
-          required: true
       responses:
         204:
           description: Successfully deleted
@@ -153,7 +185,7 @@ paths:
     put:
       tags:
         - subscriptions
-      summary: 'Update the heartbeat timer for a subscription'
+      summary: Update the heartbeat timer for a subscription
       description: Update the heartbeat timer for the specified subscription
       operationId: UpdateSubscriptionHeartbeat
       parameters:
@@ -175,7 +207,7 @@ paths:
     get:
       tags:
         - subscriptions
-      summary: 'Get the current values for the tags in a subscription'
+      summary: Get the current values for the tags in a subscription
       description: Get the current values for tags in the subscription (either all or changed only based on a query parameter).
       operationId: GetSubscriptionTagValues
       parameters:
@@ -187,7 +219,7 @@ paths:
       responses:
         200:
           schema:
-            $ref: '#/definitions/SubscriptionUpdates'
+            $ref: '#/responses/GetSubscriptionUpdatesResponse'
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
@@ -197,7 +229,7 @@ paths:
     post:
       tags:
         - subscriptions
-      summary: 'Update the heartbeat timer of multiple subscriptions'
+      summary: Update the heartbeat timer of multiple subscriptions
       description: Updates the heartbeat timers of multiple subscriptions
       operationId: UpdateSubscriptionHeartbeats
       parameters:
@@ -230,7 +262,7 @@ paths:
     post:
       tags:
         - subscriptions
-      summary: 'Get the current values for the tags from multiple subscriptions'
+      summary: Get the current values for the tags from multiple subscriptions
       description: Get the current values for all tags in multiple subscriptions
       operationId: GetSubscriptionsTagValues
       parameters:
@@ -246,7 +278,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: '#/definitions/SubscriptionUpdates'
+            $ref: '#/responses/GetSubscriptionUpdatesResponse'
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -257,7 +289,7 @@ paths:
     post:
       tags:
         - subscriptions
-      summary: 'Delete multiple subscriptions'
+      summary: Delete multiple subscriptions
       description: Delete one or more subscriptions based on the request body.
       operationId: DeleteSubscriptions
       parameters:
@@ -290,7 +322,7 @@ paths:
     post:
       tags:
         - selections
-      summary: 'Create selection'
+      summary: Create a selection
       description: Create a selection containing a collection of tags to perform subsequent operations on.
       operationId: CreateSelection
       parameters:
@@ -316,7 +348,7 @@ paths:
     get:
       tags:
         - selections
-      summary: 'Get all selections'
+      summary: Get all selections
       description: Get all selections.
       operationId: GetSelections
       parameters: []
@@ -334,18 +366,19 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: Selection ID
+        type: string
+        required: true
     put:
       tags:
         - selections
-      summary: 'Update selection'
+      summary: Update a selection
       description: Modify a selection
       operationId: UpdateSelection
       parameters:
-        - in: path
-          name: id
-          description: Selection ID
-          type: string
-          required: true
         - in: body
           name: selection
           description: Selection to replace the existing selection with
@@ -368,15 +401,9 @@ paths:
     get:
       tags:
         - selections
-      summary: 'Get selection'
+      summary: Get a selection
       description: Get a selection's metadata.
       operationId: GetSelection
-      parameters:
-        - in: path
-          name: id
-          description: Selection ID
-          type: string
-          required: true
       responses:
         200:
           schema:
@@ -391,15 +418,9 @@ paths:
     delete:
       tags:
         - selections
-      summary: 'Delete selection'
+      summary: Delete a selection
       description: Delete a selection
       operationId: DeleteSelection
-      parameters:
-        - in: path
-          name: id
-          description: Selection ID
-          type: string
-          required: true
       responses:
         204:
           description: Successfully deleted
@@ -411,7 +432,7 @@ paths:
     get:
       tags:
         - selections
-      summary: 'Get current values in selection'
+      summary: Get current values in a selection
       description: Get the current values and aggregates of the tags in a selection.
       operationId: GetSelectionTagsWithValues
       parameters:
@@ -424,9 +445,7 @@ paths:
         200:
           description: Success
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/TagsWithValuesAndTotalCount'
+            $ref: '#/responses/GetTagsWithValuesResponse'
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -434,19 +453,18 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}/tags:
+    parameters:
+    - in: path
+      name: id
+      description: Selection ID
+      type: string
+      required: true
     get:
       tags:
         - selections
-      summary: 'Get the tags in a selection'
-      # TODO: in the description, mention if the selections have current values
-      description: Get the tags in a selection.
+      summary: Get the tags in a selection
+      description: Get the metadata of the tags in a selection
       operationId: GetSelectionTags
-      parameters:
-        - in: path
-          name: id
-          description: Selection ID
-          type: string
-          required: true
       responses:
         200:
           description: Success
@@ -463,15 +481,9 @@ paths:
     delete:
       tags:
         - selections
-      summary: 'Delete all of the tags in a selection'
+      summary: Delete all of the tags in a selection
       description: Delete all of the tags in a seletion
       operationId: DeleteSelectionTags
-      parameters:
-        - in: path
-          name: id
-          description: Selection ID
-          type: string
-          required: true
       responses:
         204:
           description: Successfully deleted
@@ -485,7 +497,7 @@ paths:
     get:
       tags:
         - selections
-      summary: 'Get the values of the tags in a selection'
+      summary: Get the values of the tags in a selection
       description: Get the current values of the tags in a given selection
       operationId: GetSelectionValues
       parameters:
@@ -511,8 +523,8 @@ paths:
     get:
       tags:
         - selections
-      summary: 'Get the current times values of the tags in a selection with timestamps'
-      description: Get the current values of the tags in a selection with timestamps
+      summary: Get the current values of the tags in a selection, including timestamps
+      description: Get the current values of the tags in a selection, including timestamps
       operationId: GetSelectionCurrentTimestampedValues
       parameters:
         - in: path
@@ -535,7 +547,6 @@ paths:
                   description: Tag path
                 current:
                   $ref: '#/definitions/TagCurrentValue'
-                  # TODO: should be TagCurrentTimestampedValue
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -546,8 +557,8 @@ paths:
     get:
       tags:
         - selections
-      summary: 'Get the current values of the tags in a selection (without timestamps)'
-      description: Get the current timestamped values of the tags in a selection
+      summary: Get the current values of the tags in a selection, excluding timestamps
+      description: Get the current values of the tags in a selection, excluding timestamps
       operationId: GetSelectionCurrentValues
       parameters:
         - in: path
@@ -580,9 +591,8 @@ paths:
     get:
       tags:
         - selections
-      summary: 'Get the current value timestamps for the tags in a selection'
-      # TODO: is it really the current value timestamp here?
-      description: Get the current value timestamps for the tags in a selection
+      summary: Get the timestamps of the current values of the tags in a selection
+      description: Get the timestamps of the current values of the tags in a selection
       operationId: GetSelectionValuesCurrentTimestamp
       parameters:
         - in: path
@@ -596,7 +606,6 @@ paths:
           schema:
             description: Array containing the paths of the tags in the selection, along with the timestamp of their current values.
             type: array
-            # TODO: verify this is really an array.. cloud called it an object initially
             title: Tag Paths With Timestamps
             items:
               type: object
@@ -619,8 +628,8 @@ paths:
     get:
       tags:
         - selections
-      summary: 'Get the minimum aggregate values for a selection'
-      description: Get the minimum values from a selection's aggregates
+      summary: Get the "min" aggregate values for the tags in a selection
+      description: Get the "min" aggregate values for the tags in a selection
       operationId: GetSelectionMinValues
       parameters:
         - in: path
@@ -632,7 +641,7 @@ paths:
         200:
           description: Success
           schema:
-            description: Array containing the minimum values from the aggregates for each tag in the selection.
+            description: Array containing the "min" values from the aggregates for each tag in the selection.
             type: array
             items:
               type: object
@@ -642,7 +651,7 @@ paths:
                   description: Tag path
                   type: string
                 min:
-                  description: Countum value from the tag's aggregates
+                  description: Minimum value from the tag's aggregates
                   type: number
         401:
           $ref: '#/responses/Unauthorized'
@@ -654,8 +663,8 @@ paths:
     get:
       tags:
         - selections
-      summary: 'Get the maximum value from the aggregates of a selection''s tags'
-      description: Get the maximum value from the aggregates of a selection's tags
+      summary: Get the "max" aggregate values for the tags in a selection
+      description: Get the "max" aggregate values for the tags in a selection
       operationId: GetSelectionMaxAggregates
       parameters:
         - in: path
@@ -667,11 +676,11 @@ paths:
         200:
           description: Success
           schema:
+            description: Array containing the "max" values from the aggregates for each tag in the selection.
             type: array
             items:
-              description: The tag path with the maximum value from its aggregates
               type: object
-              title: Tag Path With Aggregate Max
+              title: Tag Path With Max Aggregate
               properties:
                 path:
                   description: Tag path
@@ -689,8 +698,8 @@ paths:
     get:
       tags:
         - selections
-      summary: 'Get the mean aggregate values for a selection'
-      description: Get the mean values from a selection's aggregates
+      summary: Get the "avg" aggregate values for the tags in a selection
+      description: Get the "avg" aggregate values for the tags in a selection
       operationId: GetSelectionMeanValues
       parameters:
         - in: path
@@ -702,7 +711,7 @@ paths:
         200:
           description: Success
           schema:
-            description: Array containing the mean values from the aggregates for each tag in the selection.
+            description: Array containing the "avg" values from the aggregates for each tag in the selection.
             type: array
             items:
               type: object
@@ -724,8 +733,8 @@ paths:
     get:
       tags:
         - selections
-      summary: 'Get the count aggregate values for a selection'
-      description: Get the count aggregate values from a selection's aggregates
+      summary: Get the "count" aggregate values for the tags in a selection
+      description: Get the "count" aggregate values for the tags in a selection
       operationId: GetSelectionCountValues
       parameters:
         - in: path
@@ -737,7 +746,7 @@ paths:
         200:
           description: Success
           schema:
-            description: Array containing the count values from the aggregates for each tag in the selection.
+            description: Array containing the "count" values from the aggregates for each tag in the selection.
             type: array
             items:
               type: object
@@ -759,7 +768,7 @@ paths:
     post:
       tags:
         - selections
-      summary: 'Reset the aggregates of all tags in a selection'
+      summary: Reset the aggregates of all tags in a selection
       description: Reset the aggregates of all tags in a selection
       operationId: ResetSelectionAggregates
       parameters:
@@ -789,19 +798,17 @@ paths:
           name: tagsAndMerge
           description: The tags to create or update, and a flag specifying whether keywords and properties should be merged for updates.
           schema:
-            type: array
-            items:
-              type: object
-              title: Tag List and Merge Flag
-              properties:
-                tags:
-                  description: A list of tags
-                  type: array
-                  items:
-                    $ref: '#/definitions/Tag'
-                merge:
-                  description: 'If set, performs a merge of any specified Keywords or Properties.'
-                  type: boolean
+            type: object
+            title: Tag List and Merge Flag
+            properties:
+              tags:
+                description: A list of tags
+                type: array
+                items:
+                  $ref: '#/definitions/Tag'
+              merge:
+                description: 'If set, performs a merge of any specified Keywords or Properties.'
+                type: boolean
           required: true
       responses:
         201:
@@ -818,7 +825,7 @@ paths:
     post:
       tags:
         - tags
-      summary: 'Create or update a tag'
+      summary: Create or update a tag
       description: Create or update single tag. Performs a merge of any specified Keywords or Properties. Changing a tag's type is not supported.
       operationId: CreateTag
       parameters:
@@ -826,9 +833,7 @@ paths:
           name: tags
           description: Tag to create
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/Tag'
+            $ref: '#/definitions/Tag'
           required: true
       responses:
         201:
@@ -844,8 +849,8 @@ paths:
     get:
       tags:
         - tags
-      summary: 'Get multiple tags'
-      description: 'Get a list of tags, filtered based on the provided query parameters.'
+      summary: Get multiple tags
+      description: Get a list of tags, filtered based on the provided query parameters.
       operationId: GetTags
       parameters:
         - in: query
@@ -876,7 +881,7 @@ paths:
       responses:
         200:
           schema:
-            $ref: '#/definitions/TagList'
+            $ref: '#/responses/GetTagsResponse'
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
@@ -886,7 +891,7 @@ paths:
     get:
       tags:
         - tags
-      summary: 'Get the total number of tags'
+      summary: Get the total number of tags
       description: Get a count of the total number of tags.
       operationId: GetTagCount
       parameters: []
@@ -901,12 +906,11 @@ paths:
     get:
       tags:
         - tags
-      # TODO: tag with tagCurrentValue or tags?
-      summary: 'Get the current values of multiple tags'
+      summary: Get the current values of multiple tags
       responses:
         200:
           schema:
-            $ref: '#/definitions/TagsWithValuesAndTotalCount'
+            $ref: '#/responses/GetTagsWithValuesResponse'
           description: Success
         400:
           description: Bad Request
@@ -948,8 +952,7 @@ paths:
     get:
       tags:
         - tags
-      # TODO: should this be tagsCurrentValue?
-      summary: 'Get a tag and its current value'
+      summary: Get a tag and its current value
       description: Get a tag and its value
       operationId: GetTagWithValue
       parameters:
@@ -970,18 +973,19 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v2/tags/{path}:
+    parameters:
+      - in: path
+        name: path
+        description: Tag path
+        type: string
+        required: true
     put:
       tags:
         - tags
-      summary: 'Create or replace a tag'
-      description: 'Replace the tag at <path>, or create one if one doesn''t exist. A complete resource representation must be sent (no partial updates).'
+      summary: Create or replace a tag
+      description: Replace the tag at the path, or create one if one doesn''t exist. A complete resource representation must be sent (no partial updates).
       operationId: CreateOrReplaceTag
       parameters:
-        - in: path
-          name: path
-          description: Tag path
-          type: string
-          required: true
         - in: body
           name: tag
           description: Tag to create or replace
@@ -1000,15 +1004,9 @@ paths:
     get:
       tags:
         - tags
-      summary: 'Get a tag'
+      summary: Get a tag
       description: Get the metadata of a single tag.
       operationId: GetTag
-      parameters:
-        - in: path
-          name: path
-          description: The tag path
-          type: string
-          required: true
       responses:
         200:
           description: Success
@@ -1018,13 +1016,25 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+    delete:
+      tags:
+        - tags
+      summary: Delete a tag
+      description: Deletes a tag
+      operationId: DeleteTag
+      responses:
+        204:
+          description: 'No content: Tag deleted successfully'
+        404:
+          description: Not Found
+        default:
+          $ref: '#/responses/Error'
   /v2/tags/{path}/values:
     get:
       tags:
         - tags
-      # TODO: should this be tagsCurrentValue?
-      summary: 'Get the aggregates and current value of a tag'
-      description: Get the current and aggregate values for the tag at <path>.
+      summary: Get the aggregates and current value of a tag
+      description: Get the current and aggregate values for the tag at the path.
       operationId: get-tag-values
       parameters:
         - in: path
@@ -1044,19 +1054,18 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v2/tags/{path}/values/current:
+    parameters:
+    - in: path
+      name: path
+      description: Tag path
+      type: string
+      required: true
     get:
       tags:
         - tags
-      # TODO: should this be tagsCurrentValue?
-      summary: 'Get the current value of a tag'
-      description: Get the current value of the tag at <path>.
+      summary: Get the current value of a tag
+      description: Get the current value of the tag at the path.
       operationId: get-tag-values-current
-      parameters:
-        - in: path
-          name: path
-          description: Tag path
-          type: string
-          required: true
       responses:
         200:
           description: Success
@@ -1071,9 +1080,8 @@ paths:
     put:
       tags:
         - tags
-      # TODO: shold the tag be tagsCurrentValue?
-      summary: 'Update the current value of a tag'
-      description: Update the current value of the tag at <path>.
+      summary: Update the current value of a tag
+      description: Update the current value of the tag at the path.
       operationId: UpdateTagCurrentValue
       responses:
         200:
@@ -1087,14 +1095,9 @@ paths:
         default:
           $ref: '#/responses/Error'
       parameters:
-        - in: path
-          name: path
-          description: Tag path
-          type: string
-          required: true
         - in: body
           name: tagValue
-          description: The timestamped value
+          description: Timestamped value
           schema:
             $ref: '#/definitions/TagCurrentValue'
           required: true
@@ -1102,8 +1105,7 @@ paths:
     get:
       tags:
         - tags
-      # TODO: should this be tagged with tagsCurrentValue?
-      summary: 'Get the timestamp of a tag''s current value'
+      summary: Get the timestamp of a tag's current value
       description: Get tag most recent timestamp.
       operationId: get-tag-values-current-timestamp
       parameters:
@@ -1127,8 +1129,7 @@ paths:
     get:
       tags:
         - tags
-      # TODO: should this be tagsCurrentValue?
-      summary: 'Get the current value of a tag without its timestamp'
+      summary: Get the current value of a tag without its timestamp
       description: Get the current value of a tag
       operationId: GetTagCurrentValue
       parameters:
@@ -1152,9 +1153,8 @@ paths:
     get:
       tags:
         - tagAggregates
-      # TODO: should this be tagCurrentValueAggregates?
-      summary: 'Get the minimum value from a tag''s aggregates'
-      description: Get the minimum value from a tag's aggregates
+      summary: Get the value of a tag's "min" aggregate
+      description: Get the value of a tag's "min" aggregate
       operationId: GetTagMinimum
       parameters:
         - in: path
@@ -1164,7 +1164,9 @@ paths:
           required: true
       responses:
         200:
-          description: The aggregate value
+          description: Minimum aggregate value
+          schema:
+            type: string
         204:
           description: No aggregate value found
         401:
@@ -1177,14 +1179,14 @@ paths:
     get:
       tags:
         - tagAggregates
-      # TODO: should the tag be tagCurrentValueAggregates?
-      summary: 'Get the maximum value from a tag''s aggregates'
-      description: Get the maximum value from a tag''s aggregates'
+      summary: Get the value of a tag's "max" aggregate
+      description: Get the value of a tag's "max" aggregate
       operationId: GetTagMaxAggregate
       responses:
         200:
-          description: Aggregate value
-          # TODO: for this and other 200 responses which don't have a schema but return something, we should probably have a schema!
+          description: Maximum aggregate value
+          schema:
+            type: string
         204:
           description: No aggregate value found
         401:
@@ -1203,14 +1205,14 @@ paths:
     get:
       tags:
         - tagAggregates
-      # TODO: should the tag be tagCurrentValueAggregates?
-      summary: 'Get the mean value from a tag''s aggregates'
-      description: Get the mean value from a tag''s aggregates'
+      summary: Get the value of a tag's "avg" aggregate
+      description: Get the value of a tag's "avg" aggregate
       operationId: GetTagMeanAggregate
       responses:
         200:
-          description: Aggregate value
-          # TODO: for this and other 200 responses which don't have a schema but return something, we should probably have a schema!
+          description: Mean aggregate value
+          schema:
+            type: string
         204:
           description: No aggregate value found
         401:
@@ -1229,10 +1231,8 @@ paths:
     get:
       tags:
         - tagAggregates
-        # TODO: should this be tagsCurrentValueAggregates?
-      summary: 'Get the count value from a tag''s aggregates'
-      # TODO: maybe "Get the value of a tag's 'count' aggregate"
-      description: Get the count value from a tag''s aggregates'
+      summary: Get the value of a tag's "count" aggregate
+      description: Get the value of a tag's "count" aggregate
       operationId: GetTagCountAggregate
       parameters:
         - in: path
@@ -1242,7 +1242,9 @@ paths:
           required: true
       responses:
         200:
-          description: Aggregate value
+          description: Count aggregate value
+          schema:
+            type: string
         204:
           description: No aggregate value found
         401:
@@ -1255,7 +1257,6 @@ paths:
     post:
       tags:
         - tagAggregates
-      # TODO: tag with tagsCurrentValueAggregates or tags?
       summary: 'Reset the aggregates of a tag'
       description: Reset tag aggregates
       operationId: ResetTagAggregates
@@ -1274,30 +1275,25 @@ paths:
           description: Tag with the given path not found
         default:
           $ref: '#/responses/Error'
-  /v2/tags-rpc/update-current-values:
+  # TODO: back to v2
+  /v1/tags-rpc/update-current-values:
     post:
       tags:
         - tags
-      # TODO: should this be tagged with tagsRpc?
-      summary: 'Update the current values of multiple tags'
+      summary: Update the current values of multiple tags
       description: Push multiple current value updates to multiple tags in one request.
       operationId: UpdateTagCurrentValues
-      parameters: []
+      parameters:
+        - in: body
+          name: updates
+          description: Updates
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TagUpdate'
       responses:
         200:
           description: Success
-          schema:
-            type: object
-            title: Tag Updates
-            properties:
-              updates:
-                description: Updates to apply
-                type: array
-                items:
-                  $ref: '#/definitions/TagCurrentAndAggregateValue'
-              path:
-                type: string
-                description: Tag path
         400:
           description: Bad Request
         401:
@@ -1308,9 +1304,8 @@ paths:
     post:
       tags:
         - tags
-      # TODDO: should this be tagscurrentvalue?
-      summary: 'Send multiple value updates to a tag'
-      description: Push a list of current value update objects to update the value of the tag at <path> multiple times. This can be used to send value history in bulk.
+      summary: Send multiple value updates to a tag
+      description: Push a list of current value update objects to update the value of the tag at the path multiple times. This can be used to send value history in bulk.
       operationId: update-tag-values
       responses:
         200:
@@ -1368,32 +1363,15 @@ definitions:
         items:
           $ref: '#/definitions/Error'
     example:
-      name: Skyline.OneOrMoreErrorsOccurred
-      code: -251040
-      message: One or more errors occurred. See the contained list for details of each error.
-      args: []
-      innerErrors:
-        - name: Message.SessionTokenNotFound
-          # TODO: tag-specific example
-          code: -251608
-          resourceType:
-          resourceId:
-          message: Session token 'f755d531-2403-433f-a0b7-463ccb8f2b9' not found.
-          args: ['f755d531-2403-433f-a0b7-463ccb8f2b9']
-  # TODO: examples for all of these guys
-  TagsWithValuesAndTotalCount:
-    description: A list of tags with current values and the total count
-    type: object
-    title: Tag List with Current Values
-    properties:
-      totalCount:
-        description: Total number of tags in a query response
-        type: integer
-      tagsWithValues:
-        description: List of tags with their values
-        type: array
-        items:
-          $ref: '#/definitions/TagWithValue'
+      name: Tag.NoSuchTag
+      code: -251909
+      resourceType:
+      resourceId:
+      message: "No such tag: 'foo'"
+      args: ['foo']
+  TagType:
+    type: string
+    enum: &TYPES [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
   TagWithValue:
     description: A tag and its current value
     type: object
@@ -1405,6 +1383,22 @@ definitions:
         $ref: '#/definitions/TagCurrentValue'
       aggregates:
         $ref: '#/definitions/TagAggregates'
+    example:
+      tag:
+        path: foo
+        type: DOUBLE
+        keywords: [fooKeyword, barKeyword]
+      current:
+        value:
+          type: DOUBLE
+          value: 3.14
+        timestamp: '2018-09-04T18:45:08.540Z'
+      aggregates:
+        sum: 10.5
+        min: 0.0
+        max: 5.0
+        mean: 2.0
+        count: 5
   TagValue:
     description: Value of a tag
     type: object
@@ -1416,6 +1410,10 @@ definitions:
       type:
         description: Tag type
         type: string
+        enum: *TYPES
+    example:
+      type: DOUBLE
+      value: 3.14
   TagPathWithCurrentAndAggregateValue:
     description: Tag path with its current value and aggregates
     type: object
@@ -1428,31 +1426,35 @@ definitions:
         $ref: '#/definitions/TagCurrentValue'
       aggregates:
         $ref: '#/definitions/TagAggregates'
-  TagList:
-    description: A list of tags without current values
-    type: object
-    title: Tag List
-    properties:
-      totalCount:
-        type: integer
-        description: Total number of tags which match a given query
-      tags:
-        description: List of tags
-        type: array
-        items:
-          $ref: '#/definitions/Tag'
+    example:
+      path: foo
+      current:
+        value:
+          type: DOUBLE
+          value: 3.14
+      aggregates:
+        sum: 10.5
+        min: 0.0
+        max: 5.0
+        mean: 2.0
+        count: 5
   TagCurrentValue:
-    description: The current value of a tag
+    description: Current value of a tag
     type: object
     title: Tag Current Value
     properties:
       value:
         $ref: '#/definitions/TagValue'
       timestamp:
-        description: The timestamp associated with the value
+        description: Timestamp associated with the value
         type: string
+        format: date-time
+    example:
+      value:
+        type: DOUBLE
+        value: 3.14
+      timestamp: '2018-09-04T18:45:08.540Z'
   TagCurrentAndAggregateValue:
-    description: The current and aggregate values for a tag
     type: object
     title: Tag Current And Aggregate Value
     properties:
@@ -1460,63 +1462,98 @@ definitions:
         $ref: '#/definitions/TagCurrentValue'
       aggregates:
         $ref: '#/definitions/TagAggregates'
+    example:
+      current:
+        value:
+          type: DOUBLE
+          value: 3.14
+        timestamp: '2018-09-04T18:45:08.540Z'
+      aggregates:
+        sum: 10.5
+        min: 0.0
+        max: 5.0
+        mean: 2.0
+        count: 5
   TagAggregates:
-    description: The aggregate values of a tag
+    description: Aggregate values of a tag
     type: object
     title: Tag Aggregate Value
     properties:
       sum:
-        type: number
         description: Sum aggregate value
+        type: number
       min:
-        type: number
         description: Minimum aggregate value
+        type: number
       max:
-        type: number
         description: Maximum aggregate value
-      count:
-        type: integer
-        description: Count aggregate value
-      avg:
         type: number
+      count:
+        description: Count aggregate value
+        type: integer
+      avg:
         description: Average aggregate value
+        type: number
+    example:
+      sum: 10.5
+      min: 0.0
+      max: 5.0
+      mean: 2.0
+      count: 5
   Tag:
-    description: Object containing a tag's metadata, without its current or aggregate values
+    description: Object containing a tag's metadata, excluding current and aggregate values
     type: object
     title: Tag
     properties:
       type:
-        type: string
         description: Type
-      properties:
-        type: object
-        description: Properties
-      path:
         type: string
+        enum: *TYPES
+      properties:
+        description: Properties
+        type: object
+      path:
         description: Path
+        type: string
       keywords:
+        description: Keywords
         type: array
         items:
           type: string
-        description: Keywords
       collectAggregates:
         description: Whether to collect aggregates
         type: boolean
-  SubscriptionUpdates:
-    description: Updates for a list of subscriptions
+    example:
+      type: DOUBLE
+      properties:
+        key1: value1
+        key2: value2
+      path: foo
+      keywords: [fooKeyword, barKeyword]
+      collectAggregates: true
+  TagUpdate:
+    description: Object containing a tag's path, and one or more updates to be applied to it
     type: object
-    title: Subscription Updates
+    title: Tag Update
     properties:
-      subscriptionUpdates:
-        description: Subscription updates
+      path:
+        description: Tag path
+        type: string
+      updates:
         type: array
         items:
-          $ref: '#/definitions/SubscriptionUpdate'
-      invalidSubscriptionIds:
-        description: List of invalid subscription IDs
-        type: array
-        items:
-          type: string
+          $ref: '$/definitions/TagCurrentValue'
+    example:
+      path: foo
+      updates:
+        - value:
+            type: DOUBLE
+            value: 3.14
+          timestamp: '2018-09-04T18:45:08.540Z'
+        - value:
+            type: DOUBLE
+            value: 5.0
+          timestamp: '2018-09-04T18:45:09.540Z'
   SubscriptionUpdate:
     description: Updates for a subscriptions
     type: object
@@ -1554,18 +1591,36 @@ definitions:
     title: Subscription Tag Update
     properties:
       value:
-        type: string
         description: Updated tag value
+        type: string
       type:
-        type: string
         description: Tag type
-      timestamp:
         type: string
-        description: The updated timestamp
+        enum: *TYPES
+      timestamp:
+        description: Updated timestamp
+        type: string
       tag:
         $ref: '#/definitions/Tag'
       aggregates:
         $ref: '#/definitions/TagAggregates'
+    example:
+      value: 5.0
+      type: DOUBLE
+      timestamp: '2018-09-04T18:45:08.540Z'
+      tag:
+        type: DOUBLE
+        properties:
+          key1: value1
+          key2: value2
+        path: foo
+        keywords: [fooKeyword, barKeyword]
+      aggregates:
+        sum: 10.5
+        min: 0.0
+        max: 5.0
+        mean: 2.0
+        count: 5
   Subscription:
     description: Object describing a subscription's metadata
     type: object
@@ -1575,13 +1630,17 @@ definitions:
         description: Whether to notify only about updates
         type: boolean
       tags:
-        description: List of subscribed tags
+        description: List of subscribed tag paths
         type: array
         items:
           type: string
       alias:
         description: Name of the subscription
         type: string
+    example:
+      updatesOnly: true
+      tags: [tag1, tag2, tag3]
+      alias: foo
   Selection:
     description: Object describing a selection's metadata
     type: object
@@ -1595,8 +1654,13 @@ definitions:
         items:
           type: string
       inactivityTimeout:
-        description: Inactivity timeout
+        description: Inactivity timeout in seconds
         type: integer
+        maximum: 900
       id:
-        type: string
         description: Selection ID
+        type: string
+    example:
+      searchPaths: [tag1, tag2, tag3]
+      inactivityTimeout: 1000
+      id: 22520497-e85b-427f-980c-ca328fc72f75
