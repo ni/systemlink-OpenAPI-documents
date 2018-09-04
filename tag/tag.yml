@@ -225,7 +225,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v2/tags-rpc/subscriptions/heartbeat:
+  /v2/refresh-subscriptions:
     post:
       tags:
         - subscriptions
@@ -238,9 +238,12 @@ paths:
           description: Subscription IDs
           required: false
           schema:
-            type: array
-            items:
-              type: string
+            type: object
+            properties:
+              subscriptionIds:
+                type: array
+                items:
+                  type: string
       responses:
         200:
           description: Success
@@ -258,7 +261,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v2/tags-rpc/subscriptions/query-values:
+  /v2/query-subscription-values:
     post:
       tags:
         - subscriptions
@@ -285,7 +288,7 @@ paths:
           description: Subscription with the given ID was not found
         default:
           $ref: '#/responses/Error'
-  /v2/tags-rpc/subscriptions/delete:
+  /v2/delete-subscriptions:
     post:
       tags:
         - subscriptions
@@ -1275,8 +1278,8 @@ paths:
           description: Tag with the given path not found
         default:
           $ref: '#/responses/Error'
-  # TODO: back to v2
-  /v1/tags-rpc/update-current-values:
+  # TODO: See if cloud handles this route under /v2/ or /v1/... server only handles under /v1/
+  /v2/update-current-values:
     post:
       tags:
         - tags
