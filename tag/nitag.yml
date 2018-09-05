@@ -322,7 +322,7 @@ paths:
     post:
       tags:
         - subscriptions
-      summary: Get the current values for the tags from multiple subscriptions (SystemLink Server Only)
+      summary: Get the current values for the tags from multiple subscriptions (SystemLink Server only)
       description: Get the current values for all tags in multiple subscriptions
       operationId: GetSubscriptionsTagValues
       parameters:
