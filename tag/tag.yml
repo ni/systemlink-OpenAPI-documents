@@ -383,7 +383,7 @@ paths:
     post:
       tags:
         - subscriptions
-      summary: Delete multiple subscriptions
+      summary: Delete multiple subscriptions (SystemLink Server only)
       description: Delete one or more subscriptions based on the request body.
       operationId: DeleteSubscriptions
       parameters:
