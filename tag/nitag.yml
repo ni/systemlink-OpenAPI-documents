@@ -89,7 +89,7 @@ paths:
       parameters:
         - in: body
           name: subscription
-          description: The subscription to create
+          description: Subscription to create
           schema:
             $ref: '#/definitions/Subscription'
           required: false
@@ -190,7 +190,7 @@ paths:
       parameters:
         - in: path
           name: id
-          description: The subscription ID
+          description: Subscription ID
           type: string
           required: true
       responses:
@@ -207,7 +207,7 @@ paths:
       tags:
         - subscriptions
       summary: Get the current values for the tags in a subscription
-      description: Get the current values for tags in the subscription (either all or changed only based on a query parameter).
+      description: Get the current values for the tags in the subscription. Provides support for getting either all values, or only new values since the last request.
       operationId: GetSubscriptionTagValues
       parameters:
         - in: path
@@ -280,7 +280,6 @@ paths:
         200:
           description: Success
           schema:
-            description: The update subscriptions heartbeat response
             type: object
             title: Update Subscriptions Heartbeat Response
             properties:
@@ -424,7 +423,7 @@ paths:
       parameters:
         - in: body
           name: selection
-          description: The selection to create
+          description: Selection to create
           schema:
             $ref: '#/definitions/Selection'
           required: false
@@ -534,7 +533,7 @@ paths:
       parameters:
         - in: path
           name: id
-          description: The selection ID
+          description: Selection ID
           type: string
           required: true
       responses:
@@ -693,7 +692,7 @@ paths:
       parameters:
         - in: path
           name: id
-          description: The selection ID
+          description: Selection ID
           type: string
           required: true
       responses:
@@ -709,10 +708,9 @@ paths:
               description: A tag path and the timestamp of its current value
               properties:
                 timestamp:
-                  description: The current value's timestamp
+                  description: Timestamp associated with the current value
                   type: string
                 path:
-                  description: The tag path
                   type: string
         401:
           $ref: '#/responses/Unauthorized'
@@ -730,7 +728,7 @@ paths:
       parameters:
         - in: path
           name: id
-          description: The selection ID
+          description: Selection ID
           type: string
           required: true
       responses:
@@ -1050,7 +1048,6 @@ paths:
       parameters:
         - in: path
           name: path
-          description: The tag path
           type: string
           required: true
       responses:
