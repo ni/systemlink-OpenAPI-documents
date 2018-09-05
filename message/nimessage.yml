@@ -1,0 +1,434 @@
+swagger: '2.0'
+info:
+  description: Send and receive messages between systems using a publish-subscribe model.
+  version: '1'
+  title: SystemLink Message Service
+  contact:
+    name: National Instruments
+    url: 'https://www.ni.com/systemlink'
+    email: support@ni.com
+basePath: /nimessage
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  apiKeyAuth:
+    type: apiKey
+    name: x-ni-api-key
+    in: header
+  basicAuth:
+    type: basic
+security:
+  - apiKeyAuth: []
+  - basicAuth: []
+
+responses:
+  Unauthorized:
+    description: Not authorized
+    headers:
+      WWW_Authenticate:
+        description: Information for how to authenticate (sent only from SystemLink Server).
+        type: string
+  Error:
+    description: Error
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+parameters:
+  Token:
+    in: path
+    name: token
+    description: Unique session ID
+    type: string
+    required: true
+
+paths:
+  /v1/sessions:
+    post:
+      tags:
+        - sessions
+      summary: Create a session
+      description: Creates a message session with the server to send and receive messages.
+      operationId: CreateSession
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/SessionToken'
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          description: Reached the maximum number of sessions
+        default:
+          $ref: '#/responses/Error'
+  /v1/sessions/{token}:
+    parameters:
+      - $ref: '#/parameters/Token'
+    delete:
+      tags:
+        - sessions
+      summary: Delete a session
+      description: Terminates the message session. If you do not delete the message session, the message service deletes the sesssion after five minutes of inactivity
+      operationId: DeleteSession
+      responses:
+        204:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/sessions/{token}/subscriptions/subscribe:
+    parameters:
+      - $ref: '#/parameters/Token'
+    post:
+      tags:
+        - topics
+      summary: Subscribe to a topic
+      description: Subscribes to a topic to receive all messages broadcast with that topic name.
+      operationId: SubscribeToTopic
+      parameters:
+        - in: body
+          name: topic
+          description: The topic to subscribe to
+          required: true
+          schema:
+            $ref: '#/definitions/Topic'
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/sessions/{token}/subscriptions/unsubscribe:
+    parameters:
+      - $ref: '#/parameters/Token'
+    post:
+      tags:
+        - topics
+      summary: Unsubscribe from a topic
+      description: Unsubscribes from a topic to stop receiving messages for that topic.
+      operationId: UnsubscribeFromTopic
+      parameters:
+        - in: body
+          name: topic
+          description: Topic to unsubscribe from
+          required: true
+          schema:
+            $ref: '#/definitions/Topic'
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+
+  /v1/sessions/{token}/messages:
+    parameters:
+      - $ref: '#/parameters/Token'
+    post:
+      tags:
+        - message queue
+      summary: Publish a message
+      description: Broadcasts a message to a topic. Subscribers of a topic receive every message published to the topic.
+      operationId: PublishMessage
+      parameters:
+        - in: body
+          name: topicAndMessage
+          description: The message to publish, and the topic to publish to
+          required: true
+          schema:
+            $ref: '#/definitions/TopicAndMessage'
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    get:
+      tags:
+        - message queue
+      summary: Read a message from the queue
+      description: Returns a message from the queue. To read a message, subscribe to a topic first.
+      operationId: ReadMessage
+      parameters:
+        - in: query
+          name: timeoutMilliseconds
+          description: Amount of time, in milliseconds, to keep the messaging connection open. May be overridden by a maximum value that the server administrator allows.
+          type: integer
+          required: false
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/TopicAndMessage'
+          description: Success
+        204:
+          description: No messages were available.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags:
+        - message queue
+      summary: Flush the message queue
+      description: Clears all messages from the session queue without reading them.
+      operationId: DeleteMessages
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/sessions/{token}/configuration/queueSizeBytes:
+    parameters:
+      - $ref: '#/parameters/Token'
+    get:
+      tags:
+        - message queue
+      summary: Get the current queue size
+      description: Returns the size (in bytes) of the message queue associated with this session. This is helpful for determining the amount of memory that unread messages are consuming.
+      operationId: GetCurrentQueueSize
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/QueueSizeBytes'
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/sessions/{token}/configuration/maxQueueSizeBytes:
+    parameters:
+      - $ref: '#/parameters/Token'
+    get:
+      tags:
+        - message queue
+      summary: Get the maximum queue size
+      description: Returns the maximum size (in bytes) of the message queue associated with this session. This is helpful for determining how much total memory is available for storing messages.
+      operationId: GetMaximumQueueSize
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/MaxQueueSizeBytes'
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/websocket:
+    get:
+      tags:
+        - webSocket (SystemLink Server only)
+      summary: Open a WebSocket session
+      description: Opens a persistent connection to the web server that allows two-way communication using a JSON
+                   protocol. After you open a connection, you can publish messages and subscribe or unsubscribe to topics.
+                   Refer to the *Models* section to access the schema for these actions. SystemLink Cloud does not support WebSocket connections.
+      operationId: OpenWebSocketSession
+      parameters:
+        - in: header
+          name: Upgrade
+          type: string
+          required: true
+          x-example: websocket
+        - in: header
+          name: Connection
+          type: string
+          required: true
+          x-example: Upgrade
+        - in: header
+          name: Sec-WebSocket-Version
+          description: Protocol version of the WebSocket connection.
+          type: string
+          required: true
+          x-example: 13
+        - in: header
+          name: Sec-WebSocket-Key
+          description: Randomly selected sixteen-byte base64-encoded string. Used to confirm a valid WebSocket handshake. Must be selected randomly for each new connection.
+          type: string
+          required: true
+          x-example: dGhlIHNhbXBsZSBub25jZQ==
+      responses:
+        101:
+          description: Switching Protocols
+          headers:
+            Sec-WebSocket-Accept:
+              description: Used in the WebSocket opening handshake. Set to a value derived from the Sec-WebSocket-Key header.
+              type: string
+        426:
+          description: Upgrade Required
+
+definitions:
+  Error:
+    description: Contains error information
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+      resourceType:
+        description: Type of resource associated with the error
+        type: string
+      resourceId:
+        description: Identifier of the resource associated with the error
+        type: string
+      message:
+        description: Complete error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+      innerErrors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+    example:
+      name: Skyline.OneOrMoreErrorsOccurred
+      code: -251040
+      message: One or more errors occurred. See the contained list for details of each error.
+      args: []
+      innerErrors:
+        - name: Message.SessionTokenNotFound
+          code: -251608
+          resourceType:
+          resourceId:
+          message: Session token 'f755d531-2403-433f-a0b7-463ccb8f2b9' not found.
+          args: ['f755d531-2403-433f-a0b7-463ccb8f2b9']
+  TopicAndMessage:
+    type: object
+    title: Topic and Message
+    required:
+      - topic
+      - message
+    properties:
+      topic:
+        description: Topic name
+        type: string
+      message:
+        description: Message content
+        type: string
+    description: The topic and message content
+    example:
+      topic: systemHealth
+      message: System A has crashed
+  Topic:
+    type: object
+    title: Topic
+    required:
+      - topic
+    properties:
+      topic:
+        description: Topic name
+        type: string
+    description: Topic name
+    example:
+      topic: systemHealth
+  SessionToken:
+    type: object
+    title: Session Token
+    required:
+      - token
+    properties:
+      token:
+        description: Unique session ID
+        type: string
+    description: Unique session ID
+    example:
+      token: BAB2AFFA-7AFA-4C79-BD41-00F25E3B8F61
+  QueueSizeBytes:
+    type: object
+    title: Current Queue Size
+    required:
+      - queueSizeBytes
+    properties:
+      queueSizeBytes:
+        description: Current queue size (in bytes)
+        type: integer
+    description: Current queue size (in bytes)
+    example:
+      queueSizeBytes: 100
+  MaxQueueSizeBytes:
+    type: object
+    title: Maximum Queue Size
+    required:
+      - maxQueueSizeBytes
+    properties:
+      maxQueueSizeBytes:
+        description: Maximum queue size (in bytes)
+        type: integer
+    description: Maximum queue size (in bytes)
+    example:
+      maxQueueSizeBytes: -1
+  WebSocketPublish:
+    type: object
+    title: WebSocket Publish Action
+    required:
+      - action
+      - topic
+      - message
+    properties:
+      action:
+        description: The action to perform. Must be set to "publish".
+        type: string
+        enum: ['publish']
+        example: publish
+      topic:
+        description: Topic to publish a message to
+        type: string
+      message:
+        description: Message to publish
+        type: string
+    example:
+      action: publish
+      topic: systemHealth
+      message: System A has crashed
+  WebSocketSubscribe:
+    type: object
+    title: WebSocket Subscribe Action
+    required:
+      - action
+      - topic
+    properties:
+      action:
+        description: Action to perform. Must be set to "subscribe".
+        type: string
+        enum: ['subscribe']
+        example: subscribe
+      topic:
+        description: Topic to subscribe to
+        type: string
+    example:
+      action: subscribe
+      topic: systemHealth
+  WebSocketUnsubscribe:
+    type: object
+    title: WebSocket Unsubscribe Action
+    required:
+      - action
+      - topic
+    properties:
+      action:
+        description: Action to perform. Must be set to "unsubscribe".
+        type: string
+        enum: ['unsubscribe']
+        example: unsubscribe
+      topic:
+        description: Topic to unsubscribe from
+        type: string
+    example:
+      action: unsubscribe
+      topic: systemHealth
