@@ -225,11 +225,44 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+  /v1/tags-rpc/subscriptions/heartbeat:
+    post:
+        tags:
+          - subscriptions
+        summary: Update the heartbeat timer of multiple subscriptions
+        description: Updates the heartbeat timers of multiple subscriptions. Note that this route is deprecated.
+        operationId: RpcUpdateSubscriptionHeartbeats
+        parameters:
+          - in: body
+            name: subscriptionIds
+            description: Subscription IDs
+            required: false
+            schema:
+              type: array
+              items:
+                type: string
+        responses:
+          200:
+            description: Success
+            schema:
+              description: The update subscriptions heartbeat response
+              type: object
+              title: Update Subscriptions Heartbeat Response
+              properties:
+                invalidSubscriptionIds:
+                  description: List of invalid subscription IDs
+                  type: array
+                  items:
+                    type: string
+          401:
+            $ref: '#/responses/Unauthorized'
+          default:
+            $ref: '#/responses/Error'
   /v2/refresh-subscriptions:
     post:
       tags:
         - subscriptions
-      summary: Update the heartbeat timer of multiple subscriptions
+      summary: Update the heartbeat timer of multiple subscriptions (SystemLink Server only)
       description: Updates the heartbeat timers of multiple subscriptions
       operationId: UpdateSubscriptionHeartbeats
       parameters:
@@ -261,13 +294,68 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+  /v1/tags-rpc/subscriptions/query-values:
+    post:
+      tags:
+      - subscriptions
+      summary: Get the current values for the tags from multiple subscriptions
+      description: Get the current values for all tags in multiple subscriptions. Note that this route is deprecated.
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/responses/GetSubscriptionUpdatesResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Subscription with the given ID was not found
+      parameters:
+      - schema:
+          type: array
+          items:
+            type: string
+        required: false
+        name: subscriptionIds
+        in: body
+        description: The subscription ids
+      operationId: get-subscriptions-tag-values
   /v2/query-subscription-values:
     post:
       tags:
         - subscriptions
-      summary: Get the current values for the tags from multiple subscriptions
+      summary: Get the current values for the tags from multiple subscriptions (SystemLink Server Only)
       description: Get the current values for all tags in multiple subscriptions
       operationId: GetSubscriptionsTagValues
+      parameters:
+        - in: body
+          name: subscriptionIds
+          description: Subscription IDs
+          required: false
+          schema:
+            type: object
+            properties:
+              subscriptionIds:
+                type: array
+                items:
+                  type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/responses/GetSubscriptionUpdatesResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: Subscription with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
+  /v1/tags-rpc/subscriptions/delete:
+    post:
+      tags:
+        - subscriptions
+      summary: Delete multiple subscriptions
+      description: Delete one or more subscriptions based on the request body. Note that this route is deprecated.
+      operationId: RpcDeleteSubscriptions
       parameters:
         - in: body
           name: subscriptionIds
@@ -281,11 +369,17 @@ paths:
         200:
           description: Success
           schema:
-            $ref: '#/responses/GetSubscriptionUpdatesResponse'
+            description: Response for deleting subscriptions
+            type: object
+            title: Delete Subscriptions Response
+            properties:
+              invalidSubscriptionIds:
+                description: List of invalid subscription IDs
+                type: array
+                items:
+                  type: string
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Subscription with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/delete-subscriptions:
@@ -299,11 +393,14 @@ paths:
         - in: body
           name: subscriptionIds
           description: Subscription IDs
-          schema:
-            type: array
-            items:
-              type: string
           required: false
+          schema:
+            type: object
+            properties:
+              subscriptionIds:
+                type: array
+                items:
+                  type: string
       responses:
         200:
           description: Success
@@ -1278,12 +1375,35 @@ paths:
           description: Tag with the given path not found
         default:
           $ref: '#/responses/Error'
-  # TODO: See if cloud handles this route under /v2/ or /v1/... server only handles under /v1/
-  /v2/update-current-values:
+  /v1/tags-rpc/update-current-values:
     post:
       tags:
         - tags
       summary: Update the current values of multiple tags
+      description: Push multiple current value updates to multiple tags in one request. Note that this route is deprecated.
+      operationId: RpcUpdateTagCurrentValues
+      parameters:
+        - in: body
+          name: updates
+          description: Updates
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TagUpdate'
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/update-current-values:
+    post:
+      tags:
+        - tags
+      summary: Update the current values of multiple tags (SystemLink Server only)
       description: Push multiple current value updates to multiple tags in one request.
       operationId: UpdateTagCurrentValues
       parameters:
@@ -1374,11 +1494,12 @@ definitions:
       args: ['foo']
   TagType:
     type: string
+    title: Tag Data Type
     enum: &TYPES [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
   TagWithValue:
     description: A tag and its current value
     type: object
-    title: Tag with value
+    title: Tag With Value
     properties:
       tag:
         $ref: '#/definitions/Tag'
@@ -1513,18 +1634,14 @@ definitions:
         type: string
         enum: *TYPES
       properties:
-        description: Properties
         type: object
       path:
-        description: Path
         type: string
       keywords:
-        description: Keywords
         type: array
         items:
           type: string
       collectAggregates:
-        description: Whether to collect aggregates
         type: boolean
     example:
       type: DOUBLE
@@ -1563,12 +1680,10 @@ definitions:
     title: Subscription Update
     properties:
       updates:
-        description: List of updates
         type: array
         items:
           $ref: '#/definitions/SubscriptionTagUpdate'
       subscriptionId:
-        description: Unique identifier of the subscription
         type: string
       nonexistentTags:
         description: List of tags which did not exist
@@ -1627,7 +1742,7 @@ definitions:
   Subscription:
     description: Object describing a subscription's metadata
     type: object
-    title: Get Subscription Response
+    title: Subscription
     properties:
       updatesOnly:
         description: Whether to notify only about updates
@@ -1661,7 +1776,6 @@ definitions:
         type: integer
         maximum: 900
       id:
-        description: Selection ID
         type: string
     example:
       searchPaths: [tag1, tag2, tag3]
