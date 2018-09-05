@@ -97,21 +97,20 @@ paths:
         200:
           description: Success
           schema:
-            description: The response for creating a subscription
+            description: Response for creating a subscription
             type: object
             title: Create Subscription Response
             properties:
               subscriptionId:
-                description: The unique identifier of the subscription
                 type: string
               nonexistentTags:
-                description: A list of tags which did not exist
+                description: List of tags which did not exist
                 type: array
                 items:
                   type: string
               alias:
                 type: string
-                description: The name of the subscription
+                description: Name of the subscription
         400:
           description: Bad Request
         401:
@@ -200,7 +199,7 @@ paths:
         401:
           $ref: '#/responses/Unauthorized'
         404:
-          description: Subscription with the given ID not found
+          description: Subscription with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/subscriptions/{id}/values/current:
@@ -235,7 +234,7 @@ paths:
         parameters:
           - in: body
             name: subscriptionIds
-            description: Subscription IDs
+            description: IDs of the subscriptions whose heartbeat timers should be updated
             required: false
             schema:
               type: array
@@ -245,7 +244,7 @@ paths:
           200:
             description: Success
             schema:
-              description: The update subscriptions heartbeat response
+              description: Update subscriptions heartbeat response
               type: object
               title: Update Subscriptions Heartbeat Response
               properties:
@@ -268,7 +267,7 @@ paths:
       parameters:
         - in: body
           name: subscriptionIds
-          description: Subscription IDs
+          description: IDs of the subscriptions whose heartbeat timers should be updated
           required: false
           schema:
             type: object
@@ -300,6 +299,16 @@ paths:
       - subscriptions
       summary: Get the current values for the tags from multiple subscriptions
       description: Get the current values for all tags in multiple subscriptions. Note that this route is deprecated.
+      operationId: RpcGetSubscriptionsTagValues
+      parameters:
+        - in: body
+          name: subscriptionIds
+          description: Subscription ids
+          schema:
+            type: array
+            items:
+              type: string
+          required: false
       responses:
         200:
           description: Success
@@ -309,16 +318,6 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           description: Subscription with the given ID was not found
-      parameters:
-      - schema:
-          type: array
-          items:
-            type: string
-        required: false
-        name: subscriptionIds
-        in: body
-        description: The subscription ids
-      operationId: get-subscriptions-tag-values
   /v2/query-subscription-values:
     post:
       tags:
@@ -329,7 +328,6 @@ paths:
       parameters:
         - in: body
           name: subscriptionIds
-          description: Subscription IDs
           required: false
           schema:
             type: object
@@ -359,7 +357,6 @@ paths:
       parameters:
         - in: body
           name: subscriptionIds
-          description: Subscription IDs
           schema:
             type: array
             items:
@@ -392,7 +389,6 @@ paths:
       parameters:
         - in: body
           name: subscriptionIds
-          description: Subscription IDs
           required: false
           schema:
             type: object
@@ -629,7 +625,7 @@ paths:
       parameters:
         - in: path
           name: id
-          description: The selection ID
+          description: Selection ID
           type: string
           required: true
       responses:
@@ -638,7 +634,7 @@ paths:
           schema:
             type: array
             items:
-              description: Tag path with current value (timestamped)
+              description: Tag path with timestamped value
               type: object
               title: Tag Path With Current Value
               properties:
@@ -672,7 +668,7 @@ paths:
           schema:
             type: array
             items:
-              description: Tag path with timestamped value
+              description: Tag path with value
               type: object
               title: Tag Path With Value
               properties:
@@ -710,7 +706,7 @@ paths:
             items:
               type: object
               title: Tag Path and Timestamp
-              description: A tag path and the timestamp of it's current value
+              description: A tag path and the timestamp of its current value
               properties:
                 timestamp:
                   description: The current value's timestamp
@@ -748,7 +744,6 @@ paths:
               title: Tag Paths and Count Values
               properties:
                 path:
-                  description: Tag path
                   type: string
                 min:
                   description: Minimum value from the tag's aggregates
@@ -783,7 +778,6 @@ paths:
               title: Tag Path With Max Aggregate
               properties:
                 path:
-                  description: Tag path
                   type: string
                 max:
                   description: Maximum value from the tag's aggregates
@@ -818,7 +812,6 @@ paths:
               title: Tag Path and Mean Value
               properties:
                 path:
-                  description: The tag path
                   type: string
                 mean:
                   description: Mean value from the tag's aggregates
@@ -853,7 +846,6 @@ paths:
               title: Tag Paths and Count Values
               properties:
                 path:
-                  description: Tag path
                   type: string
                 count:
                   description: Count value from the tag's aggregates
@@ -902,7 +894,7 @@ paths:
             title: Tag List and Merge Flag
             properties:
               tags:
-                description: A list of tags
+                description: List of tags
                 type: array
                 items:
                   $ref: '#/definitions/Tag'
@@ -1139,7 +1131,6 @@ paths:
       parameters:
         - in: path
           name: path
-          description: Tag path
           type: string
           required: true
       responses:
@@ -1211,7 +1202,7 @@ paths:
       parameters:
         - in: path
           name: path
-          description: The tag path
+          description: Tag path
           type: string
           required: true
       responses:
@@ -1235,7 +1226,7 @@ paths:
       parameters:
         - in: path
           name: path
-          description: The tag path
+          description: Tag path
           type: string
           required: true
       responses:
@@ -1259,7 +1250,7 @@ paths:
       parameters:
         - in: path
           name: path
-          description: The tag path
+          description: Tag path
           type: string
           required: true
       responses:
@@ -1292,7 +1283,7 @@ paths:
         401:
           $ref: '#/responses/Unauthorized'
         404:
-          description: Tag with the given path not found
+          description: Tag with the given path was not found
         default:
           $ref: '#/responses/Error'
       parameters:
@@ -1318,7 +1309,7 @@ paths:
         401:
           $ref: '#/responses/Unauthorized'
         404:
-          description: Tag with the given path not found
+          description: Tag with the given path was not found
         default:
           $ref: '#/responses/Error'
       parameters:
@@ -1350,7 +1341,7 @@ paths:
         401:
           $ref: '#/responses/Unauthorized'
         404:
-          description: Tag with the given path not found
+          description: Tag with the given path was not found
         default:
           $ref: '#/responses/Error'
   /v2/tags/{path}/reset-aggregates:
@@ -1363,7 +1354,7 @@ paths:
       parameters:
         - in: path
           name: path
-          description: The tag path
+          description: Tag path
           type: string
           required: true
       responses:
@@ -1372,7 +1363,7 @@ paths:
         401:
           $ref: '#/responses/Unauthorized'
         404:
-          description: Tag with the given path not found
+          description: Tag with the given path was not found
         default:
           $ref: '#/responses/Error'
   /v1/tags-rpc/update-current-values:
@@ -1529,10 +1520,8 @@ definitions:
     title: Tag Value
     properties:
       value:
-        description: Tag value
         type: string
       type:
-        description: Tag type
         type: string
         enum: *TYPES
     example:
@@ -1545,7 +1534,6 @@ definitions:
     properties:
       path:
         type: string
-        description: Tag path
       current:
         $ref: '#/definitions/TagCurrentValue'
       aggregates:
@@ -1657,7 +1645,6 @@ definitions:
     title: Tag Update
     properties:
       path:
-        description: Tag path
         type: string
       updates:
         type: array
@@ -1712,7 +1699,6 @@ definitions:
         description: Updated tag value
         type: string
       type:
-        description: Tag type
         type: string
         enum: *TYPES
       timestamp:
@@ -1767,7 +1753,6 @@ definitions:
       - searchPaths
     properties:
       searchPaths:
-        description: Tag search paths
         type: array
         items:
           type: string
