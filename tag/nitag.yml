@@ -237,9 +237,12 @@ paths:
             description: IDs of the subscriptions whose heartbeat timers should be updated
             required: false
             schema:
-              type: array
-              items:
-                type: string
+              type: object
+              properties:
+                subscriptionIds:
+                  type: array
+                  items:
+                    type: string
         responses:
           200:
             description: Success
@@ -302,12 +305,15 @@ paths:
       parameters:
         - in: body
           name: subscriptionIds
-          description: Subscription ids
-          schema:
-            type: array
-            items:
-              type: string
+          description: IDs of the subscriptions whose heartbeat timers should be updated
           required: false
+          schema:
+            type: object
+            properties:
+              subscriptionIds:
+                type: array
+                items:
+                  type: string
       responses:
         200:
           description: Success
@@ -356,11 +362,15 @@ paths:
       parameters:
         - in: body
           name: subscriptionIds
-          schema:
-            type: array
-            items:
-              type: string
+          description: IDs of the subscriptions whose heartbeat timers should be updated
           required: false
+          schema:
+            type: object
+            properties:
+              subscriptionIds:
+                type: array
+                items:
+                  type: string
       responses:
         200:
           description: Success
@@ -527,8 +537,8 @@ paths:
     get:
       tags:
         - selections
-      summary: Get current values in a selection
-      description: Get the current values and aggregates of the tags in a selection.
+      summary: Get the tags in a selection, including their current and aggregate values
+      description: Get the tags in a selection, including their current and aggregate values
       operationId: GetSelectionTagsWithValues
       parameters:
         - in: path
@@ -592,8 +602,8 @@ paths:
     get:
       tags:
         - selections
-      summary: Get the values of the tags in a selection
-      description: Get the current values of the tags in a given selection
+      summary: Get the values of the tags in a selection, excluding tag metadata
+      description: Get the current values of the tags in a given selection. The metadata for the tags will not be included.
       operationId: GetSelectionValues
       parameters:
         - in: path
@@ -955,7 +965,7 @@ paths:
           required: false
         - in: query
           name: properties
-          description: Comma-separated list of key/value property pairs.
+          description: Comma-separated list of name=value strings, e.g. key1=value,key2=value.
           type: string
           required: false
         - in: query
@@ -1025,7 +1035,7 @@ paths:
           required: false
         - in: query
           name: properties
-          description: Comma-separated list of key/value property pairs
+          description: Comma-separated list of name=value strings, e.g. key1=value,key2=value.
           type: string
           required: false
         - in: query
