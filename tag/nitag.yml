@@ -1513,13 +1513,13 @@ definitions:
       current:
         value:
           type: DOUBLE
-          value: 3.14
+          value: "3.14"
         timestamp: '2018-09-04T18:45:08.540Z'
       aggregates:
-        sum: 10.5
-        min: 0.0
-        max: 5.0
-        mean: 2.0
+        sum: "10.5"
+        min: "0.0"
+        max: "5.0"
+        mean: "2.0"
         count: 5
   TagValue:
     description: Value of a tag
@@ -1533,7 +1533,7 @@ definitions:
         enum: *TYPES
     example:
       type: DOUBLE
-      value: 3.14
+      value: "3.14"
   TagPathWithCurrentAndAggregateValue:
     description: Tag path with its current value and aggregates
     type: object
@@ -1550,12 +1550,12 @@ definitions:
       current:
         value:
           type: DOUBLE
-          value: 3.14
+          value: "3.14"
       aggregates:
-        sum: 10.5
-        min: 0.0
-        max: 5.0
-        mean: 2.0
+        sum: "10.5"
+        min: "0.0"
+        max: "5.0"
+        mean: "2.0"
         count: 5
   TagCurrentValue:
     description: Current value of a tag
@@ -1571,7 +1571,7 @@ definitions:
     example:
       value:
         type: DOUBLE
-        value: 3.14
+        value: "3.14"
       timestamp: '2018-09-04T18:45:08.540Z'
   TagCurrentAndAggregateValue:
     type: object
@@ -1585,13 +1585,13 @@ definitions:
       current:
         value:
           type: DOUBLE
-          value: 3.14
+          value: "3.14"
         timestamp: '2018-09-04T18:45:08.540Z'
       aggregates:
-        sum: 10.5
-        min: 0.0
-        max: 5.0
-        mean: 2.0
+        sum: "10.5"
+        min: "0.0"
+        max: "5.0"
+        mean: "2.0"
         count: 5
   TagAggregates:
     description: Aggregate values of a tag
@@ -1614,10 +1614,10 @@ definitions:
         description: Average aggregate value
         type: number
     example:
-      sum: 10.5
-      min: 0.0
-      max: 5.0
-      mean: 2.0
+      sum: "10.5"
+      min: "0.0"
+      max: "5.0"
+      mean: "2.0"
       count: 5
   Tag:
     description: Object containing a tag's metadata, excluding current and aggregate values
@@ -1662,11 +1662,11 @@ definitions:
       updates:
         - value:
             type: DOUBLE
-            value: 3.14
+            value: "3.14"
           timestamp: '2018-09-04T18:45:08.540Z'
         - value:
             type: DOUBLE
-            value: 5.0
+            value: "5.0"
           timestamp: '2018-09-04T18:45:09.540Z'
   SubscriptionUpdate:
     description: Updates for a subscriptions
@@ -1716,7 +1716,7 @@ definitions:
       aggregates:
         $ref: '#/definitions/TagAggregates'
     example:
-      value: 5.0
+      value: "5.0"
       type: DOUBLE
       timestamp: '2018-09-04T18:45:08.540Z'
       tag:
@@ -1727,10 +1727,10 @@ definitions:
         path: foo
         keywords: [fooKeyword, barKeyword]
       aggregates:
-        sum: 10.5
-        min: 0.0
-        max: 5.0
-        mean: 2.0
+        sum: "10.5"
+        min: "0.0"
+        max: "5.0"
+        mean: "2.0"
         count: 5
   Subscription:
     description: Object describing a subscription's metadata
