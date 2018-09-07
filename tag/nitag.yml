@@ -142,18 +142,18 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v2/subscriptions/{id}:
-    parameters:
-    - in: path
-      name: id
-      description: Subscription ID
-      type: string
-      required: true
     get:
       tags:
         - subscriptions
       summary: Get a subscription
       description: Get a subscription's metadata
       operationId: GetSubscription
+      parameters:
+        - in: path
+          name: id
+          description: Subscription ID
+          type: string
+          required: true
       responses:
         200:
           schema:
@@ -171,6 +171,12 @@ paths:
       summary: Delete a subscription
       description: Delete a specific subscription.
       operationId: DeleteSubscription
+      parameters:
+        - in: path
+          name: id
+          description: Subscription ID
+          type: string
+          required: true
       responses:
         204:
           description: Successfully deleted
@@ -471,12 +477,6 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}:
-    parameters:
-      - in: path
-        name: id
-        description: Selection ID
-        type: string
-        required: true
     put:
       tags:
         - selections
@@ -484,6 +484,11 @@ paths:
       description: Modify a selection
       operationId: UpdateSelection
       parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
         - in: body
           name: selection
           description: Selection to replace the existing selection with
@@ -509,6 +514,12 @@ paths:
       summary: Get a selection
       description: Get a selection's metadata.
       operationId: GetSelection
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
       responses:
         200:
           schema:
@@ -526,6 +537,12 @@ paths:
       summary: Delete a selection
       description: Delete a selection
       operationId: DeleteSelection
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
       responses:
         204:
           description: Successfully deleted
@@ -558,18 +575,18 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}/tags:
-    parameters:
-    - in: path
-      name: id
-      description: Selection ID
-      type: string
-      required: true
     get:
       tags:
         - selections
       summary: Get the tags in a selection
       description: Get the metadata of the tags in a selection
       operationId: GetSelectionTags
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
       responses:
         200:
           description: Success
@@ -589,6 +606,12 @@ paths:
       summary: Delete all of the tags in a selection
       description: Delete all of the tags in a seletion
       operationId: DeleteSelectionTags
+      parameters:
+        - in: path
+          name: id
+          description: Selection ID
+          type: string
+          required: true
       responses:
         204:
           description: Successfully deleted
@@ -1072,12 +1095,6 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v2/tags/{path}:
-    parameters:
-      - in: path
-        name: path
-        description: Tag path
-        type: string
-        required: true
     put:
       tags:
         - tags
@@ -1085,6 +1102,11 @@ paths:
       description: Replace the tag at the path, or create one if one doesn''t exist. A complete resource representation must be sent (no partial updates).
       operationId: CreateOrReplaceTag
       parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
         - in: body
           name: tag
           description: Tag to create or replace
@@ -1106,6 +1128,12 @@ paths:
       summary: Get a tag
       description: Get the metadata of a single tag.
       operationId: GetTag
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
       responses:
         200:
           description: Success
@@ -1121,6 +1149,12 @@ paths:
       summary: Delete a tag
       description: Deletes a tag
       operationId: DeleteTag
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
       responses:
         204:
           description: 'No content: Tag deleted successfully'
@@ -1152,18 +1186,18 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v2/tags/{path}/values/current:
-    parameters:
-    - in: path
-      name: path
-      description: Tag path
-      type: string
-      required: true
     get:
       tags:
         - tags
       summary: Get the current value of a tag
       description: Get the current value of the tag at the path.
       operationId: get-tag-values-current
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
       responses:
         200:
           description: Success
@@ -1181,6 +1215,18 @@ paths:
       summary: Update the current value of a tag
       description: Update the current value of the tag at the path.
       operationId: UpdateTagCurrentValue
+      parameters:
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+        - in: body
+          name: tagValue
+          description: Timestamped value
+          schema:
+            $ref: '#/definitions/TagCurrentValue'
+          required: true
       responses:
         200:
           description: Tag Value Updated
@@ -1192,13 +1238,6 @@ paths:
           description: Conflict
         default:
           $ref: '#/responses/Error'
-      parameters:
-        - in: body
-          name: tagValue
-          description: Timestamped value
-          schema:
-            $ref: '#/definitions/TagCurrentValue'
-          required: true
   /v2/tags/{path}/values/current/timestamp:
     get:
       tags:
