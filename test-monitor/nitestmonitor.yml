@@ -31,40 +31,25 @@ definitions:
       name:
         description: String error code
         type: string
-        example: Skyline.OneOrMoreErrorsOccurred
       code:
         description: Numeric error code
         type: integer
-        example: -251040
       resourceType:
         description: Type of resource associated with the error
         type: string
-        example: TestResult
       resourceId:
         description: Identifier of the resource associated with the error
         type: string
-        example: 4afb2ce3741fe11d88838cc9
       message:
-        description: Filled in error message
+        description: Complete error message
         type: string
-        example: >-
-          One or more errors occurred. See the contained list for details of
-          each error.
       args:
         description: Positional argument values for the error code
         type: array
         items:
           type: string
-          example: 4afb2ce3741fe11d88838cc9
       innerErrors:
         type: array
-        example:
-          - name: TestMonitor.InvalidId
-            code: -253700
-            resourceType: TestResult
-            resourceId: 4afb2ce3741fe11d88838cc9
-            message: Invalid Id.
-            args: []
         items:
           $ref: '#/definitions/Error'
     example:
@@ -916,11 +901,13 @@ responses:
 paths:
   /:
     get:
-      operationId: RootEndpoint
-      x-ni-request-all-privileges: true
+      tags: [versioning]
       summary: API information
       description: Returns information about API versions and available operations.
-      tags: [versioning]
+      operationId: RootEndpoint
+      x-ni-request-all-privileges: true
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
       responses:
         200:
@@ -943,11 +930,13 @@ paths:
         type: string
         required: true
     get:
-      operationId: RootEndpointWithVersion
-      x-ni-request-all-privileges: true
+      tags: [versioning]
       summary: API version information
       description: Returns available operations for a single version of the API.
-      tags: [versioning]
+      operationId: RootEndpointWithVersion
+      x-ni-request-all-privileges: true
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
       responses:
         200:
@@ -960,13 +949,12 @@ paths:
             $ref: '#/definitions/Error'
   /v1/query-results:
     post:
+      tags: [results]
+      summary: Queries test results
+      description: Uses input criteria to filter and return test results.  An empty request body queries all test results.
       operationId: query-results
       x-ni-operation: queryResults
       x-ni-privilege: Read
-      summary: Queries test results
-      description: Uses input criteria to filter and return test results.  An empty request body queries all test results.
-      tags:
-        - results
       parameters:
         - in: body
           name: postBody
@@ -991,13 +979,12 @@ paths:
           $ref: '#/responses/Error'
   /v1/results:
     put:
+      tags: [results]
+      summary: Updates existing test results
+      description: Updates existing test results by merging or replacing values.
       operationId: update-results
       x-ni-operation: updateResults
       x-ni-privilege: Write
-      summary: Updates existing test results
-      description: Updates existing test results by merging or replacing values.
-      tags:
-        - results
       parameters:
         - in: body
           name: requestBody
@@ -1031,13 +1018,12 @@ paths:
         default:
           $ref: '#/responses/Error'
     post:
+      tags: [results]
+      summary: Creates new test results
+      description: Creates new test results from the supplied models.  The server automatically generates the result ids.  The server will populate the start time if one is not provided.
       operationId: create-results
       x-ni-operation: createResults
       x-ni-privilege: Write
-      summary: Creates new test results
-      description: Creates new test results from the supplied models.  The server automatically generates the result ids.  The server will populate the start time if one is not provided.
-      tags:
-        - results
       parameters:
         - in: body
           name: requestBody
@@ -1066,13 +1052,12 @@ paths:
           $ref: '#/responses/Error'
   /v1/results/{resultId}:
     delete:
+      tags: [results]
+      summary: Deletes a test result
+      description: Deletes the test result with the specified id.  The request succeeds for result ids that do not exist.
       operationId: DeleteResult
       x-ni-operation: deleteResult
       x-ni-privilege: Write
-      summary: Deletes a test result
-      description: Deletes the test result with the specified id.  The request succeeds for result ids that do not exist.
-      tags: 
-        - results
       parameters:
         - in: path
           name: resultId
@@ -1093,13 +1078,12 @@ paths:
           $ref: '#/responses/Error'
   /v1/delete-results:
     post:
+      tags: [results]
+      summary: Deletes test results
+      description: Deletes multiple test results in a single request.
       operationId: delete-results
       x-ni-operation: deleteResults
       x-ni-privilege: Write
-      summary: Deletes test results
-      description: Deletes multiple test results in a single request.
-      tags:
-        - results
       parameters:
         - in: body
           name: requestBody
@@ -1133,13 +1117,12 @@ paths:
           $ref: '#/responses/Error'
   /v1/query-steps:
     post:
+      tags: [steps]
+      summary: Queries test steps
+      description: Uses input criteria to filter and return test steps.  An empty request body queries all test steps.
       operationId: query-steps
       x-ni-operation: querySteps
       x-ni-privilege: Read
-      summary: Queries test steps
-      description: Uses input criteria to filter and return test steps.  An empty request body queries all test steps.
-      tags:
-        - steps
       parameters:
         - in: body
           name: postBody
@@ -1164,13 +1147,12 @@ paths:
           $ref: '#/responses/Error'
   /v1/steps:
     put:
+      tags: [steps]
+      summary: Update test steps
+      description: Updates existing test steps by replacing values for the specified fields.
       operationId: update-steps
       x-ni-operation: updateSteps
       x-ni-privilege: Write
-      summary: Update test steps
-      description: Updates existing test steps by replacing values for the specified fields.
-      tags:
-        - steps
       parameters:
         - in: body
           name: requestBody
@@ -1186,13 +1168,12 @@ paths:
         default:
           $ref: '#/responses/Error'
     post:
+      tags: [steps]
+      summary: Create test steps
+      description: Creates new test steps from the supplied models.  The result associated with the step must exist prior to step creation.  The server automatically generates step ids if not supplied.
       operationId: create-steps
       x-ni-operation: createSteps
       x-ni-privilege: Write
-      summary: Create test steps
-      description: Creates new test steps from the supplied models.  The result associated with the step must exist prior to step creation.  The server automatically generates step ids if not supplied.
-      tags:
-        - steps
       parameters:
         - in: body
           name: requestBody
@@ -1211,13 +1192,12 @@ paths:
           $ref: '#/responses/Error'
   /v1/results/{resultId}/steps/{stepId}:
     delete:
+      tags: [steps]
+      summary: Deletes a test step
+      description: Deletes the test step with the specified id.  The request succeeds for step ids that do not exist.
       operationId: DeleteStep
       x-ni-operation: deleteStep
       x-ni-privilege: Write
-      summary: Deletes a test step
-      description: Deletes the test step with the specified id.  The request succeeds for step ids that do not exist.
-      tags: 
-       - steps
       parameters:
         - in: path
           name: resultId
@@ -1238,13 +1218,12 @@ paths:
           $ref: '#/responses/Error'
   /v1/delete-steps:
     post:
+      tags: [steps]
+      summary: Deletes test steps
+      description: Deletes multiple test steps in a single request.
       operationId: delete-steps
       x-ni-operation: deleteSteps
       x-ni-privilege: Write
-      summary: Deletes test steps
-      description: Deletes multiple test steps in a single request.
-      tags:
-        - steps
       parameters:
         - in: body
           name: requestBody
@@ -1263,13 +1242,12 @@ paths:
           $ref: '#/responses/Error'
   /v1/ping:
     get:
+      tags: [deprecated]
+      summary: Pings the test monitor service
+      description: Deprecated.  Pings the test monitor service to ensure that it is online.
       operationId: ping
       x-ni-privilege: Read
       deprecated: true
-      summary: Pings the test monitor service
-      description: Deprecated.  Pings the test monitor service to ensure that it is online.
-      tags:
-        - deprecated
       responses:
         204:
           description: No Content
