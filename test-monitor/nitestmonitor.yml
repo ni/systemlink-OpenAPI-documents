@@ -106,7 +106,7 @@ definitions:
 
           - deleteStep: The ability to delete test steps
 
-          - deleteManySteps: The ability to delete multiple test steps          
+          - deleteManySteps: The ability to delete multiple test steps
 
         type: object
         properties:
@@ -951,7 +951,7 @@ paths:
     post:
       tags: [results]
       summary: Queries test results
-      description: Uses input criteria to filter and return test results.  An empty request body queries all test results.
+      description: Uses input criteria to filter and return test results. An empty request body queries all test results.
       operationId: query-results
       x-ni-operation: queryResults
       x-ni-privilege: Read
@@ -1020,7 +1020,7 @@ paths:
     post:
       tags: [results]
       summary: Creates new test results
-      description: Creates new test results from the supplied models.  The server automatically generates the result ids.  The server will populate the start time if one is not provided.
+      description: Creates new test results from the supplied models. The server automatically generates the result ids. The server will populate the start time if one is not provided.
       operationId: create-results
       x-ni-operation: createResults
       x-ni-privilege: Write
@@ -1054,7 +1054,7 @@ paths:
     delete:
       tags: [results]
       summary: Deletes a test result
-      description: Deletes the test result with the specified id.  The request succeeds for result ids that do not exist.
+      description: Deletes the test result with the specified id. The request succeeds for result ids that do not exist.
       operationId: DeleteResult
       x-ni-operation: deleteResult
       x-ni-privilege: Write
@@ -1119,7 +1119,7 @@ paths:
     post:
       tags: [steps]
       summary: Queries test steps
-      description: Uses input criteria to filter and return test steps.  An empty request body queries all test steps.
+      description: Uses input criteria to filter and return test steps. An empty request body queries all test steps.
       operationId: query-steps
       x-ni-operation: querySteps
       x-ni-privilege: Read
@@ -1170,7 +1170,7 @@ paths:
     post:
       tags: [steps]
       summary: Create test steps
-      description: Creates new test steps from the supplied models.  The result associated with the step must exist prior to step creation.  The server automatically generates step ids if not supplied.
+      description: Creates new test steps from the supplied models. The result associated with the step must exist prior to step creation. The server automatically generates step ids if not supplied.
       operationId: create-steps
       x-ni-operation: createSteps
       x-ni-privilege: Write
@@ -1194,7 +1194,7 @@ paths:
     delete:
       tags: [steps]
       summary: Deletes a test step
-      description: Deletes the test step with the specified id.  The request succeeds for step ids that do not exist.
+      description: Deletes the test step with the specified id. The request succeeds for step ids that do not exist.
       operationId: DeleteStep
       x-ni-operation: deleteStep
       x-ni-privilege: Write
@@ -1244,7 +1244,7 @@ paths:
     get:
       tags: [deprecated]
       summary: Pings the test monitor service
-      description: Deprecated.  Pings the test monitor service to ensure that it is online.
+      description: Deprecated. Pings the test monitor service to ensure that it is online.
       operationId: ping
       x-ni-privilege: Read
       deprecated: true
