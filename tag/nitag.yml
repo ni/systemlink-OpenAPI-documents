@@ -1514,7 +1514,7 @@ definitions:
         value:
           type: DOUBLE
           value: "3.14"
-        timestamp: '2018-09-04T18:45:08.540Z'
+        timestamp: '2018-09-04T18:45:08Z'
       aggregates:
         sum: "10.5"
         min: "0.0"
@@ -1572,7 +1572,7 @@ definitions:
       value:
         type: DOUBLE
         value: "3.14"
-      timestamp: '2018-09-04T18:45:08.540Z'
+      timestamp: '2018-09-04T18:45:08Z'
   TagCurrentAndAggregateValue:
     type: object
     title: Tag Current And Aggregate Value
@@ -1586,7 +1586,7 @@ definitions:
         value:
           type: DOUBLE
           value: "3.14"
-        timestamp: '2018-09-04T18:45:08.540Z'
+        timestamp: '2018-09-04T18:45:08Z'
       aggregates:
         sum: "10.5"
         min: "0.0"
@@ -1663,11 +1663,11 @@ definitions:
         - value:
             type: DOUBLE
             value: "3.14"
-          timestamp: '2018-09-04T18:45:08.540Z'
+          timestamp: '2018-09-04T18:45:08Z'
         - value:
             type: DOUBLE
             value: "5.0"
-          timestamp: '2018-09-04T18:45:09.540Z'
+          timestamp: '2018-09-04T18:45:08Z'
   SubscriptionUpdate:
     description: Updates for a subscriptions
     type: object
@@ -1718,7 +1718,7 @@ definitions:
     example:
       value: "5.0"
       type: DOUBLE
-      timestamp: '2018-09-04T18:45:08.540Z'
+      timestamp: '2018-09-04T18:45:08Z'
       tag:
         type: DOUBLE
         properties:
