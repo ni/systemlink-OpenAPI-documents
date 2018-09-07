@@ -978,6 +978,29 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v1/results:
+    get:
+      tags: [results]
+      summary: Gets test results
+      description: Gets a list of test results.
+      operationId: get-results
+      x-ni-operation: getResults
+      x-ni-privilege: Read
+      parameters:
+        - in: query
+          name: skip
+          type: integer
+          default: 0
+        - in: query
+          name: take
+          type: integer
+          default: -1
+      responses:
+        200:
+          $ref: '#/responses/ResultsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
     put:
       tags: [results]
       summary: Updates existing test results
@@ -1146,6 +1169,29 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v1/steps:
+    get:
+      tags: [steps]
+      summary: Gets test steps
+      description: Gets a list of test steps.
+      operationId: get-steps
+      x-ni-operation: getSteps
+      x-ni-privilege: Read
+      parameters:
+        - in: query
+          name: skip
+          type: integer
+          default: 0
+        - in: query
+          name: take
+          type: integer
+          default: -1
+      responses:
+        200:
+          $ref: '#/responses/StepsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
     put:
       tags: [steps]
       summary: Update test steps
