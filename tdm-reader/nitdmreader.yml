@@ -1,0 +1,508 @@
+swagger: '2.0'
+info:
+  version: '1'
+  title: TDMReader Web Service
+  description: TDMReader HTTP API
+  contact:
+    name: National Instruments
+    url: 'https://www.ni.com/systemlink'
+    email: support@ni.com
+basePath: /nitdmreader
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  basicAuth:
+    type: basic
+  cookieAuth:
+    type: apiKey
+    in: header
+    name: Cookie
+security:
+  - basicAuth: []
+  - cookieAuth: []
+x-ni-routing-key: Skyline.TDMReader
+definitions:
+  Error:
+    description: Contains error information
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+      resourceType:
+        description: Type of resource associated with the error
+        type: string
+      resourceId:
+        description: Identifier of the resource associated with the error
+        type: string
+      message:
+        description: Complete error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+      innerErrors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+    example:
+      name: Skyline.OneOrMoreErrorsOccurred
+      code: -251040
+      message: >-
+        One or more errors occurred. See the contained list for details of each
+        error.
+      args: []
+      innerErrors:
+        - name: TDMReader.FileServiceFailed
+          code: -253500
+          resourceType: File
+          resourceId: 4afb2ce3741fe11d88838cc9
+          message: File service failed.
+          args: []
+  Operation:
+    description: An operation provided by the API
+    type: object
+    properties:
+      available:
+        type: boolean
+        description: Whether the operation is available to the caller
+      version:
+        type: integer
+        description: The version of the available operation
+    required: [available]
+    example:
+      available: true
+      version: 1
+  V1Operations:
+    description: V1 operations
+    type: object
+    properties:
+      operations:
+        description: >-
+          Available operations in the v1 version of the API:
+
+          - readData: The ability to read data
+        type: object
+        properties:
+          readData:
+            $ref: '#/definitions/Operation'
+  Property:
+    description: A property and its value.
+    type: object
+    properties:
+      name:
+        type: string
+        description: name of the property
+        example: Name
+      type:
+        type: string
+        description: data type of 'value'
+        example: String
+      value:
+        type: string
+        example: Channel name
+  Properties:
+    properties:
+      properties:
+        description: Property values.
+        type: array
+        items:
+          $ref: '#/definitions/Property'
+      totalCount:
+        type: integer
+        description: Count of all properties. This could be more than the items returned in Properties.
+        example: 1
+  FileList:
+    description: File Id
+    type: array
+    items:
+      type: string
+      example: 5b8453dba8808c22b0f99023
+  DataWindow:
+    description: Data window.
+    properties:
+      decimatex:
+        type: integer
+        description: Number of pixels on the x axis which is the number of points that can be displayed.
+        example: 1000
+        default: 0
+        format: int32
+      decimatey:
+        type: integer
+        description: Number of pixels on the y axis which is the number of points that can be displayed
+        example: 1000
+        default: 0
+        format: int32
+      xmin:
+        type: number
+        default: 0
+        format: double
+        description: Minimum X value of the display X axis.
+        example: -1
+      xmax:
+        type: number
+        default: 0
+        format: double
+        description: Maximum X value of the display X axis.
+        example: 1
+      ymin:
+        type: number
+        default: 0
+        format: double
+        description: Minimum Y value of the display Y axis.
+        example: -1
+      ymax:
+        type: number
+        default: 0
+        format: double
+        description: Maximum Y value
+        example: 1
+      showLines:
+        type: boolean
+        description: Decimate to line style graph.
+        default: true
+      showPoints:
+        type: boolean
+        default: false
+        description: Decimate to point style graph.
+  OneChannelSpecifier:
+    description: Specification for a channel of data
+    properties:
+      fileId:
+        description: file descriptor
+        type: string
+        example: "5b8453dba8808c22b0f99023"
+      groupName:
+        type: string
+        description: group name
+        example: Group 1
+      channelName:
+        type: string
+        description: channel name
+        example: Channel 1
+    required: 
+      - fileId
+      - groupName
+      - channelName
+  ChannelSpecifications:
+    description: Specification for an array of groups of channels potentially with x-y relationships.
+    properties:
+      xyChannels:
+        type: array
+        items:
+          description: Y channel(s) and an optional x channel
+          properties:
+            xChannel:
+              $ref: '#/definitions/OneChannelSpecifier'
+            yChannels:
+              description: 'Channels to be treated as y channel, associated with x channel'
+              type: array
+              items:
+                $ref: '#/definitions/OneChannelSpecifier'
+          required:
+            - y
+  ChannelSpecificationsAndWindow:
+    description: Channel specifications and data window.
+    properties:
+      channelSpecificationsAndWindow:
+        properties:
+          channelSpecifications:
+            $ref: '#/definitions/ChannelSpecifications'
+          dataWindow:
+            $ref: '#/definitions/DataWindow'
+        required:
+          - channelSpecifications
+  OneChannelData:
+    properties:
+      dataType:
+        type: string
+        description: Native data type of data
+      numericData:
+        type: array
+        description: channel data
+        items:
+          type: number
+      stringData:
+        type: array
+        description: channel data
+        items:
+          type: string
+      decimated:
+        type: boolean
+        description: is returned data decimated
+      undecimatedLength:
+        type: integer
+        description: number of points of undecimated data
+  XYData:
+    properties:
+      x:
+        $ref: '#/definitions/OneChannelData'
+      y:
+        type: array
+        description: y channels
+        items:
+          $ref: '#/definitions/OneChannelData'
+  ReturnedXYData:
+    properties:
+      data:
+        type: array
+        description: X-Y data
+        items:
+            $ref: '#/definitions/XYData'
+      timeUtcOffsetHours:
+        type: number
+        description: The timezone offset applied to local time values
+  NamesList:
+    description: A list of names and a count of all names.
+    properties:
+      names:
+        description: All names
+        type: array
+        items:
+          type: string
+          description: Name
+          example: Channel 1
+      totalCount:
+        type: integer
+        description: Count of all items in the list. This could be more than the items returned in Names.
+        example: 1
+  FileInformation:
+    type: array
+    items:
+      properties:
+        fileId:
+          type: string
+          description: File id
+          example: "5b8453dba8808c22b0f99023"
+        properties:
+          $ref: '#/definitions/Properties'
+        groups:
+          type: array
+          items:
+            properties:
+              name:
+                type: string
+                description: Group name
+                example: Group 1
+              properties:
+                $ref: '#/definitions/Properties'
+              channels:
+                type: array
+                items:
+                  properties:
+                    name:
+                      type: string
+                      description: Channel name
+                      example: Channel 1
+                    dataCount:
+                      type: number
+                      description: Number of data points in the channel.
+                      example: 1
+                    dataType:
+                      type: string
+                      description: Data type of this channel.
+                      example: String
+                    properties:
+                      $ref: '#/definitions/Properties'
+paths:
+  /:
+    get:
+      tags: [versioning]
+      summary: API information
+      description: Returns information about API versions and available operations.
+      operationId: RootEndpoint
+      x-ni-request-all-privileges: true
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Version information
+            title: RootEndpointResponse
+            type: object
+            properties:
+              v1:
+                $ref: '#/definitions/V1Operations'
+              version:
+                description: The implementation version of the web service
+                type: string
+                example: '18.0'
+  /{version}:
+    parameters:
+      - in: path
+        name: version
+        description: The version of the API to retrieve operations.
+        type: string
+        required: true
+    get:
+      tags: [versioning]
+      summary: API version information
+      description: Returns available operations for a single version of the API.
+      operationId: RootEndpointWithVersion
+      x-ni-request-all-privileges: true
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/V1Operations'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/files/{file-id}:
+    get:
+      tags: [properties]
+      summary: Gets file, group, and channel information
+      description: 'Gets all group names, channel names, channel information, and properties at all levels. This does not return channel data.'
+      operationId: getAllFileInfo
+      produces:
+        - application/json
+      parameters:
+        - name: file-id
+          description: File id
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/FileInformation'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/query-files:
+    post:
+      tags: [properties]
+      summary: Gets file, group, and channel information
+      description: 'Gets all group names, channel names, channel information, and properties at all levels. This does not return channel data.'
+      operationId: getMultipleFileInfo
+      produces:
+        - application/json
+      parameters:
+        - name: fileIds
+          description: List of File Ids to inspect.
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/FileList'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/FileInformation'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/files/{file-id}/groups:
+    get:
+      tags: [groups]
+      summary: Lists all groups in the file
+      operationId: getChannelPropertiesCount
+      produces:
+        - application/json
+      parameters:
+        - name: file-id
+          description: File id
+          in: path
+          required: true
+          type: string
+        - name: skip
+          description: Number of items to skip
+          in: query
+          type: integer
+          default: 0
+        - name: take
+          description: Number of items to take after skipping
+          in: query
+          type: integer
+          default: -1
+        - name: returnCount
+          description: Specify this to return the total count of items
+          in: query
+          type: boolean
+          default: false
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/NamesList'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/files/{file-id}/groups/{group-name}/channels:
+    get:
+      tags: [channels]
+      summary: Lists all channels in the group
+      operationId: getChannels
+      produces:
+        - application/json
+      parameters:
+        - name: file-id
+          description: File id
+          in: path
+          required: true
+          type: string
+        - name: group-name
+          description: Group name
+          in: path
+          required: true
+          type: string
+        - name: skip
+          description: Number of items to skip
+          in: query
+          type: integer
+          default: 0
+        - name: take
+          description: Number of items to take after skipping
+          in: query
+          type: integer
+          default: -1
+        - name: returnCount
+          description: Specify this to return the total count of items
+          in: query
+          type: boolean
+          default: false
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/NamesList'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/query-data:
+    post:
+      tags: [data]
+      summary: Returns data from channels.
+      operationId: queryData
+      produces:
+        - application/json
+      parameters:
+        - name: ChannelSpecificationsAndWindow
+          description: Channel specifications and window information.
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/ChannelSpecificationsAndWindow'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/ReturnedXYData'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
