@@ -88,6 +88,8 @@ definitions:
       operations:
         description: >-
           Available operations in the v1 version of the API:
+          - getResults: The ability to get test results
+
           - queryResults: The ability to query test results
 
           - createResults: The ability to create test results
@@ -97,6 +99,8 @@ definitions:
           - deleteResult: The ability to delete test results
 
           - deleteManyResults: The ability to delete multiple test results
+
+          - getSteps: The ability to get test steps
 
           - querySteps: The ability to query test steps
 
@@ -110,6 +114,8 @@ definitions:
 
         type: object
         properties:
+          getResults:
+            $ref: '#/definitions/Operation'
           queryResults:
             $ref: '#/definitions/Operation'
           createResults:
@@ -119,6 +125,8 @@ definitions:
           deleteResult:
             $ref: '#/definitions/Operation'
           deleteManyResults:
+            $ref: '#/definitions/Operation'
+          getSteps:
             $ref: '#/definitions/Operation'
           querySteps:
             $ref: '#/definitions/Operation'
