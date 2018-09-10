@@ -68,14 +68,14 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v1/sessions/{token}:
-    parameters:
-      - $ref: '#/parameters/Token'
     delete:
       tags:
         - sessions
       summary: Delete a session
       description: Terminates the message session. If you do not delete the message session, the message service deletes the sesssion after five minutes of inactivity
       operationId: DeleteSession
+      parameters:
+        - $ref: '#/parameters/Token'
       responses:
         204:
           description: Success
@@ -84,8 +84,6 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v1/sessions/{token}/subscriptions/subscribe:
-    parameters:
-      - $ref: '#/parameters/Token'
     post:
       tags:
         - topics
@@ -93,6 +91,7 @@ paths:
       description: Subscribes to a topic to receive all messages broadcast with that topic name.
       operationId: SubscribeToTopic
       parameters:
+        - $ref: '#/parameters/Token'
         - in: body
           name: topic
           description: The topic to subscribe to
@@ -107,8 +106,6 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v1/sessions/{token}/subscriptions/unsubscribe:
-    parameters:
-      - $ref: '#/parameters/Token'
     post:
       tags:
         - topics
@@ -116,6 +113,7 @@ paths:
       description: Unsubscribes from a topic to stop receiving messages for that topic.
       operationId: UnsubscribeFromTopic
       parameters:
+        - $ref: '#/parameters/Token'
         - in: body
           name: topic
           description: Topic to unsubscribe from
@@ -131,8 +129,6 @@ paths:
           $ref: '#/responses/Error'
 
   /v1/sessions/{token}/messages:
-    parameters:
-      - $ref: '#/parameters/Token'
     post:
       tags:
         - message queue
@@ -140,6 +136,7 @@ paths:
       description: Broadcasts a message to a topic. Subscribers of a topic receive every message published to the topic.
       operationId: PublishMessage
       parameters:
+        - $ref: '#/parameters/Token'
         - in: body
           name: topicAndMessage
           description: The message to publish, and the topic to publish to
@@ -160,6 +157,7 @@ paths:
       description: Returns a message from the queue. To read a message, subscribe to a topic first.
       operationId: ReadMessage
       parameters:
+        - $ref: '#/parameters/Token'
         - in: query
           name: timeoutMilliseconds
           description: Amount of time, in milliseconds, to keep the messaging connection open. May be overridden by a maximum value that the server administrator allows.
@@ -182,6 +180,8 @@ paths:
       summary: Flush the message queue
       description: Clears all messages from the session queue without reading them.
       operationId: DeleteMessages
+      parameters:
+        - $ref: '#/parameters/Token'
       responses:
         200:
           description: Success
@@ -190,14 +190,14 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v1/sessions/{token}/configuration/queueSizeBytes:
-    parameters:
-      - $ref: '#/parameters/Token'
     get:
       tags:
         - message queue
       summary: Get the current queue size
       description: Returns the size (in bytes) of the message queue associated with this session. This is helpful for determining the amount of memory that unread messages are consuming.
       operationId: GetCurrentQueueSize
+      parameters:
+        - $ref: '#/parameters/Token'
       responses:
         200:
           schema:
@@ -208,14 +208,14 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v1/sessions/{token}/configuration/maxQueueSizeBytes:
-    parameters:
-      - $ref: '#/parameters/Token'
     get:
       tags:
         - message queue
       summary: Get the maximum queue size
       description: Returns the maximum size (in bytes) of the message queue associated with this session. This is helpful for determining how much total memory is available for storing messages.
       operationId: GetMaximumQueueSize
+      parameters:
+        - $ref: '#/parameters/Token'
       responses:
         200:
           schema:
