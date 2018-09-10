@@ -88,6 +88,8 @@ definitions:
       operations:
         description: >-
           Available operations in the v1 version of the API:
+          - getResults: The ability to get test results
+
           - queryResults: The ability to query test results
 
           - createResults: The ability to create test results
@@ -97,6 +99,8 @@ definitions:
           - deleteResult: The ability to delete test results
 
           - deleteManyResults: The ability to delete multiple test results
+
+          - getSteps: The ability to get test steps
 
           - querySteps: The ability to query test steps
 
@@ -110,6 +114,8 @@ definitions:
 
         type: object
         properties:
+          getResults:
+            $ref: '#/definitions/Operation'
           queryResults:
             $ref: '#/definitions/Operation'
           createResults:
@@ -119,6 +125,8 @@ definitions:
           deleteResult:
             $ref: '#/definitions/Operation'
           deleteManyResults:
+            $ref: '#/definitions/Operation'
+          getSteps:
             $ref: '#/definitions/Operation'
           querySteps:
             $ref: '#/definitions/Operation'
@@ -168,6 +176,7 @@ definitions:
       - UPDATED_AT
       - PROGRAM_NAME
       - SYSTEM_ID
+      - HOST_NAME
       - OPERATOR
       - SERIAL_NUMBER
       - TOTAL_TIME_IN_SECONDS
@@ -254,6 +263,10 @@ definitions:
         description: System id
         type: string
         example: my-system
+      hostName:
+        description: Host name
+        type: string
+        example: My-Host
       properties:
         description: Test result properties
         type: object
@@ -323,7 +336,11 @@ definitions:
       systemId:
         description: Id of the system
         type: string
-        example: sedwards-dt2
+        example: 9c75f1b5-5882-490e-a2e2-1c14123d68b2
+      hostName:
+        description: Host name of the system
+        type: string
+        example: My-Host
       operator:
         description: Name of the operator running the test
         type: string
@@ -378,6 +395,10 @@ definitions:
         description: System id
         type: string
         example: my-system
+      hostName:
+        description: Host name
+        type: string
+        example: My-Host
       properties:
         description: Test result properties
         type: object
@@ -457,6 +478,13 @@ definitions:
           type: string
         example:
           - 9c75f1b5-5882-490e-a2e2-1c14123d68b2
+      hostNames:
+        description: Array of host names
+        type: array
+        items:
+          type: string
+        example:
+          - My-Host
       keywords:
         description: Array of keywords
         type: array
@@ -978,6 +1006,29 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v1/results:
+    get:
+      tags: [results]
+      summary: Gets test results
+      description: Gets a list of test results.
+      operationId: get-results
+      x-ni-operation: getResults
+      x-ni-privilege: Read
+      parameters:
+        - in: query
+          name: skip
+          type: integer
+          default: 0
+        - in: query
+          name: take
+          type: integer
+          default: -1
+      responses:
+        200:
+          $ref: '#/responses/ResultsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
     put:
       tags: [results]
       summary: Updates existing test results
@@ -1146,6 +1197,29 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v1/steps:
+    get:
+      tags: [steps]
+      summary: Gets test steps
+      description: Gets a list of test steps.
+      operationId: get-steps
+      x-ni-operation: getSteps
+      x-ni-privilege: Read
+      parameters:
+        - in: query
+          name: skip
+          type: integer
+          default: 0
+        - in: query
+          name: take
+          type: integer
+          default: -1
+      responses:
+        200:
+          $ref: '#/responses/StepsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
     put:
       tags: [steps]
       summary: Update test steps
