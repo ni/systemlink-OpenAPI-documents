@@ -237,6 +237,7 @@ paths:
         summary: Update the heartbeat timer of multiple subscriptions
         description: Updates the heartbeat timers of multiple subscriptions. This route is deprecated in favor of /v2/refresh-subscriptions.
         operationId: RpcUpdateSubscriptionHeartbeats
+        deprecated: true
         parameters:
           - in: body
             name: subscriptionIds
@@ -308,6 +309,7 @@ paths:
       summary: Get the current values for the tags from multiple subscriptions
       description: Returns tag values from multiple subscriptions. This route is deprecated in favor of /v2/query-subscription-values.
       operationId: RpcGetSubscriptionsTagValues
+      deprecated: true
       parameters:
         - in: body
           name: subscriptionIds
@@ -365,6 +367,7 @@ paths:
       summary: Delete multiple subscriptions
       description: Deletes one or more subscriptions you specify. This route is deprecated in favor of /v2/delete-subscriptions.
       operationId: RpcDeleteSubscriptions
+      deprecated: true
       parameters:
         - in: body
           name: subscriptionIds
@@ -1417,6 +1420,7 @@ paths:
       summary: Update the current values of multiple tags
       description: Updates multiple tags to their current value. This route is deprecated in favor of /v2/update-current-values.
       operationId: RpcUpdateTagCurrentValues
+      deprecated: true
       parameters:
         - in: body
           name: updates
