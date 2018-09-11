@@ -276,7 +276,7 @@ paths:
       parameters:
         - in: body
           name: subscriptionIds
-          description: IDs of the subscriptions whose heartbeat timers should be updated
+          description: IDs of the subscriptions whose heartbeat timers you want to update
           required: false
           schema:
             type: object
