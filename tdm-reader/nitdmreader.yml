@@ -109,6 +109,7 @@ definitions:
         type: string
         example: Channel name
   Properties:
+    type: object
     properties:
       properties:
         description: Property values.
@@ -120,11 +121,14 @@ definitions:
         description: Count of all properties. This could be more than the items returned in Properties.
         example: 1
   FileList:
-    description: File Id
-    type: array
-    items:
-      type: string
-      example: 5b8453dba8808c22b0f99023
+    type: object
+    properties:
+      fileIds:
+        description: File Ids
+        type: array
+        items:
+          type: string
+          example: 5b8453dba8808c22b0f99023
   DataWindow:
     description: Data window.
     properties:
