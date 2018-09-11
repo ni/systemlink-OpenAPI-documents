@@ -1165,7 +1165,7 @@ paths:
       tags:
         - tags
       summary: Get the aggregates and current value of a tag
-      description: Get the current and aggregate values for the tag at the path.
+      description: Returns the current aggregate values for the tag at the path.
       operationId: get-tag-values
       parameters:
         - in: path
@@ -1188,7 +1188,7 @@ paths:
       tags:
         - tags
       summary: Get the current value of a tag
-      description: Get the current value of the tag at the path.
+      description: Returns the current value of the tag at the path.
       operationId: get-tag-values-current
       parameters:
         - in: path
@@ -1211,7 +1211,7 @@ paths:
       tags:
         - tags
       summary: Update the current value of a tag
-      description: Update the current value of the tag at the path.
+      description: Updates the current value of the tag at the path.
       operationId: UpdateTagCurrentValue
       parameters:
         - in: path
@@ -1241,8 +1241,8 @@ paths:
       tags:
         - tags
       summary: Get the timestamp of a tag's current value
-      description: Get tag most recent timestamp.
-      operationId: get-tag-values-current-timestamp
+      description: Returns the timestamp of the tag's current value
+      operationId: GetTagCurrentValueTimestamp
       parameters:
         - in: path
           name: path
@@ -1265,7 +1265,7 @@ paths:
       tags:
         - tags
       summary: Get the current value of a tag without its timestamp
-      description: Get the current value of a tag
+      description: Returns the current value of a tag
       operationId: GetTagCurrentValue
       parameters:
         - in: path
@@ -1393,7 +1393,7 @@ paths:
       tags:
         - tagAggregates
       summary: Reset the aggregates of a tag
-      description: Reset tag aggregates
+      description: Resets aggregate values for a tag.
       operationId: ResetTagAggregates
       parameters:
         - in: path
@@ -1415,7 +1415,7 @@ paths:
       tags:
         - tags
       summary: Update the current values of multiple tags
-      description: Updates multiple tags to their current values in one request. This route is deprecated in favor of /v2/update-current-values.
+      description: Updates multiple tags to their current value. This route is deprecated in favor of /v2/update-current-values.
       operationId: RpcUpdateTagCurrentValues
       parameters:
         - in: body
