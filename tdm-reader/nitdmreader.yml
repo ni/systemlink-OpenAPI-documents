@@ -363,7 +363,7 @@ paths:
             $ref: '#/definitions/Error'
   /v1/files/{file-id}:
     get:
-      tags: [properties]
+      tags: [metadata]
       summary: Gets file, group, and channel information
       description: 'Gets all group names, channel names, channel information, and properties at all levels. This does not return channel data.'
       operationId: getAllFileInfo
@@ -386,7 +386,7 @@ paths:
             $ref: '#/definitions/Error'
   /v1/query-files:
     post:
-      tags: [properties]
+      tags: [metadata]
       summary: Gets file, group, and channel information
       description: 'Gets all group names, channel names, channel information, and properties at all levels. This does not return channel data.'
       operationId: getMultipleFileInfo
@@ -410,7 +410,7 @@ paths:
             $ref: '#/definitions/Error'
   /v1/files/{file-id}/groups:
     get:
-      tags: [groups]
+      tags: [metadata]
       summary: Lists all groups in the file
       operationId: getChannelPropertiesCount
       produces:
@@ -447,7 +447,7 @@ paths:
             $ref: '#/definitions/Error'
   /v1/files/{file-id}/groups/{group-name}/channels:
     get:
-      tags: [channels]
+      tags: [metadata]
       summary: Lists all channels in the group
       operationId: getChannels
       produces:
