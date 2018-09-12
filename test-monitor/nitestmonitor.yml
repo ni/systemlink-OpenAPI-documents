@@ -648,7 +648,7 @@ definitions:
       parentId:
         description: Parent step id
         type: string
-        example: Step0
+        example: root
       resultId:
         description: Result id
         type: string
@@ -658,6 +658,7 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/TestStepRequestObject'
+        example: []
       data:
         $ref: '#/definitions/StepDataObject'
       dataModel:
