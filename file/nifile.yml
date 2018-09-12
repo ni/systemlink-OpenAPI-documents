@@ -145,17 +145,17 @@ definitions:
         description: >-
           The links that apply to a service group:
 
-          - deleteFiles: Link to delete multiple files from the service group using a POST
+          - deleteFiles: Link to delete multiple files from the service group using POST
 
-          - files: Link to retrieve a list of files in the service group using a GET
+          - files: Link to retrieve a list of files in the service group using GET
 
-          - query: Link to query for available files in the service group using a POST
+          - query: Link to query for available files in the service group using POST
 
-          - searchFiles: Link to retrieve a filtered list of files in the service group using a GET
+          - searchFiles: Link to retrieve a filtered list of files in the service group using GET
 
           - self: Link to the current service group
 
-          - upload: Link to upload files to the service group using a POST
+          - upload: Link to upload files to the service group using POST
         type: object
         required: [self]
         additionalProperties:
@@ -177,7 +177,7 @@ definitions:
           upload:
             href: /nifile/v1/service-groups/Default/upload-files
   DateQuery:
-    description: A query for an date and time field
+    description: A query for a date and time field
     type: object
     properties:
       operation:
@@ -387,7 +387,7 @@ responses:
           items:
             $ref: '#/definitions/FileMetadata'
         totalCount:
-          description: The total number of files that match the query regardless of skip and take
+          description: The total number of files that match the query regardless of skip and take values
           type: integer
           example: 1
   Error:
@@ -497,18 +497,10 @@ paths:
       description: >-
         Lists available files on the Skyline File service.
 
-        The skip and take parameters can be used return paged responses. The
-        user can skip an unsigned integer number of entries, and take an
-        unsigned integer number of entries. A list of 100 files with a skip
-        value of 50 and a take value of 25 will return entries 51 through 75.
+        Use the skip and take parameters to return paged responses.
 
-        The orderBy and orderByDescending fields are intended to manage sorting
-        the list by metadata objects. The value of the orderBy field should be
-        the name of a metadata key. The elements in the list are sorted
-        ascending by default. If the orderByDescending parameter is specified,
-        the elements in the list are sorted based on it's value. The
-        orderByDescending value must be a boolean string. The elements in the
-        list are sorted ascending if false and descending if true.
+        The orderBy and orderByDescending fields can be used to manage sorting
+        the list by metadata objects. 
       operationId: ListAvailableFiles_GET
       x-ni-operation: listFiles
       x-ni-privilege: ViewMetadata
@@ -516,7 +508,10 @@ paths:
       parameters:
         - in: query
           name: skip
-          description: How many files to skip in the result when paging
+          description: >-
+            How many files to skip in the result when paging.
+            For example, a list of 100 files with a skip value of 50 and a take
+            value of 25 will return entries 51 through 75.
           type: integer
           x-ni-data-type: U32
           default: 0
@@ -524,14 +519,18 @@ paths:
           name: take
           description: >-
             How many files to return in the result, or 0 to use a default
-            defined by the service
+            defined by the service.
+            For example, a list of 100 files with a skip value of 50 and a take
+            value of 25 will return entries 51 through 75.
           type: integer
           x-ni-data-type: U32
           default: 0
           maximum: 10000
         - in: query
           name: orderBy
-          description: The name of the metadata key to sort by
+          description: >- 
+            The name of the metadata key to sort by. The value of the orderBy field should be
+            the name of a metadata key.
           type: string
           enum:
             - created
@@ -539,7 +538,13 @@ paths:
             - size
         - in: query
           name: orderByDescending
-          description: Whether to sort descending instead of ascending
+          description: >- 
+            Whether to sort descending instead of ascending.
+            The elements in the list are sorted ascending by default. If the
+            orderByDescending parameter is specified, the elements in the list
+            are sorted based on it's value. The orderByDescending value must be
+            a boolean string. The elements in the list are sorted ascending if
+            false and descending if true.
           type: boolean
           default: false
         - in: query
@@ -621,10 +626,11 @@ paths:
       tags: [files]
       summary: Update file metadata properties
       description: >-
-        Updates an existing file's metadata with the supplied metadata
-        properties. The ReplaceExisting value determines whether the current
-        list should be entirely replaced by the supplied list, or if entries
-        should be added to (or updated) in the existing set of file properties.
+        Updates an existing file's metadata with the specified metadata
+        properties.
+        
+        Use the replaceExisting element to determine the replace or merge
+        behavior.
       operationId: UpdateMetadata
       x-ni-operation: updateMetadata
       x-ni-privilege: ModifyFiles
@@ -640,9 +646,9 @@ paths:
             properties:
               replaceExisting:
                 description: >-
-                  Whether the current list should be entirely replaced by the
-                  supplied list, or if entries should be added to (or updated)
-                  in the existing set of file properties.
+                  Determines whether the current list should be entirely
+                  replaced by the specified list or merged with the existing
+                  list.
                 type: boolean
               properties:
                 description: The properties to set
@@ -730,7 +736,7 @@ paths:
           name: take
           description: >-
             How many files to return in the result, or 0 to use a default.  New in version 2 of this operation.
-            defined by the service
+            The default value is defined by the service.
           type: integer
           x-ni-data-type: U32
           default: 1000
