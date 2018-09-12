@@ -546,9 +546,7 @@ paths:
           required: true
       responses:
         200:
-          description: Success
-          schema:
-            $ref: '#/responses/GetTagsWithValuesResponse'
+          $ref: '#/responses/GetTagsWithValuesResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -971,9 +969,7 @@ paths:
           default: 100000
       responses:
         200:
-          schema:
-            $ref: '#/responses/GetTagsResponse'
-          description: Success
+          $ref: '#/responses/GetTagsResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -1488,7 +1484,7 @@ definitions:
   TagType:
     type: string
     title: Tag Data Type
-    enum: &TYPES [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
+    enum: [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
   TagWithValue:
     description: A tag and its current value
     type: object
@@ -1525,8 +1521,7 @@ definitions:
       value:
         type: string
       type:
-        type: string
-        enum: *TYPES
+        $ref: '#/definitions/TagType'
     example:
       type: DOUBLE
       value: "3.14"
@@ -1622,9 +1617,7 @@ definitions:
     required: [path,type]
     properties:
       type:
-        description: Type
-        type: string
-        enum: *TYPES
+        $ref: '#/definitions/TagType'
       properties:
         type: object
       path:
@@ -1704,8 +1697,7 @@ definitions:
         description: Updated tag value
         type: string
       type:
-        type: string
-        enum: *TYPES
+        $ref: '#/definitions/TagType'
       timestamp:
         description: Updated timestamp
         type: string
