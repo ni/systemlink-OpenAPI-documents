@@ -196,7 +196,7 @@ definitions:
       - groupName
       - channelName
   ChannelSpecifications:
-    description: Specification for an array of groups of channels potentially with x-y relationships.
+    description: Array of x-y channel groups.  The x-channel of each grouping is optional.
     properties:
       xyChannels:
         type: array
@@ -213,7 +213,7 @@ definitions:
           required:
             - y
   ChannelSpecificationsAndWindow:
-    description: Channel specifications and data window.
+    description: Channel specifications and data window
     properties:
       channelSpecificationsAndWindow:
         properties:
@@ -227,42 +227,42 @@ definitions:
     properties:
       dataType:
         type: string
-        description: Native data type of data
+        description: Native data type for the channel
       numericData:
         type: array
-        description: channel data
+        description: Channel data
         items:
           type: number
       stringData:
         type: array
-        description: channel data
+        description: Channel data
         items:
           type: string
       decimated:
         type: boolean
-        description: is returned data decimated
+        description: Specifies whether returned data is decimated
       undecimatedLength:
         type: integer
-        description: number of points of undecimated data
+        description: Number of points of undecimated data
   XYData:
     properties:
       x:
         $ref: '#/definitions/OneChannelData'
       y:
         type: array
-        description: y channels
+        description: Array of y-channels
         items:
           $ref: '#/definitions/OneChannelData'
   ReturnedXYData:
     properties:
       data:
         type: array
-        description: X-Y data
+        description: Pairing of data from an x-channel and multiple y-channels
         items:
             $ref: '#/definitions/XYData'
       timeUtcOffsetHours:
         type: number
-        description: The timezone offset applied to local time values
+        description: The time zone offset applied to local time values
   NamesList:
     description: List of names and number of names.
     properties:
