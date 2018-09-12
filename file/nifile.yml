@@ -191,7 +191,7 @@ definitions:
           - LESS_THAN_OR_EQUAL
           - NOT_EQUAL
       value:
-        description: The value of the field to query for
+        description: The value of the field to search for
         type: string
         format: iso-date-time
         example: '2018-05-14T00:00:00.000Z'
@@ -216,7 +216,7 @@ definitions:
           - LESS_THAN_OR_EQUAL
           - NOT_EQUAL
       value:
-        description: The value of the field to query for
+        description: The value of the field to search for
         type: integer
         example: 5000
     required:
@@ -230,7 +230,7 @@ definitions:
     type: object
     properties:
       key:
-        description: The name of the property to query against
+        description: The name of the property to search against
         type: string
         example: Name
       operation:
@@ -242,7 +242,7 @@ definitions:
           - NOT_CONTAINS
           - NOT_EQUAL
       value:
-        description: The value of the property to query for
+        description: The value of the property to search for
         type: string
         example: myfile.txt
     required:
@@ -264,7 +264,7 @@ definitions:
           - EQUAL
           - NOT_EQUAL
       ids:
-        description: The array of ids to query for
+        description: The array of ids to search for
         type: array
         items:
           type: string
@@ -283,7 +283,7 @@ definitions:
           - EQUAL
           - NOT_EQUAL
       value:
-        description: The value of the field to query for
+        description: The value of the field to search for
         type: string
         example: txt
     required:
@@ -549,7 +549,7 @@ paths:
           default: false
         - in: query
           name: id
-          description: Comma-separated list of file IDs to restrict to in the results
+          description: Comma-separated list of file IDs to search by
           type: string
           x-example: '5afb2ce3741fe11d88838cc9,4afb2ce3741fe11d88838cc9'
       responses:
@@ -583,15 +583,11 @@ paths:
       tags: [files]
       summary: Download file
       description: >-
-        Downloads a file from the Skyline File service. The file is returned in
-        a single HTTP response. The file's name metadata property is appended
-        to the response header so that the file is downloaded with the
-        appropriate file name.When the the inline query parameter is not
-        specified or is set to false, the Content-Disposition header is set to
-        'attachment' and the MIME type is set to binary so that the browser
-        handles the response as a file download.  When the inline query
-        parameter is set to true, the Content-Disposition header and MIME type
-        remain unset, and the file contents must be handled by the caller.
+        Downloads a file from the SystemLink File service in
+        a single HTTP response.
+        
+        Use the inline parameter in the query string to control the download
+        behavior.
       operationId: ReceiveFile
       x-ni-operation: downloadData
       x-ni-privilege: DownloadFiles
@@ -600,7 +596,15 @@ paths:
       parameters:
         - in: query
           name: inline
-          description: Whether to return the file data inline rather than as an attachment.
+          description: >-
+            Whether to return the file data inline rather than as an attachment.
+            When the inline query parameter is true, the file contents return
+            directly for the caller to handle. The Content-Disposition header
+            and MIME type remain unset.
+            When the the inline query parameter is not specified or is
+            false, the file contents are handled as a download. The
+            Content-Disposition header is set to 'attachment' and
+            the MIME type is set to binary.
           type: boolean
           default: false
       produces:
