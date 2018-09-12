@@ -124,7 +124,7 @@ definitions:
     type: object
     properties:
       fileIds:
-        description: File Ids
+        description: File IDs
         type: array
         items:
           type: string
@@ -134,13 +134,13 @@ definitions:
     properties:
       decimatex:
         type: integer
-        description: Number of pixels on the x axis which is the number of points that can be displayed.
+        description: Number of values on the x-axis. This determines the number of points that can be displayed.
         example: 1000
         default: 0
         format: int32
       decimatey:
         type: integer
-        description: Number of pixels on the y axis which is the number of points that can be displayed
+        description: Number of values on the y-axis. This determines the number of points that can be displayed.
         example: 1000
         default: 0
         format: int32
@@ -148,34 +148,34 @@ definitions:
         type: number
         default: 0
         format: double
-        description: Minimum X value of the display X axis.
+        description: Minimum x value of the display x-axis.
         example: -1
       xmax:
         type: number
         default: 0
         format: double
-        description: Maximum X value of the display X axis.
+        description: Maximum x value of the display x-axis.
         example: 1
       ymin:
         type: number
         default: 0
         format: double
-        description: Minimum Y value of the display Y axis.
+        description: Minimum y value of the display y-axis.
         example: -1
       ymax:
         type: number
         default: 0
         format: double
-        description: Maximum Y value
+        description: Maximum y value of the display y-axis.
         example: 1
       showLines:
         type: boolean
-        description: Decimate to line style graph.
+        description: Represent data as lines. When decimation is performed, the data returned represents the min and max values for that x-axis increment.
         default: true
       showPoints:
         type: boolean
         default: false
-        description: Decimate to point style graph.
+        description: Represent data as points. When decimation is performed, the data returned represents all of the points in that x-axis increment.
   OneChannelSpecifier:
     description: Specification for a channel of data
     properties:
@@ -264,7 +264,7 @@ definitions:
         type: number
         description: The timezone offset applied to local time values
   NamesList:
-    description: A list of names and a count of all names.
+    description: List of names and number of names.
     properties:
       names:
         description: All names
@@ -275,7 +275,7 @@ definitions:
           example: Channel 1
       totalCount:
         type: integer
-        description: Count of all items in the list. This could be more than the items returned in Names.
+        description: Total number of names. This might be more than the number of names in the list.
         example: 1
   FileInformation:
     type: array
@@ -283,7 +283,7 @@ definitions:
       properties:
         fileId:
           type: string
-          description: File id
+          description: File ID
           example: "5b8453dba8808c22b0f99023"
         properties:
           $ref: '#/definitions/Properties'
@@ -371,7 +371,7 @@ paths:
         - application/json
       parameters:
         - name: file-id
-          description: File id
+          description: File ID
           in: path
           type: string
           required: true
@@ -394,7 +394,7 @@ paths:
         - application/json
       parameters:
         - name: fileIds
-          description: List of File Ids to inspect.
+          description: List of File IDs to inspect.
           in: body
           required: true
           schema:
@@ -412,12 +412,13 @@ paths:
     get:
       tags: [metadata]
       summary: Lists all groups in the file
+      description: Lists all group names in the file.
       operationId: getChannelPropertiesCount
       produces:
         - application/json
       parameters:
         - name: file-id
-          description: File id
+          description: File ID
           in: path
           required: true
           type: string
@@ -432,7 +433,7 @@ paths:
           type: integer
           default: -1
         - name: returnCount
-          description: Specify this to return the total count of items
+          description: Specifies whether to return the total number of items
           in: query
           type: boolean
           default: false
@@ -449,12 +450,13 @@ paths:
     get:
       tags: [metadata]
       summary: Lists all channels in the group
+      description:  Lists all channel names for a group in a specific file.
       operationId: getChannels
       produces:
         - application/json
       parameters:
         - name: file-id
-          description: File id
+          description: File ID
           in: path
           required: true
           type: string
@@ -491,6 +493,7 @@ paths:
     post:
       tags: [data]
       summary: Returns data from channels.
+      description: Queries files based on channel and window specifications and returns channel data that matches the query.  The channel specifications select channels by group and channel relationships.  Window specifications determine a bounding box of minimum and maximum x and y values, as well as specifying the type of decimation performed on data within the window.
       operationId: queryData
       produces:
         - application/json
