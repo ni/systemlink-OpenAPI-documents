@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: Publish and manage timestamped key-value-pair data.
-  version: '1'
+  version: '2'
   title: SystemLink Tag Service
   contact:
     name: National Instruments
@@ -92,7 +92,7 @@ paths:
           description: Subscription to create
           schema:
             $ref: '#/definitions/Subscription'
-          required: false
+          required: true
       responses:
         200:
           description: Success
@@ -111,8 +111,6 @@ paths:
               alias:
                 type: string
                 description: Name of the subscription
-        400:
-          description: Bad Request
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -161,8 +159,6 @@ paths:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Subscription with the given ID was not found
         default:
           $ref: '#/responses/Error'
     delete:
@@ -182,8 +178,6 @@ paths:
           description: Subscription successfully deleted
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Subscription with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/subscriptions/{id}/heartbeat:
@@ -204,8 +198,6 @@ paths:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Subscription with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/subscriptions/{id}/values/current:
@@ -223,9 +215,7 @@ paths:
           required: true
       responses:
         200:
-          schema:
-            $ref: '#/responses/GetSubscriptionUpdatesResponse'
-          description: Success
+          $ref: '#/responses/GetSubscriptionUpdatesResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -242,7 +232,7 @@ paths:
           - in: body
             name: subscriptionIds
             description: IDs of the subscriptions whose heartbeat timers you want to update
-            required: false
+            required: true
             schema:
               type: object
               properties:
@@ -278,7 +268,7 @@ paths:
         - in: body
           name: subscriptionIds
           description: IDs of the subscriptions whose heartbeat timers you want to update
-          required: false
+          required: true
           schema:
             type: object
             properties:
@@ -314,7 +304,7 @@ paths:
         - in: body
           name: subscriptionIds
           description: IDs of the subscriptions whose heartbeat timers should be updated
-          required: false
+          required: true
           schema:
             type: object
             properties:
@@ -324,13 +314,11 @@ paths:
                   type: string
       responses:
         200:
-          description: Success
-          schema:
-            $ref: '#/responses/GetSubscriptionUpdatesResponse'
+          $ref: '#/responses/GetSubscriptionUpdatesResponse'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Subscription with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
   /v2/query-subscription-values:
     post:
       tags:
@@ -341,7 +329,7 @@ paths:
       parameters:
         - in: body
           name: subscriptionIds
-          required: false
+          required: true
           schema:
             type: object
             properties:
@@ -351,13 +339,9 @@ paths:
                   type: string
       responses:
         200:
-          description: Success
-          schema:
-            $ref: '#/responses/GetSubscriptionUpdatesResponse'
+          $ref: '#/responses/GetSubscriptionUpdatesResponse'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Subscription with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v1/tags-rpc/subscriptions/delete:
@@ -372,7 +356,7 @@ paths:
         - in: body
           name: subscriptionIds
           description: IDs of the subscriptions whose heartbeat timers should be updated
-          required: false
+          required: true
           schema:
             type: object
             properties:
@@ -407,7 +391,7 @@ paths:
       parameters:
         - in: body
           name: subscriptionIds
-          required: false
+          required: true
           schema:
             type: object
             properties:
@@ -445,7 +429,7 @@ paths:
           description: Selection to create
           schema:
             $ref: '#/definitions/Selection'
-          required: false
+          required: true
       responses:
         200:
           description: Success
@@ -475,8 +459,6 @@ paths:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID not found
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}:
@@ -497,7 +479,7 @@ paths:
           description: Selection to replace the existing selection with
           schema:
             $ref: '#/definitions/Selection'
-          required: false
+          required: true
       responses:
         200:
           schema:
@@ -507,8 +489,6 @@ paths:
           description: Bad Request
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
     get:
@@ -530,8 +510,6 @@ paths:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
     delete:
@@ -551,8 +529,8 @@ paths:
           description: Successfully deleted
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
+        default:
+          $ref: '#/responses/Error'
   /v2/selections/{id}/tags-with-values:
     get:
       tags:
@@ -573,8 +551,6 @@ paths:
             $ref: '#/responses/GetTagsWithValuesResponse'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}/tags:
@@ -599,8 +575,6 @@ paths:
               $ref: '#/definitions/Tag'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
     delete:
@@ -620,8 +594,6 @@ paths:
           description: Successfully deleted
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}/values:
@@ -646,8 +618,6 @@ paths:
               $ref: '#/definitions/TagPathWithCurrentAndAggregateValue'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}/values/current:
@@ -680,8 +650,6 @@ paths:
                   $ref: '#/definitions/TimestampedTagValue'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}/values/current/value:
@@ -714,8 +682,6 @@ paths:
                   $ref: '#/definitions/TagValue'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}/values/current/timestamp:
@@ -746,12 +712,12 @@ paths:
                 timestamp:
                   description: Timestamp associated with the current value
                   type: string
+                  format: iso-date-time
+                  example: '2018-09-04T18:45:08Z'
                 path:
                   type: string
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the specified ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}/values/aggregates/min:
@@ -781,11 +747,9 @@ paths:
                   type: string
                 min:
                   description: Minimum value from the tag's aggregates
-                  type: number
+                  type: string
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}/values/aggregates/max:
@@ -815,11 +779,9 @@ paths:
                   type: string
                 max:
                   description: Maximum value from the tag's aggregates
-                  type: number
+                  type: string
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}/values/aggregates/mean:
@@ -852,8 +814,6 @@ paths:
                   type: number
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}/values/aggregates/count:
@@ -883,11 +843,9 @@ paths:
                   type: string
                 count:
                   description: Count value from the tag's aggregates
-                  type: number
+                  type: integer
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID was not found
         default:
           $ref: '#/responses/Error'
   /v2/selections/{id}/reset-aggregates:
@@ -908,8 +866,6 @@ paths:
           description: No Content
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Selection with the given ID not found
         default:
           $ref: '#/responses/Error'
   /v2/update-tags:
@@ -923,6 +879,7 @@ paths:
         - in: body
           name: tagsAndMerge
           description: Tags to create or update. Also specifies whether to merge keywords and properties when updating.
+          required: true
           schema:
             type: object
             title: Tag List and Merge Flag
@@ -935,8 +892,12 @@ paths:
               merge:
                 description: If set, performs a merge of any specified Keywords or Properties.
                 type: boolean
-          required: true
+                default: false
       responses:
+        200:
+          description: Some tags could not be created or updated (sent only from SystemLink Server)
+          schema:
+            $ref: '#/responses/Error'
         201:
           description: Created
         400:
@@ -956,7 +917,7 @@ paths:
       operationId: CreateTag
       parameters:
         - in: body
-          name: tags
+          name: tag
           description: Tag to create
           schema:
             $ref: '#/definitions/Tag'
@@ -984,25 +945,30 @@ paths:
           description: Comma-separated list of tag paths. May include glob-style wildcards
           type: string
           required: false
+          x-example: foo,bar,baz,*.System.Health.*
         - in: query
           name: keywords
           description: Comma-separated list of case-sensitive keywords.
           type: string
           required: false
+          x-example: foo,bar,baz
         - in: query
           name: properties
-          description: Comma-separated list of name=value strings, e.g. key1=value,key2=value.
+          description: Comma-separated list of name=value strings
           type: string
           required: false
+          x-example: foo=bar,baz=boo
         - in: query
           name: skip
           description: Number of entries to skip in the response list. Typically used in combination with the take parameter to implement pagination.
           type: integer
           required: false
+          default: 0
         - in: query
           name: take
           description: Number of entries to include in the response list. Typically used in combination with the skip parameter to implement pagination.
           type: integer
+          default: 100000
       responses:
         200:
           schema:
@@ -1023,6 +989,9 @@ paths:
       responses:
         200:
           description: Contains the number of tags
+          schema:
+            type: integer
+            example: 2
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -1035,9 +1004,7 @@ paths:
       description: Returns current values of multiple tags.
       responses:
         200:
-          schema:
-            $ref: '#/responses/GetTagsWithValuesResponse'
-          description: Success
+          $ref: '#/responses/GetTagsWithValuesResponse'
         400:
           description: Bad Request
         401:
@@ -1050,28 +1017,33 @@ paths:
       parameters:
         - in: query
           name: path
-          description: Comma-separated list of tag paths. May include glob-style wildcards.
+          description: Comma-separated list of tag paths. May include glob-style wildcards
           type: string
           required: false
+          x-example: foo,bar,baz,*.System.Health.*
         - in: query
           name: keywords
-          description: Comma-separated list of case-sensitive keywords
+          description: Comma-separated list of case-sensitive keywords.
           type: string
           required: false
+          x-example: foo,bar,baz
         - in: query
           name: properties
-          description: Comma-separated list of name=value strings, e.g. key1=value,key2=value.
+          description: Comma-separated list of name=value strings
           type: string
           required: false
+          x-example: foo=bar,baz=boo
         - in: query
           name: skip
           description: Number of entries to skip in the response list. Typically used in combination with the take parameter to implement pagination.
           type: integer
           required: false
+          default: 0
         - in: query
           name: take
           description: Number of entries to include in the response list. Typically used in combination with the skip parameter to implement pagination.
           type: integer
+          default: 100000
   /v2/tags-with-values/{path}:
     get:
       tags:
@@ -1159,8 +1131,6 @@ paths:
       responses:
         204:
           description: 'No content: Tag deleted successfully'
-        404:
-          description: Not Found
         default:
           $ref: '#/responses/Error'
   /v2/tags/{path}/values:
@@ -1169,7 +1139,7 @@ paths:
         - tags
       summary: Get the aggregates and current value of a tag
       description: Returns the current aggregate values for the tag at the path.
-      operationId: get-tag-values
+      operationId: GetTagValues
       parameters:
         - in: path
           name: path
@@ -1182,8 +1152,6 @@ paths:
             $ref: '#/definitions/TagCurrentAndAggregateValue'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Tag not found
         default:
           $ref: '#/responses/Error'
   /v2/tags/{path}/values/current:
@@ -1192,7 +1160,7 @@ paths:
         - tags
       summary: Get the current value of a tag
       description: Returns the current value of the tag at the path.
-      operationId: get-tag-values-current
+      operationId: GetTagCurrentValue
       parameters:
         - in: path
           name: path
@@ -1206,8 +1174,6 @@ paths:
             $ref: '#/definitions/TimestampedTagValue'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Tag not found
         default:
           $ref: '#/responses/Error'
     put:
@@ -1259,8 +1225,6 @@ paths:
           description: No timestamped value found
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Tag not found
         default:
           $ref: '#/responses/Error'
   /v2/tags/{path}/values/current/value:
@@ -1269,7 +1233,7 @@ paths:
         - tags
       summary: Get the current value of a tag without its timestamp
       description: Returns the current value of a tag
-      operationId: GetTagCurrentValue
+      operationId: GetTagCurrentValueWithoutTimestamp
       parameters:
         - in: path
           name: path
@@ -1283,14 +1247,12 @@ paths:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Tag not found
         default:
           $ref: '#/responses/Error'
   /v2/tags/{path}/values/aggregates/min:
     get:
       tags:
-        - tagAggregates
+        - tag aggregates
       summary: Get the value of a tag's "min" aggregate
       description: Get the value of a tag's "min" aggregate
       operationId: GetTagMinimum
@@ -1309,14 +1271,12 @@ paths:
           description: No aggregate value found
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Tag with the given path not found
         default:
           $ref: '#/responses/Error'
   /v2/tags/{path}/values/aggregates/max:
     get:
       tags:
-        - tagAggregates
+        - tag aggregates
       summary: Get the value of a tag's "max" aggregate
       description: Get the value of a tag's "max" aggregate
       operationId: GetTagMaxAggregate
@@ -1329,8 +1289,6 @@ paths:
           description: No aggregate value found
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Tag with the given path was not found
         default:
           $ref: '#/responses/Error'
       parameters:
@@ -1342,7 +1300,7 @@ paths:
   /v2/tags/{path}/values/aggregates/mean:
     get:
       tags:
-        - tagAggregates
+        - tag aggregates
       summary: Get the value of a tag's "avg" aggregate
       description: Get the value of a tag's "avg" aggregate
       operationId: GetTagMeanAggregate
@@ -1355,8 +1313,6 @@ paths:
           description: No aggregate value found
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Tag with the given path was not found
         default:
           $ref: '#/responses/Error'
       parameters:
@@ -1368,7 +1324,7 @@ paths:
   /v2/tags/{path}/values/aggregates/count:
     get:
       tags:
-        - tagAggregates
+        - tag aggregates
       summary: Get the value of a tag's "count" aggregate
       description: Get the value of a tag's "count" aggregate
       operationId: GetTagCountAggregate
@@ -1387,14 +1343,12 @@ paths:
           description: No aggregate value found
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Tag with the given path was not found
         default:
           $ref: '#/responses/Error'
   /v2/tags/{path}/reset-aggregates:
     post:
       tags:
-        - tagAggregates
+        - tag aggregates
       summary: Reset the aggregates of a tag
       description: Resets aggregate values for a tag.
       operationId: ResetTagAggregates
@@ -1409,8 +1363,6 @@ paths:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          description: Tag with the given path was not found
         default:
           $ref: '#/responses/Error'
   /v1/tags-rpc/update-current-values:
@@ -1429,6 +1381,7 @@ paths:
             type: array
             items:
               $ref: '#/definitions/TagUpdate'
+          required: true
       responses:
         200:
           description: Success
@@ -1453,6 +1406,7 @@ paths:
             type: array
             items:
               $ref: '#/definitions/TagUpdate'
+          required: true
       responses:
         200:
           description: Success
@@ -1566,6 +1520,7 @@ definitions:
     description: Value of a tag
     type: object
     title: Tag Value
+    required: [value,type]
     properties:
       value:
         type: string
@@ -1601,14 +1556,14 @@ definitions:
   TimestampedTagValue:
     description: Current value of a tag
     type: object
-    title: Tag Current Value
+    title: Timestamped Tag Value
     properties:
       value:
         $ref: '#/definitions/TagValue'
       timestamp:
         description: Timestamp associated with the value
         type: string
-        format: date-time
+        format: iso-date-time
     example:
       value:
         type: DOUBLE
@@ -1641,19 +1596,19 @@ definitions:
     properties:
       sum:
         description: Sum aggregate value
-        type: number
+        type: string
       min:
         description: Minimum aggregate value
-        type: number
+        type: string
       max:
         description: Maximum aggregate value
-        type: number
+        type: string
       count:
         description: Count aggregate value
         type: integer
       avg:
         description: Average aggregate value
-        type: number
+        type: string
     example:
       sum: "10.5"
       min: "0.0"
@@ -1664,6 +1619,7 @@ definitions:
     description: Object containing a tag's metadata, excluding current and aggregate values
     type: object
     title: Tag
+    required: [path,type]
     properties:
       type:
         description: Type
@@ -1691,13 +1647,14 @@ definitions:
     description: Object containing a tag's path, and one or more updates to be applied to it
     type: object
     title: Tag Update
+    required: [path,updates]
     properties:
       path:
         type: string
       updates:
         type: array
         items:
-          $ref: '$/definitions/TimestampedTagValue'
+          $ref: '#/definitions/TimestampedTagValue'
     example:
       path: foo
       updates:
@@ -1752,6 +1709,7 @@ definitions:
       timestamp:
         description: Updated timestamp
         type: string
+        format: iso-date-time
       tag:
         $ref: '#/definitions/Tag'
       aggregates:
@@ -1777,10 +1735,12 @@ definitions:
     description: Object describing a subscription's metadata
     type: object
     title: Subscription
+    required: [tags]
     properties:
       updatesOnly:
         description: Whether to notify only about updates
         type: boolean
+        default: false
       tags:
         description: List of subscribed tag paths
         type: array
@@ -1808,6 +1768,7 @@ definitions:
         description: Inactivity timeout in seconds
         type: integer
         maximum: 900
+        default: 900
       id:
         type: string
     example:
