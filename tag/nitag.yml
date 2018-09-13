@@ -1316,7 +1316,7 @@ paths:
         200:
           description: Count aggregate value
           schema:
-            type: string
+            type: integer
         204:
           description: No aggregate value found
         401:
@@ -1339,6 +1339,8 @@ paths:
       responses:
         200:
           description: Success
+        204:
+          description: No content (Sent only from SystemLink Server)
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -1363,6 +1365,8 @@ paths:
       responses:
         200:
           description: Success
+        202:
+          description: Accepted (Sent only from SystemLink Server)
         400:
           description: Bad Request
         401:
@@ -1386,7 +1390,7 @@ paths:
               $ref: '#/definitions/TagUpdate'
           required: true
       responses:
-        200:
+        202:
           description: Success
         400:
           description: Bad Request
@@ -1404,6 +1408,8 @@ paths:
       responses:
         200:
           description: Tag Values Updated
+        202:
+          description: Accepted (Sent only from SystemLink Server)
         400:
           description: Bad Request
         401:
