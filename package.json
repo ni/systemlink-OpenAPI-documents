@@ -1,0 +1,20 @@
+{
+  "name": "systemlink-openapi-documents",
+  "version": "1.0.0",
+  "description": "Package containing OpenAPI documents which describe some of the HTTP APIs provided by web services in SystemLink and SystemLink Cloud",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ni/systemlink-OpenAPI-documents.git"
+  },
+  "author": "National Instruments",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ni/systemlink-OpenAPI-documents/issues"
+  },
+  "homepage": "https://github.com/ni/systemlink-OpenAPI-documents#readme"
+}
