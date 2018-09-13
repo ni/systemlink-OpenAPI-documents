@@ -439,8 +439,6 @@ paths:
           description: Bad Request
         401:
           $ref: '#/responses/Unauthorized'
-        409:
-          description: Duplicate selection
         default:
           $ref: '#/responses/Error'
     get:
@@ -902,8 +900,6 @@ paths:
           description: Bad Request
         401:
           $ref: '#/responses/Unauthorized'
-        409:
-          description: 'Conflict: Type change not supported'
         default:
           $ref: '#/responses/Error'
   /v2/tags:
@@ -927,8 +923,6 @@ paths:
           description: Bad Request
         401:
           $ref: '#/responses/Unauthorized'
-        409:
-          description: 'Conflict: Type change not supported'
         default:
           $ref: '#/responses/Error'
     get:
@@ -1005,8 +999,6 @@ paths:
           description: Bad Request
         401:
           $ref: '#/responses/Unauthorized'
-        409:
-          description: Conflict
         default:
           $ref: '#/responses/Error'
       operationId: GetTagsWithValues
@@ -1089,8 +1081,8 @@ paths:
           description: 'No Content: Tag replaced successfully'
         401:
           $ref: '#/responses/Unauthorized'
-        409:
-          description: 'Conflict: Type change not supported'
+        default:
+          $ref: '#/responses/Error'
     get:
       tags:
         - tags
@@ -1197,8 +1189,6 @@ paths:
           description: Bad Request
         401:
           $ref: '#/responses/Unauthorized'
-        409:
-          description: Conflict
         default:
           $ref: '#/responses/Error'
   /v2/tags/{path}/values/current/timestamp:
@@ -1426,8 +1416,6 @@ paths:
           description: Bad Request
         401:
           $ref: '#/responses/Unauthorized'
-        409:
-          description: Conflict
         default:
           $ref: '#/responses/Error'
       parameters:
