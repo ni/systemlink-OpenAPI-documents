@@ -196,6 +196,8 @@ paths:
       responses:
         200:
           description: Success
+        204:
+          description: No content (Sent only from SystemLink Server)
         401:
           $ref: '#/responses/Unauthorized'
         default:
