@@ -432,9 +432,7 @@ paths:
           required: true
       responses:
         200:
-          description: Success
-          schema:
-            $ref: '#/definitions/Selection'
+          $ref: '#/definitions/Selection'
         400:
           description: Bad Request
         401:
@@ -480,9 +478,7 @@ paths:
           required: true
       responses:
         200:
-          schema:
-            $ref: '#/definitions/Selection'
-          description: Success
+          $ref: '#/definitions/Selection'
         400:
           description: Bad Request
         401:
@@ -503,9 +499,7 @@ paths:
           required: true
       responses:
         200:
-          schema:
-            $ref: '#/definitions/Selection'
-          description: Success
+          $ref: '#/definitions/Selection'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -891,9 +885,7 @@ paths:
                 default: false
       responses:
         200:
-          description: Some tags could not be created or updated (sent only from SystemLink Server)
-          schema:
-            $ref: '#/responses/Error'
+          $ref: '#/responses/Error'
         201:
           description: Created
         400:
