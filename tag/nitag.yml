@@ -1620,7 +1620,7 @@ definitions:
       keywords: [fooKeyword, barKeyword]
       collectAggregates: true
   TagUpdate:
-    description: Object containing a tag's path, and one or more updates to be applied to it
+    description: Object containing a tag's path, and one or more values to update the tag with at times you specify.
     type: object
     title: Tag Update
     required: [path,updates]
