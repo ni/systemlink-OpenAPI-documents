@@ -244,9 +244,9 @@ paths:
           200:
             description: Success
             schema:
-              description: Update subscriptions heartbeat response
+              description: Update subscriptions' heartbeat response
               type: object
-              title: Update Subscriptions Heartbeat Response
+              title: Update Subscriptions' Heartbeat Response
               properties:
                 invalidSubscriptionIds:
                   description: List of invalid subscription IDs
@@ -731,7 +731,7 @@ paths:
             type: array
             items:
               type: object
-              title: Tag Paths and Count Values
+              title: Tag Path with Min Aggregate
               properties:
                 path:
                   type: string
