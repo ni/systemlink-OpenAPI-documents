@@ -1177,6 +1177,8 @@ paths:
       responses:
         200:
           description: Tag Value Updated
+        202:
+          description: Accepted (Sent only from SystemLink Server)
         400:
           description: Bad Request
         401:
