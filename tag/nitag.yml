@@ -1495,7 +1495,6 @@ definitions:
           value: "3.14"
         timestamp: '2018-09-04T18:45:08Z'
       aggregates:
-        sum: "10.5"
         min: "0.0"
         max: "5.0"
         avg: 2.0
@@ -1531,7 +1530,6 @@ definitions:
           type: DOUBLE
           value: "3.14"
       aggregates:
-        sum: "10.5"
         min: "0.0"
         max: "5.0"
         avg: 2.0
@@ -1567,7 +1565,6 @@ definitions:
           value: "3.14"
         timestamp: '2018-09-04T18:45:08Z'
       aggregates:
-        sum: "10.5"
         min: "0.0"
         max: "5.0"
         avg: 2.0
@@ -1577,9 +1574,6 @@ definitions:
     type: object
     title: Tag Aggregate Value
     properties:
-      sum:
-        description: Sum aggregate value
-        type: string
       min:
         description: Minimum aggregate value
         type: string
@@ -1593,7 +1587,6 @@ definitions:
         description: Average aggregate value
         type: number
     example:
-      sum: "10.5"
       min: "0.0"
       max: "5.0"
       avg: 2.0
@@ -1706,7 +1699,6 @@ definitions:
         path: foo
         keywords: [fooKeyword, barKeyword]
       aggregates:
-        sum: "10.5"
         min: "0.0"
         max: "5.0"
         avg: 2.0
