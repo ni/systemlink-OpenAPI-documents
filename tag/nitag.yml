@@ -799,7 +799,7 @@ paths:
               properties:
                 path:
                   type: string
-                mean:
+                avg:
                   description: Mean value from the tag's aggregates
                   type: number
         401:
@@ -1286,7 +1286,7 @@ paths:
         200:
           description: Mean aggregate value
           schema:
-            type: string
+            type: number
         204:
           description: No aggregate value found
         401:
@@ -1490,7 +1490,7 @@ definitions:
         sum: "10.5"
         min: "0.0"
         max: "5.0"
-        mean: "2.0"
+        avg: 2.0
         count: 5
   TagValue:
     description: Value of a tag
@@ -1526,7 +1526,7 @@ definitions:
         sum: "10.5"
         min: "0.0"
         max: "5.0"
-        mean: "2.0"
+        avg: 2.0
         count: 5
   TimestampedTagValue:
     description: Current value of a tag
@@ -1562,7 +1562,7 @@ definitions:
         sum: "10.5"
         min: "0.0"
         max: "5.0"
-        mean: "2.0"
+        avg: 2.0
         count: 5
   TagAggregates:
     description: Aggregate values of a tag
@@ -1583,12 +1583,12 @@ definitions:
         type: integer
       avg:
         description: Average aggregate value
-        type: string
+        type: number
     example:
       sum: "10.5"
       min: "0.0"
       max: "5.0"
-      mean: "2.0"
+      avg: 2.0
       count: 5
   Tag:
     description: Object containing a tag's metadata, excluding current and aggregate values
@@ -1701,7 +1701,7 @@ definitions:
         sum: "10.5"
         min: "0.0"
         max: "5.0"
-        mean: "2.0"
+        avg: 2.0
         count: 5
   Subscription:
     description: Object describing a subscription's metadata
