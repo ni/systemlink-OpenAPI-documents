@@ -63,7 +63,7 @@ responses:
           type: array
           items:
             $ref: '#/definitions/Tag'
-  GetSubscriptionUpdatesResponse:
+  V1GetSubscriptionUpdatesResponse:
     description: List of subscription updates
     schema:
       properties:
@@ -71,7 +71,21 @@ responses:
           description: Subscription updates
           type: array
           items:
-            $ref: '#/definitions/SubscriptionUpdate'
+            $ref: '#/definitions/V1SubscriptionUpdate'
+        invalidSubscriptionIds:
+          description: List of invalid subscription IDs
+          type: array
+          items:
+            type: string
+  V2GetSubscriptionUpdatesResponse:
+    description: List of subscription updates
+    schema:
+      properties:
+        subscriptionUpdates:
+          description: Subscription updates
+          type: array
+          items:
+            $ref: '#/definitions/V2SubscriptionUpdate'
         invalidSubscriptionIds:
           description: List of invalid subscription IDs
           type: array
@@ -217,7 +231,7 @@ paths:
           required: true
       responses:
         200:
-          $ref: '#/responses/GetSubscriptionUpdatesResponse'
+          $ref: '#/responses/V2GetSubscriptionUpdatesResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -316,7 +330,7 @@ paths:
                   type: string
       responses:
         200:
-          $ref: '#/responses/GetSubscriptionUpdatesResponse'
+          $ref: '#/responses/V1GetSubscriptionUpdatesResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -341,7 +355,7 @@ paths:
                   type: string
       responses:
         200:
-          $ref: '#/responses/GetSubscriptionUpdatesResponse'
+          $ref: '#/responses/V2GetSubscriptionUpdatesResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -1485,7 +1499,7 @@ definitions:
       current:
         $ref: '#/definitions/TimestampedTagValue'
       aggregates:
-        $ref: '#/definitions/TagAggregates'
+        $ref: '#/definitions/V2TagAggregates'
     example:
       tag:
         path: foo
@@ -1524,7 +1538,7 @@ definitions:
       current:
         $ref: '#/definitions/TimestampedTagValue'
       aggregates:
-        $ref: '#/definitions/TagAggregates'
+        $ref: '#/definitions/V2TagAggregates'
     example:
       path: foo
       current:
@@ -1559,7 +1573,7 @@ definitions:
       current:
         $ref: '#/definitions/TimestampedTagValue'
       aggregates:
-        $ref: '#/definitions/TagAggregates'
+        $ref: '#/definitions/V2TagAggregates'
     example:
       current:
         value:
@@ -1571,7 +1585,29 @@ definitions:
         max: "5.0"
         avg: 2.0
         count: 5
-  TagAggregates:
+  V1TagAggregates:
+    description: Aggregate values of a tag
+    type: object
+    title: Tag Aggregate Value
+    properties:
+      min:
+        description: Minimum aggregate value
+        type: number
+      max:
+        description: Maximum aggregate value
+        type: number
+      count:
+        description: Count aggregate value
+        type: integer
+      avg:
+        description: Average aggregate value
+        type: number
+    example:
+      min: 0
+      max: 5
+      avg: 2.0
+      count: 5
+  V2TagAggregates:
     description: Aggregate values of a tag
     type: object
     title: Tag Aggregate Value
@@ -1642,7 +1678,7 @@ definitions:
             type: DOUBLE
             value: "5.0"
           timestamp: '2018-09-04T18:45:08Z'
-  SubscriptionUpdate:
+  V1SubscriptionUpdate:
     description: Updates for a subscriptions
     type: object
     title: Subscription Update
@@ -1650,7 +1686,7 @@ definitions:
       updates:
         type: array
         items:
-          $ref: '#/definitions/SubscriptionTagUpdate'
+          $ref: '#/definitions/V1SubscriptionTagUpdate'
       subscriptionId:
         type: string
       nonexistentTags:
@@ -1671,7 +1707,36 @@ definitions:
       alias:
         description: Name of the subscription
         type: string
-  SubscriptionTagUpdate:
+  V2SubscriptionUpdate:
+    description: Updates for a subscriptions
+    type: object
+    title: Subscription Update
+    properties:
+      updates:
+        type: array
+        items:
+          $ref: '#/definitions/V2SubscriptionTagUpdate'
+      subscriptionId:
+        type: string
+      nonexistentTags:
+        description: List of tags which did not exist
+        type: array
+        items:
+          type: string
+      deletedTags:
+        description: List of tags which have been deleted
+        type: array
+        items:
+          type: string
+      createdTags:
+        description: List of tags which have been created
+        type: array
+        items:
+          type: string
+      alias:
+        description: Name of the subscription
+        type: string
+  V1SubscriptionTagUpdate:
     description: Update details for a tag subscription
     type: object
     title: Subscription Tag Update
@@ -1688,7 +1753,41 @@ definitions:
       tag:
         $ref: '#/definitions/Tag'
       aggregates:
-        $ref: '#/definitions/TagAggregates'
+        $ref: '#/definitions/V1TagAggregates'
+    example:
+      value: "5.0"
+      type: DOUBLE
+      timestamp: '2018-09-04T18:45:08Z'
+      tag:
+        type: DOUBLE
+        properties:
+          key1: value1
+          key2: value2
+        path: foo
+        keywords: [fooKeyword, barKeyword]
+      aggregates:
+        min: 0
+        max: 5
+        avg: 2.0
+        count: 5
+  V2SubscriptionTagUpdate:
+    description: Update details for a tag subscription
+    type: object
+    title: Subscription Tag Update
+    properties:
+      value:
+        description: Updated tag value
+        type: string
+      type:
+        $ref: '#/definitions/TagType'
+      timestamp:
+        description: Updated timestamp
+        type: string
+        format: iso-date-time
+      tag:
+        $ref: '#/definitions/Tag'
+      aggregates:
+        $ref: '#/definitions/V2TagAggregates'
     example:
       value: "5.0"
       type: DOUBLE
