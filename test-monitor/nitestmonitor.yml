@@ -435,7 +435,7 @@ definitions:
         type: array
         items:
           type: string
-        example: df1b63da-4fd8-4466-b721-5a28de036f56
+        example: [df1b63da-4fd8-4466-b721-5a28de036f56]
       startedAt:
         description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
@@ -564,8 +564,12 @@ definitions:
           type: object
           additionalProperties:
             type: string
-            example:
-              key1: value1
+          example:
+            key1: value1
+        example:
+          - key1: value1
+            key2: value2
+          - key1: value3
   TestStepsDeleteRequest:
     title: Test Steps Delete Request
     type: object
