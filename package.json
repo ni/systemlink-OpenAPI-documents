@@ -1,6 +1,6 @@
 {
   "name": "@ni-kismet/systemlink-openapi-documents",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Package containing OpenAPI documents which describe some of the HTTP APIs provided by web services in SystemLink and SystemLink Cloud",
   "main": "index.js",
   "scripts": {
