@@ -1,4 +1,4 @@
-swagger: '2.0'
+﻿swagger: '2.0'
 info:
   version: '1'
   title: Test Monitor Web Service
@@ -183,6 +183,7 @@ definitions:
       - KEYWORDS
       - PROPERTIES
       - FILE_IDS
+      - STATUS_TYPE_SUMMARY
   StepField:
     title: Step Field
     description: Step field enum
@@ -234,7 +235,7 @@ definitions:
       - operation
       - comparisonValue
     properties:
-      operation: 
+      operation:
         description: Operation enum
         type: string
         enum:
@@ -244,7 +245,7 @@ definitions:
           - GREATER_THAN
           - LESS_THAN_OR_EQUAL
           - GREATER_THAN_OR_EQUAL
-      comparisonValue: 
+      comparisonValue:
         description: ISO-8601 formatted timestamp value to compare
         type: string
         format: iso-date-time
@@ -375,6 +376,13 @@ definitions:
         items:
           type: string
         example: []
+      statusTypeSummary:
+        description: Status type summary
+        type: object
+        additionalProperties:
+          type: integer
+        example:
+          FAILED: 5
   TestResultUpdateRequestObject:
     title: Test Result Update
     type: object
@@ -411,7 +419,7 @@ definitions:
         type: array
         items:
           type: string
-        example: 
+        example:
           - keyword1
           - keyword2
       serialNumber:
