@@ -1,0 +1,826 @@
+swagger: '2.0'
+info:
+  version: '1'
+  title: Skyline File Service
+  description: Upload and download files from a SystemLink server
+  contact:
+    name: National Instruments
+    url: https://www.ni.com/systemlink
+    email: support@ni.com
+basePath: /nifile
+consumes: [application/json]
+produces: [application/json]
+
+securityDefinitions:
+  basicAuth:
+    type: basic
+  cookieAuth:
+    type: apiKey
+    in: header
+    name: Cookie
+
+security:
+  - basicAuth: []
+  - cookieAuth: []
+x-ni-routing-key: Skyline.FileIngestion
+definitions:
+  Link:
+    description: A hyperlink for a resource or action on a resource
+    type: object
+    properties:
+      href:
+        type: string
+        description: URI of the link
+        example: /nifile/v1/service-groups
+    required: [href]
+  Error:
+    description: Contains error information
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+      resourceType:
+        description: Type of resource associated with the error
+        type: string
+      resourceId:
+        description: Identifier of the resource associated with the error
+        type: string
+      message:
+        description: Complete error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+      innerErrors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+    example:
+      name: Skyline.OneOrMoreErrorsOccurred
+      code: -251040
+      message: One or more errors occurred. See the contained list for details of each error.
+      args: []
+      innerErrors:
+        - name: FileIngestion.IdNotFound
+          code: -251608
+          resourceType: file
+          resourceId: '4afb2ce3741fe11d88838cc9'
+          message: File with id '4afb2ce3741fe11d88838cc9' not found.
+          args: ['4afb2ce3741fe11d88838cc9']
+  FileMetadata:
+    description: File metadata
+    type: object
+    properties:
+      _links:
+        description: >-
+          The links to access and manipulate the file:
+
+          - data: Link to download the file using a GET request
+
+          - delete: Link to delete the file using a DELETE request
+
+          - self: Link to the file's metadata
+
+          - updateMetadata: Link to update the file's metadata using a POST request
+        type: object
+        required: [self]
+        additionalProperties:
+          $ref: '#/definitions/Link'
+        properties:
+          self:
+            $ref: '#/definitions/Link'
+        example:
+          data:
+            href: /nifile/v1/service-groups/Default/files/5b0739cc741fe114f08bd06c/data
+          delete:
+            href: /nifile/v1/service-groups/Default/files/5b0739cc741fe114f08bd06c
+          self:
+            href: /nifile/v1/service-groups/Default/files/5b0739cc741fe114f08bd06c
+          updateMetadata:
+            href: /nifile/v1/service-groups/Default/files/5b0739cc741fe114f08bd06c/update-metadata
+      created:
+        description: The date and time the file was created in the file service
+        type: string
+        format: iso-date-time
+        example: '2018-05-15T18:54:27.519Z'
+      id:
+        description: The file's ID within the service group
+        type: string
+        example: '5afb2ce3741fe11d88838cc9'
+      properties:
+        description: The file's properties
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          Name: myfile.txt
+          MyProperty: Value
+      serviceGroup:
+        description: The service group that owns the file
+        type: string
+        example: Default
+      size:
+        description: The 32-bit file size in bytes. If the value is larger than a 32-bit integer, this value is -1 and the size64 parameter contains the correct value.
+        type: integer
+        example: 7277
+      size64:
+        description: The 64-bit file size in bytes
+        type: integer
+        format: int64
+        example: 2147483648
+  ServiceGroup:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The service group's name
+        example: Default
+      _links:
+        description: >-
+          The links that apply to a service group:
+
+          - deleteFiles: Link to delete multiple files from the service group using POST
+
+          - files: Link to retrieve a list of files in the service group using GET
+
+          - query: Link to query for available files in the service group using POST
+
+          - searchFiles: Link to retrieve a filtered list of files in the service group using GET
+
+          - self: Link to the current service group
+
+          - upload: Link to upload files to the service group using POST
+        type: object
+        required: [self]
+        additionalProperties:
+          $ref: '#/definitions/Link'
+        properties:
+          self:
+            $ref: '#/definitions/Link'
+        example:
+          deleteFiles:
+            href: /nifile/v1/service-groups/Default/delete-files
+          files:
+            href: /nifile/v1/service-groups/Default/files
+          query:
+            href: /nifile/v1/service-groups/Default/query-files
+          searchFiles:
+            href: /nifile/v1/service-groups/Default/files
+          self:
+            href: /nifile/v1/service-groups/Default
+          upload:
+            href: /nifile/v1/service-groups/Default/upload-files
+  DateQuery:
+    description: A query for a date and time field
+    type: object
+    properties:
+      operation:
+        description: The query operation
+        type: string
+        enum:
+          - EQUAL
+          - GREATER_THAN
+          - GREATER_THAN_OR_EQUAL
+          - LESS_THAN
+          - LESS_THAN_OR_EQUAL
+          - NOT_EQUAL
+      value:
+        description: The value of the field to search for
+        type: string
+        format: iso-date-time
+        example: '2018-05-14T00:00:00.000Z'
+    required:
+      - operation
+      - value
+    example:
+      operation: GREATER_THAN
+      value: '2018-05-14T00:00:00.000Z'
+  IntegerQuery:
+    description: A query for an integer field
+    type: object
+    properties:
+      operation:
+        description: The query operation
+        type: string
+        enum:
+          - EQUAL
+          - GREATER_THAN
+          - GREATER_THAN_OR_EQUAL
+          - LESS_THAN
+          - LESS_THAN_OR_EQUAL
+          - NOT_EQUAL
+      value:
+        description: The value of the field to search for
+        type: integer
+        example: 5000
+    required:
+      - operation
+      - value
+    example:
+      operation: LESS_THAN
+      value: 5000
+  PropertyQuery:
+    description: A query for a file property
+    type: object
+    properties:
+      key:
+        description: The name of the property to search against
+        type: string
+        example: Name
+      operation:
+        description: The query operation
+        type: string
+        enum:
+          - CONTAINS
+          - EQUAL
+          - NOT_CONTAINS
+          - NOT_EQUAL
+      value:
+        description: The value of the property to search for
+        type: string
+        example: myfile.txt
+    required:
+      - key
+      - operation
+      - value
+    example:
+      key: Name
+      operation: CONTAINS
+      value: myfile
+  IdsQuery:
+    description: A query for a list of ids
+    type: object
+    properties:
+      operation:
+        description: The query operation
+        type: string
+        enum:
+          - EQUAL
+          - NOT_EQUAL
+      ids:
+        description: The array of ids to search for
+        type: array
+        items:
+          type: string
+          example: '4afb2ce3741fe11d88838cc9'
+    required:
+      - operation
+      - ids
+  StringQuery:
+    description: A query for a string field
+    type: object
+    properties:
+      operation:
+        description: The query operation
+        type: string
+        enum:
+          - EQUAL
+          - NOT_EQUAL
+      value:
+        description: The value of the field to search for
+        type: string
+        example: txt
+    required:
+      - operation
+      - value
+  Operation:
+    description: An operation provided by the API
+    type: object
+    properties:
+      available:
+        type: boolean
+        description: Whether the operation is available to the caller
+      version:
+        type: integer
+        description: The version of the available operation
+    required: [available]
+    example:
+      available: true
+      version: 1
+  V1Operations:
+    description: V1 operations
+    type: object
+    properties:
+      operations:
+        description: >-
+          Available operations in the v1 version of the API:
+
+          - deleteFiles: The ability to delete uploaded files
+
+          - downloadData: The ability to download file data
+
+          - listFiles: The ability to query and list available files and service groups
+
+          - updateMetadata: The ability to update file metadata properties
+
+          - uploadFiles: The ability to upload files
+        type: object
+        properties:
+          deleteFiles:
+            $ref: '#/definitions/Operation'
+          downloadData:
+            $ref: '#/definitions/Operation'
+          listFiles:
+            $ref: '#/definitions/Operation'
+          updateMetadata:
+            $ref: '#/definitions/Operation'
+          uploadFiles:
+            $ref: '#/definitions/Operation'
+
+parameters:
+  id:
+    in: path
+    name: id
+    description: The ID of the file
+    type: string
+    required: true
+    x-example: '4afb2ce3741fe11d88838cc9'
+
+responses:
+  Query:
+    description: OK
+    schema:
+      description: The result of a file query
+      title: QueryResponse
+      type: object
+      properties:
+        _links:
+          description: >-
+            The links that apply to the collection of files for a service group:
+
+            - deleteFiles: Link to delete multiple files from the service group using a POST
+
+            - query: Link to query for available files in the service group using a POST
+
+            - search: Link to retrieve a filtered list of files in the service group using a GET
+
+            - self: Link to the current service group
+
+            - upload: Link to upload files to the service group using a POST
+          type: object
+          required: [self]
+          additionalProperties:
+            $ref: '#/definitions/Link'
+          properties:
+            self:
+              $ref: '#/definitions/Link'
+          example:
+            deleteFiles:
+              href: /nifile/v1/service-groups/Default/delete-files
+            query:
+              href: /nifile/v1/service-groups/Default/query-files
+            search:
+              href: /nifile/v1/service-groups/Default/files
+            self:
+              href: /nifile/v1/service-groups/Default/files
+            upload:
+              href: /nifile/v1/service-groups/Default/upload-files
+        availableFiles:
+          description: The list of files returned by the query
+          type: array
+          items:
+            $ref: '#/definitions/FileMetadata'
+        totalCount:
+          description: The total number of files that match the query regardless of skip and take values
+          type: integer
+          example: 1
+  Error:
+    description: Error
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  Unauthorized:
+    description: Not authorized
+    headers:
+      WWW_Authenticate:
+        description: Information for how to authenticate
+        type: string
+
+paths:
+  /:
+    get:
+      tags: [versioning]
+      summary: API information
+      description: Returns information about API versions and available operations.
+      operationId: RootEndpoint
+      x-ni-request-all-privileges: true
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Version information
+            title: RootEndpointResponse
+            type: object
+            properties:
+              v1:
+                $ref: '#/definitions/V1Operations'
+              version:
+                description: The implementation version of the web service
+                type: string
+  /{version}:
+    parameters:
+      - in: path
+        name: version
+        description: The version of the API to retrieve operations.
+        type: string
+        required: true
+    get:
+      tags: [versioning]
+      summary: API version information
+      description: Returns available operations for a single version of the API.
+      operationId: RootEndpointWithVersion
+      x-ni-request-all-privileges: true
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/V1Operations'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/service-groups:
+    get:
+      tags: [service groups]
+      summary: List service groups
+      description: >-
+        Returns an array of File service group names. Each service group is a
+        distinct collection of files.
+      operationId: ListServiceGroups
+      x-ni-operation: listFiles
+      x-ni-privilege: ViewMetadata
+      x-ni-request-all-privileges: true
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Service group information
+            title: ListServiceGroupsResponse
+            type: object
+            properties:
+              _links:
+                type: object
+                description: >-
+                  Links that apply to the collection of service groups:
+
+                  - self: Link to the collection of service groups
+                properties:
+                  self:
+                    $ref: '#/definitions/Link'
+              serviceGroups:
+                type: array
+                description: Array of service groups within the file service
+                items:
+                  $ref: '#/definitions/ServiceGroup'
+        401:
+          $ref: '#/responses/Unauthorized'
+  /v1/service-groups/Default/files:
+    get:
+      tags: [files]
+      summary: List available files
+      description: >-
+        Lists available files on the Skyline File service.
+
+        Use the skip and take parameters to return paged responses.
+
+        The orderBy and orderByDescending fields can be used to manage sorting
+        the list by metadata objects. 
+      operationId: ListAvailableFiles_GET
+      x-ni-operation: listFiles
+      x-ni-privilege: ViewMetadata
+      x-ni-request-all-privileges: true
+      parameters:
+        - in: query
+          name: skip
+          description: >-
+            How many files to skip in the result when paging.
+            For example, a list of 100 files with a skip value of 50 and a take
+            value of 25 will return entries 51 through 75.
+          type: integer
+          x-ni-data-type: U32
+          default: 0
+        - in: query
+          name: take
+          description: >-
+            How many files to return in the result, or 0 to use a default
+            defined by the service.
+            For example, a list of 100 files with a skip value of 50 and a take
+            value of 25 will return entries 51 through 75.
+          type: integer
+          x-ni-data-type: U32
+          default: 0
+          maximum: 10000
+        - in: query
+          name: orderBy
+          description: >- 
+            The name of the metadata key to sort by. The value of the orderBy field should be
+            the name of a metadata key.
+          type: string
+          enum:
+            - created
+            - id
+            - size
+        - in: query
+          name: orderByDescending
+          description: >- 
+            Whether to sort descending instead of ascending.
+            The elements in the list are sorted ascending by default. If the
+            orderByDescending parameter is specified, the elements in the list
+            are sorted based on it's value. The orderByDescending value must be
+            a boolean string. The elements in the list are sorted ascending if
+            false and descending if true.
+          type: boolean
+          default: false
+        - in: query
+          name: id
+          description: Comma-separated list of file IDs to search by
+          type: string
+          x-example: '5afb2ce3741fe11d88838cc9,4afb2ce3741fe11d88838cc9'
+      responses:
+        200:
+          $ref: '#/responses/Query'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/service-groups/Default/files/{id}:
+    parameters:
+      - $ref: '#/parameters/id'
+    delete:
+      tags: [files]
+      summary: Delete file
+      description: Deletes the file indicated by the resource ID.
+      operationId: Delete
+      x-ni-operation: deleteFiles
+      x-ni-privilege: ModifyFiles
+      responses:
+        204:
+          description: No content
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/service-groups/Default/files/{id}/data:
+    parameters:
+      - $ref: '#/parameters/id'
+    get:
+      tags: [files]
+      summary: Download file
+      description: >-
+        Downloads a file from the SystemLink File service in
+        a single HTTP response.
+        
+        Use the inline parameter in the query string to control the download
+        behavior.
+      operationId: ReceiveFile
+      x-ni-operation: downloadData
+      x-ni-privilege: DownloadFiles
+      x-ni-request-variables:
+        - REQUEST_METHOD
+      parameters:
+        - in: query
+          name: inline
+          description: >-
+            Whether to return the file data inline rather than as an attachment.
+            When the inline query parameter is true, the file contents return
+            directly for the caller to handle. The Content-Disposition header
+            and MIME type remain unset.
+            When the the inline query parameter is not specified or is
+            false, the file contents are handled as a download. The
+            Content-Disposition header is set to 'attachment' and
+            the MIME type is set to binary.
+          type: boolean
+          default: false
+      produces:
+        - application/octet-stream
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            description: The file data
+            type: file
+          examples:
+            application/octet-stream:
+              File data
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/service-groups/Default/files/{id}/update-metadata:
+    parameters: 
+      - $ref: '#/parameters/id'
+    post:
+      tags: [files]
+      summary: Update file metadata properties
+      description: >-
+        Updates an existing file's metadata with the specified metadata
+        properties.
+        
+        Use the replaceExisting element to determine the replace or merge
+        behavior.
+      operationId: UpdateMetadata
+      x-ni-operation: updateMetadata
+      x-ni-privilege: ModifyFiles
+      parameters:
+        - in: body
+          name: metadata
+          description: The file's metadata and options for updating it
+          required: true
+          schema:
+            description: The file's metadata and options for updating it
+            title: UpdateMetadataRequest
+            type: object
+            properties:
+              replaceExisting:
+                description: >-
+                  Determines whether the current list should be entirely
+                  replaced by the specified list or merged with the existing
+                  list.
+                type: boolean
+              properties:
+                description: The properties to set
+                type: object
+                additionalProperties:
+                  type: string
+                example:
+                  key: value
+            required:
+              - replaceExisting
+              - properties
+      responses:
+        204:
+          description: No content
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/service-groups/Default/delete-files:
+    post:
+      tags: [files]
+      summary: Delete multiple files
+      description: >-
+        Deletes multiple files in a single API call. The request body contains
+        an array of file ids to delete.
+      operationId: DeleteMultiple
+      x-ni-operation: deleteFiles
+      x-ni-privilege: ModifyFiles
+      parameters: 
+        - in: body
+          name: files
+          description: The description of files to delete
+          required: true
+          schema:
+            description: The description of files to delete
+            title: DeleteMultipleRequest
+            type: object
+            properties:
+              ids:
+                description: The list of file IDs to delete
+                type: array
+                items:
+                  description: The ID of a file to delete
+                  type: string
+                  example: '5afb2ce3741fe11d88838cc9'
+            required: [ids]
+      responses:
+        204:
+          description: No content
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/service-groups/Default/query-files:
+    post:
+      tags: [files]
+      summary: Query files
+      description: >-
+        Queries the Skyline File service for a list of files that match
+        specified metadata properties.
+
+        Query elements:
+
+        - idQuery: a JSON query object with a string value.
+
+        - sizeMaxQuery: a JSON query object with an integer value.
+
+        - sizeMinQuery: a JSON query object with an integer value.
+
+        - createdQuery: a JSON query object with an ISO8601 date string value.
+  
+        - propertiesQuery: a JSON array of query objects with string values.
+      operationId: QueryAvailableFiles
+      x-ni-operation: listFiles
+      x-ni-privilege: ViewMetadata
+      x-ni-request-all-privileges: true
+      parameters:
+        - in: query
+          name: skip
+          description: How many files to skip in the result when paging.  New in version 2 of this operation.
+          type: integer
+          x-ni-data-type: U32
+          default: 0
+        - in: query
+          name: take
+          description: >-
+            How many files to return in the result, or 0 to use a default.  New in version 2 of this operation.
+            The default value is defined by the service.
+          type: integer
+          x-ni-data-type: U32
+          default: 1000
+          maximum: 1000
+        - in: body
+          name: query
+          description: The queries used to filter the result
+          schema:
+            description: The queries used to filter the results
+            title: QueryAvailableFilesRequest
+            type: object
+            properties:
+              idsQuery:
+                $ref: '#/definitions/IdsQuery'
+              idQuery:
+                $ref: '#/definitions/StringQuery'
+              extensionQuery:
+                $ref: '#/definitions/StringQuery'
+              sizeMaxQuery:
+                $ref: '#/definitions/IntegerQuery'
+              sizeMinQuery:
+                $ref: '#/definitions/IntegerQuery'
+              createdQuery:
+                $ref: '#/definitions/DateQuery'
+              propertiesQuery:
+                description: An array of queries for file properties
+                type: array
+                items:
+                  $ref: '#/definitions/PropertyQuery'
+      responses:
+        200:
+          $ref: '#/responses/Query'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/service-groups/Default/upload-files:
+    post:
+      tags: [files]
+      summary: Upload file
+      description: >-
+        Uploads a file using multipart/form-data headers to send the file
+        payload in the HTTP body.
+      operationId: Upload
+      x-ni-operation: uploadFiles
+      x-ni-privilege: UploadFiles
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          description: The file to upload. May be specified multiple times.
+          type: file
+          required: true
+      responses:
+        201:
+          description: OK
+          schema:
+            description: Uploaded file information
+            title: UploadResponse
+            type: object
+            properties:
+              uri:
+                type: string
+                description: URI of the uploaded file
+                example: '/nifile/v1/service-groups/Default/files/5b874c4adedd0f1c78a22a96'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/ping:
+    get:
+      tags: [deprecated]
+      summary: Check service status
+      description: Determines if the web service is available
+      operationId: Ping
+      deprecated: true
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
+      security: []
+      responses:
+        204:
+          description: No content
