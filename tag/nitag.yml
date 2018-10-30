@@ -42,6 +42,7 @@ responses:
   GetTagsWithValuesResponse:
     description: List of tags, including their current and aggregate values
     schema:
+      title: Get Tags With Values Response
       properties:
         totalCount:
           description: Total number of tags which match a given query
@@ -54,6 +55,7 @@ responses:
   GetTagsResponse:
     description: List of tags, excluding current and aggregate values
     schema:
+      title: Get Tags Response
       properties:
         totalCount:
           type: integer
@@ -63,9 +65,22 @@ responses:
           type: array
           items:
             $ref: '#/definitions/Tag'
+  UpdateSubscriptionsHeartbeatResponse:
+    description: Success
+    schema:
+      description: Update subscriptions' heartbeat response
+      type: object
+      title: Update Subscriptions Heartbeat Response
+      properties:
+        invalidSubscriptionIds:
+          description: List of invalid subscription IDs
+          type: array
+          items:
+            type: string
   V1GetSubscriptionUpdatesResponse:
     description: List of subscription updates
     schema:
+      title: V1 Get Subscription Updates Response
       properties:
         subscriptionUpdates:
           description: Subscription updates
@@ -80,6 +95,7 @@ responses:
   V2GetSubscriptionUpdatesResponse:
     description: List of subscription updates
     schema:
+      title: V2 Get Subscription Updates Response
       properties:
         subscriptionUpdates:
           description: Subscription updates
@@ -250,25 +266,10 @@ paths:
             description: IDs of the subscriptions whose heartbeat timers you want to update
             required: true
             schema:
-              type: object
-              properties:
-                subscriptionIds:
-                  type: array
-                  items:
-                    type: string
+              $ref: '#/definitions/SubscriptionIds'
         responses:
           200:
-            description: Success
-            schema:
-              description: Update subscriptions' heartbeat response
-              type: object
-              title: Update Subscriptions' Heartbeat Response
-              properties:
-                invalidSubscriptionIds:
-                  description: List of invalid subscription IDs
-                  type: array
-                  items:
-                    type: string
+            $ref: '#/responses/UpdateSubscriptionsHeartbeatResponse'
           401:
             $ref: '#/responses/Unauthorized'
           default:
@@ -286,24 +287,10 @@ paths:
           description: IDs of the subscriptions whose heartbeat timers you want to update
           required: true
           schema:
-            type: object
-            properties:
-              subscriptionIds:
-                type: array
-                items:
-                  type: string
+            $ref: '#/definitions/SubscriptionIds'
       responses:
         200:
-          description: Success
-          schema:
-            type: object
-            title: Update Subscriptions Heartbeat Response
-            properties:
-              invalidSubscriptionIds:
-                description: List of invalid subscription IDs
-                type: array
-                items:
-                  type: string
+          $ref: '#/responses/UpdateSubscriptionsHeartbeatResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -322,12 +309,7 @@ paths:
           description: IDs of the subscriptions whose heartbeat timers should be updated
           required: true
           schema:
-            type: object
-            properties:
-              subscriptionIds:
-                type: array
-                items:
-                  type: string
+            $ref: '#/definitions/SubscriptionIds'
       responses:
         200:
           $ref: '#/responses/V1GetSubscriptionUpdatesResponse'
@@ -347,12 +329,7 @@ paths:
           name: subscriptionIds
           required: true
           schema:
-            type: object
-            properties:
-              subscriptionIds:
-                type: array
-                items:
-                  type: string
+            $ref: '#/definitions/SubscriptionIds'
       responses:
         200:
           $ref: '#/responses/V2GetSubscriptionUpdatesResponse'
@@ -374,12 +351,7 @@ paths:
           description: IDs of the subscriptions whose heartbeat timers should be updated
           required: true
           schema:
-            type: object
-            properties:
-              subscriptionIds:
-                type: array
-                items:
-                  type: string
+            $ref: '#/definitions/SubscriptionIds'
       responses:
         200:
           description: Success
@@ -409,12 +381,7 @@ paths:
           name: subscriptionIds
           required: true
           schema:
-            type: object
-            properties:
-              subscriptionIds:
-                type: array
-                items:
-                  type: string
+            $ref: '#/definitions/SubscriptionIds'
       responses:
         200:
           description: Success
@@ -1632,7 +1599,7 @@ definitions:
   Tag:
     description: Object containing a tag's metadata, excluding current and aggregate values
     type: object
-    title: Tag
+    title: Tag Data
     required: [path,type]
     properties:
       type:
@@ -1826,6 +1793,13 @@ definitions:
       updatesOnly: true
       tags: [tag1, tag2, tag3]
       alias: foo
+  SubscriptionIds:
+    type: object
+    properties:
+      subscriptionIds:
+        type: array
+        items:
+          type: string
   Selection:
     description: Object describing a selection's metadata
     type: object
