@@ -1247,6 +1247,11 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
+        - in: query
+          name: updateResultTotalTime
+          description: Determine test result total time from the test step total times
+          type: boolean
+          default: false
       responses:
         200:
           $ref: '#/responses/StepsPartialSuccessResponse'
@@ -1268,6 +1273,11 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
+        - in: query
+          name: updateResultTotalTime
+          description: Determine test result total time from the test step total times
+          type: boolean
+          default: false
       responses:
         200:
           $ref: '#/responses/StepsPartialSuccessResponse'
@@ -1296,6 +1306,11 @@ paths:
           description: Id of the test step to delete
           type: string
           required: true
+        - in: query
+          name: updateResultTotalTime
+          description: Determine test result total time from the test step total times
+          type: boolean
+          default: false
       responses:
         204:
           description: The resource was deleted successfully.
@@ -1318,6 +1333,11 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/TestStepsDeleteRequest'
+        - in: query
+          name: updateResultTotalTime
+          description: Determine test result total time from the test step total times
+          type: boolean
+          default: false
       responses:
         200:
           $ref: '#/responses/StepsDeletePartialSuccessResponse'
