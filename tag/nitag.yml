@@ -762,7 +762,7 @@ paths:
       tags:
         - selections
       summary: Get the "avg" aggregate values for the tags in a selection
-      description: Returns the average aggregate values for the tags in a selection
+      description: Returns the mean aggregate values for the tags in a selection
       operationId: GetSelectionMeanValues
       parameters:
         - in: path
@@ -1567,7 +1567,7 @@ definitions:
         description: Count aggregate value
         type: integer
       avg:
-        description: Average aggregate value
+        description: Mean aggregate value
         type: number
     example:
       min: 0
@@ -1589,7 +1589,7 @@ definitions:
         description: Count aggregate value
         type: integer
       avg:
-        description: Average aggregate value
+        description: Mean aggregate value
         type: number
     example:
       min: "0.0"
