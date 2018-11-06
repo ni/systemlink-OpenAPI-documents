@@ -1606,6 +1606,8 @@ definitions:
         $ref: '#/definitions/TagType'
       properties:
         type: object
+        additionalProperties:
+          type: string
       path:
         type: string
       keywords:
