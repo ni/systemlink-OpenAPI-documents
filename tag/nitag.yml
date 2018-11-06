@@ -415,7 +415,9 @@ paths:
           required: true
       responses:
         200:
-          $ref: '#/definitions/Selection'
+          description: Success
+          schema:
+            $ref: '#/definitions/Selection'
         400:
           description: Bad Request
         401:
@@ -461,7 +463,9 @@ paths:
           required: true
       responses:
         200:
-          $ref: '#/definitions/Selection'
+          description: Success
+          schema:
+            $ref: '#/definitions/Selection'
         400:
           description: Bad Request
         401:
@@ -482,7 +486,9 @@ paths:
           required: true
       responses:
         200:
-          $ref: '#/definitions/Selection'
+          description: Success
+          schema:
+            $ref: '#/definitions/Selection'
         401:
           $ref: '#/responses/Unauthorized'
         default:
