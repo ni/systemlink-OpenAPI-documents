@@ -791,6 +791,7 @@ paths:
                 avg:
                   description: Mean value from the tag's aggregates
                   type: number
+                  format: double
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -1278,6 +1279,7 @@ paths:
           description: Mean aggregate value
           schema:
             type: number
+            format: double
         204:
           description: No aggregate value found
         401:
@@ -1566,15 +1568,18 @@ definitions:
       min:
         description: Minimum aggregate value
         type: number
+        format: double
       max:
         description: Maximum aggregate value
         type: number
+        format: double
       count:
         description: Count aggregate value
         type: integer
       avg:
         description: Average aggregate value
         type: number
+        format: double
     example:
       min: 0
       max: 5
@@ -1597,6 +1602,7 @@ definitions:
       avg:
         description: Average aggregate value
         type: number
+        format: double
     example:
       min: "0.0"
       max: "5.0"
