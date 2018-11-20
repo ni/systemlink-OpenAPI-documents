@@ -250,6 +250,27 @@ definitions:
         type: string
         format: iso-date-time
         example: '2017-11-14T15:41:06.106Z'
+  RelativeTimeQueryObject:
+    title: Relative Time Query
+    description: 'Object describing a number of time units used for calculating a date and time relative to the current server time. The calculated date and time will be whole values of the smallest time unit provided; 30 days evaluates to 30 days ago at midnight, and 10 hours evaluates to 10 hours ago at 0 minutes.'
+    type: object
+    required:
+      - unit
+      - value
+    properties:
+      unit:
+        description: The unit of time that the value represents.
+        type: string
+        enum:
+          - DAYS
+          - HOURS
+          - MINUTES
+          - SECONDS
+        example: DAYS
+      value:
+        description: Number of whole time units relative to the current server time.
+        type: integer
+        example: 30
   TestResultRequestObject:
     title: Test Result Request
     type: object
@@ -518,6 +539,10 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/TimeQueryObject'
+      updatedWithin:
+        $ref: '#/definitions/RelativeTimeQueryObject'
+      startedWithin:
+        $ref: '#/definitions/RelativeTimeQueryObject'
       fileIds:
         description: Array of file ids
         type: array
