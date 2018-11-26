@@ -317,7 +317,7 @@ definitions:
         type: array
         items:
           type: string
-        example: df1b63da-4fd8-4466-b721-5a28de036f56
+        example: [df1b63da-4fd8-4466-b721-5a28de036f56]
       startedAt:
         description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
@@ -628,14 +628,14 @@ definitions:
         items:
           type: string
         example:
-          - 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+          - Step1
       parentIds:
         description: Array of parent step ids
         type: array
         items:
           type: string
         example:
-          - 9c75f1b5-5882-490e-a2e2-1c14123d68b2
+          - 3265bc91-f214-4efa-adfd-56f8ea717349
       resultIds:
         description: Array of result ids
         type: array
@@ -745,15 +745,15 @@ definitions:
       stepType:
         description: Step type
         type: string
-        example: null
+        example: NumericLimitTest
       stepId:
         description: Step id
         type: string
-        example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+        example: Step1
       parentId:
         description: Parent step id
         type: string
-        example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+        example: root
       resultId:
         description: Result id
         type: string
@@ -761,14 +761,15 @@ definitions:
       path:
         description: Step path
         type: string
-        example: root.step1
+        example: root.My Step Name
       pathIds:
         description: Ids of the steps in the path
         type: array
         items:
           type: string
         example:
-          - 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+          - root
+          - Step1
       status:
         $ref: '#/definitions/StatusObject'
       totalTimeInSeconds:
@@ -789,7 +790,7 @@ definitions:
       dataModel:
         description: Custom string defining the model of the data object
         type: string
-        example: SOFTWARE
+        example: TestStand
       data:
         $ref: '#/definitions/StepDataObject'
 responses:
