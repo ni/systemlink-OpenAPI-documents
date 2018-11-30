@@ -1,0 +1,897 @@
+swagger: "2.0"
+info:
+  version: "1"
+  title: OpcClientService HTTP APIs
+  description: OpcClientService HTTP APIs
+  contact:
+    name: National Instruments
+    url: https://www.ni.com/systemlink
+    email: support@ni.com
+basePath: /niopcclient
+x-ni-routing-key: 'Skyline.OpcClient'
+consumes: [application/json]
+produces: [application/json]
+
+securityDefinitions:
+  basicAuth:
+    type: basic
+  cookieAuth:
+    type: apiKey
+    in: header
+    name: Cookie
+
+security:
+  - basicAuth: []
+  - cookieAuth: []
+
+paths:
+  /:
+    get:
+      operationId: HandleGetVersionInfo
+      x-ni-request-all-privileges: true
+      summary: Gets API information
+      tags: [versioning]
+      description: Returns permissions and operations for the OpcClientService
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Version information
+            title: RootEndpointResponse
+            type: object
+            properties:
+              v1:
+                $ref: '#/definitions/V1Operations'
+              version:
+                description: The implementation version of the web service
+                type: string
+        default:
+          $ref: '#/responses/Error'
+
+  /{version}:
+    parameters:
+      - in: path
+        name: version
+        description: The version of the API to retrieve operations.
+        type: string
+        required: true
+    get:
+      operationId: RootEndpointWithVersion
+      x-ni-request-all-privileges: true
+      summary: API version information
+      description: Returns available operations for a single version of the API.
+      tags: [versioning]
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/V1Operations'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          $ref: '#/responses/Error'
+
+  /v1/client-certificate:
+    get:
+      operationId: HandleHttpGetClientCertificate
+      x-ni-privilege: Read
+      tags: [certificate]
+      summary: Gets SystemLink OPC UA client certificate
+      description: Gets SystemLink OPC UA client certificate
+      produces:
+        - application/x-x509-ca-cert
+        - application/json
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: file
+        default:
+          $ref: '#/responses/Error'
+
+  /v1/server-certificates:
+    get:
+      operationId: HandleHttpGetServerCertificates
+      x-ni-privilege: Read
+      tags: [certificate]
+      summary: Gets list of certificates from the application's trusted store
+      description: Returns list of certificates from the application's trusted store
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SslCertificateInfoModel'
+        default:
+          $ref: '#/responses/Error'
+    post:
+      operationId: HandleHttpUploadServerCertificate
+      x-ni-privilege: Write
+      tags: [certificate]
+      summary: Uploads a certificate to application's trusted store
+      description: Uploads the certificate file
+      consumes: [multipart/form-data]
+      parameters:
+        - in: formData
+          name: certificate
+          description: The certificate to upload.
+          type: file
+          required: true
+      responses:
+        201:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/SslCertificateInfoModel'
+        default:
+          $ref: '#/responses/Error'
+
+  /v1/delete-server-certificates: 
+    post:
+      operationId: HandleHttpDeleteServerCertificates
+      x-ni-privilege: Write
+      tags: [certificate]
+      summary: Deletes certificates from application's trusted store
+      description: Deletes specified certificates
+      parameters:
+        - in: body
+          description: File names of the certificates to be deleted
+          required: true
+          name: fileNamesToDelete
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        200:
+          description: Partial success
+          schema:
+            $ref: '#/definitions/PartialSuccess'
+        204:
+          description: Successful response
+        default:
+          $ref: '#/responses/Error'
+
+  /v1/endpoints:
+    get:
+      operationId: HandleHttpGetEndpoints
+      x-ni-privilege: Read
+      tags: [sessions]
+      summary: Gets OPC UA server endpoints
+      description: Returns endpoints of an OPC UA server
+      parameters:
+        - in: path
+          description: URL of an OPC UA discovery server
+          required: true
+          name: uri
+          type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SessionEndpointModel'
+        default:
+          $ref: '#/responses/Error'
+
+  /v1/sessions:
+    get:
+      operationId: HandleHttpGetSessionsRequest
+      x-ni-privilege: Read
+      tags: [sessions]
+      summary: Gets existing OPC UA sessions
+      description: Returns information about in-progress OPC UA sessions
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SessionResponse'
+        default:
+          $ref: '#/responses/Error'
+    post:
+      operationId: HandleHttpCreateSessionRequest
+      x-ni-privilege: Write
+      tags: [sessions]
+      summary: Creates a new OPC UA session
+      description: Connects to an OPC UA server to start a new session
+      parameters:
+        - in: body
+          name: NewSessionRequest
+          description: Info about the session to be created
+          schema:
+            $ref: '#/definitions/NewSessionRequest'
+      responses:
+        201:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/SessionResponse'
+        default:
+          $ref: '#/responses/Error'
+
+  /v1/delete-sessions:
+    post:
+      operationId: HandleHttpDeleteSessionsRequest
+      x-ni-privilege: Write
+      tags: [sessions]
+      summary: Deletes existing OPC UA sessions
+      description: Deletes existing OPC UA sessions 
+      parameters:
+        - in: body
+          name: sessionIds
+          description: Ids of the sessions to be deleted
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                sessionId:
+                  type: string
+                  description: Id of the session to be deleted
+                removeTags:
+                  type: boolean
+                  default: false
+                  description: If set to true it will remove tags for this session's monitored items from taghistorian
+              required: [sessionId]
+      responses:
+        200:
+          description: Partial success
+          schema:
+            $ref: '#/definitions/PartialSuccess'
+        204:
+          description: Successful response
+        default:
+          $ref: '#/responses/Error'
+
+  /v1/update-sessions:
+    post:
+      operationId: HandleHttpUpdateSessionsRequest
+      x-ni-privilege: Write
+      tags: [sessions]
+      summary: Updates existing OPC UA sessions
+      description: Modifies name and publishing interval of the existing session
+      parameters:
+        - in: body
+          description: Information to update the session
+          name: updateSessionsData
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UpdateSessionRequest'
+      responses:
+        200:
+          description: Partial success
+          schema:
+            $ref: '#/definitions/PartialSuccess'
+        204:
+          description: Successful response
+        default:
+          $ref: '#/responses/Error'
+
+  /v1/sessions/{id}/nodes/{path}:
+    get:
+      operationId: HandleHttpBrowseRequest
+      x-ni-privilege: Read
+      tags: [browse]
+      summary: Gets child nodes of a node
+      description: Gets child nodes of the node specified by {path} 
+      parameters:
+        - name: id
+          in: path
+          description: session id
+          required: true
+          type: string
+        - name: path
+          in: path
+          description: Browse path of the node to be browsed. No need to encode the path.
+          required: true
+          type: string
+        - in: query
+          name: refresh
+          description: If set to true invalidates the cached SystemLinke server browser tree
+          type: boolean
+          default: false
+        - in: query
+          name: depth
+          description: Depth to which the nodes should be retrieved
+          type: integer
+          format: int32
+          default: 1
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/OpcNode'
+        default:
+          $ref: '#/responses/Error'
+
+  /v1/sessions/{id}/attributes/{opcNodeId}:
+    get:
+      operationId: HandleHttpReadAttributesRequest
+      x-ni-privilege: Read
+      tags: [read]
+      summary: Reads attributes of a node
+      description: Gets attributes for the node speicified by {opcNodeId}
+      parameters:
+        - name: id
+          in: path
+          description: session id
+          required: true
+          type: string
+        - name: opcNodeId
+          in: path
+          description: Node Id of node.
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/ReadAttributesResponse'
+        default:
+          $ref: '#/responses/Error'
+
+  /v1/sessions/{id}/monitors:
+    get:
+      operationId: HandleHttpGetMonitorsRequest
+      x-ni-privilege: Read
+      tags: [monitors]
+      summary: Gets existing monitored items
+      description: Creates SystemLink tags with specified display names
+      parameters:
+        - name: id
+          in: path
+          description: session id
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/MonitoredItemResponse'
+        default:
+            $ref: '#/responses/Error'
+    post: 
+      operationId: HandleHttpCreateMonitorsRequest
+      x-ni-privilege: Write
+      x-ni-request-timeout: 50000
+      tags: [monitors]
+      summary: Creates new monitored items
+      description: Adds OPC UA nodes to a subscription for monitoring them. Creates SystemLink tags with specified display names
+      parameters:
+      - name: id
+        in: path
+        description: session id
+        required: true
+        type: string
+      - in: body
+        name: itemsToCreate
+        description: Info of the OPC UA nodes to be monitored
+        required: true
+        schema:
+            type: array
+            items:
+                $ref: '#/definitions/NewMonitoredItem'
+      responses:
+        201:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/MonitoredItemResponse'
+        200:
+          description: Partial success
+          schema:
+            $ref: '#/definitions/PartialSuccess'
+        default:
+          $ref: '#/responses/Error'
+
+  /v1/sessions/{id}/delete-monitors:
+    post:
+      operationId: HandleHttpDeleteMonitorRequest
+      x-ni-privilege: Write
+      tags: [monitors]
+      summary: Removes existing monitored items
+      description: Removes OPC UA nodes from subscription to stop monitoring them. Can optionally remove the SystemLink tags
+      parameters:
+        - name: id
+          in: path
+          description: session id
+          required: true
+          type: string
+        - in: body
+          name: ItemsToDelete
+          description: Info of the nodes for which monitoring should be stopped.
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/MonitoredItemDeleteData'
+      responses:
+        200:
+          description: Partial success
+          schema:
+            $ref: '#/definitions/PartialSuccess'
+        204:
+          description: Successful response
+        default:
+          $ref: '#/responses/Error'
+
+  /v1/sessions/{id}/pause-monitors:
+    post:
+      operationId: HandleHttpPauseMonitorRequest
+      x-ni-privilege: Write
+      tags: [monitors]
+      summary: Pauses existing monitored items
+      description: Pauses to update tag history for the specified OPC UA variables. Doesn't remove the SystemLink tags.
+      parameters:
+        - name: id
+          in: path
+          description: session id
+          required: true
+          type: string
+        - in: body
+          name: MonitoredItemsIds
+          description: Ids of the nodes for which monitoring should be paused.
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        200:
+          description: Partial success
+          schema:
+            $ref: '#/definitions/PartialSuccess'
+        204:
+          description: Successful response
+        default:
+          $ref: '#/responses/Error'
+
+  /v1/sessions/{id}/resume-monitors:
+    post:
+      operationId: HandleHttpResumeMonitorRequest
+      x-ni-privilege: Write
+      tags: [monitors]
+      summary: Resumes paused monitored items
+      description: Resumes to update the tag history for the specified OPC UA variables.
+      parameters:
+        - name: id
+          in: path
+          description: session id
+          required: true
+          type: string
+        - in: body
+          name: MonitoredItemsIds
+          description: Ids of the nodes for which monitoring should be resumed.
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        200:
+          description: Partial success
+          schema:
+            $ref: '#/definitions/PartialSuccess'
+        204:
+          description: Successful response
+        default:
+          $ref: '#/responses/Error'
+
+responses:
+  Error:
+    description: Error
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+definitions:
+  SecurityModeEnum:
+    type: string
+    enum: [INVALID, NONE, SIGN, SIGN_AND_ENCRYPT]
+    description: Security mode used by the endpoint
+
+  UserTokenTypeEnum:
+    type: string
+    enum: [ANONYMOUS, USERNAME, CERTIFICATE, ISSUEDTOKEN]
+    description: User identity type
+
+  DatatypeEnum:
+    type: string
+    enum: [NONE, DOUBLE, INT, STRING, BOOLEAN, UINT64, DATE_TIME]
+    description: Datatype of the SystemLink tag
+
+  SessionStateEnum:
+    type: string
+    enum: [NOT_INITIALIZED, CONNECTED, RECONNECTING, STOPPED]
+    description: State of the OPC UA session
+
+  MonitoredItemStateEnum:
+    type: string
+    enum: [NO_TAG_EXISTS, MONITORING, PAUSED]
+    description: Current state of the monitored node
+
+  MonitoredItemDirectionEnum:
+    type: string
+    enum: [READ, WRITE]
+    description: Wether the monitored item is being read from OPC UA server or Systemlink is writing to OPC UA server
+    default: READ
+
+  SessionEndpointModel:
+    type: object
+    description: Information about the endpoint on OPC UA server
+    properties:
+      securityMode:
+        $ref: '#/definitions/SecurityModeEnum'
+      securityPolicy:
+        type: string
+        description: Security policy used by the endpoint
+      certificateInfo:
+        $ref: '#/definitions/SslCertificateInfoModel'
+      supportedUserIdentities:
+        description: List of user authentication schemes supported by the endpoint
+        type: array
+        items:
+          $ref: '#/definitions/SessionUserToken'
+
+  SslCertificateInfoModel:
+    type: object
+    description: Information about the SSL certificate
+    properties:
+      id:
+        type: string
+        description: unique id for this certificate
+      name:
+        type: string
+        description: file name of the certificate
+      subjectName:
+        type: string
+        description: subject name in the certificate
+      issuerName:
+        type: string
+        description: issuer name in the certificate
+      validFrom:
+        type: string
+        description: time from this certificate is valid
+      validTo:
+        type: string
+        description: time till this certificate is valid
+      thumbprint:
+        type: string
+        description: thumbprint in the certificate
+      isCertificateTrusted:
+        type: boolean
+        description: 'true, if the certificate is trusted by the SystemLink server'
+
+  SessionUserToken:
+    type: object
+    description: Information about the user authentication token
+    properties:
+      tokenType:
+        $ref: '#/definitions/UserTokenTypeEnum'
+      userTokenSecurityPolicy:
+        type: string
+        description: Security policy to use when communicating the user identification information
+
+  NewSessionRequest:
+    type: object
+    description: Information about the new session to be created
+    properties:
+      name:
+        type: string
+        description: Name of the OPC UA session
+      url:
+        type: string
+        description: URL of the OPC UA server
+      monitoringInterval:
+        type: integer
+        format: int32
+        description: 'Publishing interval, in milliseconds, for monitoring nodes. Must be greater than or equal to 1000.'
+        default: 10000
+      useDiscoveryCertificate:
+        type: boolean
+        description: 'If set to true, the SSL certificate provided by discovery server is used'
+      endpoint:
+        $ref: '#/definitions/SelectedEndpointModel'
+    required:
+      - name
+      - url
+      - useDiscoveryCertificate
+      - endpoint
+
+  SelectedEndpointModel:
+    type: object
+    description: Information about the selected endpoint
+    properties:
+      securityMode:
+        $ref: '#/definitions/SecurityModeEnum'
+      securityPolicy:
+        type: string
+        description: Security policy used by the endpoint
+      tokenType:
+        $ref: '#/definitions/UserTokenTypeEnum'
+      userTokenSecurityPolicy:
+        type: string
+        description: Security policy used by the endpoint for encrypting the user identification information
+        default: ''
+      userName:
+        type: string
+        description: user name
+        default: ''
+      password:
+        type: string
+        description: password
+        default: ''
+      x509CertificateData:
+        type: string
+        format: byte
+        description: certificate to authenticate the user
+        default: []
+    required:
+      - securityMode
+      - securityPolicy
+      - tokenType
+
+  UpdateSessionRequest:
+    type: object
+    description: Information about updating the existing session
+    properties:
+      sessionId:
+        type: string
+        description: session id
+      name:
+        type: string
+        description: New name
+      monitoringInterval:
+        type: integer
+        description: 'New Publishing interval, in milliseconds, for monitoring nodes. Must be greater than or equal to 1000.'
+    required:
+      - sessionId
+      - name
+      - monitoringInterval
+
+  SessionResponse:
+    type: object
+    description: Information about the existing session
+    properties:
+      id:
+        type: string
+        description: session id
+      name:
+        type: string
+        description: session name
+      url:
+        type: string
+        description: OPC UA server url
+      state:
+        $ref: '#/definitions/SessionStateEnum'
+      monitoringInterval:
+        type: integer
+        description: Publishing interval for monitoring nodes
+      numberOfMonitoredItems:
+        type: integer
+        description: Number of monitored OPC UA node by the session
+      useDiscoveryCertificate:
+        type: boolean
+        description: 'If set to true, then SSL certificate provided by discovery server is used'
+      certificateInfo:
+        $ref: '#/definitions/SslCertificateInfoModel'
+      endpoint:
+        $ref: '#/definitions/SelectedEndpointModel'
+
+  OpcNode:
+    type: object
+    description: Represntation of the node in the browse tree on SystemLink server
+    properties:
+      id:
+        type: string
+        description: NodeId of the node on the OPC UA server
+      displayName:
+        type: string
+        description: Display name of the node on the OPC UA server
+      browsePath:
+        type: string
+        description: Browse path of the node on the OPC UA server
+      isLeaf:
+        type: boolean
+        description: If set to true then the node doesn't have any child nodes
+      opcNodes:
+        type: array
+        description: child nodes of the node
+        items:
+          $ref: '#/definitions/OpcNode'
+
+  ReadAttributesResponse:
+    type: object
+    description: Response for the read attributes request
+    properties:
+      attributes:
+        type: object
+        description: OPC UA attributes
+        additionalProperties:
+          type: string
+      isCompatibleForTag:
+        type: boolean
+        description: 'If set to true, a monitor can be created for this node'
+
+  NewMonitoredItem:
+    type: object
+    description: Information to create a new monitored item
+    properties:
+      displayName:
+        type: string
+        description: Name of the SystemLink tag to be created for this monitored item
+      opcNodeId:
+        type: string
+        description: OPC Node Id for the node on the OPC UA server
+      direction:
+        $ref: '#/definitions/MonitoredItemDirectionEnum'
+      opcSamplingInterval:
+        type: integer
+        format: int32
+        description: Sampling interval at which the OPC UA server should sample the values
+        default: 0
+      opcQueueSize:
+        type: integer
+        format: int32
+        minimum: 0
+        description: Queue size that the OPC server should reserve for this node
+        default: 1000
+    required:
+      - displayName
+      - opcNodeId
+
+  MonitoredItemResponse:
+    type: object
+    description: Information about the existing monitored item
+    properties:
+      id:
+        type: string
+        description: Unique id of the monitored item
+      sessionId:
+        type: string
+        description: Session id of the session on which this node is being monitored
+      dataType:
+        $ref: '#/definitions/DatatypeEnum'
+      displayName:
+        type: string
+        description: SystemLink tag name
+      opcNodeId:
+        type: string
+        description: OPC Node Id for the node on the OPC UA server
+      direction:
+        $ref: '#/definitions/MonitoredItemDirectionEnum'
+      opcSamplingInterval:
+        type: integer
+        description: Sampling interval at which the OPC UA server should sample the values
+      opcQueueSize:
+        type: integer
+        description: Queue size that the OPC server should reserve for this node
+      state:
+        $ref: '#/definitions/MonitoredItemStateEnum'
+
+  MonitoredItemDeleteData:
+    type: object
+    description: Information to delete the existing monitored item
+    properties:
+      id:
+        type: string
+        description: Id of the monitored item to be deleted
+      removeTag:
+        type: boolean
+        description: 'If set to true, then the corresponding tag will be removed from the tag service'
+        default: false
+    required:
+      - id
+
+  Error:
+    description: Contains error information
+    type: object
+    properties:
+      name:
+        description: The string error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+      resourceType:
+        description: The type of resource associated with the error
+        type: string
+      resourceId:
+        description: The identifier of the resource associated with the error
+        type: string
+      message:
+        description: The filled in error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+      innerErrors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+    example:
+      name: Skyline.OneOrMoreErrorsOccurred
+      code: -251040
+      message: One or more errors occurred. See the contained list for details of each error.
+      args: []
+      innerErrors:
+        - name: OpcClientErrorCodes.OpcServerNotFound
+          code: -251608
+          resourceType: session
+          resourceId: '4afb2ce3741fe11d88838cc9'
+          message: OpcServer connection does not exist.
+          args: ['4afb2ce3741fe11d88838cc9']
+
+  PartialSuccess:
+    description: Partial success response
+    type: object
+    properties:
+      failed:
+        type: array
+        items:
+          type: string
+      error:
+        $ref: '#/definitions/Error'
+
+  Operation:
+    description: An operation provided by the API
+    type: object
+    properties:
+      available:
+        type: boolean
+        description: Whether the operation is available to the caller
+      version:
+        type: integer
+        description: The version of the available operation
+    required: [available]
+    example:
+      available: true
+      version: 1
+
+  V1Operations:
+    description: V1 operations
+    type: object
+    properties:
+      operations:
+        description: >-
+          Available operations in the v1 version of the API:
+
+          - getSessions: The ability to retrieve the session
+
+          - modifySessions: The ability to create/modify the sessions
+
+          - deleteSessions: The ability to delete the sessions
+
+          - getMonitoredItems: The ability to retrieve the monitored items
+
+          - modifyMonitoredItems: The ability to create/modify the monitored items
+
+          - deleteMonitoredItems: The ability to delete the monitored items
+
+          - browseNodes: The ability to browse the nodes
+
+          - readNode: The ability to read the attributes of OPC UA node
+
+          - getCertificates: The ability to retrieve the existing certificates
+
+          - uploadCertificates: The ability to upload the certificates
+
+          - deleteCertificates: The ability to delete the certificates
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/Operation'
