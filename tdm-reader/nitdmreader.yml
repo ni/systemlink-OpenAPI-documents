@@ -211,18 +211,7 @@ definitions:
               items:
                 $ref: '#/definitions/OneChannelSpecifier'
           required:
-            - y
-  ChannelSpecificationsAndWindow:
-    description: Channel specifications and data window
-    properties:
-      channelSpecificationsAndWindow:
-        properties:
-          channelSpecifications:
-            $ref: '#/definitions/ChannelSpecifications'
-          dataWindow:
-            $ref: '#/definitions/DataWindow'
-        required:
-          - channelSpecifications
+            - yChannels
   OneChannelData:
     properties:
       dataType:
@@ -241,6 +230,9 @@ definitions:
       decimated:
         type: boolean
         description: Specifies whether returned data is decimated
+      lossyDecimation:
+        type: boolean
+        description: Specifies whether data was decimated in a lossy manner such that the returned data is not necessarily a true visual representation
       undecimatedLength:
         type: integer
         description: Number of points of undecimated data
@@ -263,6 +255,27 @@ definitions:
       timeUtcOffsetHours:
         type: number
         description: The time zone offset applied to local time values
+  ReturnedUniqueValues:
+    properties:
+      uniqueValues:
+        type: array
+        items:
+          $ref: '#/definitions/OneChannelData'
+      timeUtcOffsetHours:
+        type: number
+        description: The time zone offset applied to local time values
+        example: 0
+  UniqueValuesSpecifier:
+    properties:
+      channelSpecifications:
+        type: array
+        description: Channel specifications.
+        items:
+          $ref: '#/definitions/OneChannelSpecifier'
+      maxNumberOfUniqueValues:
+        description: Maximum number of unique values to identify.
+        type: integer
+        example: 10
   NamesList:
     description: List of names and number of names.
     properties:
@@ -498,17 +511,41 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: ChannelSpecificationsAndWindow
+        - name: ChannelSpecifications
           description: Channel specifications and window information.
           in: body
           required: true
           schema:
-            $ref: '#/definitions/ChannelSpecificationsAndWindow'
+            $ref: '#/definitions/ChannelSpecifications'
       responses:
         200:
           description: OK
           schema:
             $ref: '#/definitions/ReturnedXYData'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/query-unique-values:
+    post:
+      tags: [data]
+      summary: Returns unique data from channels.
+      description: Queries files based on channel specifications and returns unique channel data values.  The channel specifications select channels by group and channel relationships. The maximum number of unique values to return is determined by MaxNumberOfUniqueValues. If there are more unique values, then the first MaxNumberOfUniqueValues + 1 values are returned.
+      operationId: queryUniqueValues
+      produces:
+        - application/json
+      parameters:
+        - name: ChannelSpecifications
+          description: Channel specifications.
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/UniqueValuesSpecifier'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/ReturnedUniqueValues'
         default:
           description: Error
           schema:
