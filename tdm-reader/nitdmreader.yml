@@ -176,6 +176,17 @@ definitions:
         type: boolean
         default: false
         description: Represent data as points. When decimation is performed, the data returned represents all the points in that x-axis increment.
+      filter:
+        type: string
+        default: null
+        description: Expression to apply to a group of channels. Valid variables are x, y0-yn, f0-fn (optional filterChannels). 
+        example: (x > 0) and (y0 = 1)
+      filterChannels:
+        type: array
+        items:
+          $ref: '#/definitions/OneChannelSpecifier'
+        default: null
+        description: Channels to use only to filter. Values from these channels are not returned.
   OneChannelSpecifier:
     description: Specification for a channel of data
     properties:
