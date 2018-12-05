@@ -179,6 +179,7 @@ definitions:
       - HOST_NAME
       - OPERATOR
       - SERIAL_NUMBER
+      - PRODUCT
       - TOTAL_TIME_IN_SECONDS
       - KEYWORDS
       - PROPERTIES
@@ -312,6 +313,10 @@ definitions:
         description: Operator
         type: string
         example: admin
+      product:
+        description: The product of the device under test. Added in version 2.
+        type: string
+        example: cRIO-9030
       fileIds:
         description: Array of file ids attached to the test result
         type: array
@@ -367,6 +372,10 @@ definitions:
         description: Name of the operator running the test
         type: string
         example: admin
+      product:
+        description: The product of the device under test. Added in version 2.
+        type: string
+        example: cRIO-9030
       serialNumber:
         description: Sequential number of the device under test
         type: string
@@ -451,6 +460,10 @@ definitions:
         description: Operator
         type: string
         example: admin
+      product:
+        description: The product of the device under test. Added in version 2.
+        type: string
+        example: cRIO-9030
       fileIds:
         description: Array of file ids attached to the test result
         type: array
@@ -500,6 +513,13 @@ definitions:
           type: string
         example:
           - 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+      products:
+        description: Array of products. Added in version 2.
+        type: array
+        items:
+          type: string
+        example:
+          - cRIO-9030
       systemIds:
         description: Array of system ids
         type: array
