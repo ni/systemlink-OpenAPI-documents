@@ -314,7 +314,7 @@ definitions:
         type: string
         example: admin
       product:
-        description: The product of the device under test. Added in version 2.
+        description: The type of device under test. Added in version 2.
         type: string
         example: cRIO-9030
       fileIds:
@@ -373,7 +373,7 @@ definitions:
         type: string
         example: admin
       product:
-        description: The product of the device under test. Added in version 2.
+        description: The type of device under test. Added in version 2.
         type: string
         example: cRIO-9030
       serialNumber:
@@ -461,7 +461,7 @@ definitions:
         type: string
         example: admin
       product:
-        description: The product of the device under test. Added in version 2.
+        description: The type of device under test. Added in version 2.
         type: string
         example: cRIO-9030
       fileIds:
