@@ -506,7 +506,7 @@ paths:
     post:
       tags: [data]
       summary: Returns data from channels.
-      description: Queries files based on channel and window specifications and returns channel data that matches the query. The channel specifications select channels by group and channel relationships. Window specifications determine a bounding box of minimum and maximum x and y values, as well as specifying the type of decimation performed on data within the window.
+      description: Queries files based on channel and window specifications and returns channel data that matches the query. The channel specifications select channels by group and channel relationships. Window specifications determine a bounding box of minimum and maximum x and y values, as well as specify the type of decimation performed on data within the window.
       operationId: queryData
       produces:
         - application/json
