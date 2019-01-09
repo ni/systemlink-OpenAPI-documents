@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   version: '1'
-  title: Skyline File Service
+  title: SystemLink File Service
   description: Upload and download files from a SystemLink server
   contact:
     name: National Instruments
@@ -495,12 +495,12 @@ paths:
       tags: [files]
       summary: List available files
       description: >-
-        Lists available files on the Skyline File service.
+        Lists available files on the SystemLink File service.
 
         Use the skip and take parameters to return paged responses.
 
         The orderBy and orderByDescending fields can be used to manage sorting
-        the list by metadata objects. 
+        the list by metadata objects.
       operationId: ListAvailableFiles_GET
       x-ni-operation: listFiles
       x-ni-privilege: ViewMetadata
@@ -528,7 +528,7 @@ paths:
           maximum: 10000
         - in: query
           name: orderBy
-          description: >- 
+          description: >-
             The name of the metadata key to sort by. The value of the orderBy field should be
             the name of a metadata key.
           type: string
@@ -538,7 +538,7 @@ paths:
             - size
         - in: query
           name: orderByDescending
-          description: >- 
+          description: >-
             Whether to sort descending instead of ascending.
             The elements in the list are sorted ascending by default. If the
             orderByDescending parameter is specified, the elements in the list
@@ -585,7 +585,7 @@ paths:
       description: >-
         Downloads a file from the SystemLink File service in
         a single HTTP response.
-        
+
         Use the inline parameter in the query string to control the download
         behavior.
       operationId: ReceiveFile
@@ -624,7 +624,7 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v1/service-groups/Default/files/{id}/update-metadata:
-    parameters: 
+    parameters:
       - $ref: '#/parameters/id'
     post:
       tags: [files]
@@ -632,7 +632,7 @@ paths:
       description: >-
         Updates an existing file's metadata with the specified metadata
         properties.
-        
+
         Use the replaceExisting element to determine the replace or merge
         behavior.
       operationId: UpdateMetadata
@@ -681,7 +681,7 @@ paths:
       operationId: DeleteMultiple
       x-ni-operation: deleteFiles
       x-ni-privilege: ModifyFiles
-      parameters: 
+      parameters:
         - in: body
           name: files
           description: The description of files to delete
@@ -711,7 +711,7 @@ paths:
       tags: [files]
       summary: Query files
       description: >-
-        Queries the Skyline File service for a list of files that match
+        Queries the SystemLink File service for a list of files that match
         specified metadata properties.
 
         Query elements:
@@ -723,7 +723,7 @@ paths:
         - sizeMinQuery: a JSON query object with an integer value.
 
         - createdQuery: a JSON query object with an ISO8601 date string value.
-  
+
         - propertiesQuery: a JSON array of query objects with string values.
       operationId: QueryAvailableFiles
       x-ni-operation: listFiles
