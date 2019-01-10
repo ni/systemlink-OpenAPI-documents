@@ -56,7 +56,7 @@ definitions:
       name: Skyline.OneOrMoreErrorsOccurred
       code: -251040
       message: >-
-        One or more errors occurred. See the contained list for details of each
+        One or more errors occurred. See the contained list for details about each
         error.
       args: []
       innerErrors:
@@ -67,7 +67,7 @@ definitions:
           message: File service failed.
           args: []
   Operation:
-    description: An operation provided by the API
+    description: Operation provided by the API
     type: object
     properties:
       available:
@@ -88,7 +88,7 @@ definitions:
         description: >-
           Available operations in the v1 version of the API:
 
-          - readData: The ability to read data
+          - readData: Ability to read data
         type: object
         properties:
           readData:
@@ -99,11 +99,11 @@ definitions:
     properties:
       name:
         type: string
-        description: name of the property
+        description: Name of the property
         example: Name
       type:
         type: string
-        description: data type of 'value'
+        description: Data type of 'value'
         example: String
       value:
         type: string
@@ -112,13 +112,13 @@ definitions:
     type: object
     properties:
       properties:
-        description: Property values.
+        description: Property values
         type: array
         items:
           $ref: '#/definitions/Property'
       totalCount:
         type: integer
-        description: Count of all properties. This could be more than the items returned in Properties.
+        description: Count of all properties. This might be more than the items returned in Properties.
         example: 1
   FileList:
     type: object
@@ -134,13 +134,13 @@ definitions:
     properties:
       decimatex:
         type: integer
-        description: Number of values on the x-axis. This determines the number of points that can be displayed.
+        description: Number of values on the x axis. This determines the number of points that can be displayed.
         example: 1000
         default: 0
         format: int32
       decimatey:
         type: integer
-        description: Number of values on the y-axis. This determines the number of points that can be displayed.
+        description: Number of values on the y axis. This determines the number of points that can be displayed.
         example: 1000
         default: 0
         format: int32
@@ -148,25 +148,25 @@ definitions:
         type: number
         default: 0
         format: double
-        description: Minimum x value of the display x-axis.
+        description: Minimum x value of the display x axis.
         example: -1
       xmax:
         type: number
         default: 0
         format: double
-        description: Maximum x value of the display x-axis.
+        description: Maximum x value of the display x axis.
         example: 1
       ymin:
         type: number
         default: 0
         format: double
-        description: Minimum y value of the display y-axis.
+        description: Minimum y value of the display y axis.
         example: -1
       ymax:
         type: number
         default: 0
         format: double
-        description: Maximum y value of the display y-axis.
+        description: Maximum y value of the display y axis.
         example: 1
       showLines:
         type: boolean
@@ -175,7 +175,7 @@ definitions:
       showPoints:
         type: boolean
         default: false
-        description: Represent data as points. When decimation is performed, the data returned represents all of the points in that x-axis increment.
+        description: Represent data as points. When decimation is performed, the data returned represents all the points in that x-axis increment.
   OneChannelSpecifier:
     description: Specification for a channel of data
     properties:
@@ -196,17 +196,17 @@ definitions:
       - groupName
       - channelName
   ChannelSpecifications:
-    description: Array of x-y channel groups.  The x-channel of each grouping is optional.
+    description: Array of x-y channel groups.  The x channel of each grouping is optional.
     properties:
       xyChannels:
         type: array
         items:
-          description: Y channel(s) and an optional x channel
+          description: y channel(s) and an optional x channel
           properties:
             xChannel:
               $ref: '#/definitions/OneChannelSpecifier'
             yChannels:
-              description: 'Channels to be treated as y channel, associated with x channel'
+              description: 'Channels to be treated as y channels associated with x channel'
               type: array
               items:
                 $ref: '#/definitions/OneChannelSpecifier'
@@ -242,19 +242,19 @@ definitions:
         $ref: '#/definitions/OneChannelData'
       y:
         type: array
-        description: Array of y-channels
+        description: Array of y channels
         items:
           $ref: '#/definitions/OneChannelData'
   ReturnedXYData:
     properties:
       data:
         type: array
-        description: Pairing of data from an x-channel and multiple y-channels
+        description: Pairing of data from an x channel and multiple y channels
         items:
             $ref: '#/definitions/XYData'
       timeUtcOffsetHours:
         type: number
-        description: The time zone offset applied to local time values
+        description: Time zone offset applied to local time values
   ReturnedUniqueValues:
     properties:
       uniqueValues:
@@ -263,21 +263,21 @@ definitions:
           $ref: '#/definitions/OneChannelData'
       timeUtcOffsetHours:
         type: number
-        description: The time zone offset applied to local time values
+        description: Time zone offset applied to local time values
         example: 0
   UniqueValuesSpecifier:
     properties:
       channelSpecifications:
         type: array
-        description: Channel specifications.
+        description: Channel specifications
         items:
           $ref: '#/definitions/OneChannelSpecifier'
       maxNumberOfUniqueValues:
-        description: Maximum number of unique values to identify.
+        description: Maximum number of unique values to identify
         type: integer
         example: 10
   NamesList:
-    description: List of names and number of names.
+    description: List of names and number of names
     properties:
       names:
         description: All names
@@ -320,11 +320,11 @@ definitions:
                       example: Channel 1
                     dataCount:
                       type: number
-                      description: Number of data points in the channel.
+                      description: Number of data points in the channel
                       example: 1
                     dataType:
                       type: string
-                      description: Data type of this channel.
+                      description: Data type of this channel
                       example: String
                     properties:
                       $ref: '#/definitions/Properties'
@@ -348,14 +348,14 @@ paths:
               v1:
                 $ref: '#/definitions/V1Operations'
               version:
-                description: The implementation version of the web service
+                description: Implementation version of the web service
                 type: string
                 example: '18.0'
   /{version}:
     parameters:
       - in: path
         name: version
-        description: The version of the API to retrieve operations.
+        description: Version of the API to retrieve operations
         type: string
         required: true
     get:
@@ -407,7 +407,7 @@ paths:
         - application/json
       parameters:
         - name: fileIds
-          description: List of File IDs to inspect.
+          description: List of File IDs to inspect
           in: body
           required: true
           schema:
@@ -506,13 +506,13 @@ paths:
     post:
       tags: [data]
       summary: Returns data from channels.
-      description: Queries files based on channel and window specifications and returns channel data that matches the query.  The channel specifications select channels by group and channel relationships.  Window specifications determine a bounding box of minimum and maximum x and y values, as well as specifying the type of decimation performed on data within the window.
+      description: Queries files based on channel and window specifications and returns channel data that matches the query. The channel specifications select channels by group and channel relationships. Window specifications determine a bounding box of minimum and maximum x and y values, as well as specify the type of decimation performed on data within the window.
       operationId: queryData
       produces:
         - application/json
       parameters:
         - name: ChannelSpecifications
-          description: Channel specifications and window information.
+          description: Channel specifications and window information
           in: body
           required: true
           schema:
@@ -530,13 +530,13 @@ paths:
     post:
       tags: [data]
       summary: Returns unique data from channels.
-      description: Queries files based on channel specifications and returns unique channel data values.  The channel specifications select channels by group and channel relationships. The maximum number of unique values to return is determined by MaxNumberOfUniqueValues. If there are more unique values, then the first MaxNumberOfUniqueValues + 1 values are returned.
+      description: Queries files based on channel specifications and returns unique channel data values. The channel specifications select channels by group and channel relationships. The maximum number of unique values to return is determined by MaxNumberOfUniqueValues. If there are more unique values, then the first MaxNumberOfUniqueValues + 1 values are returned.
       operationId: queryUniqueValues
       produces:
         - application/json
       parameters:
         - name: ChannelSpecifications
-          description: Channel specifications.
+          description: Channel specifications
           in: body
           required: true
           schema:
