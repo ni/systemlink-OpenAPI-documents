@@ -43,6 +43,7 @@ responses:
     description: List of tags, including their current and aggregate values
     schema:
       title: Get Tags With Values Response
+      type: object
       properties:
         totalCount:
           description: Total number of tags which match a given query
@@ -56,6 +57,7 @@ responses:
     description: List of tags, excluding current and aggregate values
     schema:
       title: Get Tags Response
+      type: object
       properties:
         totalCount:
           type: integer
@@ -81,6 +83,7 @@ responses:
     description: List of subscription updates
     schema:
       title: V1 Get Subscription Updates Response
+      type: object
       properties:
         subscriptionUpdates:
           description: Subscription updates
@@ -96,6 +99,7 @@ responses:
     description: List of subscription updates
     schema:
       title: V2 Get Subscription Updates Response
+      type: object
       properties:
         subscriptionUpdates:
           description: Subscription updates
@@ -618,15 +622,7 @@ paths:
           schema:
             type: array
             items:
-              description: Tag path with timestamped value
-              type: object
-              title: Tag Path With Current Value
-              properties:
-                path:
-                  type: string
-                  description: Tag path
-                current:
-                  $ref: '#/definitions/TimestampedTagValue'
+              $ref: '#/definitions/TagPathWithTimestampedValue'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -650,15 +646,7 @@ paths:
           schema:
             type: array
             items:
-              description: Tag path with value
-              type: object
-              title: Tag Path With Value
-              properties:
-                path:
-                  type: string
-                  description: Tag path
-                current:
-                  $ref: '#/definitions/TagValue'
+              $ref: '#/definitions/TagPathWithValue'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -684,17 +672,7 @@ paths:
             type: array
             title: Tag Paths With Timestamps
             items:
-              type: object
-              title: Tag Path and Timestamp
-              description: A tag path and the timestamp of its current value
-              properties:
-                timestamp:
-                  description: Timestamp associated with the current value
-                  type: string
-                  format: iso-date-time
-                  example: '2018-09-04T18:45:08Z'
-                path:
-                  type: string
+              $ref: '#/definitions/TagPathWithTimestamp'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -719,14 +697,7 @@ paths:
             description: Array of the "min" values from the aggregates for each tag in the selection.
             type: array
             items:
-              type: object
-              title: Tag Path with Min Aggregate
-              properties:
-                path:
-                  type: string
-                min:
-                  description: Minimum value from the tag's aggregates
-                  type: string
+              $ref: '#/definitions/TagPathWithMinAggregate'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -751,14 +722,7 @@ paths:
             description: Array of the "max" values from the aggregates for each tag in the selection.
             type: array
             items:
-              type: object
-              title: Tag Path With Max Aggregate
-              properties:
-                path:
-                  type: string
-                max:
-                  description: Maximum value from the tag's aggregates
-                  type: string
+              $ref: '#/definitions/TagPathWithMaxAggregate'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -783,15 +747,7 @@ paths:
             description: Array of the "avg" values from the aggregates for each tag in the selection.
             type: array
             items:
-              type: object
-              title: Tag Path and Mean Value
-              properties:
-                path:
-                  type: string
-                avg:
-                  description: Mean value from the tag's aggregates
-                  type: number
-                  format: double
+              $ref: '#/definitions/TagPathWithMeanAggregate'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -816,14 +772,7 @@ paths:
             description: Array of the "count" values from the aggregates for each tag in the selection.
             type: array
             items:
-              type: object
-              title: Tag Paths and Count Values
-              properties:
-                path:
-                  type: string
-                count:
-                  description: Count value from the tag's aggregates
-                  type: integer
+              $ref: '#/definitions/TagPathWithCountAggregate'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -1503,6 +1452,15 @@ definitions:
     example:
       type: DOUBLE
       value: "3.14"
+  TagPathWithCountAggregate:
+    type: object
+    title: Tag Path with Count Aggregate
+    properties:
+      path:
+        type: string
+      count:
+        description: Count value from the tag's aggregates
+        type: integer
   TagPathWithCurrentAndAggregateValue:
     description: Tag path with its current value and aggregates
     type: object
@@ -1525,6 +1483,66 @@ definitions:
         max: "5.0"
         avg: 2.0
         count: 5
+  TagPathWithTimestampedValue:
+    description: Tag path with timestamped value
+    type: object
+    title: Tag Path with Timestamped Value
+    properties:
+      path:
+        type: string
+        description: Tag path
+      current:
+        $ref: '#/definitions/TimestampedTagValue'
+  TagPathWithValue:
+    description: Tag path with value
+    type: object
+    title: Tag Path With Value
+    properties:
+      path:
+        type: string
+        description: Tag path
+      current:
+        $ref: '#/definitions/TagValue'
+  TagPathWithTimestamp:
+    type: object
+    title: Tag Path with Timestamp
+    description: A tag path and the timestamp of its current value
+    properties:
+      timestamp:
+        description: Timestamp associated with the current value
+        type: string
+        format: iso-date-time
+        example: '2018-09-04T18:45:08Z'
+      path:
+        type: string
+  TagPathWithMaxAggregate:
+    type: object
+    title: Tag Path With Max Aggregate
+    properties:
+      path:
+        type: string
+      max:
+        description: Maximum value from the tag's aggregates
+        type: string
+  TagPathWithMinAggregate:
+    type: object
+    title: Tag Path with Min Aggregate
+    properties:
+      path:
+        type: string
+      min:
+        description: Minimum value from the tag's aggregates
+        type: string
+  TagPathWithMeanAggregate:
+    type: object
+    title: Tag Path with Mean Aggregate
+    properties:
+      path:
+        type: string
+      avg:
+        description: Mean value from the tag's aggregates
+        type: number
+        format: double
   TimestampedTagValue:
     description: Current value of a tag
     type: object
