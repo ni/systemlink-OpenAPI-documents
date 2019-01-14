@@ -777,7 +777,7 @@ definitions:
             userTokenSecurityPolicy: "http://opcfoundation.org/UA/SecurityPolicy#Basic256"
             tokenType: "USERNAME"
             userName: "admin"
-            password: ""
+            password: "AQAAANCMnd8BFdERjHoBwE/Cl+sBAAAAYaA/LG/ktykZHp/tt6PfMAAAAAACAAAAAAAAwAAAABBBBBCZKwgu3/NIN5ScsQiBB4i+AAAAAASAAACgAAAAEBBBBH0QaMIJBh9ZnZLeHQSCZMoIAAAACkct5+OV1pgUAAAAL+ue1DKXQ+b3s1D19HT7716tmHY="
             x509CertificateData: ""
 
   OpcNode:
