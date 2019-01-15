@@ -268,7 +268,14 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/UpdateSessionRequest'
+                $ref: '#/definitions/UpdateSessionRequest'
+            example:
+                - sessionId: 5c39017b236b8b67785c4a1b
+                  name: "Renamed.opcuaserver.com-48010"
+                  monitoringInterval: 5000
+                - sessionId: zc39017b236b8b67785c4a1b
+                  name: "Renamed.opcuaserver.com-48011"
+                  monitoringInterval: 5000
       responses:
         200:
           description: Partial success
@@ -420,6 +427,11 @@ paths:
             type: array
             items:
               $ref: '#/definitions/MonitoredItemDeleteData'
+            example:
+                - id: "6c3907c6236b8b67785c4a1c"
+                  removeTag: false
+                - id: "zc39017b236b8b67785c4a1b"
+                  removeTag: false
       responses:
         200:
           description: Partial success
@@ -554,8 +566,8 @@ definitions:
         items:
           $ref: '#/definitions/SessionUserToken'
     example:
-        securityMode: "SIGN_AND_ENCRYPT"
-        securityPolicy: "Basic256Sha256"
+        securityMode: "SIGN"
+        securityPolicy: "Basic256"
         certificateInfo:
             id: null
             name: ""
@@ -577,37 +589,36 @@ definitions:
     properties:
       id:
         type: string
-        description: unique id for this certificate
+        description: unique id for this certificate. This can be null if the certificate is not yet saved on the SystemLink server
+        example: "NI SystemLink OPC UA Connector [1FA889F76A1DEE5DAB2B5880CC6BFE248F12A8EB].der"
       name:
         type: string
-        description: file name of the certificate
+        description: file name of the certificate. This can be empty if the certificate is not yet saved on the SystemLink server
+        example: "NI SystemLink OPC UA Connector [1FA889F76A1DEE5DAB2B5880CC6BFE248F12A8EB].der"
       subjectName:
         type: string
         description: subject name in the certificate
+        example: "CN=UaServerCpp@opcuaserver.com, OU=OPC UA, O=One-Way Automation, L=Edmonton, S=Alberta, C=CA, DC=opcuaserver.com"
       issuerName:
         type: string
         description: issuer name in the certificate
+        example: "CN=UaServerCpp@opcuaserver.com, OU=OPC UA, O=One-Way Automation, L=Edmonton, S=Alberta, C=CA, DC=opcuaserver.com"
       validFrom:
         type: string
         description: time from this certificate is valid
+        example: "1/24/2018 5:29:36 PM"
       validTo:
         type: string
         description: time till this certificate is valid
+        example: "1/23/2023 5:29:36 PM"
       thumbprint:
         type: string
         description: thumbprint in the certificate
+        example: "83A0C843ECC0D3EA7C858CC76D671DC14E2A2DE4"
       isCertificateTrusted:
         type: boolean
         description: 'true, if the certificate is trusted by the SystemLink server'
-    example:
-        id: "NI SystemLink OPC UA Connector [1FA889F76A1DEE5DAB2B5880CC6BFE248F12A8EB].der"
-        name: "NI SystemLink OPC UA Connector [1FA889F76A1DEE5DAB2B5880CC6BFE248F12A8EB].der"
-        isCertificateTrusted: true
-        issuerName: "CN=NI SystemLink OPC UA Connector"
-        subjectName: "CN=NI SystemLink OPC UA Connector"
-        thumbprint: "1FA889F76A1DEE5DAB2B5880CC6BFE248F12A8EB"
-        validFrom: "10/31/2018 4:59:04 PM"
-        validTo: "10/31/2019 4:59:04 PM"
+        example: true
 
   SessionUserToken:
     type: object
@@ -615,12 +626,11 @@ definitions:
     properties:
       tokenType:
         $ref: '#/definitions/UserTokenTypeEnum'
+        example: USERNAME
       userTokenSecurityPolicy:
         type: string
         description: Security policy to use when communicating the user identification information
-    example:
-        tokenType: USERNAME
-        userTokenSecurityPolicy: "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256"
+        example: "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256"
 
   NewSessionRequest:
     type: object
@@ -629,17 +639,21 @@ definitions:
       name:
         type: string
         description: Name of the OPC UA session
+        example: "opcuaserver.com-48010"
       url:
         type: string
         description: URL of the OPC UA server
+        example: "opc.tcp://opcuaserver.com:48010"
       monitoringInterval:
         type: integer
         format: int32
         description: 'Publishing interval, in milliseconds, for monitoring nodes. Must be greater than or equal to 1000.'
         default: 10000
+        example: 1000
       useDiscoveryCertificate:
         type: boolean
         description: 'If set to true, the SSL certificate provided by discovery server is used'
+        example: true
       endpoint:
         $ref: '#/definitions/SelectedEndpointModel'
     required:
@@ -659,6 +673,7 @@ definitions:
             tokenType: "USERNAME"
             userName: "admin"
             password: "admin"
+            x509CertificateData: []
 
   SelectedEndpointModel:
     type: object
@@ -666,65 +681,60 @@ definitions:
     properties:
       securityMode:
         $ref: '#/definitions/SecurityModeEnum'
+        example: "SIGN"
       securityPolicy:
         type: string
         description: Security policy used by the endpoint
+        example: "Basic256"
       tokenType:
         $ref: '#/definitions/UserTokenTypeEnum'
+        example: "USERNAME"
       userTokenSecurityPolicy:
         type: string
         description: Security policy used by the endpoint for encrypting the user identification information
         default: ''
+        example: "http://opcfoundation.org/UA/SecurityPolicy#Basic256"
       userName:
         type: string
         description: user name
         default: ''
+        example: admin
       password:
         type: string
-        description: password
+        description: password. Request objects should contain the actual password. Response objects will contain the encrypted password.
         default: ''
+        example: admin
       x509CertificateData:
         type: string
         format: byte
         description: certificate to authenticate the user
         default: []
+        example: []
     required:
       - securityMode
       - securityPolicy
       - tokenType
-    example:
-        securityMode: "SIGN"
-        securityPolicy: "Basic256"
-        userTokenSecurityPolicy: "http://opcfoundation.org/UA/SecurityPolicy#Basic256"
-        tokenType: "USERNAME"
-        userName: "admin"
-        password: ""
-        x509CertificateData: ""
 
   UpdateSessionRequest:
     type: object
     description: Information about updating the existing session
     properties:
-      sessionId:
-        type: string
-        description: session id
-      name:
-        type: string
-        description: New name
-      monitoringInterval:
-        type: integer
-        description: 'New Publishing interval, in milliseconds, for monitoring nodes. Must be greater than or equal to 1000.'
+        sessionId:
+            type: string
+            description: session id
+            example: 5c39017b236b8b67785c4a1b
+        name:
+            type: string
+            description: New name
+            example: "Renamed.opcuaserver.com-48010"
+        monitoringInterval:
+            type: integer
+            description: 'New Publishing interval, in milliseconds, for monitoring nodes. Must be greater than or equal to 1000.'
+            example: 5000
     required:
-      - sessionId
-      - name
-      - monitoringInterval
-    example:
-        - sessionId: 5c39017b236b8b67785c4a1b
-          name: "Renamed.opcuaserver.com-48010"
-          monitoringInterval: 5000
-        - sessionId: zc39017b236b8b67785c4a1b
-          name: "Renamed.opcuaserver.com-48011"
-          monitoringInterval: 5000
+        - sessionId
+        - name
+        - monitoringInterval
 
   SessionResponse:
     type: object
@@ -778,7 +788,7 @@ definitions:
             tokenType: "USERNAME"
             userName: "admin"
             password: "AQAAANCMnd8BFdERjHoBwE/Cl+sBAAAAYaA/LG/ktykZHp/tt6PfMAAAAAACAAAAAAAAwAAAABBBBBCZKwgu3/NIN5ScsQiBB4i+AAAAAASAAACgAAAAEBBBBH0QaMIJBh9ZnZLeHQSCZMoIAAAACkct5+OV1pgUAAAAL+ue1DKXQ+b3s1D19HT7716tmHY="
-            x509CertificateData: ""
+            x509CertificateData: []
 
   OpcNode:
     type: object
@@ -787,26 +797,25 @@ definitions:
       id:
         type: string
         description: NodeId of the node on the OPC UA server
+        example: "i=87"
       displayName:
         type: string
         description: Display name of the node on the OPC UA server
+        example: "Views"
       browsePath:
         type: string
         description: Browse path of the node on the OPC UA server
+        example: "/Views"
       isLeaf:
         type: boolean
         description: If set to true then the node doesn't have any child nodes
+        example: false
       opcNodes:
         type: array
         description: child nodes of the node
         items:
           $ref: '#/definitions/OpcNode'
-    example:
-        id: "i=87"
-        displayName: "Views"
-        browsePath: "/Views"
-        isLeaf: false
-        opcNodes:
+        example:
             - browsePath: "/Views/3:AirConditionerView"
               displayName: "AirConditionerView"
               id: "ns=3;i=5000"
@@ -922,17 +931,14 @@ definitions:
       id:
         type: string
         description: Id of the monitored item to be deleted
+        example: 6c3907c6236b8b67785c4a1c
       removeTag:
         type: boolean
         description: 'If set to true, then the corresponding tag will be removed from the tag service'
         default: false
+        example: false
     required:
       - id
-    example:
-        - id: "6c3907c6236b8b67785c4a1c"
-          removeTag: false
-        - id: "zc39017b236b8b67785c4a1b"
-          removeTag: false
 
   Error:
     description: Contains error information
