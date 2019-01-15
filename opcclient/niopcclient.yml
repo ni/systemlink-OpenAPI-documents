@@ -522,32 +522,38 @@ definitions:
     type: string
     enum: [INVALID, NONE, SIGN, SIGN_AND_ENCRYPT]
     description: Security mode used by the endpoint
+    example: SIGN
 
   UserTokenTypeEnum:
     type: string
     enum: [ANONYMOUS, USERNAME, CERTIFICATE, ISSUEDTOKEN]
     description: User identity type
+    example: USERNAME
 
   DatatypeEnum:
     type: string
     enum: [NONE, DOUBLE, INT, STRING, BOOLEAN, UINT64, DATE_TIME]
     description: Datatype of the SystemLink tag
+    example: DOUBLE
 
   SessionStateEnum:
     type: string
     enum: [NOT_INITIALIZED, CONNECTED, RECONNECTING, STOPPED]
     description: State of the OPC UA session
+    example: CONNECTED
 
   MonitoredItemStateEnum:
     type: string
     enum: [NO_TAG_EXISTS, MONITORING, PAUSED]
     description: Current state of the monitored node
+    example: MONITORING
 
   MonitoredItemDirectionEnum:
     type: string
     enum: [READ, WRITE]
     description: Wether the monitored item is being read from OPC UA server or Systemlink is writing to OPC UA server
     default: READ
+    example: READ
 
   SessionEndpointModel:
     type: object
@@ -626,7 +632,6 @@ definitions:
     properties:
       tokenType:
         $ref: '#/definitions/UserTokenTypeEnum'
-        example: USERNAME
       userTokenSecurityPolicy:
         type: string
         description: Security policy to use when communicating the user identification information
@@ -681,14 +686,12 @@ definitions:
     properties:
       securityMode:
         $ref: '#/definitions/SecurityModeEnum'
-        example: "SIGN"
       securityPolicy:
         type: string
         description: Security policy used by the endpoint
         example: "Basic256"
       tokenType:
         $ref: '#/definitions/UserTokenTypeEnum'
-        example: "USERNAME"
       userTokenSecurityPolicy:
         type: string
         description: Security policy used by the endpoint for encrypting the user identification information
