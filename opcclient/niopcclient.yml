@@ -970,7 +970,6 @@ definitions:
         innerErrors:
           - name: OpcClientErrorCodes.ResourceNotFound
             code: -251608
-            resourceType: <resource_type>
             resourceId: 'zc39017b236b8b67785c4a1b'
             message: Resource with id 'zc39017b236b8b67785c4a1b' is not found.
             args: ['zc39017b236b8b67785c4a1b']
