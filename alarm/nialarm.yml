@@ -15,13 +15,8 @@ produces:
 securityDefinitions:
   basicAuth:
     type: basic
-  cookieAuth:
-    type: apiKey
-    in: header
-    name: Cookie
 security:
   - basicAuth: []
-  - cookieAuth: []
 x-ni-routing-key: Skyline.AlarmInstance
 definitions:
   Error:
