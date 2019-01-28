@@ -15,8 +15,13 @@ produces:
 securityDefinitions:
   basicAuth:
     type: basic
+  cookieAuth:
+    type: apiKey
+    in: header
+    name: Cookie
 security:
   - basicAuth: []
+  - cookieAuth: []
 x-ni-routing-key: Skyline.AlarmInstance
 definitions:
   Error:
@@ -353,9 +358,14 @@ definitions:
         skip:
           description: Number of entries to skip in the response list. Typically used in combination with the take parameter to implement pagination.
           type: integer
+          example: 0
+          default: 0
         take:
           description: Number of entries to include in the response list. Typically used in combination with the skip parameter to implement pagination.
           type: integer
+          example: 10000
+          default: 10000
+          maximum: 10000
 
 responses:
   Error:
