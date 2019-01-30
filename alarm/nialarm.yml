@@ -253,13 +253,13 @@ definitions:
         format: iso-date-time
         example: '2019-01-14T23:15:53.7270539Z'
       severityLevel:
-        description: The severity of the transition. Valid values for CLEAR transitions are [-1,-1]. Valid
-          values for SET transitions are [1, 4].
+        description: The severity of the transition. Valid values for CLEAR transitions are [-1,-1]. Valid 
+          values for SET transitions are [1, infinity]. Note that the SystemLink Alarm UI only has display 
+          strings for SET severities in the range [1, 4].
         type: integer
         example: 2
         default: 2
         minimum: -1
-        maximum: 4
       notificationStrategyIds:
         description: The IDs of the notification strategies which should be triggered if this request results
           in an alarm instance being created or transitioning to a new highest severity
