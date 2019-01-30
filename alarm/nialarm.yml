@@ -64,6 +64,7 @@ definitions:
       operations:
         description: >-
           Available operations in the v1 version of the API:
+
           - deleteAlarmInstances: The ability to delete alarm instances
 
           - readAlarmInstances: The ability to query for alarm instances
@@ -80,9 +81,9 @@ definitions:
             $ref: '#/definitions/Operation'
   AlarmInstance:
     title: Alarm Instance
-    description: An individual instance of an alarm. The lifecycle of an instance of an alarm begins the first time it is triggered and ends when
-      it has been both acknowledged and cleared. The services enforces the invariant that there can be at most one *active*/true instance of an alarm
-      with a given *alarmId*.
+    description: An individual instance of an alarm. The lifecycle of an instance of an alarm begins the first
+      time it is triggered and ends when it has been both acknowledged and cleared. The services enforces the
+      invariant that there can be at most one *active*/true instance of an alarm with a given *alarmId*.
     type: object
     required:
       - alarmId
@@ -92,44 +93,64 @@ definitions:
         type: string
         example: 5c33c212e0d6444320d9a9f4
       alarmId:
-        description: A value meant to uniquely identify the particular process or condition tracked by an alarm. For example, alarm instances created by the Tag Rule Engine Service have their *alarmIds* set to the concatenation of the path of the tag which caused the rule to be triggered and the ID of the rule. CRIO1.System.Health.DiskSpaceLow.Bdd9u!4aMd!$pYrf*CnaIZ2tbu$-Ct%? is an example of such an *alarmId*.
+        description: A value meant to uniquely identify the particular process or condition tracked by an
+          alarm. For example, alarm instances created by the Tag Rule Engine Service have their *alarmIds* set
+          to the concatenation of the path of the tag which caused the rule to be triggered and the ID of the
+          rule.
         type: string
         example: CRIO1.System.Health.DiskSpaceUsePercentage.Bdd9u!4aMd!$pYrf*CnaIZ2tbu$-Ct%?
       active:
-        description: Whether or not the alarm instance is active. An active alarm is one that is considered to be still deserving of human or automated attention. Alarm instances always begin life with *active*/true. This field will be automatically set to false when the *clear* and *acknowledged* fields are set to true.
+        description: Whether or not the alarm instance is active. An active alarm is one that is considered to
+          be still deserving of human or automated attention. Alarm instances always begin life with
+          *active*/true. This field will be automatically set to false when the *clear* and
+          *acknowledged* fields are set to true.
         type: boolean
-        example: true
       clear:
-        description: When set to true, the condition that triggered the alarm no longer matches the trigger condition. When an alarm instance is created, *clear* is initially set to false. The creator of the alarm (typically a rule engine or application element of some sort) may determine that the trigger condition no longer applies, and may send an update, clearing the condition. Clearing the alarm does not deactivate the alarm, unless the alarm had previously been acknowledged. As long as the alarm is *active*/true, the alarm may transition from *clear*/true to *clear*/false (or vice versa) multiple times.
+        description: When set to true, the condition that triggered the alarm no longer matches the trigger
+          condition. When an alarm instance is created, *clear* is initially set to false. The creator of the
+          alarm (typically a rule engine or application element of some sort) may determine that the trigger
+          condition no longer applies, and may send an update, clearing the condition. Clearing the alarm
+          does not deactivate the alarm, unless the alarm had previously been acknowledged. As long as the
+          alarm is *active*/true, the alarm may transition from *clear*/true to *clear*/false (or vice versa)
+          multiple times.
         type: boolean
-        example: false
       acknowledged:
-        description: When set to true, the alarm has been acknowledged by an alarm handler, which is typically a human. Alarm instances always begin life with *acknowledged*/false. Acknowledging an alarm will not affect the *active* flag unless *clear* is also true. Once both *clear* and *acknowledged* are true, the alarm will become inactive (*active*/false). This field is automatically reset to false when an alarm instance's *highestSeverityLevel* field increases.
+        description: When set to true, the alarm has been acknowledged by an alarm handler, which is typically
+          a human. Alarm instances always begin life with *acknowledged*/false. Acknowledging an alarm will
+          not affect the *active* flag unless *clear* is also true. Once both *clear* and *acknowledged* are
+          true, the alarm will become inactive (*active*/false). This field is automatically reset to false
+          when an alarm instance's *highestSeverityLevel* field increases.
         type: boolean
-        example: false
       acknowledgedAt:
-        description: The time at which a given alarm instance was acknowledged. This field will be cleared when an alarm instance's *highestSeverityLevel* field increases.
+        description: The time at which a given alarm instance was acknowledged. This field will be cleared
+          when an alarm instance's *highestSeverityLevel* field increases.
         type: string
+        format: iso-date-time
         example: '2019-01-14T23:15:53.7270539Z'
       acknowledgedBy:
-        description: Description of who acknowledged a given alarm instance. This field will be cleared when an alarm instance's *highestSeverityLevel* field increases.
+        description: Description of who acknowledged a given alarm instance. This field will be cleared when
+           an alarm instance's *highestSeverityLevel* field increases.
         type: string
         example: Daffy Duck
       occurredAt:
         description: The time at which a given alarm instance was created
         type: string
+        format: iso-date-time
         example: '2019-01-14T23:15:53.7270539Z'
       updatedAt:
         description: The time at which a given alarm instance was last updated
         type: string
+        format: iso-date-time
         example: '2019-01-14T23:15:53.7270539Z'
       createdBy:
-        description: String identifying who or what created a given alarm instance. This is usually used to identify the particular
-          rule engine which requested that a given alarm instance be created.
+        description: String identifying who or what created a given alarm instance. This is usually used to
+          identify the particular rule engine which requested that a given alarm instance be created.
         type: string
         example: TagRuleEngine
       transitions:
-        description: A collection of transitions for a given alarm instance. Transitions record changes to an alarm instance's *clear* flag, as well as increases or decreases in severity. The service stores the first transition and the most recent one hundred other transitions.
+        description: A collection of transitions for a given alarm instance. Transitions record changes to
+          an alarm instance's *clear* flag, as well as increases or decreases in severity. The service stores
+          the first transition and the most recent one hundred other transitions.
         type: array
         items:
           $ref: '#/definitions/AlarmTransition'
@@ -162,7 +183,8 @@ definitions:
         type: string
         example: Disk space on tester-1 is high. Disk usage was 95% when this alarm was created.
       keywords:
-        description: Keywords associated with an alarm instance. Alarm instances can be tagged with keywords to make it easier to find them with queries.
+        description: Keywords associated with an alarm instance. Alarm instances can be tagged with keywords
+          to make it easier to find them with queries.
         type: array
         items:
           type: string
@@ -170,12 +192,16 @@ definitions:
           - keyword1
           - keyword2
       notes:
-        description: A collection of notes for a given alarm instance. Notes are set by humans to record information about an alarm after it has been investigated.
+        description: A collection of notes for a given alarm instance. Notes are set by humans to record
+          information about an alarm after it has been investigated.
         type: array
         items:
           $ref: '#/definitions/AlarmNote'
       properties:
-        description: Key-value-pair metadata associated with an alarm instance. Alarm instances can be tagged with properties so that they can be more easily found with queries. Additionally, alarm instance properties are used to expand message templates in the notification strategies associated with a given alarm instance.
+        description: Key-value-pair metadata associated with an alarm instance. Alarm instances can be tagged
+          with properties so that they can be more easily found with queries. Additionally, alarm instance
+          properties are used to expand message templates in the notification strategies associated with a
+          given alarm instance.
         type: object
         additionalProperties:
           type: string
@@ -187,17 +213,20 @@ definitions:
         example: Tag
   AlarmNote:
     title: Alarm Note
-    description: Information about a particular alarm instance, such as a description of an investigation into an alarm's root cause.
+    description: Contains information about a particular alarm instance, such as a description of an
+      investigation into an alarm's root cause.
     required:
       - note
     properties:
       note:
-        description: Information about a particular alarm instance, such as a description of an investigation into an alarm's root cause.
+        description: Information about a particular alarm instance, such as a description of an investigation
+          into an alarm's root cause.
         type: string
         example: Temperature sensor was faulty
       createdAt:
         description: The time at which the note was created
         type: string
+        format: iso-date-time
         example: '2019-01-14T23:15:53.7270539Z'
       user:
         description: The user who created the note
@@ -210,7 +239,8 @@ definitions:
     enum: [SET, CLEAR]
   AlarmTransition:
     title: Alarm Transition
-    description: A transition within a given alarm instance. Transitions can record changes to an alarm's *clear* field, as well as an alarm increasing or decreasing in severity.
+    description: A transition within a given alarm instance. Transitions record changes to an alarm's
+      *clear* field, as well as an alarm increasing or decreasing in severity.
     type: object
     required:
       - transitionType
@@ -220,34 +250,38 @@ definitions:
       occurredAt:
         description: The time at which the transition occurred.
         type: string
+        format: iso-date-time
         example: '2019-01-14T23:15:53.7270539Z'
       severityLevel:
-        description: The severity of the transition. Valid values for CLEAR transitions are [-1,-1]. Valid values for SET transitions are [1, 4].
+        description: The severity of the transition. Valid values for CLEAR transitions are [-1,-1]. Valid
+          values for SET transitions are [1, 4].
         type: integer
         example: 2
         default: 2
         minimum: -1
         maximum: 4
       notificationStrategyIds:
-        description: The IDs of the notification strategies which should be triggered if this request results in an alarm instance being created or transitioning to a new highest severity
+        description: The IDs of the notification strategies which should be triggered if this request results
+          in an alarm instance being created or transitioning to a new highest severity
         type: array
         items:
           type: string
         example: []
       condition:
-        description: The condition associated with the transition
+        description: A description of the condition associated with the transition
         type: string
         example: Greater than 90
       shortText:
-        description: Optional additional description of the condition
+        description: Short description of the condition
         type: string
         example: Low disk space
       detailText:
-        description: Optional additional description of the condition
+        description: Detailed description of the condition
         type: string
         example: Disk usage on CRIO1 is 95% (lower than configured threshold of 90%)
       keywords:
-        description: Keywords associated with a transition
+        description: Keywords associated with a transition. Useful for attaching additional metadata to
+          a given transition which could aid in an investigation into an alarm's root cause in the future.
         type: array
         items:
           type: string
@@ -255,110 +289,146 @@ definitions:
           - keyword1
           - keyword2
       properties:
-        description: Key-value-pair metadata associated with a transition
+        description: Key-value-pair metadata associated with a transition. Useful for attaching additional
+          metadata to a given transition which could aid in an investigation into an alarm's root cause
+          in the future.
         type: object
         additionalProperties:
           type: string
         example:
           key1: value1
   SubQuery:
-    title: Nested Query Body
+    title: SubQuery
+    description: Object describing the fields of an alarm instance query which can be composed in the query
+      request's *subQuery* array, enabling multiple queries to be AND'ed together
     type: object
     properties:
       alarmId:
         type: string
+        description: AlarmId query. The service will return alarm instances whose *alarmId* fields are equal
+          to the query, taking case into account.
         example: System.Health.DiskSpaceLow.Bdd9u!4aMd!$pYrf*CnaIZ2tbu$-Ct%?
       displayName:
         type: string
-        description: Display name query. The service will return alarm instances whose *displayName* fields contain the display name query string, without taking case into account.
+        description: Display name query. The service will return alarm instances whose *displayName* fields
+          contain the display name query string, without taking case into account.
         example: Low disk space on CRIO1
       active:
         type: boolean
-        example: true
+        description: Active status query. The service will return alarm instances whose *active* fields are
+          equal to the query.
       clear:
         type: boolean
-        example: false
+        description: Clear status query. The service will return alarm instances whose *clear* fields are
+          equal to the query.
       acknowledged:
         type: boolean
-        example: false
+        description: Acknowledged status query. The service will return alarm instances whose *acknowledged*
+          fields are equal to the query.
       acknowledgedAtMin:
         type: string
-        description: Acknowledged at minimum date query. The service will return instances which were acknowledged between *acknowledgedAtMin* and *acknowledgedAtMax*, inclusive.
+        description: Acknowledged at minimum date query. The service will return instances which were
+          acknowledged between *acknowledgedAtMin* and *acknowledgedAtMax*, inclusive.
+        format: iso-date-time
         example: '2019-01-14T23:15:53.7270539Z'
       acknowledgedAtMax:
         type: string
-        description: Acknowledged at maximum date query. The service will return instances which were acknowledged between *acknowledgedAtMin* and *acknowledgedAtMax*, inclusive.
+        description: Acknowledged at maximum date query. The service will return instances which were
+          acknowledged between *acknowledgedAtMin* and *acknowledgedAtMax*, inclusive.
+        format: iso-date-time
         example: '2019-01-15T23:15:53.7270539Z'
       occurredAtMin:
         type: string
-        description: Occurred at minimum date query. The service will return instances which occurred between *occurredAtMin* and *occurredAtMax*, inclusive.
+        description: Occurred at minimum date query. The service will return instances which occurred between
+          *occurredAtMin* and *occurredAtMax*, inclusive.
+        format: iso-date-time
         example: '2019-01-14T23:15:53.7270539Z'
       occurredAtMax:
         type: string
-        description: Occurred at maximum date query. The service will return instances which occurred between *occurredAtMin* and *occurredAtMax*, inclusive.
+        description: Occurred at maximum date query. The service will return instances which occurred between
+          *occurredAtMin* and *occurredAtMax*, inclusive.
+        format: iso-date-time
         example: '2019-01-15T23:15:53.7270539Z'
       currentSeverityLevelMin:
         type: integer
-        description: Current severity minimum query. The service will return instances whose current severity is between *currentSeverityLevelMin* and *currentSeverityLevelMax*, inclusive.
+        description: Current severity minimum query. The service will return instances whose current severity
+          is between *currentSeverityLevelMin* and *currentSeverityLevelMax*, inclusive.
         example: 1
       currentSeverityLevelMax:
         type: integer
-        description: Current severity maximum query. The service will return instances whose current severity is between *currentSeverityLevelMin* and *currentSeverityLevelMax*, inclusive.
+        description: Current severity maximum query. The service will return instances whose current severity
+          is between *currentSeverityLevelMin* and *currentSeverityLevelMax*, inclusive.
         example: 4
       highestSeverityLevelMin:
         type: integer
-        description: Highest severity minimum query. The service will return instances whose highest severity is between *highestSeverityLevelMin* and *highestSeverityLevelMax*, inclusive.
+        description: Highest severity minimum query. The service will return instances whose highest severity
+          is between *highestSeverityLevelMin* and *highestSeverityLevelMax*, inclusive.
         example: 1
-      highestSeverityLevelmax:
+      highestSeverityLevelMax:
         type: integer
-        description: Highest severity maximum query. The service will return instances whose highest severity is between *highestSeverityLevelMin* and *highestSeverityLevelMax*, inclusive.
+        description: Highest severity maximum query. The service will return instances whose highest severity
+          is between *highestSeverityLevelMin* and *highestSeverityLevelMax*, inclusive.
         example: 4
       createdBy:
         type: string
-        description: Created by query. The service will return instances whose *createdBy* fields are equal to the query, taking case into account.
+        description: Created by query. The service will return instances whose *createdBy* fields are equal to
+          the query, taking case into account.
         example: TagRuleEngine
       channel:
         type: string
-        description: Channel query. The service will return instances whose *channel* fields are equal to the query, taking case into account. Supports wildcard match checking uses glob-style wildcards.
+        description: Channel query. The service will return instances whose *channel* fields are equal to the
+          query, taking case into account. Supports wildcard match checking uses glob-style wildcards.
         example: '*.System.Health.DiskSpaceUsePercentage'
       properties:
         type: object
-        description: Property query. The service will return instances whose *properties* fields contain all of the specified key/value pairs.
+        description: Property query. The service will return instances whose *properties* fields contain all
+          of the specified key/value pairs.
+        additionalProperties:
+          type: string
         example:
           key1: value1
       keywords:
-        type: object
-        description: Keyword query. The service will return instances whose *keywords* fields contain all of the specified keywords.
+        type: array
+        description: Keyword query. The service will return instances whose *keywords* fields contain all of
+          the specified keywords.
+        items:
+          type: string
         example:
           - keyword1
           - keyword2
   QueryRequest:
     title: Query Request
+    description: Object describing the request body for an alarm instance query request
     allOf:
     - $ref: '#/definitions/SubQuery'
     - type: object
       properties:
         subQueries:
-          description: Additional queries. The service will return instances which match any of the queries in the subQueries array. If a top-level query was provided, the top-level query will be AND'ed with each of the sub queries.
+          description: Additional queries. The service will return instances which match any of the queries
+            in the subQueries array. If a top-level query was provided, the top-level query will be AND'ed
+            with each of the sub queries.
           type: array
           items:
             $ref: '#/definitions/SubQuery'
         returnMostRecentlyOccurredOnly:
-          description: For the instances matched by this query, only return the most recent instance for each *alarmId*. In this context, recency is based on when the alarm instance occurred, not when it was last updated.
+          description: For the instances matched by this query, only return the most recent instance for each
+            *alarmId*. In this context, recency is based on when the alarm instance occurred, not when it was
+            last updated.
           type: boolean
         orderBy:
-          description: Whether or not results should be sorted in ascending or descending order relative to the alarm instance's *updatedAt* field.
+          description: Whether or not results should be sorted in ascending or descending order relative to
+            the alarm instance's *updatedAt* field.
           type: string
           enum: [DATE_UPDATED_FORWARD, DATE_UPDATED_BACKWARD]
         skip:
-          description: Number of entries to skip in the response list. Typically used in combination with the take parameter to implement pagination.
+          description: Number of entries to skip in the response list. Typically used in combination with the
+            take parameter to implement pagination.
           type: integer
-          example: 0
           default: 0
         take:
-          description: Number of entries to include in the response list. Typically used in combination with the skip parameter to implement pagination.
+          description: Number of entries to include in the response list. Typically used in combination with
+            the skip parameter to implement pagination.
           type: integer
-          example: 10000
           default: 10000
           maximum: 10000
 
@@ -373,7 +443,7 @@ responses:
         error:
           $ref: '#/definitions/Error'
   QueryResponse:
-    description: Query response
+    description: Success
     schema:
       description: Query response
       title: QueryResponse
@@ -445,16 +515,19 @@ paths:
             $ref: '#/definitions/Error'
   /v1/acknowledge-instances:
     post:
-      tags: [alarmInstances]
+      tags: [alarm instances]
       summary: Acknowledge alarm instances
-      description: Acknowledges one or more alarm instances, optionally forcing them clear and adding notes to them.
+      description: Acknowledges one or more alarm instances, optionally forcing them clear and adding notes to
+        them.
       operationId: AcknowledgeInstances
+      x-ni-operation: writeAlarmInstances
       parameters:
         - in: body
           name: Request body
+          required: true
           schema:
             type: object
-            title: Request Body
+            title: AcknowledgeRequestBody
             required:
               - alarmIds
             properties:
@@ -465,9 +538,9 @@ paths:
                   type: string
                 example: [5c40ec55e0d6441168b4c543, 5c40ec55e0d6441168b4c543]
               forceClear:
-                description: Whether or not the affected alarm instances should have their *clear* field set to true.
+                description: Whether or not the affected alarm instances should have their *clear* field set
+                  to true.
                 type: boolean
-                example: false
                 default: false
               notes:
                 description: Notes which should be added to the alarm instances.
@@ -479,6 +552,7 @@ paths:
           description: OK
           schema:
             type: object
+            title: AcknowledgeResponse
             properties:
               acknowledged:
                 description: The *alarmIds* which were successfully acknowledged.
@@ -504,30 +578,36 @@ paths:
             $ref: '#/definitions/Error'
   /v1/instances:
     post:
-      tags: [alarmInstances]
+      tags: [alarm instances]
       summary: Create or update an alarm instance
-      description: Creates or updates an instance of an alarm based on the requested transition and the state of the current active alarm instance with the given *alarmId*.
+      description: Creates or updates an instance of an alarm based on the requested transition and the state
+        of the current active alarm instance with the given *alarmId*.
       operationId: CreateOrUpdateInstance
+      x-ni-operation: writeAlarmInstances
       parameters:
         - in: body
           name: Request body
-          description: Request body. For requests which do not result in a new alarm instance being created, all fields other than *alarmId* and *transition* are ignored.
+          description: Request body. For requests which do not result in a new alarm instance being created,
+            all fields other than *alarmId* and *transition* are ignored.
           schema:
             type: object
-            title: Request body
+            title: CreateOrUpdateInstanceRequest
             required:
               - transition
               - alarmId
             properties:
               alarmId:
-                description: A value meant to uniquely identify the particular process or condition tracked by a given alarm. For example, alarms created by the Tag Rule Engine Service have their alarmIds set to the concatenation of the path of the tag which caused the rule to be triggered and the ID of the rule.
+                description: A value meant to uniquely identify the particular process or condition tracked
+                  by a given alarm. For example, alarms created by the Tag Rule Engine Service have their
+                  alarmIds set to the concatenation of the path of the tag which caused the rule to be
+                  triggered and the ID of the rule.
                 type: string
                 example: CRIO1.System.Health.DiskSpaceMeanUsePercentage.Bdd9u!4aMd!$pYrf*CnaIZ2tbu$-Ct%?
-              transition: 
+              transition:
                 $ref: '#/definitions/AlarmTransition'
               createdBy:
-                description: String identifying who or what created a given alarm instance. This is usually used to identify the particular
-                  rule engine which requested that a given alarm be created.
+                description: String identifying who or what created a given alarm instance. This is usually
+                  used to identify the particular rule engine which requested that a given alarm be created.
                 type: string
                 example: TagRuleEngine
               channel:
@@ -539,7 +619,8 @@ paths:
                 type: string
                 example: Tag
               displayName:
-                description: Optional display name for a given alarm instance. Display names do not need to be unique.
+                description: Optional display name for a given alarm instance. Display names do not need to be
+                  unique.
                 type: string
                 example: Low disk space on tester-1.
               description:
@@ -547,7 +628,8 @@ paths:
                 type: string
                 example: Disk space on tester-1 is high. Disk usage was 95% when this alarm was created.
               keywords:
-                description: Keywords associated with an alarm instance. Alarm instances can be tagged with keywords to make it easier to find them with queries.
+                description: Keywords associated with an alarm instance. Alarm instances can be tagged with
+                  keywords to make it easier to find them with queries.
                 type: array
                 items:
                   type: string
@@ -555,8 +637,13 @@ paths:
                   - keyword1
                   - keyword2
               properties:
-                description: Key-value-pair metadata associated with an alarm instance. Alarm instances can be tagged with properties so that they can be more easily found with queries. Additionally, alarm instance properties are used to expand message templates in the notification strategies associated with a given alarm instance.
+                description: Key-value-pair metadata associated with an alarm instance. Alarm instances can be
+                  tagged with properties so that they can be more easily found with queries. Additionally,
+                  alarm instance properties are used to expand message templates in the notification
+                  strategies associated with a given alarm instance.
                 type: object
+                additionalProperties:
+                  type: string
                 example:
                   key1: value1
           required: true
@@ -565,7 +652,7 @@ paths:
           description: OK
           schema:
             type: object
-            title: ID of the created or modified instance
+            title: CreateOrUpdateInstanceResponse
             properties:
               instanceId:
                 description: The ID of the created or modified alarm instance.
@@ -576,7 +663,10 @@ paths:
           schema:
             $ref: '#/definitions/Error'
         409:
-          description: For requests which would result in an update to an existing alarm instance, this is returned when the request does not represent a valid transition for the existing alarm instance. This can occur when attempting to clear an alarm instance which is already clear, or when attempting to set an alarm instance which is already set at the given severity level.
+          description: For requests which would result in an update to an existing alarm instance, this is
+            returned when the request does not represent a valid transition for the existing alarm instance.
+            This can occur when attempting to clear an alarm instance which is already clear, or when
+            attempting to set an alarm instance which is already set at the given severity level.
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -589,21 +679,27 @@ paths:
         type: string
         required: true
     get:
-      tags: [alarmInstances]
+      tags: [alarm instances]
       summary: Get an alarm instance
-      description: Gets an alarm instance by its *instanceId*
+      description: Gets an alarm instance by its *instanceId*.
+      operationId: GetInstance
+      x-ni-operation: readAlarmInstances
       responses:
         200:
-          $ref: '#/definitions/AlarmInstance'
+          description: OK
+          schema:
+            $ref: '#/definitions/AlarmInstance'
     delete:
-      tags: [alarmInstances]
+      tags: [alarm instances]
       summary: Delete an alarm instance
-      description: Deletes an alarm instance by its *instanceId*
+      description: Deletes an alarm instance by its *instanceId*.
+      operationId: DeleteInstance
+      x-ni-operation: deleteAlarmInstances
       responses:
         204:
           description: No Content
         401:
-          $ref: '#/responses/Unauthorized'        
+          $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
   /v1/instances/{id}/notes:
@@ -614,21 +710,24 @@ paths:
         type: string
         required: true
     post:
-      tags: [alarmInstances]
+      tags: [alarm instances]
       summary: Add notes to an alarm instance
       description: Adds one or more notes to an alarm instance.
       operationId: AddNotesToInstance
+      x-ni-operation: writeAlarmInstances
       parameters:
         - in: body
           name: Request body
           required: true
           schema:
             type: object
+            title: AddNotesRequestBody
             required:
               - notes
             properties:
               notes:
                 type: array
+                description: Notes to be added to the alarm instance
                 items:
                   $ref: '#/definitions/AlarmNote'
       responses:
@@ -640,10 +739,12 @@ paths:
           $ref: '#/responses/Error'
   /v1/query-instances:
     post:
-      tags: [alarmInstances]
+      tags: [alarm instances]
       summary: Query alarm instances
-      description: Queries for alarm instances
+      description: Queries for alarm instances. Specifying an empty JSON object in the request body will
+        result in all alarm instances being returned.
       operationId: QueryInstances
+      x-ni-operation: readAlarmInstances
       parameters:
         - in: body
           name: Request body
@@ -659,10 +760,11 @@ paths:
           $ref: '#/responses/Error'
   /v1/delete-instances-by-instance-id:
     post:
-      tags: [alarmInstances]
+      tags: [alarm instances]
       summary: Delete alarm instances
       description: Deletes multiple alarm instances by their *instanceIds*.
       operationId: DeleteInstancesByInstanceId
+      x-ni-operation: deleteAlarmInstances
       parameters:
         - in: body
           name: Request body
@@ -680,6 +782,8 @@ paths:
                   - 5c33c212e0d6444320d9a9f4
                   - 5c33c212e0d6444320d9a9f5
       responses:
+        204:
+          description: No Content
         401:
           $ref: '#/responses/Unauthorized'
         default:
