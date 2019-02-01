@@ -221,6 +221,8 @@ definitions:
               type: array
               items:
                 $ref: '#/definitions/OneChannelSpecifier'
+            dataWindow:
+              $ref: '#/definitions/DataWindow'
           required:
             - yChannels
   OneChannelData:
