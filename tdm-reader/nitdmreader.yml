@@ -271,10 +271,7 @@ definitions:
   QueryDataSpecifier:
     properties:
       channelSpecifications:
-        type: array
-        description: Channel specifications
-        items:
-          $ref: '#/definitions/ChannelSpecifications'
+        $ref: '#/definitions/ChannelSpecifications'
   ReturnedUniqueValues:
     properties:
       uniqueValues:
