@@ -268,6 +268,13 @@ definitions:
       timeUtcOffsetHours:
         type: number
         description: Time zone offset applied to local time values
+  QueryDataSpecifier:
+    properties:
+      channelSpecifications:
+        type: array
+        description: Channel specifications
+        items:
+          $ref: '#/definitions/ChannelSpecifications'
   ReturnedUniqueValues:
     properties:
       uniqueValues:
@@ -529,7 +536,7 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/ChannelSpecifications'
+            $ref: '#/definitions/QueryDataSpecifier'
       responses:
         200:
           description: OK
