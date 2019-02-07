@@ -81,8 +81,8 @@ definitions:
             $ref: '#/definitions/Operation'
   AlarmInstance:
     title: Alarm Instance
-    description: An individual instance of an alarm. The lifecycle of an instance of an alarm begins the first
-      time it is triggered and ends when it has been both acknowledged and cleared. The services enforces the
+    description: An individual instance of an alarm. The lifecycle of an alarm instance begins the first
+      time it is triggered and ends when it has been both acknowledged and cleared. The service enforces the
       invariant that there can be at most one *active*/true instance of an alarm with a given *alarmId*.
     type: object
     required:
@@ -100,10 +100,9 @@ definitions:
         type: string
         example: CRIO1.System.Health.DiskSpaceUsePercentage.Bdd9u!4aMd!$pYrf*CnaIZ2tbu$-Ct%?
       active:
-        description: Whether or not the alarm instance is active. An active alarm is one that is considered to
-          be still deserving of human or automated attention. Alarm instances always begin life with
-          *active*/true. This field will be automatically set to false when the *clear* and
-          *acknowledged* fields are set to true.
+        description: Whether or not the alarm instance is active. An active alarm deserves human or automated
+          attention. Alarm instances always begin life with *active*/true. This field will be automatically 
+          set to false when the *clear* and *acknowledged* fields are set to true.
         type: boolean
       clear:
         description: When set to true, the condition that triggered the alarm no longer matches the trigger
@@ -117,33 +116,33 @@ definitions:
       acknowledged:
         description: When set to true, the alarm has been acknowledged by an alarm handler, which is typically
           a human. Alarm instances always begin life with *acknowledged*/false. Acknowledging an alarm will
-          not affect the *active* flag unless *clear* is also true. Once both *clear* and *acknowledged* are
+          not affect the *active* flag unless *clear* is also true. When *clear* and *acknowledged* are
           true, the alarm will become inactive (*active*/false). This field is automatically reset to false
           when an alarm instance's *highestSeverityLevel* field increases.
         type: boolean
       acknowledgedAt:
-        description: The time at which a given alarm instance was acknowledged. This field will be cleared
-          when an alarm instance's *highestSeverityLevel* field increases.
+        description: ISO-8601 formatted timestamp specifying when the alarm instance was acknowledged. This
+          field will be cleared when an alarm instance's *highestSeverityLevel* field increases.
         type: string
         format: iso-date-time
         example: '2019-01-14T23:15:53.7270539Z'
       acknowledgedBy:
-        description: Description of who acknowledged a given alarm instance. This field will be cleared when
-           an alarm instance's *highestSeverityLevel* field increases.
+        description: An identifier for who acknowledged a given alarm instance. This field will be cleared
+          when an alarm instance's *highestSeverityLevel* field increases.
         type: string
         example: Daffy Duck
       occurredAt:
-        description: The time at which a given alarm instance was created
+        description: ISO-8601 formatted timestamp specifying when the alarm instance was created
         type: string
         format: iso-date-time
         example: '2019-01-14T23:15:53.7270539Z'
       updatedAt:
-        description: The time at which a given alarm instance was last updated
+        description: ISO-8601 formatted timestamp specifying when the alarm instance was last updated
         type: string
         format: iso-date-time
         example: '2019-01-14T23:15:53.7270539Z'
       createdBy:
-        description: String identifying who or what created a given alarm instance. This is usually used to
+        description: An identifier for who or what created a given alarm instance. This is usually used to
           identify the particular rule engine which requested that a given alarm instance be created.
         type: string
         example: TagRuleEngine
@@ -183,8 +182,8 @@ definitions:
         type: string
         example: Disk space on tester-1 is high. Disk usage was 95% when this alarm was created.
       keywords:
-        description: Keywords associated with an alarm instance. Alarm instances can be tagged with keywords
-          to make it easier to find them with queries.
+        description: Words or phrases associated with an alarm instance. Alarm instances can be tagged
+          with keywords to make it easier to find them with queries.
         type: array
         items:
           type: string
@@ -199,9 +198,9 @@ definitions:
           $ref: '#/definitions/AlarmNote'
       properties:
         description: Key-value-pair metadata associated with an alarm instance. Alarm instances can be tagged
-          with properties so that they can be more easily found with queries. Additionally, alarm instance
-          properties are used to expand message templates in the notification strategies associated with a
-          given alarm instance.
+          with properties to make it easier to find them with queries. Additionally, alarm instance properties
+          are used to expand message templates in the notification strategies associated with a given alarm 
+          instance.
         type: object
         additionalProperties:
           type: string
@@ -213,7 +212,7 @@ definitions:
         example: Tag
   AlarmNote:
     title: Alarm Note
-    description: Contains information about a particular alarm instance, such as a description of an
+    description: Information about a particular alarm instance, such as a description of an
       investigation into an alarm's root cause.
     required:
       - note
@@ -224,7 +223,7 @@ definitions:
         type: string
         example: Temperature sensor was faulty
       createdAt:
-        description: The time at which the note was created
+        description: ISO-8601 formatted timestamp specifying when the note was created
         type: string
         format: iso-date-time
         example: '2019-01-14T23:15:53.7270539Z'
@@ -248,7 +247,7 @@ definitions:
       transitionType:
         $ref: '#/definitions/AlarmTransitionType'
       occurredAt:
-        description: The time at which the transition occurred.
+        description: ISO-8601 formatted timestamp specifying when the transition occurred
         type: string
         format: iso-date-time
         example: '2019-01-14T23:15:53.7270539Z'
@@ -280,8 +279,8 @@ definitions:
         type: string
         example: Disk usage on CRIO1 is 95% (lower than configured threshold of 90%)
       keywords:
-        description: Keywords associated with a transition. Useful for attaching additional metadata to
-          a given transition which could aid in an investigation into an alarm's root cause in the future.
+        description: Words or phrases associated with a transition. Useful for attaching additional metadata
+          to a given transition which could aid in an investigation into an alarm's root cause in the future.
         type: array
         items:
           type: string
@@ -377,7 +376,7 @@ definitions:
       channel:
         type: string
         description: Channel query. The service will return instances whose *channel* fields are equal to the
-          query, taking case into account. Supports wildcard match checking uses glob-style wildcards.
+          query, taking case into account. Supports wildcard match checking with glob-style wildcards.
         example: '*.System.Health.DiskSpaceUsePercentage'
       properties:
         type: object
@@ -411,9 +410,9 @@ definitions:
           items:
             $ref: '#/definitions/SubQuery'
         returnMostRecentlyOccurredOnly:
-          description: For the instances matched by this query, only return the most recent instance for each
-            *alarmId*. In this context, recency is based on when the alarm instance occurred, not when it was
-            last updated.
+          description: Whether or not the alarm service should group the instances matched by this query by
+            *alarmId*, and then only return the most recent instance for each grouping. In this context,
+            recency is based on when the alarm instance occurred, not when it was last updated.
           type: boolean
         orderBy:
           description: Whether or not results should be sorted in ascending or descending order relative to
@@ -587,8 +586,8 @@ paths:
       parameters:
         - in: body
           name: Request body
-          description: Request body. For requests which do not result in a new alarm instance being created,
-            all fields other than *alarmId* and *transition* are ignored.
+          description: Container which holds data for the request. For requests which do not result in a 
+            new alarm instance being created, all fields other than *alarmId* and *transition* are ignored.
           schema:
             type: object
             title: CreateOrUpdateInstanceRequest
@@ -606,7 +605,7 @@ paths:
               transition:
                 $ref: '#/definitions/AlarmTransition'
               createdBy:
-                description: String identifying who or what created a given alarm instance. This is usually
+                description: An identifier for who or what created a given alarm instance. This is usually
                   used to identify the particular rule engine which requested that a given alarm be created.
                 type: string
                 example: TagRuleEngine
@@ -628,8 +627,8 @@ paths:
                 type: string
                 example: Disk space on tester-1 is high. Disk usage was 95% when this alarm was created.
               keywords:
-                description: Keywords associated with an alarm instance. Alarm instances can be tagged with
-                  keywords to make it easier to find them with queries.
+                description: Words or phrases associated with an alarm instance. Alarm instances can be 
+                  tagged with keywords to make it easier to find them with queries.
                 type: array
                 items:
                   type: string
@@ -638,9 +637,9 @@ paths:
                   - keyword2
               properties:
                 description: Key-value-pair metadata associated with an alarm instance. Alarm instances can be
-                  tagged with properties so that they can be more easily found with queries. Additionally,
-                  alarm instance properties are used to expand message templates in the notification
-                  strategies associated with a given alarm instance.
+                  tagged with properties to make it easier to find them with queries. Additionally, alarm
+                  instance properties are used to expand message templates in the notification strategies
+                  associated with a given alarm instance.
                 type: object
                 additionalProperties:
                   type: string
