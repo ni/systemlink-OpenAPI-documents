@@ -145,6 +145,7 @@ paths:
             type: array
             items:
               type: string
+            example: ["NI SystemLink OPC UA Connector (1FA889F76A1DEE5DAB2B5880CC6BFE248F12A8EB).der", "zc39017b236b8b67785c4a1b"]
       responses:
         200:
           description: Partial success
@@ -238,6 +239,11 @@ paths:
                   default: false
                   description: If set to true it will remove tags for this session's monitored items from taghistorian
               required: [sessionId]
+              example:
+               - sessionId: 5c39017b236b8b67785c4a1b
+                 removeTags: false
+               - sessionId: zc39017b236b8b67785c4a1b
+                 removeTags: false
       responses:
         200:
           description: Partial success
@@ -262,7 +268,14 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/UpdateSessionRequest'
+                $ref: '#/definitions/UpdateSessionRequest'
+            example:
+                - sessionId: 5c39017b236b8b67785c4a1b
+                  name: "Renamed.opcuaserver.com-48010"
+                  monitoringInterval: 5000
+                - sessionId: zc39017b236b8b67785c4a1b
+                  name: "Renamed.opcuaserver.com-48011"
+                  monitoringInterval: 5000
       responses:
         200:
           description: Partial success
@@ -414,6 +427,11 @@ paths:
             type: array
             items:
               $ref: '#/definitions/MonitoredItemDeleteData'
+            example:
+                - id: "6c3907c6236b8b67785c4a1c"
+                  removeTag: false
+                - id: "zc39017b236b8b67785c4a1b"
+                  removeTag: false
       responses:
         200:
           description: Partial success
@@ -445,6 +463,7 @@ paths:
             type: array
             items:
               type: string
+            example: [ "6c3907c6236b8b67785c4a1c", "zc39017b236b8b67785c4a1b" ]
       responses:
         200:
           description: Partial success
@@ -476,6 +495,7 @@ paths:
             type: array
             items:
               type: string
+            example: [ "6c3907c6236b8b67785c4a1c", "zc39017b236b8b67785c4a1b" ]
       responses:
         200:
           description: Partial success
@@ -502,32 +522,38 @@ definitions:
     type: string
     enum: [INVALID, NONE, SIGN, SIGN_AND_ENCRYPT]
     description: Security mode used by the endpoint
+    example: SIGN
 
   UserTokenTypeEnum:
     type: string
     enum: [ANONYMOUS, USERNAME, CERTIFICATE, ISSUEDTOKEN]
     description: User identity type
+    example: USERNAME
 
   DatatypeEnum:
     type: string
     enum: [NONE, DOUBLE, INT, STRING, BOOLEAN, UINT64, DATE_TIME]
     description: Datatype of the SystemLink tag
+    example: DOUBLE
 
   SessionStateEnum:
     type: string
     enum: [NOT_INITIALIZED, CONNECTED, RECONNECTING, STOPPED]
     description: State of the OPC UA session
+    example: CONNECTED
 
   MonitoredItemStateEnum:
     type: string
     enum: [NO_TAG_EXISTS, MONITORING, PAUSED]
     description: Current state of the monitored node
+    example: MONITORING
 
   MonitoredItemDirectionEnum:
     type: string
     enum: [READ, WRITE]
     description: Wether the monitored item is being read from OPC UA server or Systemlink is writing to OPC UA server
     default: READ
+    example: READ
 
   SessionEndpointModel:
     type: object
@@ -545,6 +571,23 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/SessionUserToken'
+    example:
+        securityMode: "SIGN"
+        securityPolicy: "Basic256"
+        certificateInfo:
+            id: null
+            name: ""
+            isCertificateTrusted: true
+            issuerName: "CN=UaServerCpp@opcuaserver.com, OU=OPC UA, O=One-Way Automation, L=Edmonton, S=Alberta, C=CA, DC=opcuaserver.com"
+            subjectName: "CN=UaServerCpp@opcuaserver.com, OU=OPC UA, O=One-Way Automation, L=Edmonton, S=Alberta, C=CA, DC=opcuaserver.com"
+            thumbprint: "83A0C843ECC0D3EA7C858CC76D671DC14E2A2DE4"
+            validFrom: "1/24/2018 5:29:36 PM"
+            validTo: "1/23/2023 5:29:36 PM"
+        supportedUserIdentities:
+           - tokenType: "USERNAME"
+             userTokenSecurityPolicy: "http://opcfoundation.org/UA/SecurityPolicy#Basic256"
+           - tokenType: "ANONYMOUS"
+             userTokenSecurityPolicy: null
 
   SslCertificateInfoModel:
     type: object
@@ -552,28 +595,36 @@ definitions:
     properties:
       id:
         type: string
-        description: unique id for this certificate
+        description: unique id for this certificate. This can be null if the certificate is not yet saved on the SystemLink server
+        example: "NI SystemLink OPC UA Connector [1FA889F76A1DEE5DAB2B5880CC6BFE248F12A8EB].der"
       name:
         type: string
-        description: file name of the certificate
+        description: file name of the certificate. This can be empty if the certificate is not yet saved on the SystemLink server
+        example: "NI SystemLink OPC UA Connector [1FA889F76A1DEE5DAB2B5880CC6BFE248F12A8EB].der"
       subjectName:
         type: string
         description: subject name in the certificate
+        example: "CN=UaServerCpp@opcuaserver.com, OU=OPC UA, O=One-Way Automation, L=Edmonton, S=Alberta, C=CA, DC=opcuaserver.com"
       issuerName:
         type: string
         description: issuer name in the certificate
+        example: "CN=UaServerCpp@opcuaserver.com, OU=OPC UA, O=One-Way Automation, L=Edmonton, S=Alberta, C=CA, DC=opcuaserver.com"
       validFrom:
         type: string
         description: time from this certificate is valid
+        example: "1/24/2018 5:29:36 PM"
       validTo:
         type: string
         description: time till this certificate is valid
+        example: "1/23/2023 5:29:36 PM"
       thumbprint:
         type: string
         description: thumbprint in the certificate
+        example: "83A0C843ECC0D3EA7C858CC76D671DC14E2A2DE4"
       isCertificateTrusted:
         type: boolean
         description: 'true, if the certificate is trusted by the SystemLink server'
+        example: true
 
   SessionUserToken:
     type: object
@@ -584,6 +635,7 @@ definitions:
       userTokenSecurityPolicy:
         type: string
         description: Security policy to use when communicating the user identification information
+        example: "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256"
 
   NewSessionRequest:
     type: object
@@ -592,17 +644,21 @@ definitions:
       name:
         type: string
         description: Name of the OPC UA session
+        example: "opcuaserver.com-48010"
       url:
         type: string
         description: URL of the OPC UA server
+        example: "opc.tcp://opcuaserver.com:48010"
       monitoringInterval:
         type: integer
         format: int32
         description: 'Publishing interval, in milliseconds, for monitoring nodes. Must be greater than or equal to 1000.'
         default: 10000
+        example: 1000
       useDiscoveryCertificate:
         type: boolean
         description: 'If set to true, the SSL certificate provided by discovery server is used'
+        example: true
       endpoint:
         $ref: '#/definitions/SelectedEndpointModel'
     required:
@@ -610,6 +666,19 @@ definitions:
       - url
       - useDiscoveryCertificate
       - endpoint
+    example:
+        name: "opcuaserver.com-48010"
+        url: "opc.tcp://opcuaserver.com:48010"
+        monitoringInterval: 10000
+        useDiscoveryCertificate: true
+        endpoint:
+            securityMode: "SIGN"
+            securityPolicy: "Basic256"
+            userTokenSecurityPolicy: "http://opcfoundation.org/UA/SecurityPolicy#Basic256"
+            tokenType: "USERNAME"
+            userName: "admin"
+            password: "admin"
+            x509CertificateData: []
 
   SelectedEndpointModel:
     type: object
@@ -620,25 +689,30 @@ definitions:
       securityPolicy:
         type: string
         description: Security policy used by the endpoint
+        example: "Basic256"
       tokenType:
         $ref: '#/definitions/UserTokenTypeEnum'
       userTokenSecurityPolicy:
         type: string
         description: Security policy used by the endpoint for encrypting the user identification information
         default: ''
+        example: "http://opcfoundation.org/UA/SecurityPolicy#Basic256"
       userName:
         type: string
         description: user name
         default: ''
+        example: admin
       password:
         type: string
-        description: password
+        description: password. Request objects should contain the actual password. Response objects will contain the encrypted password.
         default: ''
+        example: admin
       x509CertificateData:
         type: string
         format: byte
         description: certificate to authenticate the user
         default: []
+        example: []
     required:
       - securityMode
       - securityPolicy
@@ -648,19 +722,22 @@ definitions:
     type: object
     description: Information about updating the existing session
     properties:
-      sessionId:
-        type: string
-        description: session id
-      name:
-        type: string
-        description: New name
-      monitoringInterval:
-        type: integer
-        description: 'New Publishing interval, in milliseconds, for monitoring nodes. Must be greater than or equal to 1000.'
+        sessionId:
+            type: string
+            description: session id
+            example: 5c39017b236b8b67785c4a1b
+        name:
+            type: string
+            description: New name
+            example: "Renamed.opcuaserver.com-48010"
+        monitoringInterval:
+            type: integer
+            description: 'New Publishing interval, in milliseconds, for monitoring nodes. Must be greater than or equal to 1000.'
+            example: 5000
     required:
-      - sessionId
-      - name
-      - monitoringInterval
+        - sessionId
+        - name
+        - monitoringInterval
 
   SessionResponse:
     type: object
@@ -690,6 +767,31 @@ definitions:
         $ref: '#/definitions/SslCertificateInfoModel'
       endpoint:
         $ref: '#/definitions/SelectedEndpointModel'
+    example:
+        id: "5c39017b236b8b67785c4a1b"
+        name: "opcuaserver.com-48010"
+        url: "opc.tcp://opcuaserver.com:48010"
+        state: "CONNECTED"
+        monitoringInterval: 10000
+        numberOfMonitoredItems: 0
+        useDiscoveryCertificate: true
+        certificateInfo:
+            id: null
+            name: "18d48415-13a8-4867-9791-b7b7b4551de9.der"
+            isCertificateTrusted: true
+            issuerName: "CN=UaServerCpp@opcuaserver.com, OU=OPC UA, O=One-Way Automation, L=Edmonton, S=Alberta, C=CA, DC=opcuaserver.com"
+            subjectName: "CN=UaServerCpp@opcuaserver.com, OU=OPC UA, O=One-Way Automation, L=Edmonton, S=Alberta, C=CA, DC=opcuaserver.com"
+            thumbprint: "83A0C843ECC0D3EA7C858CC76D671DC14E2A2DE4"
+            validFrom: "1/24/2018 5:29:36 PM"
+            validTo: "1/23/2023 5:29:36 PM"
+        endpoint:
+            securityMode: "SIGN"
+            securityPolicy: "Basic256"
+            userTokenSecurityPolicy: "http://opcfoundation.org/UA/SecurityPolicy#Basic256"
+            tokenType: "USERNAME"
+            userName: "admin"
+            password: "AQAAANCMnd8BFdERjHoBwE/Cl+sBAAAAYaA/LG/ktykZHp/tt6PfMAAAAAACAAAAAAAAwAAAABBBBBCZKwgu3/NIN5ScsQiBB4i+AAAAAASAAACgAAAAEBBBBH0QaMIJBh9ZnZLeHQSCZMoIAAAACkct5+OV1pgUAAAAL+ue1DKXQ+b3s1D19HT7716tmHY="
+            x509CertificateData: []
 
   OpcNode:
     type: object
@@ -698,20 +800,35 @@ definitions:
       id:
         type: string
         description: NodeId of the node on the OPC UA server
+        example: "i=87"
       displayName:
         type: string
         description: Display name of the node on the OPC UA server
+        example: "Views"
       browsePath:
         type: string
         description: Browse path of the node on the OPC UA server
+        example: "/Views"
       isLeaf:
         type: boolean
         description: If set to true then the node doesn't have any child nodes
+        example: false
       opcNodes:
         type: array
         description: child nodes of the node
         items:
           $ref: '#/definitions/OpcNode'
+        example:
+            - browsePath: "/Views/3:AirConditionerView"
+              displayName: "AirConditionerView"
+              id: "ns=3;i=5000"
+              isLeaf: false
+              opcNodes: []
+            - browsePath: "/Views/3:FurnaceView"
+              displayName: "FurnaceView"
+              id: "ns=3;i=5001"
+              isLeaf: false
+              opcNodes: []
 
   ReadAttributesResponse:
     type: object
@@ -725,6 +842,18 @@ definitions:
       isCompatibleForTag:
         type: boolean
         description: 'If set to true, a monitor can be created for this node'
+    example:
+        attributes:
+            BrowseName: "3:AirConditionerView"
+            ContainsNoLoops: "True"
+            Description: "View containing the AirConditioner objects"
+            DisplayName: "AirConditionerView"
+            EventNotifier: "None"
+            NodeClass: "View"
+            NodeId: "ns=3;i=5000"
+            UserWriteMask: "0"
+            WriteMask: "0"
+        isCompatibleForTag: false
 
   NewMonitoredItem:
     type: object
@@ -752,6 +881,12 @@ definitions:
     required:
       - displayName
       - opcNodeId
+    example:
+        displayname: "opc.opcuaserver.com-48010.Views.AirConditionerView.AirConditioner_1.Temperature"
+        opcNodeId: "ns=3;s=AirConditioner_1.Temperature"
+        direction: "Read"
+        opcSamplingInterval: 1000 
+        opcQueueSize: 1000
 
   MonitoredItemResponse:
     type: object
@@ -781,6 +916,16 @@ definitions:
         description: Queue size that the OPC server should reserve for this node
       state:
         $ref: '#/definitions/MonitoredItemStateEnum'
+    example:
+        id: "6c3907c6236b8b67785c4a1c"
+        sessionId: "5c39017b236b8b67785c4a1b"
+        dataType: "DOUBLE"
+        displayName: "opc.opcuaserver.com-48010.Views.AirConditionerView.AirConditioner_1.Temperature"
+        opcNodeId: "ns=3;s=AirConditioner_1.Temperature"
+        direction: "READ"
+        opcSamplingInterval: 1000
+        opcQueueSize: 1000
+        state: "MONITORING"
 
   MonitoredItemDeleteData:
     type: object
@@ -789,10 +934,12 @@ definitions:
       id:
         type: string
         description: Id of the monitored item to be deleted
+        example: 6c3907c6236b8b67785c4a1c
       removeTag:
         type: boolean
         description: 'If set to true, then the corresponding tag will be removed from the tag service'
         default: false
+        example: false
     required:
       - id
 
@@ -824,18 +971,17 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Error'
-    example:
-      name: Skyline.OneOrMoreErrorsOccurred
-      code: -251040
-      message: One or more errors occurred. See the contained list for details of each error.
-      args: []
-      innerErrors:
-        - name: OpcClientErrorCodes.OpcServerNotFound
-          code: -251608
-          resourceType: session
-          resourceId: '4afb2ce3741fe11d88838cc9'
-          message: OpcServer connection does not exist.
-          args: ['4afb2ce3741fe11d88838cc9']
+    example:  
+        name: Skyline.OneOrMoreErrorsOccurred
+        code: -251040
+        message: One or more errors occurred. See the contained list for details of each error.
+        args: []
+        innerErrors:
+          - name: OpcClientErrorCodes.ResourceNotFound
+            code: -251608
+            resourceId: 'zc39017b236b8b67785c4a1b'
+            message: Resource with id 'zc39017b236b8b67785c4a1b' is not found.
+            args: ['zc39017b236b8b67785c4a1b']
 
   PartialSuccess:
     description: Partial success response
@@ -845,6 +991,7 @@ definitions:
         type: array
         items:
           type: string
+          example: zc39017b236b8b67785c4a1b
       error:
         $ref: '#/definitions/Error'
 

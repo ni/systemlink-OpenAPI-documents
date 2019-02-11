@@ -221,6 +221,8 @@ definitions:
               type: array
               items:
                 $ref: '#/definitions/OneChannelSpecifier'
+            dataWindow:
+              $ref: '#/definitions/DataWindow'
           required:
             - yChannels
   OneChannelData:
@@ -266,6 +268,10 @@ definitions:
       timeUtcOffsetHours:
         type: number
         description: Time zone offset applied to local time values
+  QueryDataSpecifier:
+    properties:
+      channelSpecifications:
+        $ref: '#/definitions/ChannelSpecifications'
   ReturnedUniqueValues:
     properties:
       uniqueValues:
@@ -527,7 +533,7 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/ChannelSpecifications'
+            $ref: '#/definitions/QueryDataSpecifier'
       responses:
         200:
           description: OK

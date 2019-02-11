@@ -1,0 +1,924 @@
+swagger: '2.0'
+info:
+  version: '1'
+  title: User Data Service
+  description: Manage user specific data.
+  contact:
+    name: National Instruments
+    url: https://www.ni.com/systemlink
+    email: support@ni.com
+basePath: /niuserdata
+x-ni-routing-key: Skyline.UserData
+consumes: [application/json]
+produces: [application/json]
+
+securityDefinitions:
+  basicAuth:
+    type: basic
+  cookieAuth:
+    type: apiKey
+    in: header
+    name: Cookie
+
+security:
+  - basicAuth: []
+  - cookieAuth: []
+
+definitions:
+  Error:
+    title: Error
+    description: Contains error information.
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+        example: Skyline.OneOrMoreErrorsOccurred
+      code:
+        description: Numeric error code
+        type: integer
+        format: int32
+        example: -251040
+      resourceType:
+        description: Type of resource associated with the error
+        type: string
+        example: UserDataItem
+      resourceId:
+        description: Identifier of the resource associated with the error
+        type: string
+        example: '5c4b2c0756c8b455a8f849c4'
+      message:
+        description: Complete error message
+        type: string
+        example: One or more errors occurred. See the contained list for details of each error
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+          example: '5c4b2c0756c8b455a8f849c4'
+      innerErrors:
+        type: array
+        example:
+          - name: Skyline.InsufficientPrivileges
+            code: -251009
+            resourceType: string
+            resourceId: '5c4b2c0756c8b455a8f849c4'
+            message: Insufficient privileges.
+            args: []
+        items:
+          $ref: '#/definitions/Error'
+    example:
+      name: Skyline.OneOrMoreErrorsOccurred
+      code: -251040
+      message: One or more errors occurred. See the contained list for details of each error.
+      args: []
+      innerErrors:
+        - name: Skyline.InsufficientPrivileges
+          code: -251009
+          resourceType: string
+          resourceId: '5c4b2c0756c8b455a8f849c4'
+          message: Insufficient privileges.
+          args: []
+  Operation:
+    title: Operation
+    description: An operation provided by the API
+    type: object
+    required:
+      - available
+    properties:
+      available:
+        description: Whether the operation is available to the caller
+        type: boolean
+        example: true
+      version:
+        description: Version of the available operation
+        type: integer
+        format: int32
+        default: 1
+        example: 1
+    example:
+      available: true
+      version: 1
+  V1Operations:
+    title: Version 1 Operations
+    description: V1 operations
+    type: object
+    properties:
+      operations:
+        description: >-
+          Available operations in the v1 version of the API:
+
+          - queryUserDataItems: Query a set of user data items
+
+          - createOrUpdateUserDataItems: Create or update a set of user data items
+
+          - deleteUserDataItems: Delete a set of user data items
+        type: object
+        properties:
+          queryUserDataItems:
+            $ref: '#/definitions/Operation'
+          createOrUpdateUserDataItems:
+            $ref: '#/definitions/Operation'
+          deleteUserDataItems:
+            $ref: '#/definitions/Operation'
+  QueryOperation:
+    title: Query Operation
+    description: >-
+      Query operation enum. Note that 'LESS_THAN', 'GREATER_THAN', 'LESS_THAN_OR_EQUAL', and
+      'GREATER_THAN_OR_EQUAL' are only supported when the data type of the comparison is a string,
+      ISO date time, or numeric value. These are not supported on booleans, arrays, or objects
+      (also known as dictionaries).
+    type: string
+    enum:
+      - EQUAL
+      - NOT_EQUAL
+      - LESS_THAN
+      - GREATER_THAN
+      - LESS_THAN_OR_EQUAL
+      - GREATER_THAN_OR_EQUAL
+  IntegerQueryObject:
+    title: Integer Query
+    description: Integer query object
+    type: object
+    required:
+      - operation
+      - comparisonValue
+    properties:
+      operation:
+        $ref: '#/definitions/QueryOperation'
+      comparisonValue:
+        description: Integer value to compare
+        type: integer
+        format: int32
+        example: 360
+  JsonQueryObject:
+    title: JSON Query
+    description: >-
+      JSON query object. This is used when querying a field that can be any valid JSON type.
+    type: object
+    required:
+      - operation
+      - comparisonValue
+    properties:
+      operation:
+        $ref: '#/definitions/QueryOperation'
+      comparisonValue:
+        description: >-
+          Value to compare. This can be any valid JSON type. The type of this must match the type
+          of the data being compared to.
+        type: object
+        example: 'john.smith@company.com'
+  TimeQueryObject:
+    title: Time Query
+    description: Time query object
+    type: object
+    required:
+      - operation
+      - comparisonValue
+    properties:
+      operation:
+        $ref: '#/definitions/QueryOperation'
+      comparisonValue:
+        description: ISO-8601 formatted timestamp value to compare.
+        type: string
+        format: iso-date-time
+        example: '2017-11-14T15:41:06.106Z'
+  UserDataItemField:
+    title: User Data Item Field
+    description: User data item field enum
+    type: string
+    enum:
+      - ID
+      - USER
+      - APPLICATION
+      - CATEGORY
+      - NAME
+      - VALUE
+      - VISIBLE_TO_OTHERS
+      - REVISION
+      - CREATED_AT
+      - UPDATED_AT
+  UserDataItemSortField:
+    title: User Data Item Sort Field
+    description: User data item sort field enum
+    type: string
+    enum:
+      - ID
+      - USER
+      - APPLICATION
+      - CATEGORY
+      - NAME
+      - VISIBLE_TO_OTHERS
+      - REVISION
+      - CREATED_AT
+      - UPDATED_AT
+  UserDataItemSortDefinitionObject:
+    title: User Data Item Sort Definition
+    description: Defines the field and direction for sorting user data items.
+    type: object
+    required:
+      - field
+    properties:
+      field:
+        $ref: '#/definitions/UserDataItemSortField'
+      orderByDescending:
+        description: >-
+          Whether to sort descending instead of ascending.
+          The elements in the list are sorted ascending by default. If the
+          orderByDescending parameter is specified, the elements in the list
+          are sorted based on its value. The orderByDescending value must be
+          a boolean string. The elements in the list are sorted ascending if
+          false and descending if true.
+        type: boolean
+        default: false
+  UserDataItemQueryObject:
+    title: User Data Item Query
+    type: object
+    properties:
+      ids:
+        description: Array of user data item IDs
+        type: array
+        items:
+          type: string
+        example:
+          - '5c4b2c0756c8b455a8f849c4'
+          - '5c4ed77d56c8b455a80f86b5'
+          - '5c4ed78f56c8b455a80f870a'
+      users:
+        description: >-
+          Array of user names. For normal users, this field is typically not set because the
+          query results will be restricted to the particular user's access level, which for
+          normal users is just user data items that belong to the same user and any user data
+          items that have 'visibleToOthers' set to true. This field is typically intended for
+          administrator use where the desired purpose is to manage the data of other users.
+        type: array
+        items:
+          type: string
+        example:
+          - 'jsmith'
+          - 'jdoe'
+      applications:
+        description: Array of application names
+        type: array
+        items:
+          type: string
+        example:
+          - 'ni-swif'
+          - 'ni-test-management'
+      categories:
+        description: Array of category names
+        type: array
+        items:
+          type: string
+        example:
+          - 'reports'
+          - 'states'
+      names:
+        description: Array of user data item names
+        type: array
+        items:
+          type: string
+        example:
+          - 'email'
+          - 'language'
+      valueQuery:
+        description: >-
+          Array of JSON query objects to query against the values of the user data items.
+        type: array
+        items:
+          $ref: '#/definitions/JsonQueryObject'
+      visibleToOthers:
+        description: >-
+          Match against the 'visibleToOthers' field in the user item data. If not set, will match
+          both true and false values.
+        type: boolean
+        example: true
+      revisionQuery:
+        description: >-
+          Array of integer query objects used to query the revision of the user data items.
+        type: array
+        items:
+          $ref: '#/definitions/IntegerQueryObject'
+      createdAtQuery:
+        description: >-
+          Array of time query objects used to query when the user data items were created.
+        type: array
+        items:
+          $ref: '#/definitions/TimeQueryObject'
+      updatedAtQuery:
+        description: >-
+          Array of time query objects used to query when the user data items were last updated.
+        type: array
+        items:
+          $ref: '#/definitions/TimeQueryObject'
+      sortBy:
+        description: >-
+          Array of user data item sort definition objects to define how to sort the results.
+        type: array
+        items:
+          $ref: '#/definitions/UserDataItemSortDefinitionObject'
+      projection:
+        description: >-
+          Array of user data item fields. If you specify an array, the query returns a result with
+          the user data items containing the fields that are both specified and available. If you
+          do not specify an array, the query will return a result with the user data items
+          containing all available fields.
+        type: array
+        items:
+          $ref: '#/definitions/UserDataItemField'
+  UserDataItem:
+    title: User Data Item
+    description: >-
+       Information about a specific user data item. A specific user data item may be uniquely
+       identified by a combination of its 'user', 'application', 'category', and 'name' fields.
+       A specific user data item is also uniquely identified by its assigned ID.
+    type: object
+    required:
+      - id
+      - user
+      - application
+      - category
+      - name
+      - value
+      - visibleToOthers
+      - revision
+      - createdAt
+      - updatedAt
+    properties:
+      id:
+        description: The ID for this user data item.
+        type: string
+        example: '5c4b2c0756c8b455a8f849c4'
+      user:
+        description: >-
+          The user that this data item belongs to.
+        type: string
+        example: jsmith
+      application:
+        description: >-
+          The application name that this user data item belongs to.
+        type: string
+        example: 'ni-test-management'
+      category:
+        description: >-
+          The category name in the application that this user data item belongs to. An empty category
+          name is accepted.
+        type: string
+        example: 'reports'
+        default: ''
+      name:
+        description: The name of the user data item.
+        type: string
+        example: 'email'
+      value:
+        description: The value of the user data item.
+        type: object
+        example: 'john.smith@company.com'
+      visibleToOthers:
+        description: >-
+          Whether this user data item is visible to other users. This will allow other users to
+          query this data.
+        type: boolean
+        default: false
+        example: false
+      revision:
+        description: >-
+          The revision number for this user data item. When a user data item is created, the
+          revision number starts at 1. Every time it is updated, the revision number is
+          incremented by 1.
+        type: integer
+        format: int32
+        example: 1
+      createdAt:
+        description: ISO-8601 formatted timestamp specifying when the user data item was created.
+        type: string
+        format: iso-date-time
+        example: '2017-11-14T15:41:06.106Z'
+      updatedAt:
+        description: >-
+          ISO-8601 formatted timestamp specifying when the user data item was last updated.
+        type: string
+        format: iso-date-time
+        example: '2017-11-14T15:41:06.106Z'
+  CreateOrUpdateUserDataItem:
+    title: Create or Update User Data Item
+    description: >-
+       Create or update a specific user data item. A specific user data item may be uniquely
+       identified by a combination of its 'user', 'application', 'category', and 'name' fields.
+    type: object
+    required:
+      - application
+      - name
+      - value
+    properties:
+      user:
+        description: >-
+          The user that this data item belongs to. When this is not set, the service will
+          automatically use the currently logged in user. For normal use cases, this is the
+          recommended usage (to leave this field unset). This field is intended for the use of
+          administrators, where it may be desired to create or update user data items on behalf of
+          another user.
+        type: string
+        example: jsmith
+      application:
+        description: >-
+          The application name that this user data item belongs to.
+        type: string
+        example: 'ni-test-management'
+      category:
+        description: >-
+          The category name in the application that this user data item belongs to. An empty category
+          name is accepted.
+        type: string
+        example: 'reports'
+        default: ''
+      name:
+        description: The name of the user data item.
+        type: string
+        example: 'email'
+      value:
+        description: The value of the user data item.
+        type: object
+        example: 'john.smith@company.com'
+      visibleToOthers:
+        description: >-
+          Whether this user data item is visible to other users. This will allow other users to
+          query this data.
+        type: boolean
+        example: false
+      revisionLock:
+        description: >-
+          This is an optional value. When specified, this is an integer that should be set to
+          match the last known revision number of the user data item. If it doesn't match at the
+          time of execution, the update request will be rejected. This is used to ensure that
+          changes to this user data item are correctly using the previous state. This may be
+          important, for instance, in the case where multiple clients are updating an array value
+          at the same time. A value of 0 means that the item must not already exist.
+        type: integer
+        format: int32
+        minimum: 0
+        example: 5
+  UpdateUserDataItem:
+    title: Update User Data Item
+    description: >-
+       Update a specific user data item.
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        description: The ID for this user data item.
+        type: string
+        example: '5c4b2c0756c8b455a8f849c4'
+      value:
+        description: The value of the user data item.
+        type: object
+        example: 'john.smith@company.com'
+      visibleToOthers:
+        description: >-
+          Whether this user data item is visible to other users. This will allow other users to
+          query this data.
+        type: boolean
+        example: false
+      revisionLock:
+        description: >-
+          This is an optional value. When specified, this is an integer that should be set to
+          match the last known revision number of the user data item. If it doesn't match at the
+          time of execution, the update request will be rejected. This is used to ensure that
+          changes to this user data item are correctly using the previous state. This may be
+          important, for instance, in the case where multiple clients are updating an array value
+          at the same time.
+        type: integer
+        format: int32
+        minimum: 1
+        example: 5
+  CreateOrUpdateUserDataItemsPartialSuccessResponse:
+    title: Create or Update User Data Items Partial Success Response
+    description: Create or update user data items partial success response
+    type: object
+    required:
+      - succeeded
+      - failed
+      - error
+    properties:
+      succeeded:
+        description: Array of user data items that were created or updated.
+        type: array
+        items:
+          $ref: '#/definitions/UserDataItem'
+      failed:
+        description: Array of user data item create or update requests that failed.
+        type: array
+        items:
+          $ref: '#/definitions/CreateOrUpdateUserDataItem'
+      error:
+        $ref: '#/definitions/Error'
+  UpdateUserDataItemsPartialSuccessResponse:
+    title: Update User Data Items Partial Success Response
+    description: Update user data items partial success response
+    type: object
+    required:
+      - succeeded
+      - failed
+      - error
+    properties:
+      succeeded:
+        description: Array of user data item IDs that were updated.
+        type: array
+        items:
+          type: string
+        example:
+          - '5c4b2c0756c8b455a8f849c4'
+          - '5c4ed77d56c8b455a80f86b5'
+          - '5c4ed78f56c8b455a80f870a'
+      failed:
+        description: Array of user data item update requests that failed.
+        type: array
+        items:
+          $ref: '#/definitions/UpdateUserDataItem'
+      error:
+        $ref: '#/definitions/Error'
+  DeleteUserDataItemsPartialSuccessResponse:
+    title: Delete User Data Items Partial Success Response
+    description: Delete user data items partial success response
+    type: object
+    required:
+      - succeeded
+      - failed
+      - error
+    properties:
+      succeeded:
+        description: Array of user data item IDs that were successfully deleted
+        type: array
+        items:
+          type: string
+        example:
+          - '5c4b2c0756c8b455a8f849c4'
+          - '5c4ed77d56c8b455a80f86b5'
+          - '5c4ed78f56c8b455a80f870a'
+      failed:
+        description: Array of user data item IDs that failed to delete
+        type: array
+        items:
+          type: string
+        example:
+          - '5c4ed7a256c8b455a80f87a5'
+          - '5c4ed7b356c8b455a80f887f'
+      error:
+        $ref: '#/definitions/Error'
+
+parameters:
+  userDataItemId:
+    in: path
+    name: id
+    description: The ID of a specific user data item.
+    type: string
+    required: true
+    x-example: '5c4b2c0756c8b455a8f849c4'
+
+responses:
+  Error:
+    description: Error definition object
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  Unauthorized:
+    description: Not authorized
+    headers:
+      WWW_Authenticate:
+        description: Information for how to authenticate
+        type: string
+
+paths:
+  /:
+    get:
+      operationId: RootEndpoint
+      x-ni-request-all-privileges: true
+      summary: API information
+      description: Returns information about API versions and available operations.
+      tags: [versioning]
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Version information
+            title: RootEndpointResponse
+            type: object
+            properties:
+              v1:
+                $ref: '#/definitions/V1Operations'
+              version:
+                description: Implementation version of the web service
+                type: string
+  /{version}:
+    parameters:
+      - in: path
+        name: version
+        description: Version of the API to retrieve operations
+        type: string
+        required: true
+    get:
+      operationId: RootEndpointWithVersion
+      x-ni-request-all-privileges: true
+      summary: API version information
+      description: Returns available operations for a single version of the API
+      tags: [versioning]
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/V1Operations'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/items:
+    get:
+      operationId: GetUserDataItems
+      x-ni-operation: queryUserDataItems
+      x-ni-request-all-privileges: true
+      x-ni-request-variables: [REMOTE_USER]
+      summary: Get All User Data Items
+      description: >-
+        Get all the visible the user data items. Which items are visible are according to the
+        access level of the logged in user.
+
+        Use the skip and take parameters to return paged responses.
+
+        The orderBy and orderByDescending fields can be used to manage sorting
+        the list by specific fields.
+      tags: [user-data]
+      parameters:
+        - in: query
+          name: skip
+          description: >-
+            How many user data items to skip in the result when paging.
+            For example, a list of 100 user data items with a skip value of 50 and a take
+            value of 25 will return entries 51 through 75.
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          description: >-
+            How many user data items to return in the result.
+            For example, a list of 100 user data items with a skip value of 50 and a take
+            value of 25 will return entries 51 through 75.
+          type: integer
+          format: int32
+          minimum: 0
+        - in: query
+          name: orderBy
+          description: The name of the field to sort by.
+          type: string
+          enum:
+            - ID
+            - USER
+            - APPLICATION
+            - CATEGORY
+            - NAME
+            - VISIBLE_TO_OTHERS
+            - REVISION
+            - CREATED_AT
+            - UPDATED_AT
+        - in: query
+          name: orderByDescending
+          description: >-
+            Whether to sort descending instead of ascending.
+            The elements in the list are sorted ascending by default. If the
+            orderByDescending parameter is specified, the elements in the list
+            are sorted based on its value. The orderByDescending value must be
+            a boolean string. The elements in the list are sorted ascending if
+            false and descending if true.
+          type: boolean
+          default: false
+      responses:
+        200:
+          description: OK
+          schema:
+            description: User data item information
+            title: QueryUserDataItemsResponse
+            type: object
+            required:
+              - items
+              - totalCount
+            properties:
+              items:
+                description: Array of user data items
+                type: array
+                items:
+                  $ref: '#/definitions/UserDataItem'
+              totalCount:
+                description: Number of matching user data items
+                type: integer
+                format: int32
+    post:
+      operationId: CreateOrUpdateUserDataItems
+      x-ni-operation: createOrUpdateUserDataItems
+      x-ni-request-all-privileges: true
+      x-ni-request-variables: [REMOTE_USER]
+      summary: Create or update one or more user data items
+      description: >-
+        Creates one or more user data items.
+      tags: [user-data]
+      parameters:
+        - in: body
+          name: createOrUpdateUserDataItems
+          description: Array of data item information for creation or update.
+          required: true
+          schema:
+            description: Array of data item information for creation or update.
+            title: CreateOrUpdateUserDataItemsRequest
+            type: array
+            items:
+              $ref: '#/definitions/CreateOrUpdateUserDataItem'
+            minItems: 1
+      responses:
+        201:
+          description: Created
+          schema:
+            description: Array of user data items that were created or updated.
+            title: CreateOrUpdateUserDataItemsResponse
+            type: array
+            items:
+              $ref: '#/definitions/UserDataItem'
+        200:
+          description: Partial success
+          schema:
+            $ref: '#/definitions/CreateOrUpdateUserDataItemsPartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/items/{id}:
+    parameters:
+      - $ref: '#/parameters/userDataItemId'
+    get:
+      operationId: GetUserDataItem
+      x-ni-operation: queryUserDataItems
+      x-ni-request-all-privileges: true
+      x-ni-request-variables: [REMOTE_USER]
+      summary: Get information about the specified user data item
+      description: >-
+        Get information about the specified user data item.
+      tags: [user-data]
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/UserDataItem'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      operationId: DeleteUserDataItem
+      x-ni-operation: deleteUserDataItems
+      x-ni-privilege: Write
+      x-ni-request-variables: [REMOTE_USER]
+      summary: Delete the specified user data item
+      description: Deletes the specified user data item.
+      tags: [user-data]
+      responses:
+        204:
+          description: No content
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/query-items:
+    post:
+      operationId: QueryUserDataItems
+      x-ni-operation: queryUserDataItems
+      x-ni-request-all-privileges: true
+      x-ni-request-variables: [REMOTE_USER]
+      summary: Query User Data Items
+      description: Queries the user data items.
+      tags: [user-data]
+      parameters:
+        - in: body
+          name: queryUserDataItems
+          description: User data item query object
+          required: true
+          schema:
+            $ref: '#/definitions/UserDataItemQueryObject'
+        - in: query
+          name: skip
+          description: >-
+            How many user data items to skip in the result when paging.
+            For example, a list of 100 user data items with a skip value of 50 and a take
+            value of 25 will return entries 51 through 75.
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          description: >-
+            How many user data items to return in the result.
+            For example, a list of 100 user data items with a skip value of 50 and a take
+            value of 25 will return entries 51 through 75.
+          type: integer
+          format: int32
+          minimum: 0
+      responses:
+        200:
+          description: OK
+          schema:
+            description: User data item information
+            title: QueryUserDataItemsResponse
+            type: object
+            required:
+              - items
+              - totalCount
+            properties:
+              items:
+                description: Array of user data items
+                type: array
+                items:
+                  $ref: '#/definitions/UserDataItem'
+              totalCount:
+                description: Number of matching user data items
+                type: integer
+                format: int32
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/update-items:
+    post:
+      operationId: UpdateUserDataItems
+      x-ni-operation: createOrUpdateUserDataItems
+      x-ni-privilege: Write
+      x-ni-request-all-privileges: true
+      x-ni-request-variables: [REMOTE_USER]
+      summary: Update one or more user data items
+      description: >-
+        Updates one or more user data items.
+      tags: [user-data]
+      parameters:
+        - in: body
+          name: updateUserDataItems
+          description: Array of data item information for update.
+          required: true
+          schema:
+            description: Array of data item information for update.
+            title: UpdateUserDataItemsRequest
+            type: array
+            items:
+              $ref: '#/definitions/UpdateUserDataItem'
+            minItems: 1
+      responses:
+        204:
+          description: No content
+        200:
+          description: Partial success
+          schema:
+            $ref: '#/definitions/UpdateUserDataItemsPartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/delete-items:
+    post:
+      operationId: DeleteUserDataItems
+      x-ni-operation: deleteUserDataItems
+      x-ni-privilege: Write
+      x-ni-request-all-privileges: true
+      summary: Delete user data items
+      description: >-
+        Deletes multiple user data items in a single API call.
+      tags: [user-data]
+      parameters:
+        - in: body
+          name: items
+          description: Array of user data item IDs to delete.
+          required: true
+          schema:
+            description: Array of user data item IDs to delete.
+            title: DeleteUserDataItemsRequest
+            type: array
+            items:
+              description: The ID of a user data item to delete.
+              type: string
+              example: '5c4b2c0756c8b455a8f849c4'
+            minItems: 1
+      responses:
+        204:
+          description: No content
+        200:
+          description: Partial success
+          schema:
+            $ref: '#/definitions/DeleteUserDataItemsPartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
