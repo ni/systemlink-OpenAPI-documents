@@ -569,6 +569,50 @@ paths:
           description: The request encountered an error.            
         default:
           $ref: '#/responses/Error'
+  /v1/files/{pathToFile}:
+    parameters:
+      - in: path
+        name: pathToFile
+        type: string
+        required: true
+    get:
+      x-ni-privilege: Download
+      tags: [misc]
+      summary: Download files located in Package Repository.
+      description: Download files located in Package Repository.
+      produces:
+        - application/octet-stream
+      responses:
+        200:
+          description: OK
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: File not found.       
+        default:
+          $ref: '#/responses/Error'
+  /v1/files/packages/{pathToPackage}:
+    parameters:
+      - in: path
+        name: pathToPackage
+        type: string
+        required: true
+    get:
+      x-ni-privilege: Download
+      tags: [misc]
+      summary: Download files located in Package Repository in the packages folder.
+      description: Download files located in Package Repository in the packages folder.
+      produces:
+        - application/octet-stream
+      responses:
+        200:
+          description: OK
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          description: File not found.       
+        default:
+          $ref: '#/responses/Error'
   /v1/feeds:
     get:
       x-ni-privilege: Read
