@@ -280,274 +280,263 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/UpdateDescriptor'
-
-responses:
-  Error:
-    description: Contains error information.
-    schema:
-      type: object
-      properties:
-        error:
-          $ref: '#/definitions/ErrorObject'
-      example:
-        error:
-          args:
-            code: -251343
-          innerErrors: []
-          message: "'1--' is not a valid Id for a store item."
-          name: Repository.InvalidStoreItemId
-  Unauthorized:
-    description: Not authorized.
-    schema:
-      type: string
-      example: <!DOCTYPE html><html><head><title>Login</title><link rel="stylesheet" href="/login/css/normalize.css"><link rel="stylesheet" href="/login/css/style.css"><meta charset="utf-8"></head><body><form class="login" method="POST" action="/login/login.do"><input type="hidden" name="httpd_location" value="/nirepo/v1/feeds/1/packages" /><input type="text" name="httpd_username" placeholder="username" value="" /><input type="password" name="httpd_password" placeholder="password" value="" /><input type="submit" name="login" value="Login" /></form></body></html>
   Feed:
     description: A single feed.
-    schema:
-      type: object
-      properties:
-        id: 
+    type: object
+    properties:
+      id: 
+        type: string
+      feedName: 
+        type: string
+      directoryUri: 
+        type: string
+      description: 
+        type: string
+      platform:
+        $ref: '#/definitions/Platform'
+      packageReferences:
+        type: array
+        items:
           type: string
-        feedName: 
-          type: string
-        directoryUri: 
-          type: string
-        description: 
-          type: string
-        platform:
-          $ref: '#/definitions/Platform'
-        packageReferences:
-          type: array
-          items:
-            type: string
-        lastUpdated:
-          type: string
-        ready:
-          type: boolean
-      example:
-        id: 5c4f13c3781e2b17101f8220
-        feedName: asd
-        directoryUri: "/nirepo/v1/files/feeds/asd"
-        description: ''
-        platform: windows
-        packageReferences: []
-        packageSources: []
-        lastUpdated: '2019-01-28T14:37:55.043000Z'
-        ready: true
+      lastUpdated:
+        type: string
+      ready:
+        type: boolean
+    example:
+      id: 5c4f13c3781e2b17101f8220
+      feedName: asd
+      directoryUri: "/nirepo/v1/files/feeds/asd"
+      description: ''
+      platform: windows
+      packageReferences: []
+      packageSources: []
+      lastUpdated: '2019-01-28T14:37:55.043000Z'
+      ready: true
+  Error:
+    description: Contains error information.
+    type: object
+    properties:
+      error:
+        $ref: '#/definitions/ErrorObject'
+    example:
+      error:
+        args:
+          code: -251343
+        innerErrors: []
+        message: "'1--' is not a valid Id for a store item."
+        name: Repository.InvalidStoreItemId
+  Unauthorized:
+    description: Not authorized.
+    type: string
+    example: <!DOCTYPE html><html><head><title>Login</title><link rel="stylesheet" href="/login/css/normalize.css"><link rel="stylesheet" href="/login/css/style.css"><meta charset="utf-8"></head><body><form class="login" method="POST" action="/login/login.do"><input type="hidden" name="httpd_location" value="/nirepo/v1/feeds/1/packages" /><input type="text" name="httpd_username" placeholder="username" value="" /><input type="password" name="httpd_password" placeholder="password" value="" /><input type="submit" name="login" value="Login" /></form></body></html>
   Feeds:
     description: An array of feeds.
-    schema:
-      type: object
-      properties:
-        feeds:
-          type: array
-          items:
-            $ref: '#/responses/Feed'
+    type: object
+    properties:
+      feeds:
+        type: array
+        items:
+          $ref: '#/definitions/Feed'
   JobID:
     description: An object containing the Job ID.
-    schema:
-      type: object
-      properties:
-        jobId:
-          description: The ID of the job that was created for tracking the status of the operation.
-          type: string
-      example:
-        jobId: 5c666def781e2b2f64208709
+    type: object
+    properties:
+      jobId:
+        description: The ID of the job that was created for tracking the status of the operation.
+        type: string
+    example:
+      jobId: 5c666def781e2b2f64208709
   Job:
     description: An object containing the Job.
-    schema:
-      type: object
-      properties:
-        id:
-          type: string
-        operation:
-          type: string
-        status:
-          type: string
-        error:
-          $ref: '#/definitions/ErrorObject'
-        created:
-          type: string
-        resourceId:
-          type: string
-        returnType:
-          type: string
-      example:
-        created: '2019-01-30T15:09:52.391Z'
-        error:
-          args:
-          - 'https://google.ro/Packages'
-          code: -251306
-          innerErrors: []
-          message: "Unable to download feed index file at URI 'https://google.ro/Packages'."
-          name: 'Repository.CouldNotDownloadFeedIndexFile'
-        id: 5c51be40781e2b0ad0b0108c
-        operation: 'REPLICATE_FEED'
-        resourceId: ''
-        returnType: 'FEED'
-        status: 'FAILED'
+    type: object
+    properties:
+      id:
+        type: string
+      operation:
+        type: string
+      status:
+        type: string
+      error:
+        $ref: '#/definitions/ErrorObject'
+      created:
+        type: string
+      resourceId:
+        type: string
+      returnType:
+        type: string
+    example:
+      created: '2019-01-30T15:09:52.391Z'
+      error:
+        args:
+        - 'https://google.ro/Packages'
+        code: -251306
+        innerErrors: []
+        message: "Unable to download feed index file at URI 'https://google.ro/Packages'."
+        name: 'Repository.CouldNotDownloadFeedIndexFile'
+      id: 5c51be40781e2b0ad0b0108c
+      operation: 'REPLICATE_FEED'
+      resourceId: ''
+      returnType: 'FEED'
+      status: 'FAILED'
   Package:
     description: A single package.
-    schema:
-      type: object
-      properties:
-        id: 
+    type: object
+    properties:
+      id: 
+        type: string
+      fileUri: 
+        type: string
+      feedReferences:
+        type: array
+        items:
           type: string
-        fileUri: 
-          type: string
-        feedReferences:
-          type: array
-          items:
+      lastUpdated:
+        type: string
+      metadata: 
+        type: object
+        properties:
+          packageName:
             type: string
-        lastUpdated:
-          type: string
-        metadata: 
-          type: object
-          properties:
-            packageName:
-              type: string
-            version:
-              type: string
-            architecture:
-              type: string
-            breaks:
-              type: array
-              items:
-                type: string
-            conflicts:
-              type: array
-              items:
-                type: string
-            depends:
-              type: array
-              items:
-                type: string
-            description:
-              type: string
-            enhances:
-              type: array
-              items:
-                type: string
-            essential:
-              type: boolean
-            fileName:
-              type: string
-            homepage:
-              type: string
-            installedSize:
-              type: number
-            maintainer:
-              type: string
-            predepends:
-              type: array
-              items:
-                type: string
-            priority:
-              type: number
-            provides:
-              type: array
-              items:
-                type: string
-            recommends:
-              type: array
-              items:
-                type: string
-            releaseNotes:
-              type: string
-            replaces:
-              type: array
-              items:
-                type: string
-            section:
-              type: string
-            size:
-              type: number
-            source:
-              type: string
-            suggests:
-              type: array
-              items:
-                type: string
-            tags:
-              type: string
-            attributes:
-              type: object
-        description: 
-          type: string
-        platform:
-          $ref: '#/definitions/Platform'
-        packageReferences:
-          type: array
-          items:
+          version:
             type: string
-        ready:
-          type: boolean
-      example:
-        id: 581a6818e0d644f7f0c1902c
-        fileUri: files/packages/ni-securityupdate-kb67l8lcqw-killbits_2.0.0.22-0+d22_windows_x64.nipkg
-        feedReferences:
-        - 581a6818e0d644f7f0c19028
-        - 581a6819e0d644f7f0c1903a
-        - 581a6818e0d644f7f0c19026
-        lastUpdated: '2016-11-02T22:26:33.668Z'
-        metadata:
-          packageName: ni-securityupdate-kb67l8lcqw-killbits
-          version: 2.0.0.22-0+d22
-          architecture: windows_x64
-          breaks: 
-          conflicts: 
-          depends: 
-          description: This is an infrastructure package for NI Software.
-          enhances: 
-          essential: false
-          fileName: ni-securityupdate-kb67l8lcqw-killbits_2.0.0.22-0+d22_windows_x64.nipkg
-          homepage: http://www.ni.com
-          installedSize: 0
-          maintainer: National Instruments <support@ni.com>
-          predepends: 
-          priority: 4
-          provides: 
-          recommends: 
-          releaseNotes: ''
-          replaces: 
-          section: Infrastructure
-          size: 750070
-          source: ''
-          suggests: 
-          tags: KillBits, Security Update 2013
+          architecture:
+            type: string
+          breaks:
+            type: array
+            items:
+              type: string
+          conflicts:
+            type: array
+            items:
+              type: string
+          depends:
+            type: array
+            items:
+              type: string
+          description:
+            type: string
+          enhances:
+            type: array
+            items:
+              type: string
+          essential:
+            type: boolean
+          fileName:
+            type: string
+          homepage:
+            type: string
+          installedSize:
+            type: number
+          maintainer:
+            type: string
+          predepends:
+            type: array
+            items:
+              type: string
+          priority:
+            type: number
+          provides:
+            type: array
+            items:
+              type: string
+          recommends:
+            type: array
+            items:
+              type: string
+          releaseNotes:
+            type: string
+          replaces:
+            type: array
+            items:
+              type: string
+          section:
+            type: string
+          size:
+            type: number
+          source:
+            type: string
+          suggests:
+            type: array
+            items:
+              type: string
+          tags:
+            type: string
           attributes:
-            Architecture: windows_x64
-            Description: This is an infrastructure package for NI Software.
-            Filename: 71e47fbf-2782-4c10-873e-dba414213dc9.nipkg
-            Homepage: http://www.ni.com
-            MD5Sum: 672a667ca32b6915ae9a968c55f80825
-            Maintainer: National Instruments <support@ni.com>
-            Package: ni-securityupdate-kb67l8lcqw-killbits
-            Priority: standard
-            Section: Infrastructure
-            Size: '750070'
-            Version: 2.0.0.22-0+d22
-            XB-DisplayName: NI Security Update (KB 67L8LCQW)
-            XB-DisplayVersion: 2.0.0
-            XB-LanguageSupport: en
-            XB-Plugin: wininst
-            XB-Tags: KillBits, Security Update 2013
-            FileName: ni-securityupdate-kb67l8lcqw-killbits_2.0.0.22-0+d22_windows_x64.nipkg
+            type: object
+      description: 
+        type: string
+      platform:
+        $ref: '#/definitions/Platform'
+      packageReferences:
+        type: array
+        items:
+          type: string
+      ready:
+        type: boolean
+    example:
+      id: 581a6818e0d644f7f0c1902c
+      fileUri: files/packages/ni-securityupdate-kb67l8lcqw-killbits_2.0.0.22-0+d22_windows_x64.nipkg
+      feedReferences:
+      - 581a6818e0d644f7f0c19028
+      - 581a6819e0d644f7f0c1903a
+      - 581a6818e0d644f7f0c19026
+      lastUpdated: '2016-11-02T22:26:33.668Z'
+      metadata:
+        packageName: ni-securityupdate-kb67l8lcqw-killbits
+        version: 2.0.0.22-0+d22
+        architecture: windows_x64
+        breaks: 
+        conflicts: 
+        depends: 
+        description: This is an infrastructure package for NI Software.
+        enhances: 
+        essential: false
+        fileName: ni-securityupdate-kb67l8lcqw-killbits_2.0.0.22-0+d22_windows_x64.nipkg
+        homepage: http://www.ni.com
+        installedSize: 0
+        maintainer: National Instruments <support@ni.com>
+        predepends: 
+        priority: 4
+        provides: 
+        recommends: 
+        releaseNotes: ''
+        replaces: 
+        section: Infrastructure
+        size: 750070
+        source: ''
+        suggests: 
+        tags: KillBits, Security Update 2013
+        attributes:
+          Architecture: windows_x64
+          Description: This is an infrastructure package for NI Software.
+          Filename: 71e47fbf-2782-4c10-873e-dba414213dc9.nipkg
+          Homepage: http://www.ni.com
+          MD5Sum: 672a667ca32b6915ae9a968c55f80825
+          Maintainer: National Instruments <support@ni.com>
+          Package: ni-securityupdate-kb67l8lcqw-killbits
+          Priority: standard
+          Section: Infrastructure
+          Size: '750070'
+          Version: 2.0.0.22-0+d22
+          XB-DisplayName: NI Security Update (KB 67L8LCQW)
+          XB-DisplayVersion: 2.0.0
+          XB-LanguageSupport: en
+          XB-Plugin: wininst
+          XB-Tags: KillBits, Security Update 2013
+          FileName: ni-securityupdate-kb67l8lcqw-killbits_2.0.0.22-0+d22_windows_x64.nipkg
   Packages:
     description: An array of packages.
-    schema:
-      type: object
-      properties:
-        packages:
-          type: array
-          items:
-            $ref: '#/responses/Package'
+    type: object
+    properties:
+      packages:
+        type: array
+        items:
+          $ref: '#/definitions/Package'
   UpdateDescriptorResponse:
     description: An array of update descriptors.
-    schema:
-      type: array
-      items:
-        $ref: '#/definitions/UpdateDescriptor'
+    type: array
+    items:
+      $ref: '#/definitions/UpdateDescriptor'
 
 paths:
   /v1/ping:
@@ -568,7 +557,7 @@ paths:
         500:
           description: The request encountered an error.            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/files/{pathToFile}:
     parameters:
       - in: path
@@ -585,12 +574,14 @@ paths:
       responses:
         200:
           description: OK
+          schema:
+            type: file
         401:
-          $ref: '#/responses/Unauthorized'
+          $ref: '#/definitions/Unauthorized'
         404:
           description: File not found.       
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/files/packages/{pathToPackage}:
     parameters:
       - in: path
@@ -607,12 +598,14 @@ paths:
       responses:
         200:
           description: OK
+          schema:
+            type: file
         401:
-          $ref: '#/responses/Unauthorized'
+          $ref: '#/definitions/Unauthorized'
         404:
           description: File not found.       
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/feeds:
     get:
       x-ni-privilege: Read
@@ -628,13 +621,11 @@ paths:
           description: A value indicating whether the "packageReferences" array for each feed, which contains the ids of all of the packages in that feed, should be omitted. Defaults to false.
       responses:
         200:
-          description: OK
-          schema:
-            $ref: '#/responses/Feeds'
+          $ref: '#/definitions/Feeds'
         401:
-          $ref: '#/responses/Unauthorized'
+          $ref: '#/definitions/Unauthorized'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
     post:
       x-ni-privilege: Write
       x-ni-operation: createFeed
@@ -654,11 +645,11 @@ paths:
               type: string
               description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/feeds/{id}:
     parameters:
       - in: path
@@ -673,13 +664,11 @@ paths:
       description: Returns a JSON representation of a feed.
       responses:
         200:
-          description: OK
-          schema:
-            $ref: '#/responses/Feed'
+          $ref: '#/definitions/Feed'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
     delete:
       x-ni-privilege: Write
       x-ni-operation: deleteFeed
@@ -699,11 +688,11 @@ paths:
               type: string
               description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/feeds/{id}/clone:
     parameters:
       - in: path
@@ -738,11 +727,11 @@ paths:
               type: string
               description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/feeds/{id}/packages:
     parameters:
       - in: path
@@ -770,13 +759,11 @@ paths:
           description: A query parameter that determines if only packages without referencing feeds should be returned. Defaults to false.
       responses:
         200:
-          description: OK
-          schema:
-            $ref: '#/responses/Packages'
+          $ref: '#/definitions/Packages'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/replicate-feed:
     post:
       x-ni-privilege: Write
@@ -805,11 +792,11 @@ paths:
               type: string
               description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/feeds/{id}/import-packages:
     parameters:
       - in: path
@@ -843,11 +830,11 @@ paths:
               type: string
               description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/feeds/{id}/import-feeds:
     parameters:
       - in: path
@@ -900,11 +887,11 @@ paths:
               type: string
               description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/packages:
     get:
       x-ni-privilege: Read
@@ -931,11 +918,11 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/responses/Package'
+              $ref: '#/definitions/Package'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/packages/{id}:
     parameters:
       - in: path
@@ -966,11 +953,11 @@ paths:
             type: object
             properties:
               package:
-                $ref: '#/responses/Package'
+                $ref: '#/definitions/Package'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
     delete:
       x-ni-privilege: Write
       x-ni-operation: deletePackage
@@ -985,11 +972,11 @@ paths:
               type: string
               description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/upload-packages:
     post:
       x-ni-privilege: Write
@@ -1038,9 +1025,9 @@ paths:
                     type: string
                     example: '5c66b6bd781e2b2ce42ca818'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/get-package-import-descriptors:
     post:
       x-ni-privilege: Read
@@ -1064,9 +1051,9 @@ paths:
           schema:
             $ref: '#/definitions/PackageImportDescriptors'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/feeds/{id}/metadata:
     parameters:
       - in: path
@@ -1101,11 +1088,11 @@ paths:
               type: string
               description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/feeds/{id}/add-package-references:
     parameters:
       - in: path
@@ -1138,11 +1125,11 @@ paths:
               type: string
               description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/feeds/{id}/remove-package-references:
     parameters:
       - in: path
@@ -1180,11 +1167,11 @@ paths:
               type: string
               description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/feeds/{id}/import:
     parameters:
       - in: path
@@ -1237,11 +1224,11 @@ paths:
               type: string
               description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/feeds/{id}/update-check:
     parameters:
       - in: path
@@ -1273,11 +1260,11 @@ paths:
               type: string
               description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/feeds/{id}/update-apply:
     parameters:
       - in: path
@@ -1314,11 +1301,11 @@ paths:
               type: string
               description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/feeds/{id}/clean:
     parameters:
       - in: path
@@ -1339,11 +1326,11 @@ paths:
               type: string
               description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/feeds/{id}/import-store-items:
     parameters:
       - in: path
@@ -1376,15 +1363,15 @@ paths:
         202:
           description: OK
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
           headers:
             Location:
               type: string
               description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/jobs:
     get:
       x-ni-privilege: Read
@@ -1422,11 +1409,11 @@ paths:
               jobs:
                 type: array
                 items:
-                  $ref: '#/responses/Job'
+                  $ref: '#/definitions/Job'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/jobs/{id}:
     parameters:
       - in: path
@@ -1450,7 +1437,7 @@ paths:
             type: object
             properties:
               job:
-                $ref: '#/responses/Job'
+                $ref: '#/definitions/Job'
         303:
           description: See Other if the job has completed, with the Location header set to the URI of the created or modified resource, if a resource was created or modified.
           headers:
@@ -1461,11 +1448,11 @@ paths:
             type: object
             properties:
               job:
-                $ref: '#/responses/Job'
+                $ref: '#/definitions/Job'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/can-write:
     get:
       x-ni-privilege: Write
@@ -1477,9 +1464,9 @@ paths:
         200:
           description: OK
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/updates/{id}:
     parameters:
       - in: path
@@ -1496,11 +1483,11 @@ paths:
         200:
           description: OK
           schema:
-            $ref: '#/responses/UpdateDescriptorResponse'
+            $ref: '#/definitions/UpdateDescriptorResponse'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/store/items:
     get:
       x-ni-privilege: Read
@@ -1543,9 +1530,9 @@ paths:
               totalItems:
                 type: number
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/store/items/{id}:
     parameters:
       - in: path
@@ -1567,9 +1554,9 @@ paths:
               storeItem:
                 $ref: '#/definitions/StoreItem'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
   /v1/replicate-store-item:
     post:
       x-ni-privilege: Write
@@ -1596,8 +1583,8 @@ paths:
         202:
           description: OK
           schema:
-            $ref: '#/responses/JobID'
+            $ref: '#/definitions/JobID'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/definitions/Unauthorized'            
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/definitions/Error'
