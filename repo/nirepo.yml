@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   version: "1"
   title: "Package Repository Service"
-  description: "Creates and manages package repositories."
+  description: "Manages a repository of packages"
   contact:
     name: National Instruments
     url: https://www.ni.com/systemlink
@@ -22,6 +22,9 @@ securityDefinitions:
 security:
   - basicAuth: []
   - cookieAuth: []
+  
+x-ni-routing-key: Skyline.Repository
+x-ni-privilege-application: nirepo
 
 definitions:
   ErrorObject:
@@ -56,6 +59,7 @@ definitions:
   Platform:
     type: string
     enum: [windows, ni-linux-rt]
+    description: "Depending on the platform you select, you will be able to use the following package extensions: .nipkg for windows feeds, .ipk and .deb for ni-linux-rt feeds."
   PackageImportDescriptor:
     type: object
     properties:
@@ -110,7 +114,43 @@ definitions:
             value:
               type: string
       suiteContents:
-        type: object
+        type: array
+        items:
+          type: object
+          properties:
+            storeItemId:
+              type: number
+            productName:
+              type: string
+            shortDescription:
+              type: string
+            updateDate:
+              type: string
+            packageName:
+              type: string
+            packageVersion:
+              type: string
+            architecture:
+              type: string
+            preSelect:
+              type: boolean
+            repositories:
+              type: array
+              items:
+                type: object
+                properties:
+                  packageName:
+                    type: string
+                  file:
+                    type: string
+                  md5Checksum:
+                    type: string
+                  repositoryPath:
+                    type: string
+                  feedType:
+                    type: string
+            downloadItemVersion:
+              type: string
       feeds:
         type: array
         items:
@@ -132,6 +172,38 @@ definitions:
       feeds:
         - feedName: Feed Name
           uri: /path/to/feed
+      suiteContents:
+        - storeItemId: 654
+          productName: LabVIEW NXG
+          shortDescription: LabVIEW NXG enables engineers to quickly automate hardware, customize
+            tests to project specifications, and easily view measurement results from anywhere.
+          updateDate: '2018-01-23T14:33:29.000-06:00'
+          packageName: ni-labview-nxg-2.0.0
+          packageVersion: 5.3.1.49156-0+f4
+          architecture: windows_x64
+          preSelect: true
+          repositories:
+          - packageName: ni-labview-nxg-2.0.0-2.1-released-critical
+            file: http://127.0.0.1/en/ni-labview-nxg-2.0.0-2.1-released-critical.nipkg
+            md5Checksum: 233b2aa7d1c23cbef93874a7ecdce61a
+            repositoryPath: http://download-preview.ni.com/products/ni-labview-nxg-2.0.0/2.1/released-critical
+            feedType: RELEASED-CRITICAL
+          - packageName: ni-labview-nxg-2.0.0-2.1-released
+            file: http://127.0.0.1/en/ni-labview-nxg-2.0.0-2.1-released.nipkg
+            md5Checksum: 2b143c436d3c56222dade9ccfa2140a2
+            repositoryPath: http://download-preview.ni.com/products/ni-labview-nxg-2.0.0/2.1/released
+            feedType: RELEASED
+          - packageName: ni-labview-nxg-2.0.0-rte-2.1-released
+            file: http://127.0.0.1/en/ni-labview-nxg-2.0.0-rte-2.1-released.nipkg
+            md5Checksum: 40f506a2adae65c6f4bcddf98c038f2c
+            repositoryPath: http://download-preview.ni.com/products/ni-labview-nxg-2.0.0-rte/2.1/released
+            feedType: RELEASED
+          - packageName: ni-labview-nxg-2.0.0-rte-2.1-released-critical
+            file: http://127.0.0.1/en/ni-labview-nxg-2.0.0-rte-2.1-released-critical.nipkg
+            md5Checksum: 0d2df44db476950a57d7e340d3b1d172
+            repositoryPath: http://download-preview.ni.com/products/ni-labview-nxg-2.0.0-rte/2.1/released-critical
+            feedType: RELEASED-CRITICAL
+            downloadItemVersion: '2.1'
   StoreDownloadItems:
     type: object
     properties:
@@ -145,11 +217,15 @@ definitions:
           $ref: '#/definitions/StoreItemInstaller'
   UpdateDescriptor:
     type: object
+    description: Data specifying what to update.
     properties:
       packageName:
         type: string
       operation:
         type: string
+        enum:
+          - ADD
+          - UPGRADE
       fromVersion:
         type: string
       toVersion:
@@ -162,6 +238,7 @@ definitions:
         type: string
       destinationFeedId:
         type: string
+        description: The feed id pointing to the feed to be updated.
       isLocal:
         type: boolean
     example:
@@ -275,6 +352,7 @@ definitions:
       storeItemInstallerGuid: LABVIEWPKGBLDR10
   UpdateDescriptorRequest:
     type: object
+    description: An array of update descriptors.
     properties:
       updateDescriptors:
         type: array
@@ -328,7 +406,6 @@ definitions:
   Unauthorized:
     description: Not authorized.
     type: string
-    example: <!DOCTYPE html><html><head><title>Login</title><link rel="stylesheet" href="/login/css/normalize.css"><link rel="stylesheet" href="/login/css/style.css"><meta charset="utf-8"></head><body><form class="login" method="POST" action="/login/login.do"><input type="hidden" name="httpd_location" value="/nirepo/v1/feeds/1/packages" /><input type="text" name="httpd_username" placeholder="username" value="" /><input type="password" name="httpd_password" placeholder="password" value="" /><input type="submit" name="login" value="Login" /></form></body></html>
   Feeds:
     description: An array of feeds.
     type: object
@@ -347,23 +424,50 @@ definitions:
     example:
       jobId: 5c666def781e2b2f64208709
   Job:
-    description: An object containing the Job.
+    description: A resource that is created to track the status of asynchronous operations, and to redirect the user to the results of such operations when they complete.
     type: object
     properties:
       id:
+        description: The id of the job. Use this to get more informations about the job as it runs.
         type: string
       operation:
+        description: The type of the job.
         type: string
+        enum:
+          - CREATE_FEED
+          - CLONE_FEED
+          - REPLICATE_FEED
+          - UPDATE_FEED
+          - DELETE_FEED
+          - IMPORT_FEEDS
+          - REMOVE_PACKAGE_REFERENCES
+          - DELETE_PACKAGE
+          - ADD_PACKAGE_REFERENCES
+          - UPLOAD_PACKAGE
+          - CHECK_FOR_UPDATES
+          - APPLY_UPDATES
+          - CLEAN_FEED
+          - REPLICATE_STORE_ITEM
+          - IMPORT_STORE_ITEMS
+          - IMPORT_PACKAGES
+          - JOB_OPERATION_COUNT
       status:
+        description: What running state is the job in.
         type: string
+        enum: [PENDING, RUNNING, SUCCEEDED, FAILED, COMPLETED_WITH_ERROR]
       error:
+        description: The errors of the job or null.
         $ref: '#/definitions/ErrorObject'
       created:
+        description: The date when the job was created.
         type: string
       resourceId:
+        description: The resourceId that this job points to.
         type: string
       returnType:
+        description: The resource that this job will return when completed.
         type: string
+        enum: [FEED, FEEDS, PACKAGE, UPDATE_DESCRIPTORS, SIMPLE]
     example:
       created: '2019-01-30T15:09:52.391Z'
       error:
@@ -545,7 +649,7 @@ paths:
       x-ni-privilege: Read
       x-ni-operation: ping
       tags: [ping]
-      summary: Ping the service.
+      summary: Ping the service
       description: Return if the service is up.
       responses:
         204:
@@ -567,7 +671,7 @@ paths:
     get:
       x-ni-privilege: Download
       tags: [misc]
-      summary: Download files located in Package Repository.
+      summary: Download files located in Package Repository
       description: Download files located in Package Repository.
       produces:
         - application/octet-stream
@@ -576,8 +680,6 @@ paths:
           description: OK
           schema:
             type: file
-        401:
-          $ref: '#/definitions/Unauthorized'
         404:
           description: File not found.       
         default:
@@ -591,7 +693,7 @@ paths:
     get:
       x-ni-privilege: Download
       tags: [misc]
-      summary: Download files located in Package Repository in the packages folder.
+      summary: Download files located in Package Repository in the packages folder
       description: Download files located in Package Repository in the packages folder.
       produces:
         - application/octet-stream
@@ -600,8 +702,6 @@ paths:
           description: OK
           schema:
             type: file
-        401:
-          $ref: '#/definitions/Unauthorized'
         404:
           description: File not found.       
         default:
@@ -611,14 +711,15 @@ paths:
       x-ni-privilege: Read
       x-ni-operation: listFeeds
       tags: [feeds]
-      summary: List all feeds.
+      summary: List all feeds
       description: Returns a JSON array of all of the feeds in the service.
       parameters:
         - in: query
           name: omitPackageReferences
           type: boolean
           required: false
-          description: A value indicating whether the "packageReferences" array for each feed, which contains the ids of all of the packages in that feed, should be omitted. Defaults to false.
+          default: false
+          description: A value indicating whether the "packageReferences" array for each feed, which contains the ids of all of the packages in that feed, should be omitted.
       responses:
         200:
           $ref: '#/definitions/Feeds'
@@ -679,7 +780,8 @@ paths:
         - in: query
           name: deleteUnreferencedPackages
           type: boolean
-          description: If true, any packages in the feed that are no longer referenced will be deleted. Defaults to true.
+          description: If true, any packages in the feed that are no longer referenced will be deleted.
+          default: true
       responses:
         202:
           description: OK
@@ -748,15 +850,18 @@ paths:
         - in: query
           name: omitAttributes
           type: boolean
-          description: If true, the "Attributes" dictionary for the packages will be omitted. Defaults to false.
+          description: If true, the "Attributes" dictionary for the packages will be omitted.
+          default: false
         - in: query
           name: omitFeedReferences
           type: boolean
-          description: If true, the array of feed references will be omitted from each package. Defaults to false.
+          description: If true, the array of feed references will be omitted from each package.
+          default: false
         - in: query
           name: returnUnreferencedOnly
           type: boolean
-          description: A query parameter that determines if only packages without referencing feeds should be returned. Defaults to false.
+          description: A query parameter that determines if only packages without referencing feeds should be returned.
+          default: false
       responses:
         200:
           $ref: '#/definitions/Packages'
@@ -775,11 +880,13 @@ paths:
         - in: query
           name: shouldOverwrite
           type: boolean
-          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten. Defaults to false.
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
         - in: query
           name: ignoreImportErrors
           type: boolean
-          description: A query parameter that determines whether the service should abort the request if errors occur while importing some packages. If true, the service will abort and roll back the request if an error occurs while importing a package. If false, the service will import as many packages as it can, and return an error describing which packages could not be imported. Defaults to false.
+          description: A query parameter that determines whether the service should abort the request if errors occur while importing some packages. If true, the service will abort and roll back the request if an error occurs while importing a package. If false, the service will import as many packages as it can, and return an error describing which packages could not be imported.
+          default: false
         - in: body
           name: feedRequest
           schema:
@@ -807,17 +914,19 @@ paths:
       x-ni-privilege: Write
       x-ni-operation: importPackages
       tags: [feeds, packages]
-      summary: Import packages on a feed.
-      description: Import packages on a feed.
+      summary: Import packages into a feed
+      description: Import packages into a feed.
       parameters:
         - in: query
           name: shouldOverwrite
           type: boolean
-          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten. Defaults to false.
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
         - in: query
           name: ignoreImportErrors
           type: boolean
-          description: A query parameter that determines whether the service should abort the request if errors occur while importing some packages. If true, the service will abort and roll back the request if an error occurs while importing a package. If false, the service will import as many packages as it can, and return an error describing which packages could not be imported. Defaults to false.
+          description: A query parameter that determines whether the service should abort the request if errors occur while importing some packages. If true, the service will abort and roll back the request if an error occurs while importing a package. If false, the service will import as many packages as it can, and return an error describing which packages could not be imported.
+          default: false
         - in: body
           name: feedRequest
           schema:
@@ -852,17 +961,20 @@ paths:
           name: shouldCleanSourceFeeds
           type: boolean
           required: false
-          description: A value indicating whether or not only the most recent version of every package in the source feed should be added to the destination feed. If true, only the most recent version of each package will be added. If false, all versions of each package will be added. Defaults to true.
+          description: A value indicating whether or not only the most recent version of every package in the source feed should be added to the destination feed. If true, only the most recent version of each package will be added. If false, all versions of each package will be added.
+          default: true
         - in: query
           name: shouldOverwrite
           type: boolean
           required: false
-          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten. Defaults to false.
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
         - in: query
           name: ignoreImportErrors
           type: boolean
           required: false
-          description: A query parameter that determines whether the service should abort the request if errors occur while importing some packages. If true, the service will abort and roll back the request if an error occurs while importing a package. If false, the service will import as many packages as it can, and return an error describing which packages could not be imported. Defaults to false.
+          description: A query parameter that determines whether the service should abort the request if errors occur while importing some packages. If true, the service will abort and roll back the request if an error occurs while importing a package. If false, the service will import as many packages as it can, and return an error describing which packages could not be imported.
+          default: false
         - in: body
           name: feedUris
           description: An array containing the URIs of remote feeds whose packages should be added to the destination feed. Appending /Packages to each URI should yield the "Packages" file for that feed.
@@ -903,15 +1015,18 @@ paths:
         - in: query
           name: omitAttributes
           type: boolean
-          description: If true, the "Attributes" dictionary for the package will be omitted. Defaults to false.
+          description: If true, the "Attributes" dictionary for the package will be omitted.
+          default: false
         - in: query
           name: omitFeedReferences
           type: boolean
-          description: If true, the array of feed references will be omitted from each package. Defaults to false.
+          description: If true, the array of feed references will be omitted from each package.
+          default: false
         - in: query
           name: returnUnreferencedOnly
           type: boolean
-          description: A query parameter that determines if only packages without referencing feeds should be returned. Defaults to false.
+          description: A query parameter that determines if only packages without referencing feeds should be returned.
+          default: false
       responses:
         200:
           description: OK
@@ -933,22 +1048,28 @@ paths:
       x-ni-privilege: Read
       x-ni-operation: getPackage
       tags: [packages]
-      summary: Get package details.
+      summary: Get package details
       description: Get package details.
       parameters:
         - in: query
           name: omitAttributes
           type: boolean
-          description: If true, the "Attributes" dictionary for the package will be omitted. Defaults to false.
+          description: If true, the "Attributes" dictionary for the package will be omitted.
+          default: false
           required: false
         - in: query
           name: omitFeedReferences
           type: boolean
-          description: If true, the array of feed references will be omitted from the package. Defaults to false.
+          description: If true, the array of feed references will be omitted from the package.
+          default: false
           required: false
       responses:
         200:
-          description: OK - The requested Package object. Not all of the fields on package objects will be available depending on the package. Not all fields will have content because not all packages will store this information. Do not rely on all of these fields being available in any application as some may be null, and empty string, or not exist of the object. However, key properties such as _id, name, owners, and FileName will never be null.
+          description: |
+            OK - The requested Package object. Not all of the fields on package objects will be available depending on the package.
+            Not all fields will have content because not all packages will store this information.
+            Do not rely on all of these fields being available in any application as some may be null, and empty string, or not exist of the object.
+            However, key properties such as _id, name, owners, and FileName will never be null.
           schema:
             type: object
             properties:
@@ -962,8 +1083,8 @@ paths:
       x-ni-privilege: Write
       x-ni-operation: deletePackage
       tags: [packages]
-      summary: Remove a package.
-      description: Remove a package.
+      summary: Remove a package
+      description: Remove a package. The package will be removed from all of the feeds that reference it, potentially creating feeds with unsatisfied dependencies.
       responses:
         202:
           description: OK
@@ -990,7 +1111,8 @@ paths:
         - in: query
           name: shouldOverwrite
           type: boolean
-          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten. Defaults to false.
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
           required: false
         - in: formData 
           name: filename
@@ -1140,14 +1262,15 @@ paths:
       x-ni-privilege: Write
       x-ni-operation: removePackageReferences
       tags: [feeds, packages]
-      summary: Remove package references.
+      summary: Remove package references
       description: Remove package references.
       parameters:
         - in: query
           name: deleteIfLastReference
           type: boolean
           required: false
-          description: A value indicating whether any packages that are no longer referenced after being removed from the feeds should be deleted. Defaults to true.
+          description: A value indicating whether any packages that are no longer referenced after being removed from the feeds should be deleted.
+          default: true
         - in: body
           name: packageReferences
           description: An array of package IDs to be removed from the feeds.
@@ -1189,17 +1312,20 @@ paths:
           name: shouldCleanSourceFeeds
           type: boolean
           required: false
-          description: A value indicating whether or not only the most recent version of every package in the source feed should be added to the destination feed. If true, only the most recent version of each package will be added. If false, all versions of each package will be added. Defaults to true.
+          description: A value indicating whether or not only the most recent version of every package in the source feed should be added to the destination feed. If true, only the most recent version of each package will be added. If false, all versions of each package will be added.
+          default: true
         - in: query
           name: shouldOverwrite
           type: boolean
           required: false
-          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten. Defaults to false.
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
         - in: query
           name: ignoreImportErrors
           type: boolean
           required: false
-          description: A query parameter that determines whether the service should abort the request if errors occur while importing some packages. If true, the service will abort and roll back the request if an error occurs while importing a package. If false, the service will import as many packages as it can, and return an error describing which packages could not be imported. Defaults to false.
+          description: A query parameter that determines whether the service should abort the request if errors occur while importing some packages. If true, the service will abort and roll back the request if an error occurs while importing a package. If false, the service will import as many packages as it can, and return an error describing which packages could not be imported.
+          default: false
         - in: body
           name: feeds
           description: An array containing the URIs of remote feeds whose packages should be added to the destination feed. Appending /Packages to each URI should yield the "Packages" file for that feed.
@@ -1275,19 +1401,21 @@ paths:
       x-ni-privilege: Write
       x-ni-operation: applyUpdates
       tags: [feeds]
-      summary: Apply updates.
+      summary: Apply updates
       description: Asynchronously applies a set of updates to a feed. Returns the ID of a resource which can be queried to determine the status of the operation. Upon completion, the resource redirects to the modified feed.
       parameters:
         - in: query
           name: shouldOverwrite
           type: boolean
           required: false
-          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten. Defaults to false.
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
         - in: query
           name: ignoreImportErrors
           type: boolean
           required: false
-          description: A query parameter that determines whether the service should abort the request if errors occur while importing some packages. If true, the service will abort and roll back the request if an error occurs while importing a package. If false, the service will import as many packages as it can, and return an error describing which packages could not be imported. Defaults to false.
+          description: A query parameter that determines whether the service should abort the request if errors occur while importing some packages. If true, the service will abort and roll back the request if an error occurs while importing a package. If false, the service will import as many packages as it can, and return an error describing which packages could not be imported.
+          default: false
         - in: body
           name: updateDescriptors
           description: An array containing the update descriptors that should be applied to the feed. Update descriptors should be obtained from a call to the "Check for updates to a feed" route, detailed above. One is free to remove any update descriptors returned from the "Check for updates" route, but modifying them in any other way is not supported.
@@ -1316,7 +1444,7 @@ paths:
       x-ni-privilege: Write
       x-ni-operation: cleanFeed
       tags: [feeds]
-      summary: Clean a feed.
+      summary: Clean a feed
       description: Asynchronously cleans a feed by removing all but the most recent version of every package in the feed. Returns the ID of a resource which can be queried to track the status of the operation. Upon completion, the resource redirects to the modified feed.
       responses:
         202:
@@ -1341,14 +1469,15 @@ paths:
       x-ni-privilege: Write
       x-ni-operation: importStoreItems
       tags: [feeds, store]
-      summary: Import store items.
+      summary: Import store items
       description: Route for importing one or more store items into an existing feed.
       parameters:
         - in: query
           name: shouldOverwrite
           type: string
           required: false
-          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten. Defaults to false.
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
         - in: body
           name: storeItemDescriptors
           schema:
@@ -1377,8 +1506,8 @@ paths:
       x-ni-privilege: Read
       x-ni-operation: listJobs
       tags: [jobs]
-      summary: List all jobs.
-      description: Gets all "jobs" in the service. See the entry for "Get a job" for more information about jobs.
+      summary: List all jobs
+      description: Gets all "jobs" in the service. See the entry for "Get job details" route for more information about jobs.
       parameters:
         - in: query
           name: id
@@ -1424,8 +1553,8 @@ paths:
       x-ni-privilege: Read
       x-ni-operation: getJobs
       tags: [jobs]
-      summary: Get job details.
-      description: Gets a "job," which is a resource that is created to track the status of asynchronous operations, and to redirect the user to the results of such operations when they complete.
+      summary: Get job details
+      description: Gets a job.
       responses:
         200:
           description: OK if the job has not completed.
@@ -1458,7 +1587,7 @@ paths:
       x-ni-privilege: Write
       x-ni-operation: canWrite
       tags: [misc]
-      summary: Check if the logged user can write.
+      summary: Check if the logged user can write
       description: Check if the logged user can write.
       responses:
         200:
@@ -1493,7 +1622,7 @@ paths:
       x-ni-privilege: Read
       x-ni-operation: queryStoreItems
       tags: [store]
-      summary: Query the store items.
+      summary: Query store items
       description: Route for querying for store items.
       parameters:
         - in: query
@@ -1568,12 +1697,14 @@ paths:
         - in: query
           name: shouldOverwrite
           type: boolean
-          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten. Defaults to false.
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
           required: false
         - in: query
           name: split
           type: boolean
           description: A query parameter that determines if the store item should be merged into one feed, or if each feed in the store item should be copied into a separate feed.
+          default: false
           required: false
         - in: body
           name: feedRequest
