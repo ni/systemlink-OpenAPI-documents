@@ -642,6 +642,16 @@ definitions:
     items:
       $ref: '#/definitions/UpdateDescriptor'
 
+responses:
+  JobIdResponse:
+    description: Response with a JobID in it. This is the usual result after executing a write operation.
+    headers:
+      Location:
+        type: string
+        description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
+    schema:
+      $ref: '#/definitions/JobID'
+
 paths:
   /v1/ping:
     get:
@@ -740,13 +750,7 @@ paths:
             $ref: '#/definitions/FeedData'
       responses:
         202:
-          description: OK
-          headers:
-            Location:
-              type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
-          schema:
-            $ref: '#/definitions/JobID'
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -784,13 +788,7 @@ paths:
           default: true
       responses:
         202:
-          description: OK
-          headers:
-            Location:
-              type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
-          schema:
-            $ref: '#/definitions/JobID'
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -823,13 +821,7 @@ paths:
                 example: Feed Description
       responses:
         202:
-          description: OK
-          headers:
-            Location:
-              type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
-          schema:
-            $ref: '#/definitions/JobID'
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -893,13 +885,7 @@ paths:
             $ref: '#/definitions/FeedDataWithURI'
       responses:
         202:
-          description: OK
-          headers:
-            Location:
-              type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
-          schema:
-            $ref: '#/definitions/JobID'
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -933,13 +919,7 @@ paths:
             $ref: '#/definitions/PackageImportDescriptors'
       responses:
         202:
-          description: OK
-          headers:
-            Location:
-              type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
-          schema:
-            $ref: '#/definitions/JobID'
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -993,13 +973,7 @@ paths:
                   example: 5c62bf36781e2b1c7c57daf4
       responses:
         202:
-          description: OK
-          headers:
-            Location:
-              type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
-          schema:
-            $ref: '#/definitions/JobID'
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -1087,13 +1061,7 @@ paths:
       description: Remove a package. The package will be removed from all of the feeds that reference it, potentially creating feeds with unsatisfied dependencies.
       responses:
         202:
-          description: OK
-          headers:
-            Location:
-              type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
-          schema:
-            $ref: '#/definitions/JobID'
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -1204,13 +1172,7 @@ paths:
                 example: Feed Description
       responses:
         202:
-          description: OK
-          headers:
-            Location:
-              type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
-          schema:
-            $ref: '#/definitions/JobID'
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -1241,13 +1203,7 @@ paths:
                   example: 5c62bf36781e2b1c7c57daf4
       responses:
         202:
-          description: OK
-          headers:
-            Location:
-              type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
-          schema:
-            $ref: '#/definitions/JobID'
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -1284,13 +1240,7 @@ paths:
                   example: 5c62bf36781e2b1c7c57daf4
       responses:
         202:
-          description: OK
-          headers:
-            Location:
-              type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
-          schema:
-            $ref: '#/definitions/JobID'
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -1344,13 +1294,7 @@ paths:
                   example: 5c62bf36781e2b1c7c57daf4
       responses:
         202:
-          description: OK
-          headers:
-            Location:
-              type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
-          schema:
-            $ref: '#/definitions/JobID'
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -1380,13 +1324,7 @@ paths:
                   type: string
       responses:
         202:
-          description: OK
-          headers:
-            Location:
-              type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
-          schema:
-            $ref: '#/definitions/JobID'
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -1423,13 +1361,7 @@ paths:
             $ref: '#/definitions/UpdateDescriptorRequest'
       responses:
         202:
-          description: OK
-          headers:
-            Location:
-              type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
-          schema:
-            $ref: '#/definitions/JobID'
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -1448,13 +1380,7 @@ paths:
       description: Asynchronously cleans a feed by removing all but the most recent version of every package in the feed. Returns the ID of a resource which can be queried to track the status of the operation. Upon completion, the resource redirects to the modified feed.
       responses:
         202:
-          description: OK
-          headers:
-            Location:
-              type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
-          schema:
-            $ref: '#/definitions/JobID'
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -1490,13 +1416,7 @@ paths:
                   $ref: '#/definitions/StoreItemDescriptor'
       responses:
         202:
-          description: OK
-          schema:
-            $ref: '#/definitions/JobID'
-          headers:
-            Location:
-              type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -1712,9 +1632,7 @@ paths:
             $ref: '#/definitions/StoreItemRequest'
       responses:
         202:
-          description: OK
-          schema:
-            $ref: '#/definitions/JobID'
+          $ref: '#/responses/JobIdResponse'
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
