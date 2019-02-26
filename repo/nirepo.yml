@@ -697,7 +697,7 @@ definitions:
     type: object
     properties:
       packages:
-        deescription: An array of packages.
+        description: An array of packages.
         type: array
         items:
           $ref: '#/definitions/Package'
