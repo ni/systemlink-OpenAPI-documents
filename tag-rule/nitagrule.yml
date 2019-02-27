@@ -1,0 +1,566 @@
+swagger: '2.0'
+info:
+  version: '1'
+  title: Tag Rule Engine Web Service
+  description: SystemLink Tag Rule Engine Service HTTP API
+  contact:
+    name: National Instruments
+    url: 'https://www.ni.com/systemlink'
+    email: support@ni.com
+basePath: /nitagrule
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  basicAuth:
+    type: basic
+security:
+  - basicAuth: []
+x-ni-routing-key: Skyline.TagRuleEngine
+definitions:
+  Error:
+    description: Contains error information
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+      message:
+        description: Complete error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+    example:
+      name: TagRuleEngine.RuleNotFound
+      code: -253103
+      message: A rule with ID '5c2cf7e0e0d64403b486fcb4' was not found.
+      args: []
+  Operation:
+    description: Operation provided by the API
+    type: object
+    properties:
+      available:
+        type: boolean
+        description: Whether the operation is available to the caller
+      version:
+        type: integer
+        description: Version of the available operation
+    required: [available]
+    example:
+      available: true
+      version: 1
+  V1Operations:
+    title: V1 Operations
+    description: V1 operations
+    type: object
+    properties:
+      operations:
+        description: >-
+          Available operations in the v1 version of the API:
+
+          - deleteRules: The ability to delete tag alarm rules
+
+          - readRules: The ability to query for tag alarm rules
+
+          - writeRules: The ability to create and modify tag alarm rules
+
+        type: object
+        properties:
+          deleteAlarmInstances:
+            $ref: '#/definitions/Operation'
+          readAlarmInstances:
+            $ref: '#/definitions/Operation'
+          writeAlarmInstances:
+            $ref: '#/definitions/Operation'
+  Condition:
+    title: Condition
+    description: A condition which will result in alarms being created or updated when it evaluates to true.
+    type: object
+    required:
+      - setPoints
+      - comparator
+    properties:
+      setPoints:
+        description: Values which the tag's current value will be compared to when determining if the condition
+          evaluates to true or not. Conditions associated with the IN_RANGE and OUT_OF_RANGE comparators will
+          have two set points. All other conditions should have only one set point.
+        type: array
+        items:
+          type: string
+      comparator:
+          type: string
+          description: Operator which will be used when comparing the tag's current value to the set point(s).
+            Note that the CONTAINS and NOT_CONTAINS comparators are only valid for rules associated with string tags.
+            Similarly, LESS_THAN, GREATER_THAN, IN_RANGE, and the other numeric comparators are not valid for rules
+            associated with string tags.
+          enum: [LESS_THAN, LESS_THAN_OR_EQUAL, GREATER_THAN, GREATER_THAN_OR_EQUAL, IN_RANGE, OUT_OF_RANGE,
+            EQUAL, NOT_EQUAL, CONTAINS, NOT_CONTAINS]  
+      deadband:
+        description: The change in signal from the set point necessary to clear the alarm. For example, a rule
+          with a set point of 10, a comparator of GREATER_THAN, and a deadband of 2 will request that alarms
+          be cleared if the tag's values is less than or equal to (10 - 2) = 8. Similarly, if the rule
+          had a comparator of LESS_THAN, the rule would request that alarms be cleared if the tag's value is greater
+          than or equal to (10 + 2) = 12.
+        type: string
+        example: '2'
+      severityLevel:
+        description: An integer in the range [1,4] which specifies the severity level of this condition. Higher numeric
+          values correspond to higher severity levels.
+        type: number
+        minimum: 1
+        maximum: 4
+        example: 2
+      notificationStrategyIds:
+        description: The IDs of the notification strategies which should be triggered if this condition
+          results in alarms being created or increasing in severity.
+        type: array
+        items:
+          type: string
+        example: []
+  CreateOrModifyRuleCommonFields:
+    title: Create Or Modify Common Fields
+    description: Fields which can be used when creating or modifying rules
+    properties:
+      searchPath:
+        description: A string describing which tags the rule applies to. This can take the form of either
+          a single tag's path, or a string containing wildcard characters which can match multiple tags.
+        type: string
+        example: '*.System.Health.DiskUsePercentage'
+      tagDataType:
+        description: The data type of the tags which the rule applies to. If the tagDataType of the rule
+          does not match the tags matched by the searchPath, the rule will not be evaluated.
+        type: string
+        enum: [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
+        example: DOUBLE
+      conditions:
+        description: Array containing one or more conditions which control when the rule creates or clears alarms.
+        type: array
+        items:
+          $ref: '#/definitions/Condition'
+      displayName:
+        description: Optional human-readable identifier for the rule.
+        type: string
+        example: Low Disk Space Rule
+      description:
+        description: Optional human-readable description for the rule.
+        type: string
+        example: Preconfigured rule for monitoring managed systems' disk space
+      alarmInstanceDisplayNameTemplate:
+        description: Template string which will be used to set the displayName field on alarms created
+          by this rule. Values surrounded by angle brackets will be substituted with values from the tag's property
+          dictionary. For example, if an alarmInstanceDisplayNameTemplate contained the string "Excessive vibration on turbine <turbine_number>",
+          and the rule was evaluated against a tag whose property dictionary contained the key "turbine_number" with value "5",
+          then the rule would request that an alarm with display name "Excessive vibration on turbine 5" be created.
+        example: Excessive vibration on turbine <turbine_number>
+        type: string
+      alarmInstanceDescriptionTemplate:
+        description: Template string which will be used to set the description field on alarms created by this rule.
+          Values surrounded by angle brackets will be substituted with values from the tag's property dictionary. See
+          the description of alarmInstanceDisplayNameTemplate above for more information.
+        example: Disk space on <system> is low. Disk usage was <value>% when this alarm was triggered.
+        type: string
+      keywords:
+        description: Words or phrases associated with a rule. Rules can be tagged
+          with keywords to make it easier to find them with queries.
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      properties:
+        description: Key-value-pair metadata associated with a rule. Rules can be tagged with properties
+          to make it easier to find them with queries.
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+  Rule:
+    title: Rule
+    description: A rule which contains one or more conditions which will be evaluated when the tag's
+      matched by the rule's search path are updated.
+    allOf:
+     - type: object
+       properties:
+          id:
+            description: The unique ID of a particular rule.
+            type: string
+            example: 5c33c212e0d6444320d9a9f4
+          disabled:
+            description: A value indicating whether or not the rule is disabled
+            type: boolean
+            example: false
+            default: false
+     - $ref: '#/definitions/CreateOrModifyRuleCommonFields'
+responses:
+  Error:
+    description: Error
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  Unauthorized:
+    description: Not authorized
+    headers:
+      WWW_Authenticate:
+        description: Information for how to authenticate
+        type: string
+paths:
+  /:
+    get:
+      tags: [versioning]
+      summary: API information
+      description: Returns information about API versions and available operations.
+      operationId: RootEndpoint
+      x-ni-request-all-privileges: true
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Version information
+            title: RootEndpointResponse
+            type: object
+            properties:
+              v1:
+                $ref: '#/definitions/V1Operations'
+              version:
+                description: Implementation version of the web service
+                type: string
+  /{version}:
+    parameters:
+      - in: path
+        name: version
+        description: Version of the API to retrieve operations.
+        type: string
+        required: true
+    get:
+      tags: [versioning]
+      summary: API version information
+      description: Returns available operations for a single version of the API.
+      operationId: RootEndpointWithVersion
+      x-ni-request-all-privileges: true
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/V1Operations'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/rules:
+    post:
+      tags: [rules]
+      summary: Create a rule
+      description: Creates a rule.
+      operationId: CreateRule
+      x-ni-operation: writeRules
+      parameters:
+        - in: body
+          name: Request body
+          required: true
+          schema:
+            type: object
+            title: CreateRuleRequestBody
+            required:
+              - searchPath
+              - tagDataTpye
+              - conditions
+            properties:
+              searchPath:
+                description: A string describing which tags the rule applies to. This can take the form of either
+                  a single tag's path, or a string containing wildcard characters which can match multiple tags.
+                type: string
+                example: '*.System.Health.DiskUsePercentage'
+              tagDataType:
+                description: The data type of the tags which the rule applies to. If the tagDataType of the rule
+                  does not match the tags matched by the searchPath, the rule will not be evaluated.
+                type: string
+                enum: [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
+                example: DOUBLE
+              conditions:
+                description: Array containing one or more conditions which control when the rule creates or clears alarms.
+                type: array
+                items:
+                  $ref: '#/definitions/Condition'
+              displayName:
+                description: Optional human-readable identifier for the rule.
+                type: string
+                example: Low Disk Space Rule
+              description:
+                description: Optional human-readable description for the rule.
+                type: string
+                example: Preconfigured rule for monitoring managed systems' disk space
+              alarmInstanceDisplayNameTemplate:
+                description: Template string which will be used to set the displayName field on alarms created
+                  by this rule. Values surrounded by angle brackets will be substituted with values from the tag's property
+                  dictionary. For example, if an alarmInstanceDisplayNameTemplate contained the string 
+                  "Excessive vibration on turbine <turbine_number>", and the rule was evaluated against a tag whose property
+                  dictionary contained the key "turbine_number" with value "5", then the rule would request that an alarm with
+                  display name "Excessive vibration on turbine 5" be created.
+                example: Excessive vibration on turbine <turbine_number>
+                type: string
+              alarmInstanceDescriptionTemplate:
+                description: Template string which will be used to set the description field on alarms created by this rule.
+                  Values surrounded by angle brackets will be substituted with values from the tag's property dictionary. See
+                  the description of alarmInstanceDisplayNameTemplate above for more information.
+                example: Disk space on <system> is low. Disk usage was <value>% when this alarm was triggered.
+                type: string
+              keywords:
+                description: Words or phrases associated with a rule. Rules can be tagged
+                  with keywords to make it easier to find them with queries.
+                type: array
+                items:
+                  type: string
+                example:
+                  - keyword1
+                  - keyword2
+              properties:
+                description: Key-value-pair metadata associated with a rule. Rules can be tagged with properties
+                  to make it easier to find them with queries.
+                type: object
+                additionalProperties:
+                  type: string
+                example:
+                  key1: value1
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            title: CreateRuleResponse
+            properties:
+              id:
+                description: The ID of the created rule
+                type: string
+                example: 5c40ec55e0d6441168b4c543
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/rules/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: Rule ID
+        type: string
+        required: true
+    get:
+      tags: [rules]
+      summary: Get a rule
+      description: Gets a rule by ID.
+      operationId: GetRule
+      x-ni-operation: readRules
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Rule'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      tags: [rules]
+      summary: Delete a rule
+      description: Deletes a rule by ID
+      operationId: DeleteRule
+      x-ni-operation: deleteRules
+      responses:
+        204:
+          description: No Content
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      tags: [rules]
+      summary: Modify a rule
+      description: Modifies a rule. All fields specified will have their values replaced
+        with the given values.
+      operationId: ModifyRule
+      x-ni-operation: writeRules
+      parameters:
+        - in: body
+          name: Request body
+          required: true
+          schema:
+            allOf:
+            - type: object
+              properties:
+                disabled:
+                  description: A value indicating whether or not the rule is disabled
+                  type: boolean
+                  example: false
+            - $ref: '#/definitions/CreateOrModifyRuleCommonFields'
+      responses:
+        204:
+          description: No Content
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/delete-rules:
+    post:
+      tags: [rules]
+      summary: Delete rules
+      description: Delete multiple rules
+      operationId: DeleteRules
+      x-ni-operation: deleteRules
+      parameters:
+        - in: body
+          name: Request body
+          required: true
+          schema:
+            properties:
+              ids:
+                description: The IDs of the rules which should be deleted
+                type: array
+                items:
+                  type: string
+                example: [5c40ec55e0d6441168b4c543, 5c40ec55e0d6441168b4c543]
+      responses:
+        204:
+          description: No Content
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/toggle-rules:
+    post:
+      tags: [rules]
+      summary: Toggle rules
+      description: Enables or disables multiple rules.
+      operationId: ToggleRules
+      x-ni-operation: writeRules
+      parameters:
+        - in: body
+          name: Request body
+          required: true
+          schema:
+            properties:
+              ids:
+                description: The IDs of the rules which should be toggled
+                type: array
+                items:
+                  type: string
+                example: [5c40ec55e0d6441168b4c543, 5c40ec55e0d6441168b4c543]
+              disabled:
+                description: New value for the "disabled" field of the rules to be modified
+                type: boolean
+                example: false
+      responses:
+        200:
+          description: OK
+          schema:
+            properties:
+              toggled:
+                description: The IDs of the rules which were toggled
+                type: array
+                items:
+                  type: string
+                example: [5c40ec55e0d6441168b4c543, 5c40ec55e0d6441168b4c544]
+              notFoundIds:
+                description: The IDs of the rules which were not found
+                type: array
+                items:
+                  type: string
+                example: [5c40ec55e0d6441168b4c541]
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/query-rules:
+    post:
+      tags: [rules]
+      summary: Query rules
+      description: Queries for rules.
+      operationId: QueryRules
+      x-ni-operation: readRules
+      parameters:
+        - in: body
+          name: Request body
+          required: true
+          schema:
+            properties:
+              displayName:
+                description: Display name query. Returns rules whose display name field contains the query
+                  string, without taking case into account.
+                type: string
+                example: low disk space
+              description:
+                description: Description query. Returns rules whose description field contains the query
+                  string, without taking case into account.
+                type: string
+                example: turbine 5
+              tagPath:
+                description: Tag path query. If the query string contains wildcard characters, the service will return
+                  rules whose search paths either intersect with, or are matched by, the query string. If the query
+                  string does not contain wildcard characters, the service will return rules whose search paths match
+                  the query string.
+                type: string
+                example: System1.System.Health.DiskUsePercentage
+              properties:
+                type: object
+                description: Property query. The service will return instances whose *properties* fields contain all
+                  of the specified key/value pairs.
+                additionalProperties:
+                  type: string
+                example:
+                  key1: value1
+              keywords:
+                type: array
+                description: Keyword query. The service will return instances whose *keywords* fields contain all of
+                  the specified keywords.
+                items:
+                  type: string
+                example:
+                  - keyword1
+                  - keyword2
+              skip:
+                description: Number of entries to skip in the response list. Typically used in combination with the
+                  take parameter to implement pagination.
+                type: integer
+                default: 0
+              take:
+                description: Number of entries to include in the response list. Typically used in combination with
+                  the skip parameter to implement pagination.
+                type: integer
+                default: 10000
+                maximum: 10000
+      responses:
+        200:
+          description: OK
+          schema:
+            properties:
+              rules:
+                description: The rules matched by the filter criteria in the request body.
+                type: array
+                items:
+                  $ref: '#/definitions/Rule'
+              totalCount:
+                description: The total number of rules which matched the filter criteria.
+                type: integer
+                example: 1
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+ 
