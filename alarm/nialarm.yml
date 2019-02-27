@@ -535,7 +535,7 @@ paths:
                 type: array
                 items:
                   type: string
-                example: [5c40ec55e0d6441168b4c543, 5c40ec55e0d6441168b4c543]
+                example: [System1.Health.DiskSpaceAlarm, System2.Health.DiskSpaceAlarm]
               forceClear:
                 description: Whether or not the affected alarm instances should have their *clear* field set
                   to true.
@@ -586,8 +586,8 @@ paths:
       parameters:
         - in: body
           name: Request body
-          description: Container which holds data for the request. For requests which do not result in a 
-            new alarm instance being created, all fields other than *alarmId* and *transition* are ignored.
+          description: Container which holds data for the request. For requests which result in an update to 
+            an existing alarm instance, all fields other than *alarmId* and *transition* are ignored.
           schema:
             type: object
             title: CreateOrUpdateInstanceRequest
@@ -670,10 +670,10 @@ paths:
             $ref: '#/definitions/Error'
         default:
           $ref: '#/responses/Error'
-  /v1/instances/{id}:
+  /v1/instances/{instanceId}:
     parameters:
       - in: path
-        name: id
+        name: instanceId
         description: Instance ID
         type: string
         required: true
@@ -701,10 +701,10 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/instances/{id}/notes:
+  /v1/instances/{instanceId}/notes:
     parameters:
       - in: path
-        name: id
+        name: instanceId
         description: Instance ID
         type: string
         required: true
