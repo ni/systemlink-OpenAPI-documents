@@ -41,14 +41,14 @@ definitions:
         example: "Unable to download feed index file at URI 'http://google.ro/Packages'."
       args:
         type: array
-        description: Array of arguments for the error
+        description: Array of arguments for the error.
         items:
           type: string
-          description: Argument for the error
+          description: Argument for the error.
           example: "http://google.ro/Packages"
       innerErrors:
         type: array
-        description: Internal errors that occured in the service
+        description: Internal errors that occured in the service.
         items:
           $ref: '#/definitions/JobError'
   Job:
@@ -95,7 +95,7 @@ definitions:
       resourceId:
         description: The resourceId that this job points to.
         type: string
-        example: 
+        example: 58339eb8e0d6442db09f03f5
       returnType:
         description: The resource that this job will return when completed.
         type: string
@@ -106,26 +106,26 @@ definitions:
     type: object
     properties:
       name:
-        description: String error code
+        description: String error code.
         type: string
         example: Repository.StoreApiException
       code:
-        description: Numeric error code
+        description: Numeric error code.
         type: integer
         example: -251340
       message:
-        description: Complete error message
+        description: Complete error message.
         type: string
         example: "Unable to download feed index file at URI 'http://google.ro/Packages'."
       args:
-        description: Positional argument values for the error code
+        description: Positional argument values for the error code.
         type: array
         items:
           type: string
           example: "http://google.ro/Packages"
       innerErrors:
         type: array
-        description: Internal errors that occured in the service
+        description: Internal errors that occured in the service.
         items:
           $ref: '#/definitions/ErrorObject'
   Error:
@@ -144,27 +144,27 @@ definitions:
     description: This object defined what packages to be imported into the feed from a remote feed.
     properties:
       architecture:
-        description: The architecture of th package
+        description: The architecture of th package.
         type: string
         example: x64
       description:
-        description: The description of the package
+        description: The description of the package.
         type: string
         example: Enter description here
       feedUri:
-        description: The feed uri from where to import the package
+        description: The feed uri from where to import the package.
         type: string
         example: "/path/to/feed"
       packageName:
-        description: The package name
+        description: The package name.
         type: string
         example: Package Name
       packageUri:
-        description: The package uri
+        description: The package uri.
         type: string
         example: "/path/to/package"
       version:
-        description: The package version
+        description: The package version.
         type: string
         example: "1.2.3"
   PackageImportDescriptors:
@@ -196,7 +196,7 @@ definitions:
               example: "1"
             value:
               type: string
-              description: The architecture that this package can run on
+              description: The architecture that this package can run on.
               example: "64-bit"
       languages:
         type: array
@@ -230,7 +230,7 @@ definitions:
               example: LabVIEW NXG
             shortDescription:
               type: string
-              description: A short description of the product
+              description: A short description of the product.
               example: LabVIEW NXG enables engineers to quickly automate hardware, customize tests to project specifications, and easily view measurement results from anywhere.
             updateDate:
               type: string
@@ -238,15 +238,15 @@ definitions:
               example: '2018-01-23T14:33:29.000-06:00'
             packageName:
               type: string
-              description: The name of the package to installed
+              description: The name of the package to installed.
               example: ni-labview-nxg-2.0.0
             packageVersion:
               type: string
-              description: The version of the package to installed
+              description: The version of the package to installed.
               example: 5.3.1.49156-0+f4
             architecture:
               type: string
-              description: The architecture this product works on
+              description: The architecture this product works on.
               example: windows_x64
             preSelect:
               type: boolean
@@ -306,8 +306,12 @@ definitions:
     properties:
       downloadItemVersion:
         type: string
+        example: '1.2.3'
+        description: The version of the download item.
       productVersionedId:
         type: string
+        example: 'LVNXG210SUITE'
+        description: The id of the product.
       storeItemInstallers:
         type: array
         items:
@@ -318,115 +322,123 @@ definitions:
     properties:
       packageName:
         type: string
+        example: ni-svcloc
+        description: The name of the package.
       operation:
         type: string
         enum:
           - ADD
           - UPGRADE
+        example: UPGRADE
+        description: The operation type.
       fromVersion:
         type: string
+        example: 17.0.0.7-0+d7
+        description: The old version.
       toVersion:
         type: string
+        example: 17.0.0.8-0+d8
+        description: The new version.
       packageUri:
         type: string
+        example: path/to/package
+        description: The path to the package.
       packageId:
         type: string
+        example: PackageId
+        description: The package id.
       packageToReplace:
         type: string
+        example: 58339eb8e0d6442db09f03f5
+        description: The package to replace reference id.
       destinationFeedId:
         type: string
         description: The feed id pointing to the feed to be updated.
+        example: 58339eb7e0d6442db09f03ec
       isLocal:
         type: boolean
-    example:
-      packageName: ni-svcloc
-      operation: UPGRADE
-      fromVersion: 17.0.0.7-0+d7
-      toVersion: 17.0.0.8-0+d8
-      packageUri: path/to/package
-      packageId: PackageId
-      packageToReplace: 58339eb8e0d6442db09f03f5
-      destinationFeedId: 58339eb7e0d6442db09f03ec
-      isLocal: false
+        description: If it is local or remote.
+        example: false
   FeedData:
     type: object
     properties:
       feedName:
         type: string
         description: A string value representing the feed's name.
+        example: Feed Name
       description:
         type: string
         description: A short description of the feed.
+        example: Enter description here
       platform:
         $ref: '#/definitions/Platform'
-    example:
-      feedName: Feed Name
-      description: Enter description here
-      platform: windows
   FeedDataWithURI:
     type: object
     properties:
       name:
         type: string
         description: A string value representing the feed's name.
+        example: Feed Name
       description:
         type: string
         description: A short description of the feed.
+        example: Enter description here
       platform:
         $ref: '#/definitions/Platform'
       uri:
         type: string
-        description: The string uri of the feed to replicate. Appending /Packages to the URI should yield the "Packages" file of the feed.        
-    example:
-      name: Feed Name
-      description: Enter description here
-      platform: windows
-      uri: /path/to/feed
+        description: 'The string uri of the feed to replicate. Appending /Packages to the URI should yield the "Packages" file of the feed.'
+        example: '/path/to/feed'
   StoreItemRequest:
     type: object
     properties:
       storeItemId:
         type: string
         description: The ID of the store item to replicate.
+        example: '468'
       downloadItemVersion:
         type: string
         description: The version of the store item to replicate.
+        example: '1.0'
       storeItemInstallerGuid:
         type: string
         description: Value uniquely identifying the specific store item installer to replicate.
+        example: LABVIEWPKGBLDR10
       feedName:
         type: string
         description: If "split" is false, the name of the feed which will be created. If "split" is true, this field is ignored.
+        example: Feed Name
       description:
         type: string
         description: If "split" is false, the description of the feed which will be created. If "split" is true, this field is ignored.
-    example:
-      storeItemId: '468'
-      downloadItemVersion: '1.0'
-      storeItemInstallerGuid: LABVIEWPKGBLDR10
-      feedName: Feed Name
-      description: Feed Description
+        example: Feed Description
   StoreItem:
     type: object
     properties:
       id:
         type: string
+        description: The id of the store item.
         example: 1.0
       storeItemName:
         type: string
+        description: The name of the store item.
         example: LabVIEW Package Builder
       shortDescription:
         type: string
         example: LabVIEW Package Builder adds NI Package creation capabilities to LabVIEW Application Builder.
+        description: The short description of the store item.
       longDescription:
         type: string
-        example: LabVIEW Package Builder enables LabVIEW users to create Packages by adding a new Build Specification option in Application Builder. Packages provide a standard container for the distribution of executables, VIs, libraries, and other supporting files. LabVIEW must be installed prior to installing LabVIEW Package Builder. 
+        example: LabVIEW Package Builder enables LabVIEW users to create Packages by adding a new Build Specification option in Application Builder. Packages provide a standard container for the distribution of executables, VIs, libraries, and other supporting files. LabVIEW must be installed prior to installing LabVIEW Package Builder.
+        description: The long description of the store item.
       iconUri:
         type: string
-        example: http://s7d5.scene7.com/is/image/ni/Generic_NI?$ni-icon-pm$
+        example: 'http://s7d5.scene7.com/is/image/ni/Generic_NI?$ni-icon-pm$'
+        description: The icon location of the store item.
       isSuite:
         type: boolean
         example: false
+        description: If this store item is a suite.
       downloadItems:
         type: array
         items:
@@ -437,16 +449,15 @@ definitions:
       storeItemId:
         type: string
         description: The ID of the store item to replicate.
+        example: '1.0'
       downloadItemVersion:
         type: string
         description: The version of the store item to replicate.
+        example: '1.0'
       storeItemInstallerGuid:
         type: string
         description: Value uniquely identifying the specific store item installer to replicate.
-    example:
-      storeItemId: '1.0'
-      downloadItemVersion: '1.0'
-      storeItemInstallerGuid: LABVIEWPKGBLDR10
+        example: LABVIEWPKGBLDR10
   UpdateDescriptorRequest:
     type: object
     description: An array of update descriptors.
@@ -615,7 +626,7 @@ definitions:
               example: "ni-teststand-2017-tools (>= 17.0.0)"
           priority:
             type: number
-            description: The priority of the package
+            description: The priority of the package.
             example: 4
           provides:
             type: array
@@ -741,6 +752,7 @@ paths:
     parameters:
       - in: path
         name: pathToFile
+        description: The path to the file to download.
         type: string
         required: true
         x-example: "filePath"
@@ -754,7 +766,7 @@ paths:
         - application/octet-stream
       responses:
         200:
-          description: OK
+          description: The request has succeeded.
           schema:
             type: file
         404:
@@ -765,6 +777,7 @@ paths:
     parameters:
       - in: path
         name: pathToPackage
+        description: The path to the file to download.
         type: string
         required: true
         x-example: "pathToPackage.extension"
@@ -778,7 +791,7 @@ paths:
         - application/octet-stream
       responses:
         200:
-          description: OK
+          description: The request has succeeded.
           schema:
             type: file
         404:
@@ -830,6 +843,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -869,6 +883,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -905,6 +920,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -972,6 +988,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1009,6 +1026,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1017,7 +1035,7 @@ paths:
       x-ni-operation: importFeeds
       tags: [feeds]
       summary: Import feeds into an existing feed
-      description: Asynchronously imports feeds into an existing feed. Returns the ID of a resource which can be queried to track the status of the operation. Same as /v1/feeds/{id}/import
+      description: Asynchronously imports feeds into an existing feed. Returns the ID of a resource which can be queried to track the status of the operation. Same as /v1/feeds/{id}/import.
       parameters:
         - in: query
           name: shouldCleanSourceFeeds
@@ -1087,7 +1105,7 @@ paths:
           default: false
       responses:
         200:
-          description: OK
+          description: The request has succeeded.
           schema:
             type: array
             items:
@@ -1100,6 +1118,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1125,7 +1144,7 @@ paths:
       responses:
         200:
           description: |
-            OK - The requested Package object. Not all of the fields on package objects will be available depending on the package.
+            The request has succeeded. - The requested Package object. Not all of the fields on package objects will be available depending on the package.
             Not all fields will have content because not all packages will store this information.
             Do not rely on all of these fields being available in any application as some may be null, and empty string, or not exist of the object.
             However, key properties such as _id, name, owners, and FileName will never be null.
@@ -1186,7 +1205,7 @@ paths:
           required: false
       responses:
         202:
-          description: OK
+          description: The request has succeeded.
           headers:
             Location:
               type: string
@@ -1222,7 +1241,7 @@ paths:
                 description: The URI of the feed to get package import descriptors from.
       responses:
         200:
-          description: OK
+          description: The request has succeeded.
           schema:
             $ref: '#/definitions/PackageImportDescriptors'
         400:
@@ -1235,6 +1254,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1271,6 +1291,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1305,6 +1326,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1345,6 +1367,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1402,6 +1425,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1435,6 +1459,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1475,6 +1500,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1495,6 +1521,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1542,25 +1569,25 @@ paths:
           name: id
           type: string
           required: false
-          description: A comma-delimited list of job ids
+          description: A comma-delimited list of job ids.
         - in: query
           name: operation
           type: string
           required: false
-          description: A comma-delimited list of operations
+          description: A comma-delimited list of operations.
         - in: query
           name: status
           type: string
           required: false
-          description: A comma-delimited list of statuses
+          description: A comma-delimited list of statuses.
         - in: query
           name: resourceId
           type: string
           required: false
-          description: A comma-delimited list of resource ids
+          description: A comma-delimited list of resource ids.
       responses:
         200:
-          description: OK
+          description: The request has succeeded.
           schema:
             type: object
             properties:
@@ -1576,6 +1603,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1584,10 +1612,10 @@ paths:
       x-ni-operation: getJobs
       tags: [jobs]
       summary: Get job details
-      description: Gets a job.
+      description: Gets a job with a specific identifier.
       responses:
         200:
-          description: OK if the job has not completed.
+          description: The request has succeeded. - If the job has not completed.
           headers:
             Location:
               type: string
@@ -1621,7 +1649,7 @@ paths:
       description: Check if the logged user can write.
       responses:
         200:
-          description: OK
+          description: The request has succeeded.
         401:
           $ref: '#/definitions/Unauthorized'            
         default:
@@ -1630,6 +1658,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1638,10 +1667,10 @@ paths:
       x-ni-operation: getUpdateDescriptors
       tags: [updates]
       summary: Retrieve updates for a feed
-      description: Retrieve updates for a feed
+      description: Retrieve updates for a feed.
       responses:
         200:
-          description: OK
+          description: The request has succeeded.
           schema:
             $ref: '#/definitions/UpdateDescriptorResponse'
         401:
@@ -1673,7 +1702,7 @@ paths:
           required: false
       responses:
         200:
-          description: OK
+          description: The request has succeeded.
           schema:
             type: object
             properties:
@@ -1697,6 +1726,7 @@ paths:
     parameters:
       - in: path
         name: id
+        description: The id of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1705,10 +1735,10 @@ paths:
       x-ni-operation: getStoreItems
       tags: [store]
       summary: Get a store item
-      description: Route for getting an individual store item
+      description: Route for getting an individual store item.
       responses:
         200:
-          description: OK
+          description: The request has succeeded.
           schema:
             type: object
             properties:
