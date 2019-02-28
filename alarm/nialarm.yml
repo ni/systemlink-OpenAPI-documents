@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   version: '1'
   title: Alarm Web Service
-  description: SystemLink Alarm Service HTTP API
+  description: SystemLink Alarm Service HTTP API. Only available on SystemLink Server.
   contact:
     name: National Instruments
     url: 'https://www.ni.com/systemlink'
@@ -414,11 +414,13 @@ definitions:
             *alarmId*, and then only return the most recent instance for each grouping. In this context,
             recency is based on when the alarm instance occurred, not when it was last updated.
           type: boolean
+          default: false
         orderBy:
           description: Whether or not results should be sorted in ascending or descending order relative to
             the alarm instance's *updatedAt* field.
           type: string
           enum: [DATE_UPDATED_FORWARD, DATE_UPDATED_BACKWARD]
+          default: DATE_UPDATED_FORWARD
         skip:
           description: Number of entries to skip in the response list. Typically used in combination with the
             take parameter to implement pagination.
@@ -535,7 +537,7 @@ paths:
                 type: array
                 items:
                   type: string
-                example: [5c40ec55e0d6441168b4c543, 5c40ec55e0d6441168b4c543]
+                example: [System1.Health.DiskSpaceAlarm, System2.Health.DiskSpaceAlarm]
               forceClear:
                 description: Whether or not the affected alarm instances should have their *clear* field set
                   to true.
@@ -575,6 +577,8 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/Error'
+        default:
+          $ref: '#/responses/Error'
   /v1/instances:
     post:
       tags: [alarm instances]
@@ -586,8 +590,8 @@ paths:
       parameters:
         - in: body
           name: Request body
-          description: Container which holds data for the request. For requests which do not result in a 
-            new alarm instance being created, all fields other than *alarmId* and *transition* are ignored.
+          description: Container which holds data for the request. If an alarm instance is being updated, only
+            alarmId and transition are applied.
           schema:
             type: object
             title: CreateOrUpdateInstanceRequest
@@ -670,10 +674,10 @@ paths:
             $ref: '#/definitions/Error'
         default:
           $ref: '#/responses/Error'
-  /v1/instances/{id}:
+  /v1/instances/{instanceId}:
     parameters:
       - in: path
-        name: id
+        name: instanceId
         description: Instance ID
         type: string
         required: true
@@ -688,6 +692,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/AlarmInstance'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
     delete:
       tags: [alarm instances]
       summary: Delete an alarm instance
@@ -701,10 +709,10 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/instances/{id}/notes:
+  /v1/instances/{instanceId}/notes:
     parameters:
       - in: path
-        name: id
+        name: instanceId
         description: Instance ID
         type: string
         required: true
