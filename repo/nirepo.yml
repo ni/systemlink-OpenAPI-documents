@@ -82,7 +82,7 @@ definitions:
           - JOB_OPERATION_COUNT
         example: REPLICATE_FEED
       status:
-        description: What running state is the job in.
+        description: What state is the job in.
         type: string
         enum: [PENDING, RUNNING, SUCCEEDED, FAILED, COMPLETED_WITH_ERROR]
         example: FAILED
@@ -93,7 +93,7 @@ definitions:
         type: string
         example: "2019-01-30T15:09:52.391Z"
       resourceId:
-        description: The resourceId that this job points to.
+        description: The ID of the feed or package which this job created or modified.
         type: string
         example: 58339eb8e0d6442db09f03f5
       returnType:
@@ -116,13 +116,13 @@ definitions:
       message:
         description: Complete error message.
         type: string
-        example: "Unable to download feed index file at URI 'http://google.ro/Packages'."
+        example: "Unable to download feed index file at URI 'http://download.ni.com/Packages'."
       args:
         description: Positional argument values for the error code.
         type: array
         items:
           type: string
-          example: "http://google.ro/Packages"
+          example: "http://download.ni.com/Packages"
       innerErrors:
         type: array
         description: Internal errors that occured in the service.
@@ -141,10 +141,10 @@ definitions:
     example: windows
   PackageImportDescriptor:
     type: object
-    description: This object defined what packages to be imported into the feed from a remote feed.
+    description: This object defines what packages need to be imported into the feed from a remote feed.
     properties:
       architecture:
-        description: The architecture of th package.
+        description: The architecture of the package.
         type: string
         example: x64
       description:
@@ -238,20 +238,20 @@ definitions:
               example: '2018-01-23T14:33:29.000-06:00'
             packageName:
               type: string
-              description: The name of the package to installed.
+              description: The name of the package to install.
               example: ni-labview-nxg-2.0.0
             packageVersion:
               type: string
-              description: The version of the package to installed.
+              description: The version of the package to install.
               example: 5.3.1.49156-0+f4
             architecture:
               type: string
               description: The architecture this product works on.
               example: windows_x64
             preSelect:
-              type: boolean
-              description: If the product will be preselected.
-              example: yes
+              type: string
+              description: yes if the product will be preselected, no overwise.
+              example: "yes"
             repositories:
               type: array
               description: An array containing information about the repositories and the packages to install from them.
@@ -276,7 +276,7 @@ definitions:
                   repositoryPath:
                     type: string
                     description: The path to the repository where the package is found.
-                    example: "http://download-preview.ni.com/products/ni-labview-nxg-2.0.0/2.1/released-critical"
+                    example: "http://download.ni.com/products/ni-labview-nxg-2.0.0/2.1/released-critical"
                   feedType:
                     type: string
                     enum: [RELEASED, RELEASED-CRITICAL]
@@ -353,7 +353,7 @@ definitions:
         description: The package to replace reference id.
       destinationFeedId:
         type: string
-        description: The feed id pointing to the feed to be updated.
+        description: The ID of the feed which will be modified.
         example: 58339eb7e0d6442db09f03ec
       isLocal:
         type: boolean
@@ -490,10 +490,10 @@ definitions:
         $ref: '#/definitions/Platform'
       packageReferences:
         type: array
-        description: An array containing the package references of this feed.
+        description: An array containing the IDs of the packages in this feed.
         items:
           type: string
-          description: The reference to a package.
+          description: The ID of a package.
           example: "5c652e1f781e2b05cc4d589e"
       lastUpdated:
         type: string
@@ -501,7 +501,7 @@ definitions:
         example: "2019-01-28T14:37:55.043000Z"
       ready:
         type: boolean
-        description: If the job that creates this feed has finished running or not.
+        description: If the job that creates this feed is completed.
         example: true
   Unauthorized:
     type: string
@@ -538,7 +538,7 @@ definitions:
         example: "files/packages/ni-securityupdate-kb67l8lcqw-killbits_2.0.0.22-0+d22_windows_x64.nipkg"
       feedReferences:
         type: array
-        description: An array with references to the feed that contain this package.
+        description: An array containing the IDs of the feeds which reference this package.
         items:
           type: string
           description: A reference to the feed that contains this package.
@@ -659,7 +659,7 @@ definitions:
             example: Infrastructure
           size:
             type: number
-            description: The size of the package.
+            description: The size of the package(bytes).
             example: 750070
           source:
             type: string
@@ -741,7 +741,7 @@ paths:
         204:
           description: The service is up.
         302:
-          description: The user does not have the required priviledge.
+          description: The user does not have the required privilege.
         404:
           description: Service is down.
         500:
@@ -1176,7 +1176,7 @@ paths:
       x-ni-operation: uploadPackage
       tags: [packages]
       summary: Upload packages to the pool
-      description: Asynchronously uploads packages to the service's package pool. Returns an array of IDs of resource which can be queried to track the status of each upload operation.
+      description: Asynchronously uploads packages to the service's package pool. Returns an array of IDs of resources which can be queried to track the status of each upload operation.
       consumes:
         - multipart/form-data
       parameters:
