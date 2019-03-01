@@ -38,14 +38,14 @@ definitions:
       message:
         type: string
         description: Complete error message.
-        example: "Unable to download feed index file at URI 'http://google.ro/Packages'."
+        example: "Unable to download feed index file at URI 'http://download.ni.com/Packages'."
       args:
         type: array
         description: Array of arguments for the error.
         items:
           type: string
           description: Argument for the error.
-          example: "http://google.ro/Packages"
+          example: "http://download.ni.com/Packages"
       innerErrors:
         type: array
         description: Internal errors that occured in the service.
