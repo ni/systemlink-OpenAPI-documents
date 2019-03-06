@@ -129,7 +129,7 @@ definitions:
   TagDataType:
     title: Tag Data Type
     description: The data type of the tags which a rule applies to. Rules are only evaluated
-      against tags whose data type matches their tagDataType.
+      against tags whose data type matches their *tagDataType*.
     type: string
     enum: [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
     example: DOUBLE
@@ -158,23 +158,23 @@ definitions:
     type: string
     example: Preconfigured rule for monitoring managed systems' disk space
   AlarmInstanceDisplayNameTemplate:
-    description: Template string which will be used to set the displayName field on alarms created
+    description: Template string which will be used to set the *displayName* field on alarms created
       by a rule. Values surrounded by angle brackets will be substituted with values from the tag's property
-      dictionary. For example, if an alarmInstanceDisplayNameTemplate contained the string "Excessive vibration
+      dictionary. For example, if an *alarmInstanceDisplayNameTemplate* contained the string "Excessive vibration
       on turbine <turbine_number>", and the rule was evaluated against a tag whose property dictionary
       contained the key "turbine_number" with value "5", then the rule would request that an alarm with 
       display name "Excessive vibration on turbine 5" be created.
     example: Excessive vibration on turbine <turbine_number>
     type: string
   AlarmInstanceDescriptionTemplate:
-    description: Template string which will be used to set the description field on alarms created by a rule.
+    description: Template string which will be used to set the *description* field on alarms created by a rule.
       Values surrounded by angle brackets will be substituted with values from the tag's property dictionary.
       See the description of AlarmInstanceDisplayNameTemplate for more information.
     example: Disk space on <system> is low. Disk usage was <value>% when this alarm was triggered.
     type: string
   Keywords:
-    description: Words or phrases associated with a rule. Rules can be tagged
-      with keywords to make it easier to find them with queries.
+    description: Words or phrases associated with a rule. Rules can be taggedwith keywords to make it easier
+      to find them with queries.
     type: array
     items:
       type: string
@@ -182,8 +182,8 @@ definitions:
       - keyword1
       - keyword2
   Properties:
-    description: Key-value-pair metadata associated with a rule. Rules can be tagged with properties
-      to make it easier to find them with queries.
+    description: Key-value-pair metadata associated with a rule. Rules can be tagged with properties to make
+      it easier to find them with queries.
     type: object
     additionalProperties:
       type: string
@@ -493,12 +493,12 @@ paths:
           schema:
             properties:
               displayName:
-                description: Display name query. Returns rules whose *displayName* field contains the query
+                description: Display name query. Returns rules whose *displayName* fields contain the query
                   string, without taking case into account.
                 type: string
                 example: low disk space
               description:
-                description: Description query. Returns rules whose *description) field contains the query
+                description: Description query. Returns rules whose *description* fields contain the query
                   string, without taking case into account.
                 type: string
                 example: turbine 5
@@ -516,7 +516,7 @@ paths:
                 example: System1.System.Health.DiskUsePercentage
               properties:
                 type: object
-                description: Property query. The service will return instances whose *properties* fields
+                description: Property query. The service will return rules whose *properties* fields
                   contain all of the specified key/value pairs.
                 additionalProperties:
                   type: string
@@ -524,7 +524,7 @@ paths:
                   key1: value1
               keywords:
                 type: array
-                description: Keyword query. The service will return instances whose *keywords* fields contain
+                description: Keyword query. The service will return rules whose *keywords* fields contain
                   all of the specified keywords.
                 items:
                   type: string
