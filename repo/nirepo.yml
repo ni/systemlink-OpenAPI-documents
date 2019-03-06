@@ -28,7 +28,7 @@ x-ni-privilege-application: nirepo
 
 definitions:
   JobError:
-    description: The error of the job or null.
+    description: Contains error information about the job.
     type: object
     properties:
       name:
@@ -44,7 +44,7 @@ definitions:
         description: Array of arguments for the error.
         items:
           type: string
-          description: Argument for the error.
+          description: Positional argument values for the error code.
           example: "http://download.ni.com/Packages"
       innerErrors:
         type: array
@@ -52,15 +52,15 @@ definitions:
         items:
           $ref: '#/definitions/JobError'
   Job:
-    description: A resource that is created to track the status of asynchronous operations, and to redirect the user to the results of such operations when they complete.
+    description: A resource, such as a package or feed, created to track the status of asynchronous operations and redirect the user to the results of such operations when they complete.
     type: object
     properties:
       id:
-        description: The id of the job. Use this to get more informations about the job as it runs.
+        description: The unique ID of the job. Use this to get more information about the job as it runs.
         type: string
         example: 5c51be40781e2b0ad0b0108c
       operation:
-        description: The type of the job.
+        description: The type of job you want to execute.
         type: string
         enum:
           - CREATE_FEED
@@ -82,7 +82,7 @@ definitions:
           - JOB_OPERATION_COUNT
         example: REPLICATE_FEED
       status:
-        description: What state is the job in.
+        description: The state in which the job is in.
         type: string
         enum: [PENDING, RUNNING, SUCCEEDED, FAILED, COMPLETED_WITH_ERROR]
         example: FAILED
@@ -97,7 +97,7 @@ definitions:
         type: string
         example: 58339eb8e0d6442db09f03f5
       returnType:
-        description: The resource that this job will return when completed.
+        description: The type of resource, such as a package or feed, that this job will return when completed.
         type: string
         enum: [FEED, FEEDS, PACKAGE, UPDATE_DESCRIPTORS, SIMPLE]
         example: FEED
@@ -137,11 +137,11 @@ definitions:
   Platform:
     type: string
     enum: [windows, ni-linux-rt]
-    description: "Depending on the platform you select, you will be able to use the following package extensions: .nipkg for windows feeds, .ipk and .deb for ni-linux-rt feeds."
+    description: "Depending on the platform you select, you can only use specific package extensions. For Windows feeds, you must use .nipkg. For NI Linux RT feeds, you must use .ipk or .deb."
     example: windows
   PackageImportDescriptor:
     type: object
-    description: This object defines what packages need to be imported into the feed from a remote feed.
+    description: A defined list of packages that need to be imported into the feed from a remote feed.
     properties:
       architecture:
         description: The architecture of the package.
@@ -152,7 +152,7 @@ definitions:
         type: string
         example: Enter description here
       feedUri:
-        description: The feed uri from where to import the package.
+        description: The path to the feed.
         type: string
         example: "/path/to/feed"
       packageName:
@@ -160,7 +160,7 @@ definitions:
         type: string
         example: Package Name
       packageUri:
-        description: The package uri.
+        description: The path to the package.
         type: string
         example: "/path/to/package"
       version:
@@ -169,7 +169,7 @@ definitions:
         example: "1.2.3"
   PackageImportDescriptors:
     type: object
-    description: This object contains an object where the package importer array is located.
+    description: An object that points to the location of a package importer array.
     properties:
       packageImportDescriptors:
         description: An array containing objects which describe the packages in the remote feed.
@@ -181,18 +181,18 @@ definitions:
     properties:
       guid:
         type: string
-        description: The Global Unique ID of the Store Item.
+        description: The global unique identifier (GUID) of the store item.
         example: LABVIEWPKGBLDR10
       bitnesses:
         type: array
-        description: An array containing information about what possible architectures the software can run on.
+        description: An array containing information about the possible architectures the software can run on.
         items:
           type: object
-          description: An object defining on what architecture the software can run on.
+          description: An object defining the architecture the software can run on.
           properties:
             id:
               type: string
-              description: The id of this element.
+              description: The ID of this element.
               example: "1"
             value:
               type: string
@@ -207,11 +207,11 @@ definitions:
           properties:
             id:
               type: string
-              description: The id of this element.
+              description: The ID of this element.
               example: "2"
             value:
               type: string
-              description: One language that this product supports.
+              description: The language the product supports.
               example: English
       suiteContents:
         type: array
@@ -222,11 +222,11 @@ definitions:
           properties:
             storeItemId:
               type: number
-              description: The id of this element.
+              description: The ID of this element.
               example: 654
             productName:
               type: string
-              description: The name of one the products contained in this suite.
+              description: The name of one the products contained in the software suite.
               example: LabVIEW NXG
             shortDescription:
               type: string
@@ -250,11 +250,11 @@ definitions:
               example: windows_x64
             preSelect:
               type: string
-              description: yes if the product will be preselected, no overwise.
+              description: The designation of whether the product will be automatically set to install. Select "yes" to preselect the product.
               example: "yes"
             repositories:
               type: array
-              description: An array containing information about the repositories and the packages to install from them.
+              description: An array containing information about where to locate the repositories and packages to install them.
               items:
                 type: object
                 description: An object containing information about one of the repositories where the packages of this product are located.
@@ -296,10 +296,10 @@ definitions:
             feedName:
               type: string
               description: The name of the feed.
-              example: Feed Name
+              example: "SystemLink 19.0"
             uri:
               type: string
-              description: The feed uri. This is the location of the feed.
+              description: The path to the feed.
               example: "/path/to/feed"
   StoreDownloadItems:
     type: object
@@ -311,7 +311,7 @@ definitions:
       productVersionedId:
         type: string
         example: 'LVNXG210SUITE'
-        description: The id of the product.
+        description: The ID of the product.
       storeItemInstallers:
         type: array
         items:
@@ -334,11 +334,11 @@ definitions:
       fromVersion:
         type: string
         example: 17.0.0.7-0+d7
-        description: The old version.
+        description: The old version of the package.
       toVersion:
         type: string
         example: 17.0.0.8-0+d8
-        description: The new version.
+        description: The new version of the package.
       packageUri:
         type: string
         example: path/to/package
@@ -346,18 +346,18 @@ definitions:
       packageId:
         type: string
         example: PackageId
-        description: The package id.
+        description: The unique ID of the package.
       packageToReplace:
         type: string
         example: 58339eb8e0d6442db09f03f5
-        description: The package to replace reference id.
+        description: The ID of the package which will replace another package.
       destinationFeedId:
         type: string
         description: The ID of the feed which will be modified.
         example: 58339eb7e0d6442db09f03ec
       isLocal:
         type: boolean
-        description: If it is local or remote.
+        description: Whether it is local or remote.
         example: false
   FeedData:
     type: object
@@ -377,7 +377,7 @@ definitions:
     properties:
       name:
         type: string
-        description: A string value representing the feed's name.
+        description: The name of the feed.
         example: Feed Name
       description:
         type: string
@@ -387,7 +387,7 @@ definitions:
         $ref: '#/definitions/Platform'
       uri:
         type: string
-        description: 'The string uri of the feed to replicate. Appending /Packages to the URI should yield the "Packages" file of the feed.'
+        description: 'The path of the feed to replicate. Appending /Packages to the URI should yield the "Packages" file of the feed.'
         example: '/path/to/feed'
   StoreItemRequest:
     type: object
@@ -417,7 +417,7 @@ definitions:
     properties:
       id:
         type: string
-        description: The id of the store item.
+        description: The ID of the store item.
         example: 1.0
       storeItemName:
         type: string
@@ -438,7 +438,7 @@ definitions:
       isSuite:
         type: boolean
         example: false
-        description: If this store item is a suite.
+        description: Whether this store item is a suite.
       downloadItems:
         type: array
         items:
@@ -472,7 +472,7 @@ definitions:
     properties:
       id:
         type: string
-        description: The unique id of this feed.
+        description: The unique ID of this feed.
         example: "5c4f13c3781e2b17101f8220"
       feedName: 
         type: string
@@ -501,11 +501,11 @@ definitions:
         example: "2019-01-28T14:37:55.043000Z"
       ready:
         type: boolean
-        description: If the job that creates this feed is completed.
+        description: If the job that creates this feed is complete.
         example: true
   Unauthorized:
     type: string
-    description: Not authorized. Response is a Web Page with a form used for logging in.
+    description: A not authorized response from a web page you use to log in.
     example: Web Page with login information.
   Feeds:
     description: An object containing an array of feeds.
@@ -530,7 +530,7 @@ definitions:
     properties:
       id: 
         type: string
-        description: The id of this package. This is used to reference this package in the service.
+        description: The ID of this package. This is used to reference this package in the service.
         example: "581a6818e0d644f7f0c1902c"
       fileUri: 
         type: string
@@ -545,7 +545,7 @@ definitions:
           example: "581a6818e0d644f7f0c19028"
       lastUpdated:
         type: string
-        description: The date this package was last updated at.
+        description: The date this package was last updated.
         example: "2016-11-02T22:26:33.668Z"
       metadata: 
         type: object
@@ -597,7 +597,7 @@ definitions:
               example: "ni-msiproperties (>= 18.0.1)"
           essential:
             type: boolean
-            description: If this package is essential.
+            description: Whether this package is essential.
             example: true
           fileName:
             type: string
@@ -644,7 +644,7 @@ definitions:
               example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"
           releaseNotes:
             type: string
-            description: A text containing the release notes of the package.
+            description: A page containing the release notes of the package.
             example: Refer to the NI website at http://www.ni.com/r/slrm185 for installation instructions, known issues, bug fixes, compatibility information, and other important notices about this product.
           replaces:
             type: array
@@ -659,7 +659,7 @@ definitions:
             example: Infrastructure
           size:
             type: number
-            description: The size of the package(bytes).
+            description: The size of the package in bytes.
             example: 750070
           source:
             type: string
@@ -681,7 +681,7 @@ definitions:
             description: Attributes of the package.
             example:
               Architecture: windows_x64
-              Description: This is an infrastructure package for NI Software.
+              Description: An infrastructure package for NI Software.
               Filename: 71e47fbf-2782-4c10-873e-dba414213dc9.nipkg
               Homepage: http://www.ni.com
               MD5Sum: 672a667ca32b6915ae9a968c55f80825
@@ -811,7 +811,7 @@ paths:
           type: boolean
           required: false
           default: false
-          description: A value indicating whether the "packageReferences" array for each feed, which contains the ids of all of the packages in that feed, should be omitted.
+          description: Whether the "packageReferences" array for each feed, which contains the ids of all of the packages in that feed, should be omitted.
       responses:
         200:
           $ref: '#/definitions/Feeds'
@@ -843,7 +843,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -870,7 +870,7 @@ paths:
         - in: query
           name: deleteUnreferencedPackages
           type: boolean
-          description: If true, any packages in the feed that are no longer referenced will be deleted.
+          description: Whether the packages in the feed that are no longer referenced will be deleted. If true, they will be deleted.
           default: true
       responses:
         202:
@@ -883,7 +883,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -901,7 +901,7 @@ paths:
             properties:
               name:
                 type: string
-                description: A string representing the name for the cloned feed.
+                description: The name for the cloned feed.
                 example: Feed Name
               description:
                 type: string
@@ -920,7 +920,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -934,17 +934,17 @@ paths:
         - in: query
           name: omitAttributes
           type: boolean
-          description: If true, the "Attributes" dictionary for the packages will be omitted.
+          description: Whether the "Attributes" dictionary for the packages will be omitted. If true, they will be omitted.
           default: false
         - in: query
           name: omitFeedReferences
           type: boolean
-          description: If true, the array of feed references will be omitted from each package.
+          description: Whether the array of feed reference will be omitted from each package. If true, they will be omitted.
           default: false
         - in: query
           name: returnUnreferencedOnly
           type: boolean
-          description: A query parameter that determines if only packages without referencing feeds should be returned.
+          description: A query parameter that determines whether only packages without referencing feeds should be returned.
           default: false
       responses:
         200:
@@ -988,7 +988,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1026,7 +1026,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1041,7 +1041,7 @@ paths:
           name: shouldCleanSourceFeeds
           type: boolean
           required: false
-          description: A value indicating whether or not only the most recent version of every package in the source feed should be added to the destination feed. If true, only the most recent version of each package will be added. If false, all versions of each package will be added.
+          description: A value indicating whether only the most recent version of every package in the source feed should be added to the destination feed. If true, only the most recent version of each package will be added. If false, all versions of each package will be added.
           default: true
         - in: query
           name: shouldOverwrite
@@ -1118,7 +1118,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1146,7 +1146,7 @@ paths:
           description: |
             The request has succeeded. - The requested Package object. Not all of the fields on package objects will be available depending on the package.
             Not all fields will have content because not all packages will store this information.
-            Do not rely on all of these fields being available in any application as some may be null, and empty string, or not exist of the object.
+            Do not rely on all of these fields being available in any application as some may be null, empty, or nonexistent.
             However, key properties such as _id, name, owners, and FileName will never be null.
           schema:
             type: object
@@ -1209,7 +1209,7 @@ paths:
           headers:
             Location:
               type: string
-              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
+              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute GET against this URI to get information about the status of the operation.
           schema:
             type: object
             properties:
@@ -1254,7 +1254,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1291,7 +1291,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1300,7 +1300,7 @@ paths:
       x-ni-operation: addPackageReferences
       tags: [feeds, packages]
       summary: Add package references to feed
-      description: Asynchronously adds package(s) to a feed. Returns the ID of a resource which can be queried to determine the status of the operation.
+      description: Asynchronously adds packages to a feed. Returns the ID of a resource which can be queried to determine the status of the operation.
       parameters:
         - in: body
           name: packageReferences
@@ -1326,7 +1326,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1367,7 +1367,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1382,7 +1382,7 @@ paths:
           name: shouldCleanSourceFeeds
           type: boolean
           required: false
-          description: A value indicating whether or not only the most recent version of every package in the source feed should be added to the destination feed. If true, only the most recent version of each package will be added. If false, all versions of each package will be added.
+          description: A value indicating whether only the most recent version of every package in the source feed should be added to the destination feed. If true, only the most recent version of each package will be added. If false, all versions of each package will be added.
           default: true
         - in: query
           name: shouldOverwrite
@@ -1425,7 +1425,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1438,7 +1438,7 @@ paths:
       parameters:
         - in: body
           name: packageSources
-          description: An optional array of the ids and/or external uris of package sources which should be queried for updates. If not given, all of the feed's package sources will be checked. Package sources that are not present in the feed's array of package sources will be ignored. If you would like to add additional package sources to a feed, use the import route.
+          description: An optional array of the IDs and/or external URIs of package sources which should be queried for updates. If not given, all of the feed's package sources will be checked. Package sources that are not present in the feed's array of package sources will be ignored. If you would like to add additional package sources to a feed, use the import route.
           schema:
             type: object
             properties:
@@ -1459,7 +1459,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1484,7 +1484,7 @@ paths:
           default: false
         - in: body
           name: updateDescriptors
-          description: An array containing the update descriptors that should be applied to the feed. Update descriptors should be obtained from a call to the "Check for updates to a feed" route, detailed above. One is free to remove any update descriptors returned from the "Check for updates" route, but modifying them in any other way is not supported.
+          description: An array containing the update descriptors that should be applied to the feed. Update descriptors should be obtained from a call to the "Check for updates to a feed" route, detailed above. You can remove any update descriptors returned from the "Check for updates" route, but modifying them in any other way is not supported.
           schema:
             $ref: '#/definitions/UpdateDescriptorRequest'
       responses:
@@ -1500,7 +1500,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1521,7 +1521,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1563,7 +1563,7 @@ paths:
       x-ni-operation: listJobs
       tags: [jobs]
       summary: List all jobs
-      description: Gets all "jobs" in the service. See the entry for "Get job details" route for more information about jobs.
+      description: Gets all jobs in the service. See the entry for "Get job details" route for more information about jobs.
       parameters:
         - in: query
           name: id
@@ -1603,7 +1603,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1626,7 +1626,7 @@ paths:
               job:
                 $ref: '#/definitions/Job'
         303:
-          description: See Other if the job has completed, with the Location header set to the URI of the created or modified resource, if a resource was created or modified.
+          description: If the job has completed, see Other with the Location header set to the URI of the created or modified resource.
           headers:
             Location:
               type: string
@@ -1658,7 +1658,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
@@ -1698,7 +1698,7 @@ paths:
         - in: query
           name: pageNumber
           type: number
-          description: Which page of the response to return.
+          description: The page of the response to return.
           required: false
       responses:
         200:
@@ -1726,7 +1726,7 @@ paths:
     parameters:
       - in: path
         name: id
-        description: The id of this resource.
+        description: The ID of this resource.
         type: string
         required: true
         x-example: "5c5d49f2781e2b2cd045267b"
