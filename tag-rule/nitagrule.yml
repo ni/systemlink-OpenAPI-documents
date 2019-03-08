@@ -351,9 +351,7 @@ paths:
                 type: string
                 example: 5c40ec55e0d6441168b4c543
         401:
-          description: Unauthorized
-          schema:
-            $ref: '#/responses/Unauthorized'
+          $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
   /v1/rules/{id}:
@@ -375,9 +373,7 @@ paths:
           schema:
             $ref: '#/definitions/Rule'
         401:
-          description: Unauthorized
-          schema:
-            $ref: '#/responses/Unauthorized'
+          $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
     delete:
@@ -390,9 +386,7 @@ paths:
         204:
           description: No Content
         401:
-          description: Unauthorized
-          schema:
-            $ref: '#/responses/Unauthorized'
+          $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
     patch:
@@ -413,9 +407,7 @@ paths:
         204:
           description: No Content
         401:
-          description: Unauthorized
-          schema:
-            $ref: '#/responses/Unauthorized'
+          $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
   /v1/delete-rules:
@@ -445,9 +437,7 @@ paths:
         204:
           description: No Content
         401:
-          description: Unauthorized
-          schema:
-            $ref: '#/responses/Unauthorized'
+          $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
   /v1/toggle-rules:
@@ -499,9 +489,7 @@ paths:
                   type: string
                 example: [5c40ec55e0d6441168b4c541]
         401:
-          description: Unauthorized
-          schema:
-            $ref: '#/responses/Unauthorized'
+          $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
   /v1/query-rules:
@@ -586,8 +574,6 @@ paths:
                 type: integer
                 example: 1
         401:
-          description: Unauthorized
-          schema:
-            $ref: '#/responses/Unauthorized'
+          $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
