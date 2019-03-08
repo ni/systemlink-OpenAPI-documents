@@ -574,9 +574,7 @@ paths:
                   type: string
                 example: [5c40ec55e0d6441168b4c549]
         401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/Error'
+          $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
   /v1/instances:
@@ -662,9 +660,7 @@ paths:
                 type: string
                 example: 5c40ec55e0d6441168b4c543
         401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/Error'
+          $ref: '#/responses/Unauthorized'
         409:
           description: For requests which would result in an update to an existing alarm instance, this is
             returned when the request does not represent a valid transition for the existing alarm instance.
