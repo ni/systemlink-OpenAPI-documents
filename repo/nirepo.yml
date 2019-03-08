@@ -1,0 +1,1783 @@
+swagger: '2.0'
+info:
+  version: "1"
+  title: "Package Repository Service"
+  description: "Manages a repository of packages"
+  contact:
+    name: National Instruments
+    url: https://www.ni.com/systemlink
+    email: support@ni.com
+basePath: "/nirepo"
+consumes: [application/json]
+produces: [application/json]
+
+securityDefinitions:
+  basicAuth:
+    type: basic
+  cookieAuth:
+    type: apiKey
+    in: header
+    name: Cookie
+    
+security:
+  - basicAuth: []
+  - cookieAuth: []
+  
+x-ni-routing-key: Skyline.Repository
+x-ni-privilege-application: nirepo
+
+definitions:
+  JobError:
+    description: Contains error information about the job.
+    type: object
+    properties:
+      name:
+        type: string
+        description: String error code.
+        example: "Repository.CouldNotDownloadFeedIndexFile"
+      message:
+        type: string
+        description: Complete error message.
+        example: "Unable to download feed index file at URI 'http://download.ni.com/Packages'."
+      args:
+        type: array
+        description: Array of arguments for the error.
+        items:
+          type: string
+          description: Positional argument values for the error code.
+          example: "http://download.ni.com/Packages"
+      innerErrors:
+        type: array
+        description: Internal errors that occured in the service.
+        items:
+          $ref: '#/definitions/JobError'
+  Job:
+    description: A resource, such as a package or feed, created to track the status of asynchronous operations and redirect the user to the results of such operations when they complete.
+    type: object
+    properties:
+      id:
+        description: The unique ID of the job. Use this to get more information about the job as it runs.
+        type: string
+        example: 5c51be40781e2b0ad0b0108c
+      operation:
+        description: The type of job you want to execute.
+        type: string
+        enum:
+          - CREATE_FEED
+          - CLONE_FEED
+          - REPLICATE_FEED
+          - UPDATE_FEED
+          - DELETE_FEED
+          - IMPORT_FEEDS
+          - REMOVE_PACKAGE_REFERENCES
+          - DELETE_PACKAGE
+          - ADD_PACKAGE_REFERENCES
+          - UPLOAD_PACKAGE
+          - CHECK_FOR_UPDATES
+          - APPLY_UPDATES
+          - CLEAN_FEED
+          - REPLICATE_STORE_ITEM
+          - IMPORT_STORE_ITEMS
+          - IMPORT_PACKAGES
+          - JOB_OPERATION_COUNT
+        example: REPLICATE_FEED
+      status:
+        description: The state in which the job is in.
+        type: string
+        enum: [PENDING, RUNNING, SUCCEEDED, FAILED, COMPLETED_WITH_ERROR]
+        example: FAILED
+      error:
+        $ref: '#/definitions/JobError'
+      created:
+        description: The date when the job was created.
+        type: string
+        example: "2019-01-30T15:09:52.391Z"
+      resourceId:
+        description: The ID of the feed or package which this job created or modified.
+        type: string
+        example: 58339eb8e0d6442db09f03f5
+      returnType:
+        description: The type of resource, such as a package or feed, that this job will return when completed.
+        type: string
+        enum: [FEED, FEEDS, PACKAGE, UPDATE_DESCRIPTORS, SIMPLE]
+        example: FEED
+  ErrorObject:
+    description: Contains error information.
+    type: object
+    properties:
+      name:
+        description: String error code.
+        type: string
+        example: Repository.StoreApiException
+      code:
+        description: Numeric error code.
+        type: integer
+        example: -251340
+      message:
+        description: Complete error message.
+        type: string
+        example: "Unable to download feed index file at URI 'http://download.ni.com/Packages'."
+      args:
+        description: Positional argument values for the error code.
+        type: array
+        items:
+          type: string
+          example: "http://download.ni.com/Packages"
+      innerErrors:
+        type: array
+        description: Internal errors that occured in the service.
+        items:
+          $ref: '#/definitions/ErrorObject'
+  Error:
+    description: Contains error information.
+    type: object
+    properties:
+      error:
+        $ref: '#/definitions/ErrorObject'
+  Platform:
+    type: string
+    enum: [windows, ni-linux-rt]
+    description: "Depending on the platform you select, you can only use specific package extensions. For Windows feeds, you must use .nipkg. For NI Linux RT feeds, you must use .ipk or .deb."
+    example: windows
+  PackageImportDescriptor:
+    type: object
+    description: A defined list of packages that need to be imported into the feed from a remote feed.
+    properties:
+      architecture:
+        description: The architecture of the package.
+        type: string
+        example: x64
+      description:
+        description: The description of the package.
+        type: string
+        example: Enter description here
+      feedUri:
+        description: The path to the feed.
+        type: string
+        example: "/path/to/feed"
+      packageName:
+        description: The package name.
+        type: string
+        example: Package Name
+      packageUri:
+        description: The path to the package.
+        type: string
+        example: "/path/to/package"
+      version:
+        description: The package version.
+        type: string
+        example: "1.2.3"
+  PackageImportDescriptors:
+    type: object
+    description: An object that points to the location of a package importer array.
+    properties:
+      packageImportDescriptors:
+        description: An array containing objects which describe the packages in the remote feed.
+        type: array
+        items:
+          $ref: '#/definitions/PackageImportDescriptor'
+  StoreItemInstaller:
+    type: object
+    properties:
+      guid:
+        type: string
+        description: The global unique identifier (GUID) of the store item.
+        example: LABVIEWPKGBLDR10
+      bitnesses:
+        type: array
+        description: An array containing information about the possible architectures the software can run on.
+        items:
+          type: object
+          description: An object defining the architecture the software can run on.
+          properties:
+            id:
+              type: string
+              description: The ID of this element.
+              example: "1"
+            value:
+              type: string
+              description: The architecture that this package can run on.
+              example: "64-bit"
+      languages:
+        type: array
+        description: An array containing objects that offer information about the supported locale of the product.
+        items:
+          type: object
+          description: An object offering information about the supported locale of the product.
+          properties:
+            id:
+              type: string
+              description: The ID of this element.
+              example: "2"
+            value:
+              type: string
+              description: The language the product supports.
+              example: English
+      suiteContents:
+        type: array
+        description: Array of descriptions about what this store item contains.
+        items:
+          type: object
+          description: An object containing information about a piece of software that this store item contains.
+          properties:
+            storeItemId:
+              type: number
+              description: The ID of this element.
+              example: 654
+            productName:
+              type: string
+              description: The name of one the products contained in the software suite.
+              example: LabVIEW NXG
+            shortDescription:
+              type: string
+              description: A short description of the product.
+              example: LabVIEW NXG enables engineers to quickly automate hardware, customize tests to project specifications, and easily view measurement results from anywhere.
+            updateDate:
+              type: string
+              description: The last date this product was updated at.
+              example: '2018-01-23T14:33:29.000-06:00'
+            packageName:
+              type: string
+              description: The name of the package to install.
+              example: ni-labview-nxg-2.0.0
+            packageVersion:
+              type: string
+              description: The version of the package to install.
+              example: 5.3.1.49156-0+f4
+            architecture:
+              type: string
+              description: The architecture this product works on.
+              example: windows_x64
+            preSelect:
+              type: string
+              description: The designation of whether the product will be automatically set to install. Select "yes" to preselect the product.
+              example: "yes"
+            repositories:
+              type: array
+              description: An array containing information about where to locate the repositories and packages to install them.
+              items:
+                type: object
+                description: An object containing information about one of the repositories where the packages of this product are located.
+                properties:
+                  packageName:
+                    type: string
+                    description: The name of one of the packages.
+                    example: ni-labview-nxg-2.0.0-2.1-released-critical
+                  file:
+                    type: string
+                    description: |
+                      The location of the file, including the file extension.
+                      Depending on the platform you select, you will be able to use the following package extensions: .nipkg for windows feeds, .ipk and .deb for ni-linux-rt feeds.
+                    example: "http://127.0.0.1/en/ni-labview-nxg-2.0.0-2.1-released-critical.nipkg"
+                  md5Checksum:
+                    description: The MD5 fingerprint of the file.
+                    type: string
+                    example: 233b2aa7d1c23cbef93874a7ecdce61a
+                  repositoryPath:
+                    type: string
+                    description: The path to the repository where the package is found.
+                    example: "http://download.ni.com/products/ni-labview-nxg-2.0.0/2.1/released-critical"
+                  feedType:
+                    type: string
+                    enum: [RELEASED, RELEASED-CRITICAL]
+                    description: The release type of the feed.
+                    example: RELEASED
+            downloadItemVersion:
+              type: string
+              description: The item version number.
+              example: "2.1"
+      feeds:
+        type: array
+        description: The feeds where the suite contents are located at.
+        items:
+          type: object
+          description: Item containing information about the feed.
+          properties:
+            feedName:
+              type: string
+              description: The name of the feed. Feed names must begin with an alphabetical character and contain only alphanumeric characters, spaces, underscores, and hyphens.
+              example: "SystemLink 19.0"
+            uri:
+              type: string
+              description: The path to the feed.
+              example: "/path/to/feed"
+  StoreDownloadItems:
+    type: object
+    properties:
+      downloadItemVersion:
+        type: string
+        example: '1.2.3'
+        description: The version of the download item.
+      productVersionedId:
+        type: string
+        example: 'LVNXG210SUITE'
+        description: The ID of the product.
+      storeItemInstallers:
+        type: array
+        items:
+          $ref: '#/definitions/StoreItemInstaller'
+  UpdateDescriptor:
+    type: object
+    description: Data specifying what to update.
+    properties:
+      packageName:
+        type: string
+        example: ni-svcloc
+        description: The name of the package.
+      operation:
+        type: string
+        enum:
+          - ADD
+          - UPGRADE
+        example: UPGRADE
+        description: The operation type.
+      fromVersion:
+        type: string
+        example: 17.0.0.7-0+d7
+        description: The old version of the package.
+      toVersion:
+        type: string
+        example: 17.0.0.8-0+d8
+        description: The new version of the package.
+      packageUri:
+        type: string
+        example: path/to/package
+        description: The path to the package.
+      packageId:
+        type: string
+        example: PackageId
+        description: The unique ID of the package.
+      packageToReplace:
+        type: string
+        example: 58339eb8e0d6442db09f03f5
+        description: The ID of the package which will replace another package.
+      destinationFeedId:
+        type: string
+        description: The ID of the feed which will be modified.
+        example: 58339eb7e0d6442db09f03ec
+      isLocal:
+        type: boolean
+        description: Whether it is local or remote.
+        example: false
+  FeedData:
+    type: object
+    properties:
+      feedName:
+        type: string
+        description: A string value representing the feed's name.
+        example: Feed Name
+      description:
+        type: string
+        description: A short description of the feed.
+        example: Enter description here
+      platform:
+        $ref: '#/definitions/Platform'
+  FeedDataWithURI:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The name of the feed.
+        example: Feed Name
+      description:
+        type: string
+        description: A short description of the feed.
+        example: Enter description here
+      platform:
+        $ref: '#/definitions/Platform'
+      uri:
+        type: string
+        description: 'The path of the feed to replicate. Appending /Packages to the URI should yield the "Packages" file of the feed.'
+        example: '/path/to/feed'
+  StoreItemRequest:
+    type: object
+    properties:
+      storeItemId:
+        type: string
+        description: The ID of the store item to replicate.
+        example: '468'
+      downloadItemVersion:
+        type: string
+        description: The version of the store item to replicate.
+        example: '1.0'
+      storeItemInstallerGuid:
+        type: string
+        description: Value uniquely identifying the specific store item installer to replicate.
+        example: LABVIEWPKGBLDR10
+      feedName:
+        type: string
+        description: If "split" is false, the name of the feed which will be created. If "split" is true, this field is ignored.
+        example: Feed Name
+      description:
+        type: string
+        description: If "split" is false, the description of the feed which will be created. If "split" is true, this field is ignored.
+        example: Feed Description
+  StoreItem:
+    type: object
+    properties:
+      id:
+        type: string
+        description: The ID of the store item.
+        example: 1.0
+      storeItemName:
+        type: string
+        description: The name of the store item.
+        example: LabVIEW Package Builder
+      shortDescription:
+        type: string
+        example: LabVIEW Package Builder adds NI Package creation capabilities to LabVIEW Application Builder.
+        description: The short description of the store item.
+      longDescription:
+        type: string
+        example: LabVIEW Package Builder enables LabVIEW users to create Packages by adding a new Build Specification option in Application Builder. Packages provide a standard container for the distribution of executables, VIs, libraries, and other supporting files. LabVIEW must be installed prior to installing LabVIEW Package Builder.
+        description: The long description of the store item.
+      iconUri:
+        type: string
+        example: 'http://s7d5.scene7.com/is/image/ni/Generic_NI?$ni-icon-pm$'
+        description: The icon location of the store item.
+      isSuite:
+        type: boolean
+        example: false
+        description: Whether this store item is a suite.
+      downloadItems:
+        type: array
+        items:
+          $ref: '#/definitions/StoreDownloadItems'
+  StoreItemDescriptor:
+    type: object
+    properties:
+      storeItemId:
+        type: string
+        description: The ID of the store item to replicate.
+        example: '1.0'
+      downloadItemVersion:
+        type: string
+        description: The version of the store item to replicate.
+        example: '1.0'
+      storeItemInstallerGuid:
+        type: string
+        description: Value uniquely identifying the specific store item installer to replicate.
+        example: LABVIEWPKGBLDR10
+  UpdateDescriptorRequest:
+    type: object
+    description: An array of update descriptors.
+    properties:
+      updateDescriptors:
+        type: array
+        items:
+          $ref: '#/definitions/UpdateDescriptor'
+  Feed:
+    description: A single feed.
+    type: object
+    properties:
+      id:
+        type: string
+        description: The unique ID of this feed.
+        example: "5c4f13c3781e2b17101f8220"
+      feedName: 
+        type: string
+        description: The name of this feed.
+        example: Feed Name
+      directoryUri: 
+        type: string
+        description: The location of this feed.
+        example: "/nirepo/v1/files/feeds/asd"
+      description: 
+        type: string
+        description: The description of this feed.
+        example: Feed Description
+      platform:
+        $ref: '#/definitions/Platform'
+      packageReferences:
+        type: array
+        description: An array containing the IDs of the packages in this feed.
+        items:
+          type: string
+          description: The ID of a package.
+          example: "5c652e1f781e2b05cc4d589e"
+      lastUpdated:
+        type: string
+        description: The date this feed was last updated at.
+        example: "2019-01-28T14:37:55.043000Z"
+      ready:
+        type: boolean
+        description: If the job that creates this feed is complete.
+        example: true
+  Unauthorized:
+    type: string
+    description: A not authorized response from a web page you use to log in.
+    example: Web Page with login information.
+  Feeds:
+    description: An object containing an array of feeds.
+    type: object
+    properties:
+      feeds:
+        description: An array of feeds.
+        type: array
+        items:
+          $ref: '#/definitions/Feed'
+  JobID:
+    description: An object containing the Job ID.
+    type: object
+    properties:
+      jobId:
+        description: The ID of the job that was created for tracking the status of the operation.
+        type: string
+        example: "5c666def781e2b2f64208709"
+  Package:
+    description: A single package.
+    type: object
+    properties:
+      id: 
+        type: string
+        description: The ID of this package. This is used to reference this package in the service.
+        example: "581a6818e0d644f7f0c1902c"
+      fileUri: 
+        type: string
+        description: The location of the file for this package.
+        example: "files/packages/ni-securityupdate-kb67l8lcqw-killbits_2.0.0.22-0+d22_windows_x64.nipkg"
+      feedReferences:
+        type: array
+        description: An array containing the IDs of the feeds which reference this package.
+        items:
+          type: string
+          description: A reference to the feed that contains this package.
+          example: "581a6818e0d644f7f0c19028"
+      lastUpdated:
+        type: string
+        description: The date this package was last updated.
+        example: "2016-11-02T22:26:33.668Z"
+      metadata: 
+        type: object
+        description: Information about the metadata of this package.
+        properties:
+          packageName:
+            type: string
+            description: The name of the package.
+            example: "ni-securityupdate-kb67l8lcqw-killbits"
+          version:
+            type: string
+            description: The version of the package.
+            example: "2.0.0.22-0+d22"
+          architecture:
+            type: string
+            description: The architecture of the package.
+            example: windows_x64
+          breaks:
+            type: array
+            description: An array containing information about other packages this package breaks.
+            items:
+              type: string
+              description: The name of a package that this package breaks. This also contains information about the version of the package.
+              example: "ni-sysapi (>= 18.0.0)"
+          conflicts:
+            type: array
+            description: An array containing information about other packages this package conflicts with.
+            items:
+              type: string
+              description: The name of a package that this package conflicts with. This also contains information about the version of the package.
+              example: "ni-msvcrt-2015 (>= 14.1.4)"
+          depends:
+            type: array
+            description: An array containing information about other packages this package depends on.
+            items:
+              type: string
+              description: The name of a package that this package depends on. This also contains information about the version of the package.
+              example: "ni-metauninstaller (>= 18.0.1)"
+          description:
+            type: string
+            description: The description of the package.
+            example: This is an infrastructure package for NI Software.
+          enhances:
+            type: array
+            description: An array containing information about other packages this package enhances.
+            items:
+              type: string
+              description: The name of a package that this package enhances. This also contains information about the version of the package.
+              example: "ni-msiproperties (>= 18.0.1)"
+          essential:
+            type: boolean
+            description: Whether this package is essential.
+            example: true
+          fileName:
+            type: string
+            description: |
+              The location of the file, including the file extension.
+              Depending on the platform you select, you will be able to use the following package extensions: .nipkg for windows feeds, .ipk and .deb for ni-linux-rt feeds.
+            example: ni-securityupdate-kb67l8lcqw-killbits_2.0.0.22-0+d22_windows_x64.nipkg
+          homepage:
+            type: string
+            description: The website of the maintainers for this package.
+            example: "http://www.ni.com"
+          installedSize:
+            type: number
+            description: The size of this package after install.
+            example: 0
+          maintainer:
+            type: string
+            description: The maintainer of this package.
+            example: "National Instruments <support@ni.com>"
+          predepends:
+            type: array
+            description: An array containing information about other packages this package predepends.
+            items:
+              description: The name of a package that this package predepends. This also contains information about the version of the package.
+              type: string
+              example: "ni-teststand-2017-tools (>= 17.0.0)"
+          priority:
+            type: number
+            description: The priority of the package.
+            example: 4
+          provides:
+            type: array
+            description: An array containing information about other packages that this package provides.
+            items:
+              type: string
+              example: "ni-curl (= 17.0.0.49152-0+f0)"
+              description: One of the packages that the containing package provides. This also contains information about the version of the package.
+          recommends:
+            type: array
+            description: An array containing information about other packages this package recommends.
+            items:
+              type: string
+              description: The name of a package that this package recommends. This also contains information about the version of the package.
+              example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"
+          releaseNotes:
+            type: string
+            description: A page containing the release notes of the package.
+            example: Refer to the NI website at http://www.ni.com/r/slrm185 for installation instructions, known issues, bug fixes, compatibility information, and other important notices about this product.
+          replaces:
+            type: array
+            description: An array containing information about other packages this package replaces.
+            items:
+              type: string
+              description: The name of a package that this package replaces. This also contains information about the version of the package.
+              example: "b235b862-6a92-4a04-a8b2-6d71f777de67 (< 16.99.65535)"
+          section:
+            type: string
+            description: The section of the package.
+            example: Infrastructure
+          size:
+            type: number
+            description: The size of the package in bytes.
+            example: 750070
+          source:
+            type: string
+            description: The source of this package, if any.
+            example: "thunar-archive-plugin_0.3.1.bb"
+          suggests:
+            type: array
+            description: An array containing information about other packages this package suggests.
+            items:
+              type: string
+              description: The name of a package that this package suggests. This also contains information about the version of the package.
+              example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"
+          tags:
+            type: string
+            description: Tags of the package.
+            example: "KillBits, Security Update 2013"
+          attributes:
+            type: object
+            description: Attributes of the package.
+            example:
+              Architecture: windows_x64
+              Description: An infrastructure package for NI Software.
+              Filename: 71e47fbf-2782-4c10-873e-dba414213dc9.nipkg
+              Homepage: http://www.ni.com
+              MD5Sum: 672a667ca32b6915ae9a968c55f80825
+              Maintainer: National Instruments <support@ni.com>
+              Package: ni-securityupdate-kb67l8lcqw-killbits
+              Priority: standard
+              Section: Infrastructure
+              Size: '750070'
+              Version: 2.0.0.22-0+d22
+              XB-DisplayName: NI Security Update (KB 67L8LCQW)
+              XB-DisplayVersion: 2.0.0
+              XB-LanguageSupport: en
+              XB-Plugin: wininst
+              XB-Tags: KillBits, Security Update 2013
+              FileName: ni-securityupdate-kb67l8lcqw-killbits_2.0.0.22-0+d22_windows_x64.nipkg
+      description: 
+        type: string
+        description: Description of the package.
+        example: Package Description.
+      platform:
+        $ref: '#/definitions/Platform'
+  Packages:
+    description: An object containing an array of packages.
+    type: object
+    properties:
+      packages:
+        description: An array of packages.
+        type: array
+        items:
+          $ref: '#/definitions/Package'
+  UpdateDescriptorResponse:
+    description: An array of update descriptors.
+    type: array
+    items:
+      $ref: '#/definitions/UpdateDescriptor'
+
+responses:
+  JobIdResponse:
+    description: Response with a JobID in it. This is the usual result after executing a write operation.
+    headers:
+      Location:
+        type: string
+        description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
+    schema:
+      $ref: '#/definitions/JobID'
+
+paths:
+  /v1/ping:
+    get:
+      operationId: Ping
+      x-ni-privilege: Read
+      x-ni-operation: ping
+      tags: [ping]
+      summary: Ping the service
+      description: Return if the service is up.
+      responses:
+        204:
+          description: The service is up.
+        302:
+          description: The user does not have the required privilege.
+        404:
+          description: Service is down.
+        500:
+          description: The request encountered an error.            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/files/{pathToFile}:
+    parameters:
+      - in: path
+        name: pathToFile
+        description: The path to the file to download.
+        type: string
+        required: true
+        x-example: "filePath"
+    get:
+      x-ni-privilege: Download
+      x-ni-operation: getResource
+      tags: [files]
+      summary: Download files located in Package Repository
+      description: Download files located in Package Repository.
+      produces:
+        - application/octet-stream
+      responses:
+        200:
+          description: The request has succeeded.
+          schema:
+            type: file
+        404:
+          description: File not found.       
+        default:
+          $ref: '#/definitions/Error'
+  /v1/files/packages/{pathToPackage}:
+    parameters:
+      - in: path
+        name: pathToPackage
+        description: The path to the file to download.
+        type: string
+        required: true
+        x-example: "pathToPackage.extension"
+    get:
+      x-ni-privilege: Download
+      x-ni-operation: getResource
+      tags: [files]
+      summary: Download files located in Package Repository in the packages folder
+      description: Download files located in Package Repository in the packages folder.
+      produces:
+        - application/octet-stream
+      responses:
+        200:
+          description: The request has succeeded.
+          schema:
+            type: file
+        404:
+          description: File not found.       
+        default:
+          $ref: '#/definitions/Error'
+  /v1/feeds:
+    get:
+      x-ni-privilege: Read
+      x-ni-operation: getFeeds
+      tags: [feeds]
+      summary: List all feeds
+      description: Returns a JSON array of all of the feeds in the service.
+      parameters:
+        - in: query
+          name: omitPackageReferences
+          type: boolean
+          required: false
+          default: false
+          description: Whether the "packageReferences" array for each feed, which contains the ids of all of the packages in that feed, should be omitted.
+      responses:
+        200:
+          $ref: '#/definitions/Feeds'
+        401:
+          $ref: '#/definitions/Unauthorized'
+        default:
+          $ref: '#/definitions/Error'
+    post:
+      x-ni-privilege: Write
+      x-ni-operation: createFeed
+      tags: [feeds]
+      summary: Create a feed
+      description: Asynchronously creates a feed. Returns the ID of a resource which can be queried to determine the status of the operation.
+      parameters:
+        - in: body
+          name: feedData
+          schema:
+            $ref: '#/definitions/FeedData'
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        400:
+          $ref: '#/definitions/Error'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/feeds/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    get:
+      x-ni-privilege: Read
+      x-ni-operation: getFeeds
+      tags: [feeds]
+      summary: Get feed
+      description: Returns a JSON representation of a feed.
+      responses:
+        200:
+          $ref: '#/definitions/Feed'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+    delete:
+      x-ni-privilege: Write
+      x-ni-operation: deleteFeeds
+      tags: [feeds]
+      summary: Remove a feed
+      description: Asynchronously removes a feed. Returns the ID of a resource which can be queried to determine the status of the operation.
+      parameters:
+        - in: query
+          name: deleteUnreferencedPackages
+          type: boolean
+          description: Whether the packages in the feed that are no longer referenced will be deleted. If true, they will be deleted.
+          default: true
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/feeds/{id}/clone:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    post:
+      x-ni-privilege: Write
+      x-ni-operation: cloneFeed
+      tags: [feeds]
+      summary: Clone a feed
+      description: Asynchronously clones a feed. Returns the ID of a resource which can be queried to determine the status of the operation.
+      parameters:
+        - in: body
+          name: feedRequestData
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The name for the cloned feed.
+                example: Feed Name
+              description:
+                type: string
+                description: A description for the cloned feed.
+                example: Feed Description
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        400:
+          $ref: '#/definitions/Error'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/feeds/{id}/packages:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    get:
+      x-ni-privilege: Read
+      x-ni-operation: getPackages
+      tags: [feeds, packages]
+      summary: Get all packages in a feed
+      description: Gets all of the packages in the service's package pool.
+      parameters:
+        - in: query
+          name: omitAttributes
+          type: boolean
+          description: Whether the "Attributes" dictionary for the packages will be omitted. If true, they will be omitted.
+          default: false
+        - in: query
+          name: omitFeedReferences
+          type: boolean
+          description: Whether the array of feed reference will be omitted from each package. If true, they will be omitted.
+          default: false
+        - in: query
+          name: returnUnreferencedOnly
+          type: boolean
+          description: A query parameter that determines whether only packages without referencing feeds should be returned.
+          default: false
+      responses:
+        200:
+          $ref: '#/definitions/Packages'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/replicate-feed:
+    post:
+      x-ni-privilege: Write
+      x-ni-operation: replicateFeed
+      tags: [feeds]
+      summary: Replicate a feed
+      description: Asynchronously replicates a feed. Returns the ID of a resource which can be queried to determine the status of the operation.
+      parameters:
+        - in: query
+          name: shouldOverwrite
+          type: boolean
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
+        - in: query
+          name: ignoreImportErrors
+          type: boolean
+          description: A query parameter that determines whether the service should abort the request if errors occur while importing some packages. If true, the service will abort and roll back the request if an error occurs while importing a package. If false, the service will import as many packages as it can, and return an error describing which packages could not be imported.
+          default: false
+        - in: body
+          name: feedRequest
+          schema:
+            $ref: '#/definitions/FeedDataWithURI'
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        400:
+          $ref: '#/definitions/Error'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/feeds/{id}/import-packages:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    post:
+      x-ni-privilege: Write
+      x-ni-operation: importPackages
+      tags: [feeds, packages]
+      summary: Import packages into a feed
+      description: Import packages into a feed.
+      parameters:
+        - in: query
+          name: shouldOverwrite
+          type: boolean
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
+        - in: query
+          name: ignoreImportErrors
+          type: boolean
+          description: A query parameter that determines whether the service should abort the request if errors occur while importing some packages. If true, the service will abort and roll back the request if an error occurs while importing a package. If false, the service will import as many packages as it can, and return an error describing which packages could not be imported.
+          default: false
+        - in: body
+          name: feedRequest
+          schema:
+            $ref: '#/definitions/PackageImportDescriptors'
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        400:
+          $ref: '#/definitions/Error'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/feeds/{id}/import-feeds:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    post:
+      x-ni-privilege: Write
+      x-ni-operation: importFeeds
+      tags: [feeds]
+      summary: Import feeds into an existing feed
+      description: Asynchronously imports feeds into an existing feed. Returns the ID of a resource which can be queried to track the status of the operation. Same as /v1/feeds/{id}/import.
+      parameters:
+        - in: query
+          name: shouldCleanSourceFeeds
+          type: boolean
+          required: false
+          description: A value indicating whether only the most recent version of every package in the source feed should be added to the destination feed. If true, only the most recent version of each package will be added. If false, all versions of each package will be added.
+          default: true
+        - in: query
+          name: shouldOverwrite
+          type: boolean
+          required: false
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
+        - in: query
+          name: ignoreImportErrors
+          type: boolean
+          required: false
+          description: A query parameter that determines whether the service should abort the request if errors occur while importing some packages. If true, the service will abort and roll back the request if an error occurs while importing a package. If false, the service will import as many packages as it can, and return an error describing which packages could not be imported.
+          default: false
+        - in: body
+          name: feedUris
+          description: An array containing the URIs of remote feeds whose packages should be added to the destination feed. Appending /Packages to each URI should yield the "Packages" file for that feed.
+          schema:
+            type: object
+            properties:
+              feedUris:
+                type: array
+                items:
+                  type: string
+                  example: path/to/feed
+              feedIds:
+                type: array
+                items:
+                  type: string
+                  example: 5c62bf36781e2b1c7c57daf4
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        400:
+          $ref: '#/definitions/Error'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/packages:
+    get:
+      x-ni-privilege: Read
+      x-ni-operation: getPackages
+      tags: [packages]
+      summary: Get all packages
+      description: Gets all of the packages in the service's package pool.
+      parameters:
+        - in: query
+          name: omitAttributes
+          type: boolean
+          description: If true, the "Attributes" dictionary for the package will be omitted.
+          default: false
+        - in: query
+          name: omitFeedReferences
+          type: boolean
+          description: If true, the array of feed references will be omitted from each package.
+          default: false
+        - in: query
+          name: returnUnreferencedOnly
+          type: boolean
+          description: A query parameter that determines if only packages without referencing feeds should be returned.
+          default: false
+      responses:
+        200:
+          description: The request has succeeded.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Package'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/packages/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    get:
+      x-ni-privilege: Read
+      x-ni-operation: getPackages
+      tags: [packages]
+      summary: Get package details
+      description: Get package details.
+      parameters:
+        - in: query
+          name: omitAttributes
+          type: boolean
+          description: If true, the "Attributes" dictionary for the package will be omitted.
+          default: false
+          required: false
+        - in: query
+          name: omitFeedReferences
+          type: boolean
+          description: If true, the array of feed references will be omitted from the package.
+          default: false
+          required: false
+      responses:
+        200:
+          description: |
+            The request has succeeded. - The requested Package object. Not all of the fields on package objects will be available depending on the package.
+            Not all fields will have content because not all packages will store this information.
+            Do not rely on all of these fields being available in any application as some may be null, empty, or nonexistent.
+            However, key properties such as _id, name, owners, and FileName will never be null.
+          schema:
+            type: object
+            properties:
+              package:
+                $ref: '#/definitions/Package'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+    delete:
+      x-ni-privilege: Write
+      x-ni-operation: deletePackage
+      tags: [packages]
+      summary: Remove a package
+      description: Remove a package. The package will be removed from all of the feeds that reference it, potentially creating feeds with unsatisfied dependencies.
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/upload-packages:
+    post:
+      x-ni-privilege: Write
+      x-ni-operation: uploadPackage
+      tags: [packages]
+      summary: Upload packages to the pool
+      description: Asynchronously uploads packages to the service's package pool. Returns an array of IDs of resources which can be queried to track the status of each upload operation.
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: query
+          name: shouldOverwrite
+          type: boolean
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
+          required: false
+        - in: formData 
+          name: filename
+          type: file
+          required: true
+          description: The name of this parameter is the name of the file that will be uploaded. If the file you upload is test.ipkg, put instead of filename that name.
+        - in: header
+          name: X-File-Name
+          type: string
+          required: false
+        - in: header
+          name: X-File-Size
+          type: string
+          required: false
+        - in: header
+          name: X-File-Type
+          type: string
+          required: false
+      responses:
+        202:
+          description: The request has succeeded.
+          headers:
+            Location:
+              type: string
+              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute GET against this URI to get information about the status of the operation.
+          schema:
+            type: object
+            properties:
+              jobIds:
+                type: array
+                items:
+                    type: string
+                    example: '5c66b6bd781e2b2ce42ca818'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/get-package-import-descriptors:
+    post:
+      x-ni-privilege: Read
+      x-ni-operation: getPackageImportDescriptors
+      tags: [packages]
+      summary: Get package import descriptors
+      description: Route for getting a description of the packages in a remote feed.
+      parameters:
+        - in: body
+          name: feedUri
+          schema:
+            type: object
+            properties:
+              feedUri:
+                type: string
+                example: /path/to/feed
+                description: The URI of the feed to get package import descriptors from.
+      responses:
+        200:
+          description: The request has succeeded.
+          schema:
+            $ref: '#/definitions/PackageImportDescriptors'
+        400:
+          $ref: '#/definitions/Error'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/feeds/{id}/metadata:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    put:
+      x-ni-privilege: Write
+      x-ni-operation: getFeedMetadata
+      tags: [feeds]
+      summary: Update a feed's name and/or description
+      description: Asynchronously updates a feed's name and/or description. Returns the ID of a resource which can be queried to determine the status of the operation.
+      parameters:
+        - in: body
+          name: updateData
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: A string value representing the new name for the feed. Must be unique.
+                example: Feed Name
+              description:
+                type: string
+                description: A short description of the feed. If you want to clear the description for the feed, provide a null or empty value for the description key.
+                example: Feed Description
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        400:
+          $ref: '#/definitions/Error'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/feeds/{id}/add-package-references:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    post:
+      x-ni-privilege: Write
+      x-ni-operation: addPackageReferences
+      tags: [feeds, packages]
+      summary: Add package references to feed
+      description: Asynchronously adds packages to a feed. Returns the ID of a resource which can be queried to determine the status of the operation.
+      parameters:
+        - in: body
+          name: packageReferences
+          description: An array of the IDs of the packages to be added to the feed.
+          schema:
+            type: object
+            properties:
+              packageReferences:
+                type: array
+                items:
+                  type: string
+                  example: 5c62bf36781e2b1c7c57daf4
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        400:
+          $ref: '#/definitions/Error'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/feeds/{id}/remove-package-references:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    post:
+      x-ni-privilege: Write
+      x-ni-operation: removePackageReferences
+      tags: [feeds, packages]
+      summary: Remove package references
+      description: Remove package references.
+      parameters:
+        - in: query
+          name: deleteIfLastReference
+          type: boolean
+          required: false
+          description: A value indicating whether any packages that are no longer referenced after being removed from the feeds should be deleted.
+          default: true
+        - in: body
+          name: packageReferences
+          description: An array of package IDs to be removed from the feeds.
+          schema:
+            type: object
+            properties:
+              packageReferences:
+                type: array
+                items:
+                  type: string
+                  example: 5c62bf36781e2b1c7c57daf4
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        400:
+          $ref: '#/definitions/Error'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/feeds/{id}/import:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    post:
+      x-ni-privilege: Write
+      x-ni-operation: importFeeds
+      tags: [feeds]
+      summary: Import feeds into an existing feed
+      description: Asynchronously imports feeds into an existing feed. Returns the ID of a resource which can be queried to track the status of the operation.
+      parameters:
+        - in: query
+          name: shouldCleanSourceFeeds
+          type: boolean
+          required: false
+          description: A value indicating whether only the most recent version of every package in the source feed should be added to the destination feed. If true, only the most recent version of each package will be added. If false, all versions of each package will be added.
+          default: true
+        - in: query
+          name: shouldOverwrite
+          type: boolean
+          required: false
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
+        - in: query
+          name: ignoreImportErrors
+          type: boolean
+          required: false
+          description: A query parameter that determines whether the service should abort the request if errors occur while importing some packages. If true, the service will abort and roll back the request if an error occurs while importing a package. If false, the service will import as many packages as it can, and return an error describing which packages could not be imported.
+          default: false
+        - in: body
+          name: feeds
+          description: An array containing the URIs of remote feeds whose packages should be added to the destination feed. Appending /Packages to each URI should yield the "Packages" file for that feed.
+          schema:
+            type: object
+            properties:
+              feedUris:
+                type: array
+                items:
+                  type: string
+                  example: path/to/feed
+              feedIds:
+                type: array
+                items:
+                  type: string
+                  example: 5c62bf36781e2b1c7c57daf4
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        400:
+          $ref: '#/definitions/Error'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/feeds/{id}/update-check:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    post:
+      x-ni-privilege: Read
+      x-ni-operation: checkForUpdates
+      tags: [feeds]
+      summary: Check for updates to a feed
+      description: Asynchronously checks for updates to a feed, based on the latest versions of the packages available in the package sources for that feed. Offers to upgrade packages in the feed to the latest version available, as well as add any new packages to the feed if new packages were added to the package sources. Returns the ID of a resource which can be queried to determine the status of the operation. Upon completion, the resource redirects to an array of UpdateDescriptor objects, describing the updates available for the feed. Remove any updates you don't want to apply, and then send the modified array to the "Apply updates to a feed" route below.
+      parameters:
+        - in: body
+          name: packageSources
+          description: An optional array of the IDs and/or external URIs of package sources which should be queried for updates. If not given, all of the feed's package sources will be checked. Package sources that are not present in the feed's array of package sources will be ignored. If you would like to add additional package sources to a feed, use the import route.
+          schema:
+            type: object
+            properties:
+              packageSources:
+                type: array
+                items:
+                  type: string
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        400:
+          $ref: '#/definitions/Error'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/feeds/{id}/update-apply:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    post:
+      x-ni-privilege: Write
+      x-ni-operation: applyUpdates
+      tags: [feeds]
+      summary: Apply updates
+      description: Asynchronously applies a set of updates to a feed. Returns the ID of a resource which can be queried to determine the status of the operation. Upon completion, the resource redirects to the modified feed.
+      parameters:
+        - in: query
+          name: shouldOverwrite
+          type: boolean
+          required: false
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
+        - in: query
+          name: ignoreImportErrors
+          type: boolean
+          required: false
+          description: A query parameter that determines whether the service should abort the request if errors occur while importing some packages. If true, the service will abort and roll back the request if an error occurs while importing a package. If false, the service will import as many packages as it can, and return an error describing which packages could not be imported.
+          default: false
+        - in: body
+          name: updateDescriptors
+          description: An array containing the update descriptors that should be applied to the feed. Update descriptors should be obtained from a call to the "Check for updates to a feed" route, detailed above. You can remove any update descriptors returned from the "Check for updates" route, but modifying them in any other way is not supported.
+          schema:
+            $ref: '#/definitions/UpdateDescriptorRequest'
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        400:
+          $ref: '#/definitions/Error'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/feeds/{id}/clean:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    post:
+      x-ni-privilege: Write
+      x-ni-operation: cleanFeed
+      tags: [feeds]
+      summary: Clean a feed
+      description: Asynchronously cleans a feed by removing all but the most recent version of every package in the feed. Returns the ID of a resource which can be queried to track the status of the operation. Upon completion, the resource redirects to the modified feed.
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/feeds/{id}/import-store-items:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    post:
+      x-ni-privilege: Write
+      x-ni-operation: importStoreItems
+      tags: [feeds, store]
+      summary: Import store items
+      description: Route for importing one or more store items into an existing feed.
+      parameters:
+        - in: query
+          name: shouldOverwrite
+          type: string
+          required: false
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
+        - in: body
+          name: storeItemDescriptors
+          schema:
+            type: object
+            description:  A required array of objects which describe which specific store items to replicate.
+            properties:
+              storeItemDescriptors:
+                type: array
+                items:
+                  $ref: '#/definitions/StoreItemDescriptor'
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        400:
+          $ref: '#/definitions/Error'
+        401:
+          $ref: '#/definitions/Unauthorized'
+        default:
+          $ref: '#/definitions/Error'
+  /v1/jobs:
+    get:
+      x-ni-privilege: Read
+      x-ni-operation: listJobs
+      tags: [jobs]
+      summary: List all jobs
+      description: Gets all jobs in the service. See the entry for "Get job details" route for more information about jobs.
+      parameters:
+        - in: query
+          name: id
+          type: string
+          required: false
+          description: A comma-delimited list of job ids.
+        - in: query
+          name: operation
+          type: string
+          required: false
+          description: A comma-delimited list of operations.
+        - in: query
+          name: status
+          type: string
+          required: false
+          description: A comma-delimited list of statuses.
+        - in: query
+          name: resourceId
+          type: string
+          required: false
+          description: A comma-delimited list of resource ids.
+      responses:
+        200:
+          description: The request has succeeded.
+          schema:
+            type: object
+            properties:
+              jobs:
+                type: array
+                items:
+                  $ref: '#/definitions/Job'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/jobs/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    get:
+      x-ni-privilege: Read
+      x-ni-operation: getJobs
+      tags: [jobs]
+      summary: Get job details
+      description: Gets a job with a specific identifier.
+      responses:
+        200:
+          description: The request has succeeded. - If the job has not completed.
+          headers:
+            Location:
+              type: string
+              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
+          schema:
+            type: object
+            properties:
+              job:
+                $ref: '#/definitions/Job'
+        303:
+          description: If the job has completed, see Other with the Location header set to the URI of the created or modified resource.
+          headers:
+            Location:
+              type: string
+              description: Contains the relative URI of the job that was created for tracking the status of the operation. Execute a GET against this URI to get information about the status of the operation.
+          schema:
+            type: object
+            properties:
+              job:
+                $ref: '#/definitions/Job'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/can-write:
+    get:
+      x-ni-privilege: Write
+      x-ni-operation: canWrite
+      tags: [misc]
+      summary: Check if the logged user can write
+      description: Check if the logged user can write.
+      responses:
+        200:
+          description: The request has succeeded.
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/updates/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    get:
+      x-ni-privilege: Read
+      x-ni-operation: getUpdateDescriptors
+      tags: [updates]
+      summary: Retrieve updates for a feed
+      description: Retrieve updates for a feed.
+      responses:
+        200:
+          description: The request has succeeded.
+          schema:
+            $ref: '#/definitions/UpdateDescriptorResponse'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/store/items:
+    get:
+      x-ni-privilege: Read
+      x-ni-operation: getStoreItems
+      tags: [store]
+      summary: Query store items
+      description: Route for querying for store items.
+      parameters:
+        - in: query
+          name: query
+          type: string
+          description: A search string. E.g., "labview".
+          required: false
+        - in: query
+          name: pageSize
+          type: number
+          description: How many results should be returned in the response.
+          required: false
+        - in: query
+          name: pageNumber
+          type: number
+          description: The page of the response to return.
+          required: false
+      responses:
+        200:
+          description: The request has succeeded.
+          schema:
+            type: object
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/definitions/StoreItem'
+              pageSize:
+                type: number
+              pageNumber:
+                type: number
+              totalPages:
+                type: number
+              totalItems:
+                type: number
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/store/items/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: The ID of this resource.
+        type: string
+        required: true
+        x-example: "5c5d49f2781e2b2cd045267b"
+    get:
+      x-ni-privilege: Read
+      x-ni-operation: getStoreItems
+      tags: [store]
+      summary: Get a store item
+      description: Route for getting an individual store item.
+      responses:
+        200:
+          description: The request has succeeded.
+          schema:
+            type: object
+            properties:
+              storeItem:
+                $ref: '#/definitions/StoreItem'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
+  /v1/replicate-store-item:
+    post:
+      x-ni-privilege: Write
+      x-ni-operation: replicateStoreItem
+      tags: [store]
+      summary: Replicate a store item
+      description: Route for replicating a store item into either a single feed, or a separate feed for each feed within the store item.
+      parameters:
+        - in: query
+          name: shouldOverwrite
+          type: boolean
+          description: A query parameter that determines if existing packages with the same filename as a package to be added to the pool should be overwritten.
+          default: false
+          required: false
+        - in: query
+          name: split
+          type: boolean
+          description: A query parameter that determines if the store item should be merged into one feed, or if each feed in the store item should be copied into a separate feed.
+          default: false
+          required: false
+        - in: body
+          name: feedRequest
+          schema:
+            $ref: '#/definitions/StoreItemRequest'
+      responses:
+        202:
+          $ref: '#/responses/JobIdResponse'
+        400:
+          $ref: '#/definitions/Error'
+        401:
+          $ref: '#/definitions/Unauthorized'            
+        default:
+          $ref: '#/definitions/Error'
