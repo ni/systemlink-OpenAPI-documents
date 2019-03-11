@@ -88,9 +88,9 @@ definitions:
       - comparator
     properties:
       setPoints:
-        description: Values which the tag's current value will be compared to when determining if the
-          condition evaluates to true or not. Conditions associated with the IN_RANGE and OUT_OF_RANGE 
-          comparators will have two set points. All other conditions should have only one set point.
+        description: Values compared against the tag's current value to determine whether or not the condition
+          is true. Conditions associated with the IN_RANGE and OUT_OF_RANGE comparators will have two set
+          points. All other conditions should have only one set point.
         type: array
         items:
           type: string
@@ -139,7 +139,7 @@ definitions:
     items:
       $ref: '#/definitions/Condition'
   Keywords:
-    description: Words or phrases associated with a rule. Rules can be taggedwith keywords to make it easier
+    description: Words or phrases associated with a rule. Rules can be tagged with keywords to make it easier
       to find them with queries.
     type: array
     items:
@@ -157,8 +157,8 @@ definitions:
       key1: value1
   RuleCommonFields:
     title: Rule Common Fields
-    description: Type single-sourcing the definition of the fields available in both an update request and in
-      the rule type itself.
+    description: A single-sourced definition of available fields in both an udpate request and the rule type
+      itself.
     properties:
       searchPath:
         description: A string describing which tag(s) a rule applies to. This can take the form of either
@@ -181,7 +181,7 @@ definitions:
       description:
         description: Display string for a rule's description.
         type: string
-        example: Preconfigured rule for monitoring managed systems' disk space
+        example: Preconfigured rule for monitoring managed system's disk space
       alarmInstanceDisplayNameTemplate:
         description: Template string which will be used to set the *displayName* field on alarms created
           by a rule. Values surrounded by angle brackets will be substituted with values from the tag's property
@@ -319,7 +319,7 @@ paths:
               description:
                 description: Display string for a rule's description.
                 type: string
-                example: Preconfigured rule for monitoring managed systems' disk space
+                example: Preconfigured rule for monitoring managed system's disk space
               alarmInstanceDisplayNameTemplate:
                 description: Template string which will be used to set the *displayName* field on alarms created
                   by a rule. Values surrounded by angle brackets will be substituted with values from the tag's property
@@ -347,7 +347,7 @@ paths:
             title: CreateRuleResponse
             properties:
               id:
-                description: The ID of the created rule
+                description: The unique ID of the created rule
                 type: string
                 example: 5c40ec55e0d6441168b4c543
         401:
