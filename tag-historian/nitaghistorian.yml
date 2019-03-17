@@ -1,0 +1,383 @@
+swagger: '2.0'
+info:
+  version: '1'
+  title: Tag Historian Web Service
+  description: SystemLink Tag Historian Service HTTP API.
+  contact:
+    name: National Instruments
+    url: 'https://www.ni.com/systemlink'
+    email: support@ni.com
+basePath: /nitaghistorian
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  basicAuth:
+    type: basic
+security:
+  - basicAuth: []
+definitions:
+  Error:
+    description: Contains error information
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+      message:
+        description: Complete error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+    example:
+      name: TagHistorian.InvalidId
+      code: -251913
+      message: 'Invalid id: 5c88d2ae26b41e22f08b4407.'
+      args: []
+  ErrorEntry:
+    description: Populated with any errors that ocurr when performing multiple operations in a single request, with one inner error per failed operation.
+    title: Error Entry
+    allOf:
+      - $ref: '#/definitions/Error'
+      - type: object
+        properties:
+          resourceType:
+            description: Type of resource associated with the error
+            type: string
+          resourceId:
+            description: Identifier of the resource associated with the error
+            type: string
+          innerErrors:
+            type: array
+            items:
+              $ref: '#/definitions/ErrorEntry'
+    example:
+      name: Skyline.OneOrMoreErrorsOccurred
+      code: -251040
+      message: One or more errors occurred. See the contained list for details of each error.
+      args: []
+      innerErrors:
+        - name: TagHistorian.DatabaseError
+          code: -253304
+          resourceType: tag
+          resourceId: system2.tag1
+          message: Database error.
+          args: []
+  Operation:
+    description: Operation provided by the API
+    type: object
+    properties:
+      available:
+        type: boolean
+        description: Whether the operation is available to the caller
+      version:
+        type: integer
+        description: Version of the available operation
+    required: [available]
+    example:
+      available: true
+      version: 1
+  V1Operations:
+    title: V1 Operations
+    description: V1 operations
+    type: object
+    properties:
+      operations:
+        description: >-
+          Available operations in the v1 version of the API:
+
+          - queryHistoricalTagValues: The ability to read historical tag values
+
+          - modifyHistoricalTagValues: The ability to modify properties of historical tag values
+
+          - deleteHistoricalTagValues: The ability to delete historical tag values
+
+        type: object
+        properties:
+          queryHistoricalTagValues:
+            $ref: '#/definitions/Operation'
+          modifyHistoricalTagValues:
+            $ref: '#/definitions/Operation'
+          deleteHistoricalTagValues:
+            $ref: '#/definitions/Operation'
+  HttpHistoricalValueUpdate:
+    description: An update for a single historical value.
+    type: object
+    title: Http Historical Value Update
+    properties:
+      id:
+        description: The ID of the historical value to update.
+        type: string
+        example: '5c88d2ae26b41e22f08b4407'
+      properties:
+        description: Key-value pairs to associate with the historical value.
+        additionalProperties:
+          type: string
+        example:
+          note: This value is an outlier and needs investigation.
+      expirationDate:
+        description: The expiration date is the date and time at which the historical value will be deleted automatically, in ISO-8601 format.
+        type: string
+        format: iso-date-time
+        example: '2020-03-13T09:51:38Z'
+    required: [id]
+responses:
+  Error:
+    description: Error
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  Unauthorized:
+    description: Not authorized
+    headers:
+      WWW_Authenticate:
+        description: Information for how to authenticate
+        type: string
+paths:
+  /:
+    get:
+      tags: [versioning]
+      summary: API information
+      description: Returns information about API versions and available operations.
+      operationId: RootEndpoint
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Version information
+            title: RootEndpointResponse
+            type: object
+            properties:
+              v1:
+                $ref: '#/definitions/V1Operations'
+              version:
+                description: Implementation version of the web service
+                type: string
+                example: 18.0.0.1722
+  /{version}:
+    parameters:
+      - in: path
+        name: version
+        description: Version of the API to retrieve operations.
+        type: string
+        required: true
+    get:
+      tags: [versioning]
+      summary: API version information
+      description: Returns available operations for a single version of the API.
+      operationId: RootEndpointWithVersion
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/V1Operations'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/tags/query-history:
+    post:
+      tags: [history]
+      summary: Read historical tag values
+      description: Queries for the historical values of one or more tags, with optional decimation.
+      operationId: QueryHistory
+      x-ni-operation: queryHistoricalTagValues
+      produces:
+        - application/json
+        - text/csv
+      parameters:
+        - in: body
+          name: Request body
+          required: true
+          description: Defines how historical values are queried and for which tags.
+          schema:
+            description: Defines how historical values are queried and for which tags.
+            type: object
+            title: Http Query Request Body
+            properties:
+              paths:
+                description: One or more paths identifying the tags whose historical values should be returned.
+                type: array
+                items:
+                  type: string
+                example:
+                  - system1.tag1
+                  - system2.tag1
+              startTime:
+                description: Limits the returned historical values to those written at or after at the given time in ISO-6801 format.
+                type: string
+                format: iso-date-time
+                example: '2018-09-04T18:45:08Z'
+                default: '0001-01-01T00:00:00Z'
+              endTime:
+                description: Limits the returned historical values to those written at or before the given time in ISO-8601 format.
+                type: string
+                format: iso-date-time
+                example: '2018-09-04T18:45:08Z'
+                default: '9999-12-31T23:59:59Z'
+              skip:
+                description: Limits the returned historical values to those after the given number of values. Use with the take property to implement pagination. Only applies when not specifying a decimation.
+                type: integer
+                minimum: 0
+                default: 0
+              take:
+                description: Limits the returned historical values to the specified number of values. Use with the skip property to implement pagination. Only applies when not specifying a decimation.
+                type: integer
+                minimum: 0
+                default: 1000
+                example: 1
+              decimation:
+                description: When non-zero, the returned historical values are decimated across requested time span divided into the specified number of equal-sized intervals.
+                type: integer
+                minimum: 0
+                default: 0
+              sortOrder:
+                description: Specifies the order to return historical values, either ascending or descending order based on when each tag value was written.
+                type: string
+                enum: [ASCENDING, DESCENDING]
+                default: ASCENDING
+              responseFormat:
+                description: The data format for the returned historical values. The values can either be returned as a JSON document (default) or comma-separated values.
+                type: string
+                enum: [JSON, CSV]
+                default: JSON
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            title: Http Query Response Body
+            properties:
+              values:
+                description: An object containing the historical values for each requested tag that was successfully queried. The object's property names correspond to a tag path.
+                additionalProperties:
+                  type: array
+                  items:
+                    type: object
+                    title: Http Historical Value
+                    properties:
+                      id:
+                        description: The unique identifier for referencing the historical value in other requests.
+                        type: string
+                        example: '5c88d2ae26b41e22f08b4407'
+                      path:
+                        description: The path of the tag corresponding to this historical value.
+                        type: string
+                        example: system1.tag1
+                      type:
+                        description: The value's data type.
+                        type: string
+                        enum: [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
+                      value:
+                        description: The value of the tag at the time it was written, converted to a string.
+                        type: string
+                        example: '12.87'
+                      timestamp:
+                        description: The ISO-8601 date and time that the historical value was written, in UTC.
+                        type: string
+                        format: iso-date-time
+                        example: '2019-03-13T09:51:38Z'
+                      properties:
+                        description: Key-value pairs associated with the historical value after the fact. Tag properties are not copied to the historical value.
+                        additionalProperties:
+                          type: string
+                        example:
+                          note: This value is an outlier and needs investigation.
+                      expirationDate:
+                        description: TODO - I need to investigate DateTime.MinValue.ToUniversalTime() and timezone changes... For historical values of tags that aren't using a count-based retention policy, the expiration date is the date and time at which the historical value will be deleted automatically.
+                        type: string
+                        format: iso-date-time
+                        example: '2020-03-13T09:51:38Z'
+                example:
+                  system1.tag1:
+                    id: '5c88d2ae26b41e22f08b4407'
+                    path: system1.tag1
+                    type: DOUBLE
+                    value: '12.87'
+                    timestamp: '2019-03-13T09:51:38Z'
+                    properties:
+                      note: This value is an outlier and needs investigation.
+                    expirationDate: '2020-03-13T09:51:38Z'
+              totalCount:
+                description: The total number of historical values matched by the query regardless of the take parameter. When applying decimation, this value is always equal to the number of returned values.
+                type: integer
+                minimum: 0
+                example: 1100
+              errors:
+                $ref: '#/definitions/ErrorEntry'
+              failed:
+                description: The paths of the tags that had errors.
+                type: array
+                items:
+                  type: string
+                example: [system2.tag1]
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/tags/history/{path}/update-values:
+    post:
+      tags: [history]
+      summary: Modify historical value metadata
+      description: TODO - this route doesn't work... Updates one or more historical values' properties or expiration.
+      operationId: UpdateHistoricalValues
+      x-ni-operation: modifyHistoricalTagValues
+      parameters:
+        - in: path
+          name: path
+          type: string
+          required: true
+          description: The path of the tag whose historical values are being updated.
+        - in: body
+          name: Request body
+          required: true
+          description: Contains the updates to apply to the tag's historical values.
+          schema:
+            description: Contains the updates to apply to the tag's historical values.
+            type: object
+            title: HttpUpdateValuesRequestBody
+            properties:
+              values:
+                description: An array of updates to apply to the tag's historical values.
+                type: array
+                items:
+                  $ref: '#/definitions/HttpHistoricalValueUpdate'
+            required: [values]
+      responses:
+        200:
+          description: Partial success
+          schema:
+            description: Describes one or more errors that ocurred while updating historical values.
+            title: Http Update Values Response Body
+            type: object
+            properties:
+              failed:
+                description: The historical value updates that failed to apply.
+                type: array
+                items:
+                  $ref: '#/definitions/HttpHistoricalValueUpdate'
+              error:
+                $ref: '#/definitions/ErrorEntry'
+        204:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
