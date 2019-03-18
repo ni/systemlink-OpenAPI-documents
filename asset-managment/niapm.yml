@@ -1,0 +1,1405 @@
+swagger: "2.0"
+info:
+  version: '1'
+  title: Asset Performance Management Web Service
+  description: Asset Performance Management HTTP API
+  contact:
+    name: National Instruments
+    url: 'https://www.ni.com/systemlink'
+    email: support@ni.com
+basePath: /niapm
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  basicAuth:
+    type: basic
+  cookieAuth:
+    type: apiKey
+    in: header
+    name: Cookie
+security:
+  - basicAuth: []
+  - cookieAuth: []
+x-ni-routing-key: Skyline.AssetPerformanceManagement
+definitions:
+  Error:
+    description: Contains error information.
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+      resourceType:
+        description: Type of resource associated with the error
+        type: string
+      resourceId:
+        description: Identifier of the resource associated with the error
+        type: string
+      message:
+        description: Complete error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+      innerErrors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+    example:
+      name: Skyline.OneOrMoreErrorsOccurred
+      code: -251040
+      message: >-
+        One or more errors occurred. See the contained list for details of each
+        error.
+      args: []
+      ## TODO: populate with valid error code
+      innerErrors:
+        - name: AssetPerformanceManagement.AssetNotFound
+          code: -253401
+          resourceType: AssetEntry
+          resourceId: 29162;01B245D6;4243;0
+          message: 'The asset with identifier 29162;01B245D6;4243;0 was not found.'
+          args: [29162;01B245D6;4243;0]
+  Operation:
+    description: An operation provided by the API.
+    type: object
+    properties:
+      available:
+        type: boolean
+        description: Whether the operation is available to the caller.
+      version:
+        type: integer
+        description: Version of the available operation.
+    required: [available]
+    example:
+      available: true
+      version: 1
+  V1Operations:
+    title: V1 Operations
+    description: Object containing available operations in the v1 version of the API.
+    type: object
+    properties:
+      operations:
+        description: >-
+          Available operations in the v1 version of the API:
+          
+          - readAssets: Read information related to assets.
+          
+          - writeAssets: Write information related to assets.
+          
+          - deleteAssets: Delete information related to assets.
+        type: object
+        properties:
+          readAssets:
+            $ref: '#/definitions/Operation'
+          writeAssets:
+            $ref: '#/definitions/Operation'
+          deleteAssets:
+            $ref: '#/definitions/Operation'
+  BusType:
+    title: Bus Type
+    description: Specifies all supported bus types for an asset.
+    type: string
+    enum:
+      - BUILT_IN_SYSTEM
+      - PCI_PXI
+      - USB
+      - GPIB
+      - VXI
+      - SERIAL
+      - TCP_IP
+      - CRIO
+      - SCXI
+      - CDAQ
+      - SWITCH_BLOCK
+      - SCC
+      - FIRE_WIRE
+      - ACCESSORY
+      - CAN
+      - SWITCH_BLOCK_DEVICE
+  SystemConnectionState:
+    title: System Connection State
+    description: Specifies whether the minion is connected to the server and has updated the server with its data.
+    type: string
+    enum:
+      - APPROVED
+      - DISCONNECTED
+      - CONNECTED_UPDATE_PENDING
+      - CONNECTED_UPDATE_SUCCESSFUL
+      - CONNECTED_UPDATE_FAILED
+      - UNSUPPORTED
+      - ACTIVATED
+  AssetPresenceStatus:
+    title: Asset Presence Status
+    description: Specifies the asset presence in the system.
+    type: string
+    enum:
+      - INITIALIZING
+      - UNKNOWN
+      - NOT_PRESENT
+      - PRESENT
+  CalibrationHistoryModel:
+    allOf:
+      - $ref: '#/definitions/ExternalCalibrationModel'
+      - title: Calibration History
+      - description: Contains a calibration history entry for an asset.
+      - type: object
+      - required:
+        - id
+        - calibrationType
+      - properties:
+          id:
+            description: The calibration entry identifier.
+            type: string
+            example: "5c4f0834174ae321b8a95a03"
+          calibrationType:
+            $ref: '#/definitions/CalibrationType'
+          timestamp:
+            description: ISO-8601 formatted timestamp specifying the created date of the entry.
+            type: string
+            format: iso-date-time
+            example: '2018-05-07T18:58:05.219692Z'
+  CalibrationStatus:
+    title: Calibration Status
+    description: Specifies the calibration category that an asset belongs to based on the next due calibration date.
+    type: string
+    enum:
+      - OK
+      - APPROACHING_RECOMMENDED_DUE_DATE
+      - PAST_RECOMMENDED_DUE_DATE
+  CalibrationMode:
+    title: Calibration Mode
+    description: Specifies how calibration data has been recoded; either automatically discovered or manually entered.
+    type: string
+    enum:
+      - AUTOMATIC
+      - MANUAL
+  CalibrationType:
+    title: Calibration Type
+    description: Specifies the type of the calibration; either self or external calibration.
+    type: string
+    enum:
+      - SELF_CALIBRATION
+      - EXTERNAL_CALIBRATION
+  AssetState:
+    title: Asset State
+    description: Specifies the state of the asset and its system.
+    type: object
+    properties:
+      systemConnectionState:
+        $ref: '#/definitions/SystemConnectionState'
+      assetPresence:
+        $ref: '#/definitions/AssetPresenceStatus'
+  TemperatureSensor:
+    title: Temperature Sensor
+    description: Specifies the sensor name and temperature reading, in Celsius.
+    type: object
+    required:
+        - reading
+    properties:
+      name:
+        description: Sensor name
+        type: string
+        example: Sensor0
+      reading:
+        description: Sensor reading
+        type: number
+        format: double
+        example: 25.8
+  AssetLocation:
+    title: Asset Location
+    description: Specifies information about the asset and the system in which the asset resides.
+    type: object
+    properties:
+      minionId:
+        description: Id of the minion the asset is located in.
+        type: string
+        example: NI_PXIe-8135_Embedded_Controller--MAC-00-80-2F-23-52-65
+      parent:
+        description: The parent of the asset.
+        type: string
+        example: Chassis1
+      resourceUri:
+        description: Identifier of a resource.
+        type: string
+        example: 1/4243/1949942980/01BB877A/3
+      slotNumber:
+        description: Number of the slot the asset is located in.
+        type: integer
+        example: 2
+      systemName:
+        description: Hostname of the system.
+        type: string
+        example: APM-PXI1
+      state:
+        $ref: '#/definitions/AssetState'
+  ExternalCalibrationOperator:
+    title: External Calibration Operator
+    description: Specifies the operator that performed the calibration.
+    type: object
+    properties:
+      displayName:
+        description: Display name of logged in user.
+        type: string
+      userId:
+        description: Identifier of the logged in user.
+        type: string
+  SelfCalibrationModel:
+    title: Self Calibration
+    description: Contains data from the last self calibration.
+    type: object
+    required:
+        - date
+    properties:
+      temperatureSensors:
+          description: An array of temperature sensor information.
+          type: array
+          items:
+            $ref: '#/definitions/TemperatureSensor'
+      isLimited:
+        description: Specifies whether the last internal/self calibration of the asset was a limited calibration.
+        type: boolean
+        example: false
+      date:
+        description: ISO-8601 formatted timestamp specifying the last date the asset was self-calibrated.
+        type: string
+        format: iso-date-time
+        example: '2018-05-07T18:58:05.219692Z'
+  ExternalCalibrationBaseModel:
+    title: Base External Calibration
+    description: Contains data for an external calibration entry.
+    type: object
+    required:
+        - date
+        - recommendedInterval
+        - nextRecommendedDate
+        - temperatureSensors
+    properties:
+      temperatureSensors:
+          description: An array of temperature sensor information.
+          type: array
+          items:
+            $ref: '#/definitions/TemperatureSensor'
+      isLimited:
+        description: Specifies whether the last external calibration of the asset was a limited calibration.
+        type: boolean
+        example: false
+      date:
+        description: ISO-8601 formatted timestamp specifying the last date the asset was externally calibrated.
+        type: string
+        format: iso-date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      recommendedInterval:
+        description: Specifies the manufacturer-recommended calibration interval in months.
+        type: integer
+        example: 12
+      nextRecommendedDate:
+        description: ISO-8601 formatted timestamp specifying the recommended date for the next external calibration.
+        type: string
+        format: iso-date-time
+        example: '2019-05-07T18:58:05.219692Z'
+      comments:
+        description: Specifies any calibration comments.
+        type: string
+  ExternalCalibrationModel:
+    allOf:
+      - $ref: '#/definitions/ExternalCalibrationBaseModel'
+      - title: External Calibration
+      - description: Contains data from the last external calibration.
+      - type: object
+      - properties:
+          entryType:
+            $ref: '#/definitions/CalibrationMode'
+          operator:
+            $ref: '#/definitions/ExternalCalibrationOperator'
+  AssetModel:
+    title: Asset Model
+    description: An object describing an asset with all of its properties.
+    type: object
+    required:
+      - id
+      - modelName
+      - modelNumber
+      - serialNumber
+      - vendorName
+      - vendorNumber
+      - busType
+    properties:
+      id: 
+        description: Unique identifier of the asset.
+        type: string
+        example: "29162;01B245D6;4243;0"
+      serialNumber:
+        description: Serial number of the asset.
+        type: string
+        example: "01BB877A"
+      modelName:
+        description: Model name of the asset.
+        type: string
+        example: "NI PXIe-6368"
+      modelNumber:
+        description: Model number of the asset.
+        type: integer
+        example : 123
+      vendorName:
+        description: Vendor name of the asset.
+        type: string
+        example: National Instruments
+      vendorNumber:
+        description: Vendor number of the asset.
+        type: integer
+        example: 4244
+      name:
+        description: Name of the asset.
+        type: string
+        example: PCISlot2
+      firmwareVersion:
+        description: Firmware version of the asset.
+        type: string
+        example: A1
+      hardwareVersion:
+        description: Hardware version of the asset.
+        type: string
+        example: 12A
+      busType:
+        $ref: '#/definitions/BusType'
+      visaResourceName:
+        description: VISA resource name of the asset.
+        type: string
+        example : vs-1234
+      assetLocation:
+        $ref: '#/definitions/AssetLocation'
+      temperatureSensors:
+        description: An array of temperature sensor information.
+        type: array
+        items:
+          $ref: '#/definitions/TemperatureSensor'
+      supportsSelfCalibration:
+        description: Specifies whether the asset supports internal (self) calibration.
+        type: boolean
+        example: true
+      supportsExternalCalibration:
+        description: Specifies whether the asset supports external calibration.
+        type: boolean
+        example: true
+      selfCalibration:
+        $ref: '#/definitions/SelfCalibrationModel'
+      externalCalibration:
+        $ref: '#/definitions/ExternalCalibrationModel'
+      calibrationStatus:
+        $ref: '#/definitions/CalibrationStatus'
+      lastUpdatedTimestamp:
+        description: ISO-8601 formatted timestamp specifying the last date that the asset has had a property update.
+        type: string
+        format: iso-date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      isNIAsset:
+        description: Specifies whether this asset is an NI asset (true) or a 3rd party asset (false).
+        type: boolean
+        example: true
+      properties:
+        description: Specifies a set of properties associated with an asset.
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          Key1: Value1
+      keywords:
+        description: Specifies a set of keywords associated with an asset.
+        type: array
+        items:
+          type: string
+          example: Keyword1
+  AssetWithAvailabilityHistoryModel:
+    title: Asset With Availability History
+    description: Contains asset availability history which consists in availability information for each system in which the asset was present.
+    type: object
+    properties:
+      assetName:
+        description: The asset name for which availability history is computed.
+        type: string
+        example: PCI-Slot2
+      assetIdentifier:
+        description: The identifier of the asset for which availability history is computed.
+        type: string
+        example: 29162;01B245D6;4243;0
+      availabilityHistory:
+        description: The availability history for the asset consisting in availability information for each system in which the asset was present.
+        type: array
+        items:
+          $ref: '#/definitions/OverallAvailabilityInTimespanModel'
+    required:
+      - assetName
+      - assetIdentifier
+      - availabilityHistory
+  OverallAvailabilityInSystemModel:
+    title: Overall Availability In System
+    description: Contains availability information for an asset in a single system for the specified timespan.
+    type: object
+    properties:
+      key:
+        description: Date representing the beginning of a timespan.
+        type: string
+        example: 2018/11/01
+      value:
+        description: The percentage of time in which the asset was available in a system during the specific timespan.
+        type: number
+        format: double
+        example: 7.38958
+    required:
+      - key
+      - value
+  OverallAvailabilityInTimespanModel:
+    title: Overall Availability In Timespan
+    description: Contains availability information for an asset in a single system for the specified timespan.
+    type: object
+    properties:
+      key:
+        description: The name of the system in which the asset was available.
+        type: string
+        example: APM-PXI1
+      value:
+        description: The percentage of time in which the asset was available in a system during a specific timespan.
+        type: number
+        format: double
+        example: 7.38958
+    required:
+      - key
+      - value
+  ResponseFormat:
+    title: Response Format
+    description: Specifies the return type. Valid options are "JSON" and "CSV".
+    type: string
+    default: JSON
+    enum:
+      - JSON
+      - CSV
+  Destination:
+    title: Request Destination
+    description:
+      Specifies the destination of the request.
+      "INLINE" (default) returns the list of assets as the body of the response.
+      "DOWNLOAD" returns the list of assets as the body of the response and indicates to the client that it should be downloaded as a file.
+      "FILE_SERVICE" sends the list of assets to the file ingestion service and returns the ID of the file to the client in a JSON object.
+    type: string
+    default: INLINE
+    enum:
+      - INLINE
+      - DOWNLOAD
+      - FILE_SERVICE
+  ServicePolicy:
+    title: Service policy
+    description: An object containing the service policy.
+    type: object
+    required:
+      - calibrationPolicy
+    properties:
+      calibrationPolicy:
+        description: Calibration policy
+        type: object
+        properties:
+          daysForApproachingCalibrationDueDate:
+            description: The number of days for an asset to be considered as approaching calibration.
+            type: integer
+            example: 30
+parameters:
+  AssetAvailabilityGranularity:
+    in: query
+    name: granularity
+    description: Specifies the possible granularities that can be used to obtain asset availability.
+    type: string
+    default: WEEK
+    enum:
+      - NONE
+      - WEEK
+      - MONTH
+  AssetId: 
+    in: path
+    name: assetId
+    description: Specifies the identifier of an asset.
+    type: string
+    required: true
+    x-example: "29162;01B245D6;4243;0"
+  Skip:
+    in: path
+    name: skip
+    description:
+      How many resources to skip in the result when paging.
+      For example, a list of 100 asssets with a skip value of 50 will return
+      entries 51 through 100.
+    type: integer
+    required: true
+    x-example: 0
+  Take:
+    in: path
+    name: take
+    description:
+      How many resources to return in the result, or -1 to use a default
+      defined by the service.
+      For example, a list of 100 assets with a take value of 25 will return
+      entries 1 through 25.
+    type: integer
+    required: true
+    x-example: 0
+  AssetAvailabilityComparison:
+    in: body
+    name: assetIds
+    description: Request body consisting in a time interval and a list of assets to compute availability history for.
+    schema:
+      type: object
+      required:
+        - assetIds
+      properties:
+        assetIds:
+          description: Specifies multiple asset identifiers for which to compare availability history.
+          type: array
+          items:
+            type: string
+          example: ["29162;01B245D6;4243;0"]
+        startDate:
+          description: >-
+            A date time value which can be used to specify the beginning of a timespan. 
+            
+            This parameter is required to have the "ISO 8601" format in order to be considered valid. 
+            
+            If the parameter is not specified, the value will be set to the 1st day of the current month.
+          type: string
+          example: '2018-05-01T00:00:00.519Z'
+        endDate:
+          description: >- 
+            A date time value which can be used to specify the end of a timespan.
+            
+            This parameter is required to have the "ISO 8601" format in order to be considered valid. 
+            
+            If the parameter is not specified, the value will be set to the current date in UTC.
+          type: string
+          example: '2018-05-20T00:00:00Z'
+    required: true
+  DeleteAssetsRequestBody:
+    in: body
+    name: deleteAssets
+    description: Request body containing identifiers of the assets for which all data must be deleted.
+    required: true
+    schema:
+      title: Delete Assets Request
+      description: Request body containing identifiers of the assets to delete all information for.
+      type: object
+      properties:
+        ids:
+          description: Specifies multiple asset identifiers for which to delete all data.
+          type: array
+          items:
+            type: string
+          example: [1234;4567;8456]
+  DeleteCalibrationsRequestBody:
+    in: body
+    name: deleteCalibrationsRequestBody
+    description: Request body containing identifiers of the calibration history entries to delete.
+    schema:
+      title: Delete Calibrations Request
+      description: Request body containing identifiers of the calibration history entries to delete.
+      type: object
+      properties:
+        calibrationIds:
+          description: Identifiers of the calibration entries to delete.
+          type: array
+          items:
+            type: string
+          example: ["5c4f0834174ae321b8a95a03"]
+  ExternalCalibrationRequestBody:
+    in: body
+    name: externalCalibrationRequestBody
+    description: Request body containing data to create a new external calibration entry for a non NI asset.
+    schema:
+      title: Post External Calibration Request
+      description: Request body containing data to create a new external calibration entry for a non NI asset.
+      type: object
+      properties:
+        externalCalibration:
+          $ref: '#/definitions/ExternalCalibrationBaseModel'
+  UpdateMetadata:
+    in: body
+    name: updateMetadata
+    description: >-
+      The metadata to be updated on the asset. The method overrides any asset metadata with what is contained in the request.
+      
+      - In order to ignore metadata properties update, leave the value off the request.
+      
+      - In order to set the value to null, assign an empty array or an empty object to the request metadata object.
+    required: true
+    schema:
+      title: Update Metadata Request
+      description: The asset metadata information to be updated.
+      type: object
+      properties:
+        keywords:
+          description: Keywords associated with an asset.
+          type: array
+          items:
+            type: string
+            example: Keyword1
+        properties:
+          description: Properties associated with an asset.
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            Key1: Value1
+  QueryAssetsRequest:
+    in: body
+    name: queryAssets
+    description: Request body consisting of filters to apply when retrieving assets.
+    schema:
+      title: Query Assets Request
+      description: Object containing filters to apply when retrieving assets.
+      type: object
+      properties:
+        ids:
+          description: Identifiers of the assets to be retrieved.
+          type: array
+          items:
+            type: string
+          example: ["29162;01B245D6;4243;0"]
+        responseFormat:
+          $ref: '#/definitions/ResponseFormat'
+        destination: 
+          $ref: '#/definitions/Destination'
+        skip:
+          description:
+            How many assets to skip in the result when paging.
+            For example, a list of 100 asssets with a skip value of 50 will return
+            entries 51 through 100.
+          type: integer
+          default: 0
+        take:
+          description:
+            How many assets to return in the result, or -1 to use a default
+            defined by the service.
+            For example, a list of 100 assets with a take value of 25 will return
+            entries 1 through 25.
+          type: integer
+          default: -1
+          maximum: 1000
+        filter:
+          description: >-
+            Specifies the filter criteria for assets. Consists of a string of queries composed using AND/OR operators.
+            String values and date strings need to be enclosed in double quotes.
+            Parenthesis can be used around filtes to better define the order of operations.
+            
+            Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+            
+
+            Operators:
+
+            - Equals operator '='. Example: 'x = y'
+            
+            - Not equal operator '!='. Example: 'x != y'
+            
+            - Greater than operator '>'. Example: 'x > y'
+           
+            - Greater than or equal operator '>='. Example: 'x >= y'
+            
+            - Less than operator '<'. Example: 'x < y'
+            
+            - Less than or equal operator '<='. Example: 'x <= y'
+            
+            - Logical AND operator 'and'. Example: 'x and y'
+            
+            - Logical OR operator 'or'. Example: 'x or y'
+            
+            - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
+
+            - Not Contains operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
+
+            
+            Valid asset properties that can be used in the filter:
+          
+            - AssetIdentifier: String representing the unique identifier of an asset.
+            
+            - AssetClass: String enumeration representing the class of an asset. Possible values are: UNDEFINED, DISCOVERED, ASSET, DUT, FIXTURE.
+
+            - SerialNumber: String representing the serial number of an asset.
+
+            - ModelName: String representing the model name of an asset.
+
+            - ModelNumber: Unsigned integer representing the model number of an asset.
+
+            - VendorName: String representing the vendor name of an asset.
+
+            - VendorNumber: Unsigned integer representing the vendor number of an asset.
+
+            - AssetName: String representing the asset name.
+
+            - FirmwareVersion: String representing the firmware version of an asset.
+
+            - HardwareVersion: String representing the hardware version of an asset.
+
+            - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE.
+
+            - IsNIAsset: Boolean flag specifying whether the asset is an NI asset or a 3rd party asset.
+
+            - Keywords: Collection of string values representing asset metadata keywords. Example: 'Keywords=["keyword1", "keyword2"]'.
+
+            - Properties: Collection of key-value pairs, each key-value pair representing an asset metadata property. Example: 'Properties=["key1":"value1", "key2":"value2"]'.
+
+            - Location.MinionId: String representing the identifier of the minion in which the asset is located in.
+
+            - Location.SystemName: String representing the name of the system that the asset is located in.
+
+            - Location.SlotNumber: Unsigned integer representing the slot number the asset is located in.
+
+            - Location.AssetState.SystemConnection: String enumeration representing the connection state of the system the asset is currently located in. Possible values are: APPROVED, DISCONNECTED, CONNECTED_UPDATE_PENDING, CONNECTED_UPDATE_SUCCESSFUL, CONNECTED_UPDATE_FAILED, UNSUPPORTED, ACTIVATED.
+
+            - Location.AssetState.AssetPresence: String enumeration representing the present status of an asset in a system. Possible values are: INITIALIZING, UNKNOWN, NOT_PRESENT, PRESENT.
+
+            - SupportsSelfCalibration: Boolean flag specifying whether the asset supports self calibration.
+
+            - SelfCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was self-calibrated. Example: "2018-05-20T00:00:00Z"
+
+            - SupportsExternalCalibration: Boolean flag specifying whether the asset supports external calibration.
+
+            - ExternalCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was externally-calibrated. Example: "2018-05-20T00:00:00Z"
+
+            - ExternalCalibration.NextRecommendedDate: ISO-8601 formatted timestamp string specifying the recommended date for the next external calibration. Example: "2018-05-20T00:00:00Z"
+
+            - ExternalCalibration.RecommendedInterval: Integer representing the manufacturer-recommended calibration interval, in months.
+
+            - ExternalCalibration.Comments: String representing any external calibration comments.
+
+            - ExternalCalibration.IsLimited: Boolean flag specifying whether the last external calibration was a limited calibration.
+
+            - ExternalCalibration.Operator.DisplayName: String representing the name of the operator which performed an external calibration on a 3rd party asset.
+          type: string
+          example: AssetName = "APMPXI1Slot3" and ExternalCalibration.NextRecommendedDate > "2018-05-01T00:00:00.519Z"
+  QueryHistoryRequestBody:
+    in: body
+    name: queryHistory
+    description: Request body consisting of options to be used for querying history for an asset.
+    schema:
+      title: Query History Request Body
+      description: Object containing options for querying history.
+      type: object
+      properties:
+        responseFormat:
+          $ref: '#/definitions/ResponseFormat'
+        destination: 
+          $ref: '#/definitions/Destination'
+  ServicePolicyUpdateRequestBody:
+    in: body
+    name: servicePolicyUpdateRequest
+    description: The request to update properties of the current service policy.
+    schema:
+      $ref: '#/definitions/ServicePolicy'
+responses:
+  Error:
+    description: Error
+    schema:
+      title: Error Response
+      description: Error Response.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  BadRequest:
+    description: Bad Request indicates that the server was unable to process the request because of invalid syntax.
+    schema:
+      title: Bad Request Error Response
+      description: Bad request error response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  NotFound:
+    description: The requested resource was not found.
+    schema:
+      title: Not Found Request Error Response
+      description: Not found error response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  PartialSuccess:
+    description: Partial Success is returned in the case when only a part of the request body information was processed successfully.
+    schema:
+      title: Partial Success Response
+      description: Partial success response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  Unauthorized:
+    description: Not authorized
+    headers:
+      WWW_Authenticate:
+        description: Information for how to authenticate
+        type: string
+  AssetsResponse:
+    description: Assets Response containing the assets satisfying the query and the total count of matching assets.
+    schema:
+      title: Assets Response
+      description: Assets Response containing the assets satisfying the query and the total count of matching assets.
+      type: object
+      required:
+        - assets
+        - totalCount
+      properties:
+        assets:
+          description: Array of assets
+          type: array
+          items:
+            $ref: '#/definitions/AssetModel'
+        totalCount:
+            description: The total number of Assets which match the query.
+            type: integer
+            example: 1
+  AssetDetailsResponse:
+    description: Asset details response containing a single asset with the requested ID.
+    schema:
+      $ref: '#/definitions/AssetModel'
+  AssetSummaryResponse:
+    description: Get asset summary response containing the count of active assets, inactive assets and the total number of assets.
+    schema:
+      title: Asset Summary
+      description: Asset summary response containing the total number of assets, the number of assets which are active (present in a connected system) and the number of assets which are not active.
+      type: object
+      properties:
+        active:
+          description: Number of assets which are active (present in a connected system).
+          type: integer
+          example: 12
+        notActive:
+          description: Number of assets which are not active.
+          type: integer
+          example: 5
+        total:
+          description: Total number of managed assets.
+          type: integer
+          example: 17
+  AvailabilityInSystemResponse:
+    description: >- 
+      Returns asset availability information in the specified timespan split based on the specified timespan granularity. 
+      The response contains a collection of systems that an asset has been present during the timespan, along with the percentage of time the asset was present in the system in each timespan.
+    schema:
+      title: Asset Availability
+      description: The response contains a collection of systems that an asset has been present during the timespan, along with the percentage of time the asset was present in the system in each timespan.
+      type: array
+      items:
+        type: object
+        properties:
+          systemName: 
+            description: Hostname of the system in which the asset was located.
+            type: string
+            example: APM-PXI1
+          availabilityData:
+            description: Collection of asset availability data consisting of timespans and percentage of time the asset was available in each timespan.
+            type: array
+            items:
+              $ref: '#/definitions/OverallAvailabilityInSystemModel'
+  CalibratedAssetSummaryResponse:
+    description: Response containing summary of assets supporting calibration. Contains the count of assets approaching recommended calibration due date, assets past recommended calibration due date and count of assets supporting (any type of) calibration.
+    schema:
+      title: Calibrated Asset Summary
+      description: Asset summary of the total number of assets supporting calibration, the number of assets approaching recommended calibration date and the number of assets past their recommended calibration date.
+      type: object
+      properties:
+        approachingRecommendedDueDate:
+          description: Number of assets approaching calibration date.
+          type: integer
+          example: 12
+        pastRecommendedDueDate:
+          description: Number of assets past their calibration date.
+          type: integer
+          example: 5
+        total:
+          description: Total number of assets supporting calibration.
+          type: integer
+          example: 17
+  CalibrationHistoryResponse:
+    description: Calibration history response for a single asset with the requested ID.
+    schema:
+      title: Calibration History Response
+      description: Calibration history response containing all calibration history entries for the requested asset.
+      type: object
+      required:
+        - calibrationHistory
+        - totalCount
+      properties:
+        calibrationHistory:
+          description: Array of calibration history entries
+          type: array
+          items:
+            $ref: '#/definitions/CalibrationHistoryModel'
+        totalCount:
+          description: The total number of calibration history entries for the requested asset.
+          type: integer
+          example: 1
+  SendToFileIngestionOrDownloadResponse:
+    description: Response for the query operation that consists either in the file information for when the result was sent to the file ingestion service or the report file content for download. In the latter case, the name of the file is provided in the header of the resonse with key='Filename'.
+    schema:
+      title: Send to File Ingestion Or Download Response
+      description: Response for the query that consists in the file information for when the result was sent to the file ingestion service or the CSV file content for download.
+      type: object
+      required:
+        - fileId
+      properties:
+        fileId:
+          description: File identifier in the file ingestion service
+          type: string
+          example: "5c6be9dc174ae3305ca4e7e1"
+  ServicePolicyResponse:
+    description: Get the service policy. This contains the service calibration policy with the number of days for an asset to be considered as approaching calibration.
+    schema:
+      $ref: '#/definitions/ServicePolicy'
+paths:
+  /:
+    get:
+      tags: [versioning]
+      summary: API information
+      description: Returns information about API versions and available operations.
+      operationId: RootEndpoint
+      x-ni-request-all-privileges: true
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            title: Root Endpoint Response
+            description: Version Information.
+            type: object
+            properties:
+              v1:
+                $ref: '#/definitions/V1Operations'
+              version:
+                description: Implementation version of the web service.
+                type: string
+        default:
+          $ref: '#/responses/Error'
+  /v1:
+    get:
+      tags: [versioning]
+      summary: API version information
+      description: Returns available operations for a single version of the API.
+      operationId: RootEndpointWithVersion
+      x-ni-request-all-privileges: true
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/V1Operations'
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets:
+    get:
+      tags: [assets]
+      summary: Gets assets
+      description: Gets a list of assets. Calibrated assets can be obtained by setting calibratableOnly=true. To obtain a report of the assets, reponseFormat=csv&destination=download should be sent as query parameters.
+      operationId: get-assets
+      x-ni-operation: readAssets
+      x-ni-privilege: Read
+      parameters:
+        - in: query
+          name: skip
+          description:
+            How many files to skip in the result when paging.
+            For example, a list of 100 asssets with a skip value of 50 and a take
+            value of 25 will return entries 51 through 75.
+          type: integer
+          default: 0
+        - in: query
+          name: take
+          description:
+            How many assets to return in the result, or -1 to use a default
+            defined by the service.
+            For example, a list of 100 assets with a skip value of 50 and a take
+            value of 25 will return entries 51 through 75.
+          type: integer
+          default: -1
+          maximum: 1000
+        - in: query
+          name: calibratableOnly
+          description:
+            Flag to specify whether to filter only assets which support calibration.
+          type: boolean
+          default: false
+        - in: query
+          name: responseFormat
+          description: Specifies the return type. Valid options are "JSON" and "CSV".
+          type: string
+          default: JSON
+          enum:
+            - JSON
+            - CSV
+        - in: query
+          name: destination
+          description:
+            Specifies the destination of the request.
+            "INLINE" (default) returns the list of assets as the body of the response.
+            "DOWNLOAD" returns the list of assets as the body of the response and indicates to the client that it should be downloaded as a file.
+            "FILE_SERVICE" sends the list of assets to the file ingestion service and returns the ID of the file to the client in a JSON object.
+          type: string
+          default: INLINE
+          enum:
+            - INLINE
+            - DOWNLOAD
+            - FILE_SERVICE
+      responses:
+        200:
+          $ref: '#/responses/AssetsResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/asset-summary:
+    get:
+      tags: [assets]
+      summary: Gets a summary of assets
+      description: Gets asset summary response containing the total number of assets, the number of assets which are active (present in a connected system) and the number of assets which are not active.
+      operationId: get-asset-summary
+      x-ni-operation: readAssets
+      x-ni-priviledge: Read
+      responses:
+          200:
+            $ref: '#/responses/AssetSummaryResponse'
+          401:
+            $ref: '#/responses/Unauthorized'
+          default:
+            $ref: '#/responses/Error'
+  /v1/calibratable-asset-summary:
+    get:
+      tags: [assets]
+      summary: Get a summary of assets supporting calibration
+      description: Get asset summary of the total number of assets supporting calibration, the number of assets approaching calibration date and the number of assets past their calibration date
+      operationId: get-calibratable-asset-summary
+      x-ni-operation: readAssets
+      x-ni-priviledge: Read
+      responses:
+          200:
+            $ref: '#/responses/CalibratedAssetSummaryResponse'
+          401:
+            $ref: '#/responses/Unauthorized'
+          default:
+            $ref: '#/responses/Error'
+  /v1/query-assets:
+    post:
+      tags: [assets]
+      summary: Query assets
+      description: Returns the assets satisfying the provided filtering criteria. If the the caller requests a JSON inline response, the returned assets are filtered based on the filter string and the ids property is not taken into consideration. When the caller requests a CSV response, the filter is not taken into consideration, but the ids property can used to filter the assets from the response.
+      operationId: query-assets
+      x-ni-operation: readAssets
+      x-ni-privilege: Read
+      parameters:
+        - $ref: '#/parameters/QueryAssetsRequest'
+      responses:
+        200:
+          $ref: '#/responses/AssetsResponse'
+        400:
+          $ref: '#/responses/BadRequest' 
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/{assetId}:
+    get:
+      tags: [assets]
+      summary: Gets asset with identifier
+      description: Gets the asset which has the given identifier.
+      operationId: get-asset-with-identifier
+      x-ni-operation: readAssets
+      x-ni-priviledge: Read
+      parameters:
+        - $ref: '#/parameters/AssetId'
+      responses:
+        200:
+          $ref: '#/responses/AssetDetailsResponse'
+        400:
+          $ref: '#/responses/BadRequest' 
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/{assetId}/history/availability:
+    get:
+      tags: [assets]
+      summary: Retrieve asset availability history
+      description: Returns availability information for an asset in the specified timespan and split based on the specified time granularity.
+      operationId: get-asset-availability-history
+      x-ni-operation: readAssets
+      x-ni-priviledge: Read
+      parameters:
+        - $ref: '#/parameters/AssetId'
+        - in: query
+          name: startDate
+          description: >-
+            A date time value which can be used to specify the beginning of a timespan. 
+            
+            This parameter is required to have the "ISO 8601" format in order to be considered valid. 
+            
+            If the parameter is not specified, the value will be set to the 1st day of the current month.
+          type: string
+          x-example: '2018-05-01T00:00:00.519Z'
+        - in: query
+          name: endDate
+          description: >- 
+            A date time value which can be used to specify the end of a timespan.
+            
+            This parameter is required to have the "ISO 8601" format in order to be considered valid. 
+            
+            If the parameter is not specified, the value will be set to the current date in UTC.
+          type: string
+          x-example: '2018-05-20T00:00:00Z'
+        - $ref: '#/parameters/AssetAvailabilityGranularity'
+      responses:
+        200:
+          $ref: '#/responses/AvailabilityInSystemResponse'
+        400:
+          $ref: '#/responses/BadRequest' 
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/{assetId}/history/calibration:
+    get:
+      tags: [assets]
+      summary: Retrieves asset calibration history
+      description: Returns the calibration history of the asset which has the given identifier.
+      operationId: get-asset-calibration-history
+      x-ni-operation: readAssets
+      x-ni-priviledge: Read
+      parameters:
+        - $ref: '#/parameters/AssetId'
+        - $ref: '#/parameters/Skip'
+        - $ref: '#/parameters/Take'
+      responses:
+        200:
+          $ref: '#/responses/CalibrationHistoryResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+    post:
+      tags: [assets]
+      summary: Creates a new calibration history entry for an asset
+      description: Creates a new calibration history entry for a non-NI manufactured asset.
+      operationId: post-asset-calibration-history
+      x-ni-operation: writeAssets
+      x-ni-priviledge: Write
+      parameters:
+        - $ref: '#/parameters/AssetId'
+        - $ref: '#/parameters/ExternalCalibrationRequestBody'
+      responses:
+        201:
+          description: Created
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/{assetId}/history/delete-calibrations:
+    post:
+      tags: [assets]
+      summary: Deletes calibration history entries
+      description: Deletes multiple calibration history entries for an asset.
+      operationId: post-delete-asset-calibration-history
+      x-ni-operation: deleteAssets
+      x-ni-priviledge: Write
+      parameters:
+        - $ref: '#/parameters/AssetId'
+        - $ref: '#/parameters/DeleteCalibrationsRequestBody'
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        204:
+          description: No Content
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/{assetId}/history/query-calibration:
+    post:
+      tags: [assets]
+      summary: Query asset calibration history
+      description: Computes the calibration history of an asset in CSV format. If the destination is download, the response will contain the calibration history file content. If the destination is file ingestion, the CSV file is sent to the file storing service and an object containing the file identifier is returned. Any other format and destination combinations are not supported yet.
+      operationId: post-asset-query-calibration-history
+      x-ni-operation: readAssets
+      x-ni-priviledge: Read
+      parameters:
+        - $ref: '#/parameters/AssetId'
+        - $ref: '#/parameters/QueryHistoryRequestBody'
+      responses:
+        200:
+          $ref: '#/responses/SendToFileIngestionOrDownloadResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          description: Internal server error. Possible while sending the file to the FileIngestion service, because the service is not running or there is not enough space on disk to store the file or the file could not be sent due to networking issues.
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/{assetId}/history/query-location:
+    post:
+      tags: [assets]
+      summary: Query asset location history
+      description: Computes the location history of an asset in CSV format. If the destination is download, the response will contain the location history file content. If the destination is file ingestion, the CSV file is sent to the file storing service and an object containing the file identifier is returned. Any other format and destination combinations are not supported yet.
+      operationId: post-asset-query-location-history
+      x-ni-operation: readAssets
+      x-ni-priviledge: Read
+      parameters:
+        - $ref: '#/parameters/AssetId'
+        - $ref: '#/parameters/QueryHistoryRequestBody'
+      responses:
+        200:
+          $ref: '#/responses/SendToFileIngestionOrDownloadResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          description: Internal server error. Possible while sending the file to the FileIngestion service, because the service is not running or there is not enough space on disk to store the file or the file could not be sent due to networking issues.
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/{assetId}/metadata:
+    patch:
+      tags: [assets]
+      summary: Updates asset metadata
+      description: Performs a request to update the metadata information of an asset.
+      operationId: update-asset-metadata
+      x-ni-operation: writeAssets
+      x-ni-priviledge: Write
+      consumes:
+        - application/merge-patch+json
+      parameters:
+        - $ref: '#/parameters/AssetId'
+        - $ref: '#/parameters/UpdateMetadata'
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        204:
+          description: No Content
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/compare-assets-availability:
+    post:
+      tags: [assets]
+      summary: Gets availability history for multiple assets.
+      description: Gets availability history for multiple assets based on a specified timespan.
+      operationId: compare-asset-availability
+      x-ni-operation: readAssets
+      x-ni-priviledge: Read
+      parameters:
+        - $ref: '#/parameters/AssetAvailabilityComparison'
+      responses:
+        200:
+          description: Asset availability comparison response containing availability history for requested assets based on the requested timespan.
+          schema:
+            title: Asset Comparison Response
+            description: Asset comparison response containing availability history for the requested assets. If availability history could not be resolved for some assets, the response contains error information on the assets which could not be resolved.
+            type: object
+            properties:
+              availabilityComparisons:
+                type: array
+                items:
+                  $ref: '#/definitions/AssetWithAvailabilityHistoryModel'
+              error:
+                $ref: '#/definitions/Error'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/delete-assets:
+    post:
+      tags: [assets]
+      summary: Delete assets and all information associated with assets.
+      description: Delete all persisted data for the assets with the provided identifiers. This includes asset properties and all related historical information.
+      operationId: delete-assets
+      x-ni-operation: deleteAssets
+      x-ni-priviledge: Write
+      parameters:
+        - $ref: '#/parameters/DeleteAssetsRequestBody'
+      responses:
+        200: 
+          $ref: '#/responses/PartialSuccess'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/policy:
+    get:
+      tags: [policy]
+      summary: Retrieves the service policy
+      description: Retrieves the service policy.
+      operationId: get-policy
+      x-ni-operation: readAssets
+      x-ni-priviledge: Read
+      responses:
+        200:
+          $ref: '#/responses/ServicePolicyResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    patch:
+      tags: [policy]
+      summary: Updates the service policy
+      description: Performs a request to update the service policy.
+      operationId: update-policy
+      x-ni-operation: writeAssets
+      x-ni-priviledge: Write
+      consumes:
+        - application/merge-patch+json
+      parameters:
+        - $ref: '#/parameters/ServicePolicyUpdateRequestBody'
+      responses:
+        204:
+          description: No Content
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
