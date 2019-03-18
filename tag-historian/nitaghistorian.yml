@@ -128,6 +128,18 @@ definitions:
         format: iso-date-time
         example: '2020-03-13T09:51:38Z'
     required: [id]
+  HttpUpdateValuesResponseBody:
+    description: Describes one or more errors that ocurred while updating historical values.
+    title: Http Update Values Response Body
+    type: object
+    properties:
+      failed:
+        description: The historical value updates that failed to apply.
+        type: array
+        items:
+          $ref: '#/definitions/HttpHistoricalValueUpdate'
+      error:
+        $ref: '#/definitions/ErrorEntry'
 responses:
   Error:
     description: Error
@@ -345,6 +357,7 @@ paths:
           type: string
           required: true
           description: The path of the tag whose historical values are being updated.
+          x-example: system1.tag1
         - in: body
           name: Request body
           required: true
@@ -364,17 +377,273 @@ paths:
         200:
           description: Partial success
           schema:
-            description: Describes one or more errors that ocurred while updating historical values.
-            title: Http Update Values Response Body
+            $ref: '#/definitions/HttpUpdateValuesResponseBody'
+        204:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/tags/history/{path}/delete-values-by-id:
+    post:
+      tags: [history]
+      summary: Delete historical values
+      description: Deletes one or more historical tag values.
+      operationId: DeleteHistoricalValuesById
+      x-ni-operation: deleteHistoricalTagValues
+      parameters:
+        - in: path
+          name: path
+          type: string
+          required: true
+          description: The path of the tag whose historical values are being deleted.
+          x-example: system1.tag1
+        - in: body
+          name: Request body
+          required: true
+          description: Contains the IDs of the historical values to delete.
+          schema:
+            description: Contains the IDs of the historical values to delete.
             type: object
+            title: Tag Historian Delete Values By Id Request
             properties:
-              failed:
-                description: The historical value updates that failed to apply.
+              ids:
+                description: The IDs of the historical values to delete.
                 type: array
                 items:
-                  $ref: '#/definitions/HttpHistoricalValueUpdate'
-              error:
-                $ref: '#/definitions/ErrorEntry'
+                  type: string
+                  example: '5c88d2ae26b41e22f08b4407'
+            required: [ids]
+      responses:
+        204:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/tags/history/{path}/values/{id}:
+    get:
+      tags: [history]
+      summary: Read a historical value
+      description: Retrieves a single historical value and its metadata.
+      operationId: GetHistoricalValue
+      x-ni-operation: queryHistoricalTagValues
+      parameters:
+        - in: path
+          name: path
+          type: string
+          required: true
+          description: The path of the tag that owns the historical value being retrieved.
+          x-example: system1.tag1
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: The ID of the historical value to retrieve. - TODO exception when invalid
+          x-example: '5c88d2ae26b41e22f08b4407'
+      responses:
+        200:
+          description: Success
+          schema:
+            description: Contains the historical value, if found.
+            title: TagHistorianQueryResponseBody
+            type: object
+            properties:
+              tagHistorianValues:
+                type: object
+                title: Tag Historian Values
+                properties:
+                  values:
+                    description: An object containing the historical value for the requested tag if it was successfully queried. The object's property name is the tag path.
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: object
+                        title: Historical Value
+                        properties:
+                          id:
+                            description: The unique identifier of the retrieved historical value.
+                            type: string
+                            example: '5c88d2ae26b41e22f08b4407'
+                          path:
+                            description: The path of the tag corresponding to the historical value.
+                            type: string
+                            example: system1.tag1
+                          type:
+                            description: The value's data type.
+                            type: string
+                            enum: [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
+                          value:
+                            description: The value of the tag at the time it was written, converted to a string.
+                            type: string
+                            example: '12.87'
+                          timestamp:
+                            description: The ISO-8601 date and time that the historical value was written, in UTC.
+                            type: string
+                            format: iso-date-time
+                            example: '2019-03-13T09:51:38Z'
+                          properties:
+                            description: Key-value pairs associated with the historical value after the fact. Tag properties are not copied to the historical value.
+                            additionalProperties:
+                              type: string
+                            example:
+                              note: This value is an outlier and needs investigation.
+                          expirationDate:
+                            description: TODO - I need to investigate DateTime.MinValue.ToUniversalTime() and timezone changes... For historical values of tags that aren't using a count-based retention policy, the expiration date is the date and time at which the historical value will be deleted automatically.
+                            type: string
+                            format: iso-date-time
+                            example: '2020-03-13T09:51:38Z'
+                    example:
+                      system1.tag1:
+                        id: '5c88d2ae26b41e22f08b4407'
+                        path: system1.tag1
+                        type: DOUBLE
+                        value: '12.87'
+                        timestamp: '2019-03-13T09:51:38Z'
+                        properties:
+                          note: This value is an outlier and needs investigation.
+                        expirationDate: '2020-03-13T09:51:38Z'
+                  totalCount:
+                    description: '1 if the historical value was found, or 0 if not. - TODO can have multiple values per ID?'
+                    type: integer
+                    minimum: 0
+                    maximum: 1
+                    example: 1
+                  errors:
+                    description: This value is always null.
+                    type: object
+                    example: null
+                  failed:
+                    description: This value is always null.
+                    type: object
+                    example: null
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    put:
+      tags: [history]
+      summary: Update a historical value
+      description: Updates a single historical value's metadata.
+      operationId: UpdateHistoricalValue
+      x-ni-operation: modifyHistoricalTagValues
+      parameters:
+        - in: path
+          name: path
+          type: string
+          required: true
+          description: The path of the tag that owns the historical value being modified.
+          x-example: system1.tag1
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: The ID of the historical value to modify. This value is used in preference to the ID contained in the request body.
+          x-example: '5c88d2ae26b41e22f08b4407'
+        - in: body
+          name: Request body
+          required: true
+          description: Contains the update to apply to the historical value.
+          schema:
+            description: Contains the update to apply to the historical value.
+            type: object
+            title: Http Update Value Request Body
+            properties:
+              value:
+                $ref: '#/definitions/HttpHistoricalValueUpdate'
+            required: [value]
+      responses:
+        200:
+          description: Partial success
+          schema:
+            $ref: '#/definitions/HttpUpdateValuesResponseBody'
+        204:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags: [history]
+      summary: Delete a historical value
+      description: Deletes a single historical value.
+      operationId: DeleteHistoricalValue
+      x-ni-operation: deleteHistoricalTagValues
+      parameters:
+        - in: path
+          name: path
+          type: string
+          required: true
+          description: The path of the tag that owns the historical value being deleted.
+          x-example: system1.tag1
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: The ID of the historical value to delete.
+          x-example: '5c88d2ae26b41e22f08b4407'
+      responses:
+        204:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/tags/delete-values-by-range:
+    post:
+      tags: [history]
+      summary: Deletes a range of historical values
+      description: Deletes all historical values within a given time range for one or more tags.
+      operationId: DeleteHistoricalValuesByRange
+      x-ni-operation: deleteHistoricalTagValues
+      parameters:
+        - in: body
+          name: Request body
+          required: true
+          description: Contains the time ranges to delete. TODO empty body throws exception
+          schema:
+            description: Contains the time ranges to delete.
+            type: object
+            title: Tag Historian Delete Values By Range Request
+            properties:
+              ranges:
+                description: The time ranges to delete. TODO null or missing throws exception
+                type: array
+                items:
+                  description: A time range of historical tag values to delete.
+                  type: object
+                  title: Historical Tag Query Range
+                  properties:
+                    path:
+                      description: The path of the tag whose historical values within the range will be deleted.
+                      type: string
+                      example: system1.tag1
+                    startTime:
+                      description: The ISO-8601 formatted date and time indicating the start of the range. Any historical values from this time until endTime will be deleted. TODO invalid format throws exception
+                      type: string
+                      format: iso-date-time
+                      example: '2019-03-13T09:51:38Z'
+                    endTime:
+                      description: The ISO-8601 formatted date and time indicating the end of the range. Any historical values from startTime to and including this time will be deleted.
+                      type: string
+                      format: iso-date-time
+                      example: '2020-03-13T09:51:38Z'
+            required: [ranges]
+      responses:
+        204:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/tags/flush-values:
+    post:
+      tags: [utility]
+      summary: Process buffered tag updates
+      description: Triggers the tag historian to immediately begin processing tag updates. Clients do not need to call this method for updates to be processed normally.
+      operationId: FlushValues
+      x-ni-operation: modifyHistoricalTagValues
+      responses:
         204:
           description: Success
         401:
