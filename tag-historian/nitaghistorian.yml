@@ -123,7 +123,7 @@ definitions:
         example:
           note: This value is an outlier and needs investigation.
       expirationDate:
-        description: The expiration date is the date and time at which the historical value will be deleted automatically, in ISO-8601 format.
+        description: The expiration date is the date and time at which the historical value will be deleted automatically, in ISO-8601 format. Do not specify this value for tags that use count-based retention.
         type: string
         format: iso-date-time
         example: '2020-03-13T09:51:38Z'
@@ -313,7 +313,7 @@ paths:
                         example:
                           note: This value is an outlier and needs investigation.
                       expirationDate:
-                        description: TODO - I need to investigate DateTime.MinValue.ToUniversalTime() and timezone changes... For historical values of tags that aren't using a count-based retention policy, the expiration date is the date and time at which the historical value will be deleted automatically.
+                        description: For historical values of tags that aren't using a count-based retention policy, the expiration date is the date and time at which the historical value will be deleted automatically.
                         type: string
                         format: iso-date-time
                         example: '2020-03-13T09:51:38Z'
@@ -348,7 +348,7 @@ paths:
     post:
       tags: [history]
       summary: Modify historical value metadata
-      description: TODO - this route doesn't work... Updates one or more historical values' properties or expiration.
+      description: Updates one or more historical values' properties or expiration.
       operationId: UpdateHistoricalValues
       x-ni-operation: modifyHistoricalTagValues
       parameters:
@@ -439,7 +439,7 @@ paths:
           name: id
           type: string
           required: true
-          description: The ID of the historical value to retrieve. - TODO exception when invalid
+          description: The ID of the historical value to retrieve.
           x-example: '5c88d2ae26b41e22f08b4407'
       responses:
         200:
@@ -489,7 +489,7 @@ paths:
                             example:
                               note: This value is an outlier and needs investigation.
                           expirationDate:
-                            description: TODO - I need to investigate DateTime.MinValue.ToUniversalTime() and timezone changes... For historical values of tags that aren't using a count-based retention policy, the expiration date is the date and time at which the historical value will be deleted automatically.
+                            description: For historical values of tags that aren't using a count-based retention policy, the expiration date is the date and time at which the historical value will be deleted automatically.
                             type: string
                             format: iso-date-time
                             example: '2020-03-13T09:51:38Z'
@@ -504,7 +504,7 @@ paths:
                           note: This value is an outlier and needs investigation.
                         expirationDate: '2020-03-13T09:51:38Z'
                   totalCount:
-                    description: '1 if the historical value was found, or 0 if not. - TODO can have multiple values per ID?'
+                    description: '1 if the historical value was found, or 0 if not.'
                     type: integer
                     minimum: 0
                     maximum: 1
@@ -600,14 +600,14 @@ paths:
         - in: body
           name: Request body
           required: true
-          description: Contains the time ranges to delete. TODO empty body throws exception
+          description: Contains the time ranges to delete.
           schema:
             description: Contains the time ranges to delete.
             type: object
             title: Tag Historian Delete Values By Range Request
             properties:
               ranges:
-                description: The time ranges to delete. TODO null or missing throws exception
+                description: The time ranges to delete.
                 type: array
                 items:
                   description: A time range of historical tag values to delete.
@@ -619,7 +619,7 @@ paths:
                       type: string
                       example: system1.tag1
                     startTime:
-                      description: The ISO-8601 formatted date and time indicating the start of the range. Any historical values from this time until endTime will be deleted. TODO invalid format throws exception
+                      description: The ISO-8601 formatted date and time indicating the start of the range. Any historical values from this time until endTime will be deleted.
                       type: string
                       format: iso-date-time
                       example: '2019-03-13T09:51:38Z'
