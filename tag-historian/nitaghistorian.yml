@@ -44,20 +44,31 @@ definitions:
   ErrorEntry:
     description: Populated with any errors that ocurr when performing multiple operations in a single request, with one inner error per failed operation.
     title: Error Entry
-    allOf:
-      - $ref: '#/definitions/Error'
-      - type: object
-        properties:
-          resourceType:
-            description: Type of resource associated with the error
-            type: string
-          resourceId:
-            description: Identifier of the resource associated with the error
-            type: string
-          innerErrors:
-            type: array
-            items:
-              $ref: '#/definitions/ErrorEntry'
+    properties:
+      name:
+        description: String error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+      message:
+        description: Complete error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+      resourceType:
+        description: Type of resource associated with the error
+        type: string
+      resourceId:
+        description: Identifier of the resource associated with the error
+        type: string
+      innerErrors:
+        type: array
+        items:
+          $ref: '#/definitions/ErrorEntry'
     example:
       name: Skyline.OneOrMoreErrorsOccurred
       code: -251040
@@ -107,6 +118,43 @@ definitions:
             $ref: '#/definitions/Operation'
           deleteHistoricalTagValues:
             $ref: '#/definitions/Operation'
+  HttpHistoricalValue:
+    type: object
+    title: Http Historical Value
+    properties:
+      id:
+        description: The unique identifier for referencing the historical value in other requests.
+        type: string
+        example: '5c88d2ae26b41e22f08b4407'
+      path:
+        description: The path of the tag corresponding to this historical value.
+        type: string
+        example: system1.tag1
+      type:
+        description: The value's data type.
+        type: string
+        enum: [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
+      value:
+        description: The value of the tag at the time it was written, converted to a string.
+        type: string
+        example: '12.87'
+      timestamp:
+        description: The ISO-8601 date and time that the historical value was written, in UTC.
+        type: string
+        format: iso-date-time
+        example: '2019-03-13T09:51:38Z'
+      properties:
+        description: Key-value pairs associated with the historical value after the fact. Tag properties are not copied to the historical value.
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          note: This value is an outlier and needs investigation.
+      expirationDate:
+        description: For historical values of tags that aren't using a count-based retention policy, the expiration date is the date and time at which the historical value will be deleted automatically.
+        type: string
+        format: iso-date-time
+        example: '2020-03-13T09:51:38Z'
   HttpHistoricalValueUpdate:
     description: An update for a single historical value.
     type: object
@@ -118,6 +166,7 @@ definitions:
         example: '5c88d2ae26b41e22f08b4407'
       properties:
         description: Key-value pairs to associate with the historical value.
+        type: object
         additionalProperties:
           type: string
         example:
@@ -213,6 +262,7 @@ definitions:
         example: '2019-03-13T09:51:38Z'
       properties:
         description: Key-value pairs associated with the historical value after the fact. Tag properties are not copied to the historical value.
+        type: object
         additionalProperties:
           type: string
         example:
@@ -228,6 +278,7 @@ definitions:
     properties:
       values:
         description: An object containing the historical value for the requested tag if it was successfully queried. The object's property name is the tag path.
+        type: object
         additionalProperties:
           type: array
           items:
@@ -577,44 +628,11 @@ paths:
             properties:
               values:
                 description: An object containing the historical values for each requested tag that was successfully queried. The object's property names correspond to a tag path.
+                type: object
                 additionalProperties:
                   type: array
                   items:
-                    type: object
-                    title: Http Historical Value
-                    properties:
-                      id:
-                        description: The unique identifier for referencing the historical value in other requests.
-                        type: string
-                        example: '5c88d2ae26b41e22f08b4407'
-                      path:
-                        description: The path of the tag corresponding to this historical value.
-                        type: string
-                        example: system1.tag1
-                      type:
-                        description: The value's data type.
-                        type: string
-                        enum: [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
-                      value:
-                        description: The value of the tag at the time it was written, converted to a string.
-                        type: string
-                        example: '12.87'
-                      timestamp:
-                        description: The ISO-8601 date and time that the historical value was written, in UTC.
-                        type: string
-                        format: iso-date-time
-                        example: '2019-03-13T09:51:38Z'
-                      properties:
-                        description: Key-value pairs associated with the historical value after the fact. Tag properties are not copied to the historical value.
-                        additionalProperties:
-                          type: string
-                        example:
-                          note: This value is an outlier and needs investigation.
-                      expirationDate:
-                        description: For historical values of tags that aren't using a count-based retention policy, the expiration date is the date and time at which the historical value will be deleted automatically.
-                        type: string
-                        format: iso-date-time
-                        example: '2020-03-13T09:51:38Z'
+                    $ref: '#/definitions/HttpHistoricalValue'
                 example:
                   system1.tag1:
                     id: '5c88d2ae26b41e22f08b4407'
