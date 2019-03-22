@@ -105,7 +105,7 @@ definitions:
             $ref: '#/definitions/Operation'
   BusType:
     title: Bus Type
-    description: Specifies all supported bus types for an asset.
+    description: All supported bus types for an asset.
     type: string
     enum:
       - BUILT_IN_SYSTEM
@@ -126,7 +126,7 @@ definitions:
       - SWITCH_BLOCK_DEVICE
   SystemConnectionState:
     title: System Connection State
-    description: Specifies whether the minion is connected to the server and has updated the server with its data.
+    description: Whether or not the minion is connected to the server and has updated the server with its data.
     type: string
     enum:
       - APPROVED
@@ -138,7 +138,7 @@ definitions:
       - ACTIVATED
   AssetPresenceStatus:
     title: Asset Presence Status
-    description: Specifies the asset presence in the system.
+    description: The status of an asset's presence in a system.
     type: string
     enum:
       - INITIALIZING
@@ -149,7 +149,7 @@ definitions:
     allOf:
       - $ref: '#/definitions/ExternalCalibrationModel'
       - title: Calibration History
-      - description: Contains a calibration history entry for an asset.
+      - description: The calibration history for an asset.
       - type: object
       - required:
         - id
@@ -162,13 +162,13 @@ definitions:
           calibrationType:
             $ref: '#/definitions/CalibrationType'
           timestamp:
-            description: ISO-8601 formatted timestamp specifying the created date of the entry.
+            description: ISO-8601 formatted timestamp specifying the creation date of the entry.
             type: string
             format: iso-date-time
             example: '2018-05-07T18:58:05.219692Z'
   CalibrationStatus:
     title: Calibration Status
-    description: Specifies the calibration category that an asset belongs to based on the next due calibration date.
+    description: The calibration category the asset belongs to based on the next due calibration date.
     type: string
     enum:
       - OK
@@ -176,21 +176,21 @@ definitions:
       - PAST_RECOMMENDED_DUE_DATE
   CalibrationMode:
     title: Calibration Mode
-    description: Specifies how calibration data has been recoded; either automatically discovered or manually entered.
+    description: Whether SystemLink automatically discovered the calibration data for an asset or if it was manually entered.
     type: string
     enum:
       - AUTOMATIC
       - MANUAL
   CalibrationType:
     title: Calibration Type
-    description: Specifies the type of the calibration; either self or external calibration.
+    description: The type of calibration the asset received, such as self or external calibration.
     type: string
     enum:
       - SELF_CALIBRATION
       - EXTERNAL_CALIBRATION
   AssetState:
     title: Asset State
-    description: Specifies the state of the asset and its system.
+    description: The status of an asset and the system to which it is connected.
     type: object
     properties:
       systemConnectionState:
@@ -199,7 +199,7 @@ definitions:
         $ref: '#/definitions/AssetPresenceStatus'
   TemperatureSensor:
     title: Temperature Sensor
-    description: Specifies the sensor name and temperature reading, in Celsius.
+    description: The sensor name and temperature reading in Celsius.
     type: object
     required:
         - reading
@@ -215,11 +215,11 @@ definitions:
         example: 25.8
   AssetLocation:
     title: Asset Location
-    description: Specifies information about the asset and the system in which the asset resides.
+    description: Information about the asset and the system in which it resides.
     type: object
     properties:
       minionId:
-        description: Id of the minion the asset is located in.
+        description: Identifier of the minion where the asset is located.
         type: string
         example: NI_PXIe-8135_Embedded_Controller--MAC-00-80-2F-23-52-65
       parent:
@@ -231,7 +231,7 @@ definitions:
         type: string
         example: 1/4243/1949942980/01BB877A/3
       slotNumber:
-        description: Number of the slot the asset is located in.
+        description: The number of the slot in which the asset is located.
         type: integer
         example: 2
       systemName:
@@ -242,7 +242,7 @@ definitions:
         $ref: '#/definitions/AssetState'
   ExternalCalibrationOperator:
     title: External Calibration Operator
-    description: Specifies the operator that performed the calibration.
+    description: The information about the operator who performed the calibration.
     type: object
     properties:
       displayName:
@@ -252,8 +252,8 @@ definitions:
         description: Identifier of the logged in user.
         type: string
   SelfCalibrationModel:
-    title: Self Calibration
-    description: Contains data from the last self calibration.
+    title: Self-Calibration
+    description: Contains data from the last self-calibration.
     type: object
     required:
         - date
@@ -264,7 +264,7 @@ definitions:
           items:
             $ref: '#/definitions/TemperatureSensor'
       isLimited:
-        description: Specifies whether the last internal/self calibration of the asset was a limited calibration.
+        description: Whether the last self-calibration of the asset was a limited calibration.
         type: boolean
         example: false
       date:
@@ -274,7 +274,7 @@ definitions:
         example: '2018-05-07T18:58:05.219692Z'
   ExternalCalibrationBaseModel:
     title: Base External Calibration
-    description: Contains data for an external calibration entry.
+    description: Data for an external calibration entry.
     type: object
     required:
         - date
@@ -288,7 +288,7 @@ definitions:
           items:
             $ref: '#/definitions/TemperatureSensor'
       isLimited:
-        description: Specifies whether the last external calibration of the asset was a limited calibration.
+        description: Whether the last external calibration of the asset was a limited calibration.
         type: boolean
         example: false
       date:
@@ -297,7 +297,7 @@ definitions:
         format: iso-date-time
         example: '2018-05-07T18:58:05.219692Z'
       recommendedInterval:
-        description: Specifies the manufacturer-recommended calibration interval in months.
+        description: The manufacturer's recommended calibration interval in months.
         type: integer
         example: 12
       nextRecommendedDate:
@@ -306,13 +306,13 @@ definitions:
         format: iso-date-time
         example: '2019-05-07T18:58:05.219692Z'
       comments:
-        description: Specifies any calibration comments.
+        description: Calibration comments provided by an operator.
         type: string
   ExternalCalibrationModel:
     allOf:
       - $ref: '#/definitions/ExternalCalibrationBaseModel'
       - title: External Calibration
-      - description: Contains data from the last external calibration.
+      - description: Data from the last external calibration
       - type: object
       - properties:
           entryType:
@@ -382,11 +382,11 @@ definitions:
         items:
           $ref: '#/definitions/TemperatureSensor'
       supportsSelfCalibration:
-        description: Specifies whether the asset supports internal (self) calibration.
+        description: Whether the asset supports self-calibration.
         type: boolean
         example: true
       supportsExternalCalibration:
-        description: Specifies whether the asset supports external calibration.
+        description: Whether the asset supports external calibration.
         type: boolean
         example: true
       selfCalibration:
@@ -401,25 +401,25 @@ definitions:
         format: iso-date-time
         example: '2018-05-07T18:58:05.219692Z'
       isNIAsset:
-        description: Specifies whether this asset is an NI asset (true) or a 3rd party asset (false).
+        description: Whether this asset is an NI asset (true) or a third-party asset (false).
         type: boolean
         example: true
       properties:
-        description: Specifies a set of properties associated with an asset.
+        description: Key-value-pair metadata associated with an asset.
         type: object
         additionalProperties:
           type: string
         example:
           Key1: Value1
       keywords:
-        description: Specifies a set of keywords associated with an asset.
+        description: Words or phrases associated with an asset.
         type: array
         items:
           type: string
           example: Keyword1
   AssetWithAvailabilityHistoryModel:
     title: Asset With Availability History
-    description: Contains asset availability history which consists in availability information for each system in which the asset was present.
+    description: Information about the availability, or connection, history of an asset, which also contains information about each system in which the asset was present.
     type: object
     properties:
       assetName:
@@ -441,7 +441,7 @@ definitions:
       - availabilityHistory
   OverallAvailabilityInSystemModel:
     title: Overall Availability In System
-    description: Contains availability information for an asset in a single system for the specified timespan.
+    description: Availability information for an asset in a single system for the specified timespan.
     type: object
     properties:
       key:
@@ -475,7 +475,7 @@ definitions:
       - value
   ResponseFormat:
     title: Response Format
-    description: Specifies the return type. Valid options are "JSON" and "CSV".
+    description: The return type. Valid options are "JSON" and "CSV".
     type: string
     default: JSON
     enum:
@@ -484,7 +484,7 @@ definitions:
   Destination:
     title: Request Destination
     description:
-      Specifies the destination of the request.
+      The destination of the request.
       "INLINE" (default) returns the list of assets as the body of the response.
       "DOWNLOAD" returns the list of assets as the body of the response and indicates to the client that it should be downloaded as a file.
       "FILE_SERVICE" sends the list of assets to the file ingestion service and returns the ID of the file to the client in a JSON object.
@@ -513,7 +513,7 @@ parameters:
   AssetAvailabilityGranularity:
     in: query
     name: granularity
-    description: Specifies the possible granularities that can be used to obtain asset availability.
+    description: The possible granularities that can be used to obtain asset availability.
     type: string
     default: WEEK
     enum:
@@ -523,7 +523,7 @@ parameters:
   AssetId: 
     in: path
     name: assetId
-    description: Specifies the identifier of an asset.
+    description: The identifier of an asset.
     type: string
     required: true
     x-example: "29162;01B245D6;4243;0"
@@ -531,7 +531,7 @@ parameters:
     in: path
     name: skip
     description:
-      How many resources to skip in the result when paging.
+      The number of resources to skip in the result when paging.
       For example, a list of 100 asssets with a skip value of 50 will return
       entries 51 through 100.
     type: integer
@@ -558,7 +558,7 @@ parameters:
         - assetIds
       properties:
         assetIds:
-          description: Specifies multiple asset identifiers for which to compare availability history.
+          description: Multiple asset identifiers for which to compare availability history.
           type: array
           items:
             type: string
@@ -593,7 +593,7 @@ parameters:
       type: object
       properties:
         ids:
-          description: Specifies multiple asset identifiers for which to delete all data.
+          description: Multiple asset identifiers for which to delete all data.
           type: array
           items:
             type: string
@@ -616,10 +616,10 @@ parameters:
   ExternalCalibrationRequestBody:
     in: body
     name: externalCalibrationRequestBody
-    description: Request body containing data to create a new external calibration entry for a non NI asset.
+    description: Request body containing data to create a new external calibration entry for a third-party asset.
     schema:
       title: Post External Calibration Request
-      description: Request body containing data to create a new external calibration entry for a non NI asset.
+      description: Request body containing data to create a new external calibration entry for a third-party asset.
       type: object
       properties:
         externalCalibration:
@@ -689,9 +689,9 @@ parameters:
           maximum: 1000
         filter:
           description: >-
-            Specifies the filter criteria for assets. Consists of a string of queries composed using AND/OR operators.
+            The filter criteria for assets. Consists of a string of queries composed using AND/OR operators.
             String values and date strings need to be enclosed in double quotes.
-            Parenthesis can be used around filtes to better define the order of operations.
+            Parenthesis can be used around filters to better define the order of operations.
             
             Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
             
@@ -743,7 +743,7 @@ parameters:
 
             - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE.
 
-            - IsNIAsset: Boolean flag specifying whether the asset is an NI asset or a 3rd party asset.
+            - IsNIAsset: Boolean flag specifying whether the asset is an NI asset or a third-party asset.
 
             - Keywords: Collection of string values representing asset metadata keywords. Example: 'Keywords=["keyword1", "keyword2"]'.
 
@@ -759,7 +759,7 @@ parameters:
 
             - Location.AssetState.AssetPresence: String enumeration representing the present status of an asset in a system. Possible values are: INITIALIZING, UNKNOWN, NOT_PRESENT, PRESENT.
 
-            - SupportsSelfCalibration: Boolean flag specifying whether the asset supports self calibration.
+            - SupportsSelfCalibration: Boolean flag specifying whether the asset supports self-calibration.
 
             - SelfCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was self-calibrated. Example: "2018-05-20T00:00:00Z"
 
@@ -775,7 +775,7 @@ parameters:
 
             - ExternalCalibration.IsLimited: Boolean flag specifying whether the last external calibration was a limited calibration.
 
-            - ExternalCalibration.Operator.DisplayName: String representing the name of the operator which performed an external calibration on a 3rd party asset.
+            - ExternalCalibration.Operator.DisplayName: String representing the name of the operator which performed an external calibration on a third-party asset.
           type: string
           example: AssetName = "APMPXI1Slot3" and ExternalCalibration.NextRecommendedDate > "2018-05-01T00:00:00.519Z"
   QueryHistoryRequestBody:
@@ -864,7 +864,7 @@ responses:
     schema:
       $ref: '#/definitions/AssetModel'
   AssetSummaryResponse:
-    description: Get asset summary response containing the count of active assets, inactive assets and the total number of assets.
+    description: Asset summary response containing the count of active assets, inactive assets and the total number of assets.
     schema:
       title: Asset Summary
       description: Asset summary response containing the total number of assets, the number of assets which are active (present in a connected system) and the number of assets which are not active.
@@ -954,7 +954,7 @@ responses:
           type: string
           example: "5c6be9dc174ae3305ca4e7e1"
   ServicePolicyResponse:
-    description: Get the service policy. This contains the service calibration policy with the number of days for an asset to be considered as approaching calibration.
+    description: Service policy response containing the service calibration policy with the number of days for an asset to be considered as approaching calibration.
     schema:
       $ref: '#/definitions/ServicePolicy'
 paths:
@@ -1027,13 +1027,12 @@ paths:
           maximum: 1000
         - in: query
           name: calibratableOnly
-          description:
-            Flag to specify whether to filter only assets which support calibration.
+          description: Whether to filter only assets which support calibration.
           type: boolean
           default: false
         - in: query
           name: responseFormat
-          description: Specifies the return type. Valid options are "JSON" and "CSV".
+          description: The return type. Valid options are "JSON" and "CSV".
           type: string
           default: JSON
           enum:
@@ -1042,7 +1041,7 @@ paths:
         - in: query
           name: destination
           description:
-            Specifies the destination of the request.
+            The destination of the request.
             "INLINE" (default) returns the list of assets as the body of the response.
             "DOWNLOAD" returns the list of assets as the body of the response and indicates to the client that it should be downloaded as a file.
             "FILE_SERVICE" sends the list of assets to the file ingestion service and returns the ID of the file to the client in a JSON object.
@@ -1077,8 +1076,8 @@ paths:
   /v1/calibratable-asset-summary:
     get:
       tags: [assets]
-      summary: Get a summary of assets supporting calibration
-      description: Get asset summary of the total number of assets supporting calibration, the number of assets approaching calibration date and the number of assets past their calibration date
+      summary: Gets a summary of assets supporting calibration
+      description: Gets asset summary of the total number of assets supporting calibration, the number of assets approaching calibration date and the number of assets past their calibration date
       operationId: get-calibratable-asset-summary
       x-ni-operation: readAssets
       x-ni-priviledge: Read
@@ -1134,7 +1133,7 @@ paths:
   /v1/assets/{assetId}/history/availability:
     get:
       tags: [assets]
-      summary: Retrieve asset availability history
+      summary: Retrieves asset availability history
       description: Returns availability information for an asset in the specified timespan and split based on the specified time granularity.
       operationId: get-asset-availability-history
       x-ni-operation: readAssets
@@ -1199,7 +1198,7 @@ paths:
     post:
       tags: [assets]
       summary: Creates a new calibration history entry for an asset
-      description: Creates a new calibration history entry for a non-NI manufactured asset.
+      description: Creates a new calibration history entry for a third-party asset.
       operationId: post-asset-calibration-history
       x-ni-operation: writeAssets
       x-ni-priviledge: Write
@@ -1244,7 +1243,7 @@ paths:
   /v1/assets/{assetId}/history/query-calibration:
     post:
       tags: [assets]
-      summary: Query asset calibration history
+      summary: Queries asset calibration history
       description: Computes the calibration history of an asset in CSV format. If the destination is download, the response will contain the calibration history file content. If the destination is file ingestion, the CSV file is sent to the file storing service and an object containing the file identifier is returned. Any other format and destination combinations are not supported yet.
       operationId: post-asset-query-calibration-history
       x-ni-operation: readAssets
@@ -1262,13 +1261,13 @@ paths:
         404:
           $ref: '#/responses/NotFound'
         500:
-          description: Internal server error. Possible while sending the file to the FileIngestion service, because the service is not running or there is not enough space on disk to store the file or the file could not be sent due to networking issues.
+          description: Internal server error. Possible while sending the file to the FileIngestion service because the service is not running; there is not enough space on disk to store the file; or there are network issues.
         default:
           $ref: '#/responses/Error'
   /v1/assets/{assetId}/history/query-location:
     post:
       tags: [assets]
-      summary: Query asset location history
+      summary: Queries asset location history
       description: Computes the location history of an asset in CSV format. If the destination is download, the response will contain the location history file content. If the destination is file ingestion, the CSV file is sent to the file storing service and an object containing the file identifier is returned. Any other format and destination combinations are not supported yet.
       operationId: post-asset-query-location-history
       x-ni-operation: readAssets
@@ -1350,8 +1349,8 @@ paths:
   /v1/delete-assets:
     post:
       tags: [assets]
-      summary: Delete assets and all information associated with assets.
-      description: Delete all persisted data for the assets with the provided identifiers. This includes asset properties and all related historical information.
+      summary: Deletes assets and all information associated with assets.
+      description: Deletes all persisted data for the assets with the provided identifiers. This includes asset properties and all related historical information.
       operationId: delete-assets
       x-ni-operation: deleteAssets
       x-ni-priviledge: Write

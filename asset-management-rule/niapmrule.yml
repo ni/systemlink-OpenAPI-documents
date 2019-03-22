@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   version: '1'
   title: Asset Performance Management Rule Web Service
-  description: Manage rules like calibration for assets which are managed by the Asset Performance Management service.
+  description: Create and manage calibration rules for assets.
   contact:
     name: National Instruments
     url: 'https://www.ni.com/systemlink'
@@ -65,7 +65,7 @@ definitions:
           code: -254051
           resourceType: CalibrationRuleEntry
           resourceId: 4afb2ce3741fe11d88838cc9
-          message: "The rule with ID 4afb2ce3741fe11d88838cc9 was not found."
+          message: "The rule with identifier 4afb2ce3741fe11d88838cc9 was not found."
           args: [ 4afb2ce3741fe11d88838cc9 ]
   Operation:
     description: An operation provided by the API.
@@ -75,7 +75,7 @@ definitions:
     properties:
       available:
         type: boolean
-        description: Specifies whether or not the operation is available to the caller.
+        description: Whether or not the operation is available to the caller.
       version:
         type: integer
         description: Version of the available operation.
@@ -91,9 +91,9 @@ definitions:
         description: >-
           Available operations in the v1 version of the API:
           
-          - getCalibrationRule: The ability to obtain calibration rules.
+          - getCalibrationRule: Obtain calibration rule information.
           
-          - updateCalibrationRule: The ability to update a calibration rule.
+          - updateCalibrationRule: Update calibration rule information.
         type: object
         properties:
           getCalibrationRule:
@@ -102,7 +102,7 @@ definitions:
             $ref: '#/definitions/Operation'
   CalibrationSeverityModel:
     title: Calibration Severity Model
-    description: Specifies a calibration severity for a rule.
+    description: A calibration severity level for a rule.
     type: object
     required:
       - name
@@ -121,18 +121,18 @@ definitions:
         default: 2
         example: 2
       notificationStrategyIds:
-        description: Specifies the notification strategies IDs to use when this rule is triggered for an asset.
+        description: The unique identifiers for notification strategies to use when this rule is triggered for an asset.
         type: array
         items:
           type: string
           example: e3491890f7b15b83d3fc174a
       daysUntilCalibrationDue:
-        description: Specifies the number of days until recommended calibration due date to trigger the alarm.
+        description: The number of days until recommended calibration due date to trigger the alarm.
         type: integer
         example: 30
   CalibrationRulePutRequestModel:
     title: Calibration Rule Put Request Model
-    description: Specifies a request to replace a calibration rule.
+    description: A request to replace a calibration rule.
     type: object
     required:
       - displayName
@@ -151,7 +151,7 @@ definitions:
         type: string
         example: Rule to identify assets that passed their recommended calibration due date.
       disabled:
-        description: Specifies whether or not the rule is disabled.
+        description: Whether or not the rule is disabled.
         type: boolean
         example: false
       instanceDisplayNameTemplate:
@@ -171,13 +171,13 @@ definitions:
     allOf:
       - $ref: '#/definitions/CalibrationRulePutRequestModel'
       - title: Calibration Rule Model
-      - description: Specifies a calibration rule that runs on assets.
+      - description: A calibration rule that runs on assets.
       - type: object
       - required:
         - id
       - properties:
           id:
-            description: ID of the rule.
+            description: Calibration rule identifier.
             type: string
             example: "5b83d3fc174ae3491890f7ae"
           lastUpdatedTimestamp:
@@ -187,40 +187,40 @@ definitions:
             example: '2018-05-07T18:58:05.219692Z'
   RuleStateUpdateModel:
     title: Rule State Update Model
-    description: The collection of rule identifiers and the enable/disable state to be applied on all of them.
+    description: The collection of rule identifiers and the enable/disable state to apply on them.
     type: object
     required:
       - ruleIds
       - disabled
     properties:
       ruleIds:
-        description: Array containing the IDs of the rules to set the enabled/disabled state for.
+        description: Array containing the rule identifiers on which to set the enable/disable state.
         type: array
         items:
           type: string
           example: '5b83d3fc174ae3491890f7ae'
       disabled:
-        description: Specifies whether or not to disable all the specified rules.
+        description: Whether or not to disable all the specified rules.
         type: boolean
         example: true
 parameters:
   RuleId:
     in: path
     name: ruleId
-    description: The ID of the rule.
+    description: Calibration rule identifier.
     type: string
     required: true
     x-example: '5b83d3fc174ae3491890f7ae'
   SetRulesState:
     in: body
     name: setRulesState
-    description: The collection of rule identifiers and the enable/disable state to be applied on all of them.
+    description: The collection of rule identifiers and the enable/disable state to apply on them.
     required: true
     schema:
       $ref: '#/definitions/RuleStateUpdateModel'
 responses:
   BadRequest:
-    description: Bad Request indicating that the server was unable to process the request because of invalid syntax.
+    description: The server was unable to process the request because of invalid syntax.
     schema:
       title: Bad Request Error Response
       description: Bad request error response containing error information.
@@ -238,7 +238,7 @@ responses:
         error:
           $ref: '#/definitions/Error'
   CalibrationRuleResponse:
-    description: Response containing the rule having the specified ID.
+    description: Response containing the rule having the specified identifier.
     schema:
       $ref: '#/definitions/CalibrationRuleModel'
   CalibrationRulesResponse:
@@ -252,7 +252,7 @@ responses:
         - totalCount
       properties:
         calibrationRules:
-          description: Array of calibration rules
+          description: Array of calibration rules.
           type: array
           items:
             $ref: '#/definitions/CalibrationRuleModel'
@@ -270,7 +270,7 @@ responses:
         error:
           $ref: '#/definitions/Error'
   PartialSuccessResponse:
-    description: Partial Success when updating rules. Only a part of the requested information was successfully processed.
+    description: Rules update was partially successful. Only part of the requested information was successfully processed.
     schema:
       title: Partial Success Response
       description: Partial success response containing error information.
@@ -353,7 +353,7 @@ paths:
     get:
       tags: [calibration rules]
       summary: Get a specific calibration rule
-      description: Gets the calibration rule with the specified ID.
+      description: Gets the calibration rule with the specified identifier.
       operationId: get-calibration-rule-by-id
       x-ni-operation: getCalibrationRule
       x-ni-privilege: assetrule.Read
