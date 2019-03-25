@@ -860,7 +860,7 @@ responses:
             type: integer
             example: 1
   AssetDetailsResponse:
-    description: Asset details response containing a single asset with the requested ID.
+    description: Asset details response containing a single asset with the requested identifier.
     schema:
       $ref: '#/definitions/AssetModel'
   AssetSummaryResponse:
@@ -922,7 +922,7 @@ responses:
           type: integer
           example: 17
   CalibrationHistoryResponse:
-    description: Calibration history response for a single asset with the requested ID.
+    description: Calibration history response for a single asset with the requested identifier.
     schema:
       title: Calibration History Response
       description: Calibration history response containing all calibration history entries for the requested asset.
