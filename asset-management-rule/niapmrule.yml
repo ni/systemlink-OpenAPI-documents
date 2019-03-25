@@ -1,0 +1,418 @@
+swagger: '2.0'
+info:
+  version: '1'
+  title: Asset Performance Management Rule Web Service
+  description: Create and manage calibration rules for assets.
+  contact:
+    name: National Instruments
+    url: 'https://www.ni.com/systemlink'
+    email: support@ni.com
+basePath: /niapmrule
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  basicAuth:
+    type: basic
+  cookieAuth:
+    type: apiKey
+    in: header
+    name: Cookie
+security:
+  - basicAuth: []
+  - cookieAuth: []
+x-ni-routing-key: Skyline.AssetPerformanceManagementRuleEngine
+x-ni-privilege-application: ninotification
+definitions:
+  Error:
+    description: Contains error information.
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+      resourceType:
+        description: Type of resource associated with the error
+        type: string
+      resourceId:
+        description: Identifier of the resource associated with the error
+        type: string
+      message:
+        description: Complete error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+      innerErrors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+    example:
+      name: Skyline.OneOrMoreErrorsOccurred
+      code: -251040
+      message: >-
+        One or more errors occurred. See the contained list for details of each
+        error.
+      args: []
+      innerErrors:
+        - name: AssetPerformanceManagementRuleEngine.RuleNotFound
+          code: -254051
+          resourceType: CalibrationRuleEntry
+          resourceId: 4afb2ce3741fe11d88838cc9
+          message: "The rule with identifier 4afb2ce3741fe11d88838cc9 was not found."
+          args: [ 4afb2ce3741fe11d88838cc9 ]
+  Operation:
+    description: An operation provided by the API.
+    type: object
+    required:
+        - available
+    properties:
+      available:
+        type: boolean
+        description: Whether or not the operation is available to the caller.
+      version:
+        type: integer
+        description: Version of the available operation.
+    example:
+      available: true
+      version: 1
+  V1Operations:
+    title: V1 Operations
+    description: Object containing available operations in the v1 version of the API.
+    type: object
+    properties:
+      operations:
+        description: >-
+          Available operations in the v1 version of the API:
+          
+          - getCalibrationRule: Obtain calibration rule information.
+          
+          - updateCalibrationRule: Update calibration rule information.
+        type: object
+        properties:
+          getCalibrationRule:
+            $ref: '#/definitions/Operation'
+          updateCalibrationRule:
+            $ref: '#/definitions/Operation'
+  CalibrationSeverityModel:
+    title: Calibration Severity Model
+    description: A calibration severity level for a rule.
+    type: object
+    required:
+      - name
+      - severityLevel
+      - daysUntilCalibrationDue
+    properties:
+      name:
+        description: The name of the severity.
+        type: string
+        example: Approaching
+      severityLevel:
+        description: The level of the severity.
+        type: integer
+        minimum: 1
+        maximum: 4
+        default: 2
+        example: 2
+      notificationStrategyIds:
+        description: The unique identifiers for notification strategies to use when this rule is triggered for an asset.
+        type: array
+        items:
+          type: string
+          example: e3491890f7b15b83d3fc174a
+      daysUntilCalibrationDue:
+        description: The number of days until recommended calibration due date to trigger the alarm.
+        type: integer
+        example: 30
+  CalibrationRulePutRequestModel:
+    title: Calibration Rule Put Request Model
+    description: A request to replace a calibration rule.
+    type: object
+    required:
+      - displayName
+      - description
+      - disabled
+      - instanceDisplayNameTemplate
+      - instanceDescriptionTemplate
+      - severityLevels
+    properties:
+      displayName:
+        description: Display name of the rule.
+        type: string
+        example: Calibration
+      description:
+        description: Description of what the rule does.
+        type: string
+        example: Rule to identify assets that passed their recommended calibration due date.
+      disabled:
+        description: Whether or not the rule is disabled.
+        type: boolean
+        example: false
+      instanceDisplayNameTemplate:
+        description: Template used for the display name that appears on an alarm instance created by this rule.
+        type: string
+        example: Asset <AssetName> passed recommended calibration date.
+      instanceDescriptionTemplate:
+        description: Template used for the description that appears on an alarm instance created by this rule.
+        type: string
+        example: Asset <AssetName> from system <SystemName> has the next recommended calibration date as <NextExternalCalibrationDate> but that date already passed.
+      severityLevels:
+        description: Severity levels for the alarm rule.
+        type: array
+        items:
+          $ref: '#/definitions/CalibrationSeverityModel'
+  CalibrationRuleModel:
+    allOf:
+      - $ref: '#/definitions/CalibrationRulePutRequestModel'
+      - title: Calibration Rule Model
+      - description: A calibration rule that runs on assets.
+      - type: object
+      - required:
+        - id
+      - properties:
+          id:
+            description: Calibration rule identifier.
+            type: string
+            example: "5b83d3fc174ae3491890f7ae"
+          lastUpdatedTimestamp:
+            description: ISO-8601 formatted timestamp specifying the last date the rule was updated.
+            type: string
+            format: iso-date-time
+            example: '2018-05-07T18:58:05.219692Z'
+  RuleStateUpdateModel:
+    title: Rule State Update Model
+    description: The collection of rule identifiers and the enable/disable state to apply on them.
+    type: object
+    required:
+      - ruleIds
+      - disabled
+    properties:
+      ruleIds:
+        description: Array containing the rule identifiers on which to set the enable/disable state.
+        type: array
+        items:
+          type: string
+          example: '5b83d3fc174ae3491890f7ae'
+      disabled:
+        description: Whether or not to disable all the specified rules.
+        type: boolean
+        example: true
+parameters:
+  RuleId:
+    in: path
+    name: ruleId
+    description: Calibration rule identifier.
+    type: string
+    required: true
+    x-example: '5b83d3fc174ae3491890f7ae'
+  SetRulesState:
+    in: body
+    name: setRulesState
+    description: The collection of rule identifiers and the enable/disable state to apply on them.
+    required: true
+    schema:
+      $ref: '#/definitions/RuleStateUpdateModel'
+responses:
+  BadRequest:
+    description: The server was unable to process the request because of invalid syntax.
+    schema:
+      title: Bad Request Error Response
+      description: Bad request error response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  NotFound:
+    description: The requested resource was not found.
+    schema:
+      title: Not Found Request Error Response
+      description: Not found error response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  CalibrationRuleResponse:
+    description: Response containing the rule having the specified identifier.
+    schema:
+      $ref: '#/definitions/CalibrationRuleModel'
+  CalibrationRulesResponse:
+    description: Response containing all the calibration rules that the service manages.
+    schema:
+      description: Response containing all the calibration rules.
+      title: Calibration Rules Response
+      type: object
+      required:
+        - calibrationRules
+        - totalCount
+      properties:
+        calibrationRules:
+          description: Array of calibration rules.
+          type: array
+          items:
+            $ref: '#/definitions/CalibrationRuleModel'
+        totalCount:
+            description: The total number of calibration rules.
+            type: integer
+            example: 1
+  Error:
+    description: Error
+    schema:
+      description: Error response containing error information.
+      title: Error Response
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  PartialSuccessResponse:
+    description: Rules update was partially successful. Only part of the requested information was successfully processed.
+    schema:
+      title: Partial Success Response
+      description: Partial success response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  Unauthorized:
+    description: Not authorized
+    headers:
+      WWW_Authenticate:
+        description: Information for how to authenticate
+        type: string
+paths:
+  /:
+    get:
+      tags: [versioning]
+      summary: API information
+      description: Returns information about API versions and available operations.
+      operationId: RootEndpoint
+      x-ni-request-all-privileges: true
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Version information
+            title: Root Endpoint Response
+            type: object
+            properties:
+              v1:
+                $ref: '#/definitions/V1Operations'
+              version:
+                description: Defines the implementation version of the web service.
+                type: string
+                example: 1
+  /{version}:
+    parameters:
+      - in: path
+        name: version
+        description: The version of the API to retrieve operations.
+        type: string
+        required: true
+    get:
+      tags: [versioning]
+      summary: API version information
+      description: Returns available operations for a single version of the API.
+      operationId: RootEndpointWithVersion
+      x-ni-request-all-privileges: true
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/V1Operations'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/calibration-rules:
+    get:
+      tags: [calibration rules]
+      summary: Get calibration rules
+      description: Gets a list containing all rules specific to calibration.
+      operationId: get-calibration-rules
+      x-ni-operation: getCalibrationRule
+      x-ni-privilege: assetrule.Read
+      responses:
+        200:
+          $ref: '#/responses/CalibrationRulesResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/calibration-rules/{ruleId}:
+    parameters:
+      - $ref: '#/parameters/RuleId'
+    get:
+      tags: [calibration rules]
+      summary: Get a specific calibration rule
+      description: Gets the calibration rule with the specified identifier.
+      operationId: get-calibration-rule-by-id
+      x-ni-operation: getCalibrationRule
+      x-ni-privilege: assetrule.Read
+      responses:
+        200:
+          $ref: '#/responses/CalibrationRuleResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+    put:
+      tags: [calibration rules]
+      summary: Replace a specific calibration rule
+      description: Replaces a specific calibration rule with the given one.
+      operationId: put-calibration-rule
+      x-ni-operation: updateCalibrationRule
+      x-ni-privilege: assetrule.Write
+      parameters:
+        - in: body
+          name: CalibrationRulePutRequestModel
+          description: The calibration rule that replaces the other rule.
+          required: true
+          schema:
+            $ref: '#/definitions/CalibrationRulePutRequestModel'
+      responses:
+        204:
+          description: No Content
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/set-calibration-rules-state:
+    post:
+      tags: [calibration rules]
+      summary: Set specific calibration rules state
+      description: Sets specific calibration rules state by enabling or disabling them.
+      operationId: set-calibration-rules-state
+      x-ni-operation: updateCalibrationRule
+      x-ni-privilege: assetrule.Write
+      parameters:
+        - $ref: '#/parameters/SetRulesState'
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccessResponse'
+        204:
+          description: No Content
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
