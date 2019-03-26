@@ -42,7 +42,7 @@ definitions:
       message: 'Invalid id: 5c88d2ae26b41e22f08b4407.'
       args: []
   ErrorEntry:
-    description: Populated with any errors that ocurr when performing multiple operations in a single
+    description: Populated with any errors that occur when performing multiple operations in a single
       request, with one inner error per failed operation.
     title: Error Entry
     properties:
@@ -128,7 +128,7 @@ definitions:
         type: string
         example: '5c88d2ae26b41e22f08b4407'
       path:
-        description: The path of the tag corresponding to this historical value.
+        description: The path of the tag corresponding to the historical value.
         type: string
         example: system1.tag1
       type:
@@ -140,7 +140,7 @@ definitions:
         type: string
         example: '12.87'
       timestamp:
-        description: The ISO-8601 date and time that the historical value was written, in UTC.
+        description: The ISO-8601 formatted timestamp when the historical value was written, in UTC.
         type: string
         format: iso-date-time
         example: '2019-03-13T09:51:38Z'
@@ -154,8 +154,8 @@ definitions:
           note: This value is an outlier and needs investigation.
       expirationDate:
         description: For historical values of tags that aren't using a count-based retention policy,
-          the expiration date is the date and time at which the historical value will be deleted
-          automatically.
+          the expiration date is the ISO-8601 formatted timestamp at which the historical value will
+          be deleted automatically.
         type: string
         format: iso-date-time
         example: '2020-03-13T09:51:38Z'
@@ -165,7 +165,7 @@ definitions:
     title: Http Historical Value Update
     properties:
       id:
-        description: The ID of the historical value to update.
+        description: The identifier of the historical value to update.
         type: string
         example: '5c88d2ae26b41e22f08b4407'
       properties:
@@ -176,8 +176,8 @@ definitions:
         example:
           note: This value is an outlier and needs investigation.
       expirationDate:
-        description: The expiration date is the date and time at which the historical value will be
-          deleted automatically, in ISO-8601 format. Do not specify this value for tags that use
+        description: The expiration date is the ISO-8601 formatted timestamp at which the historical
+          value will be deleted automatically. Do not specify this value for tags that use
           count-based retention.
         type: string
         format: iso-date-time
@@ -210,7 +210,7 @@ definitions:
           - system1.tag1
           - system2.tag1
       startTime:
-        description: Limits the returned historical values to those written at or after at the given
+        description: Limits the returned historical values to those written at or after the given
           time in ISO-6801 format.
         type: string
         format: iso-date-time
@@ -244,8 +244,8 @@ definitions:
         minimum: 0
         default: 0
       sortOrder:
-        description: Specifies the order to return historical values, either ascending or descending
-          order based on when each tag value was written.
+        description: Specifies ascending or descending order to return historical values, based
+          on when each tag was written.
         type: string
         enum: [ASCENDING, DESCENDING]
         default: ASCENDING
@@ -262,7 +262,7 @@ definitions:
         type: string
         example: system1.tag1
       type:
-        description: The value's data type.
+        description: The data type of the value.
         type: string
         enum: [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
       value:
@@ -270,7 +270,7 @@ definitions:
         type: string
         example: '12.87'
       timestamp:
-        description: The ISO-8601 date and time that the historical value was written, in UTC.
+        description: The ISO-8601 formatted timestamp that the historical value was written, in UTC.
         type: string
         format: iso-date-time
         example: '2019-03-13T09:51:38Z'
@@ -284,8 +284,8 @@ definitions:
           note: This value is an outlier and needs investigation.
       expirationDate:
         description: For historical values of tags that aren't using a count-based retention policy,
-          the expiration date is the date and time at which the historical value will be deleted
-          automatically.
+          the expiration date is the ISO-8601 formatted timestamp at which the historical value will
+          be deleted automatically.
         type: string
         format: iso-date-time
         example: '2020-03-13T09:51:38Z'
@@ -333,7 +333,7 @@ definitions:
       query:
         $ref: '#/definitions/HistoricalTagQuery'
       requestId:
-        description: The ID of the asynchronous query to associate with a result in a later message.
+        description: The identifier of the asynchronous query to associate with a result in a later message.
         type: string
         example: '4cbba25a-c1b8-4fbe-8829-9ddfde555188'
       hasError:
@@ -383,7 +383,7 @@ definitions:
         enum: ['TagHistorianAsyncQueryRequest']
         example: TagHistorianAsyncQueryRequest
       queries:
-        description: The list of history queries to perform.
+        description: The list of historical queries to perform.
         type: array
         items:
           $ref: '#/definitions/HistoricalTagQuery'
@@ -408,7 +408,7 @@ definitions:
         enum: ['TagHistorianAsyncQueryResponse']
         example: TagHistorianAsyncQueryResponse
       queryJobs:
-        description: A list containing the information about each started query.
+        description: A list containing the information about each query started.
         type: array
         items:
           $ref: '#/definitions/HistoricalTagAsyncQueryJob'
@@ -427,7 +427,7 @@ definitions:
             enum: ['TagHistorianAsyncQueryDataRoutedMessage']
             example: TagHistorianAsyncQueryDataRoutedMessage
           requestId:
-            description: The ID of the completed asynchronous query as given in the corresponding
+            description: The identifier of the completed asynchronous query as given in the corresponding
               *WebSocketAsyncQueryResponse* message.
             type: string
             example: '4cbba25a-c1b8-4fbe-8829-9ddfde555188'
@@ -444,7 +444,7 @@ definitions:
         enum: ['TagHistorianAsyncQueryCompleteRoutedMessage']
         example: TagHistorianAsyncQueryCompleteRoutedMessage
       queryJobs:
-        description: A list containing the information about each started query.
+        description: A list containing the information about each query started.
         type: array
         items:
           $ref: '#/definitions/HistoricalTagAsyncQueryJob'
@@ -783,14 +783,14 @@ paths:
         - in: body
           name: Request body
           required: true
-          description: Contains the IDs of the historical values to delete.
+          description: Contains the identifiers of the historical values to delete.
           schema:
-            description: Contains the IDs of the historical values to delete.
+            description: Contains the identifiers of the historical values to delete.
             type: object
             title: Tag Historian Delete Values By Id Request
             properties:
               ids:
-                description: The IDs of the historical values to delete.
+                description: The identifiers of the historical values to delete.
                 type: array
                 items:
                   type: string
@@ -821,7 +821,7 @@ paths:
           name: id
           type: string
           required: true
-          description: The ID of the historical value to retrieve.
+          description: The identifier of the historical value to retrieve.
           x-example: '5c88d2ae26b41e22f08b4407'
       responses:
         200:
@@ -854,8 +854,8 @@ paths:
           name: id
           type: string
           required: true
-          description: The ID of the historical value to modify. This value is used in preference to
-            the ID contained in the request body.
+          description: The identifier of the historical value to modify. This value is used in preference to
+            the identifier contained in the request body.
           x-example: '5c88d2ae26b41e22f08b4407'
         - in: body
           name: Request body
@@ -897,7 +897,7 @@ paths:
           name: id
           type: string
           required: true
-          description: The ID of the historical value to delete.
+          description: The identifier of the historical value to delete.
           x-example: '5c88d2ae26b41e22f08b4407'
       responses:
         204:
@@ -937,13 +937,13 @@ paths:
                       type: string
                       example: system1.tag1
                     startTime:
-                      description: The ISO-8601 formatted date and time indicating the start of the
+                      description: The ISO-8601 formatted timestamp indicating the start of the
                         range. Any historical values from this time until endTime will be deleted.
                       type: string
                       format: iso-date-time
                       example: '2019-03-13T09:51:38Z'
                     endTime:
-                      description: The ISO-8601 formatted date and time indicating the end of the range.
+                      description: The ISO-8601 formatted timestamp indicating the end of the range.
                         Any historical values from startTime to and including this time will be deleted.
                       type: string
                       format: iso-date-time
