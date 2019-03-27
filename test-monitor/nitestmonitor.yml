@@ -13,6 +13,10 @@ consumes:
 produces:
   - application/json
 securityDefinitions:
+  apiKeyAuth:
+    type: apiKey
+    name: x-ni-api-key
+    in: header
   basicAuth:
     type: basic
   cookieAuth:
@@ -20,6 +24,7 @@ securityDefinitions:
     in: header
     name: Cookie
 security:
+  - apiKeyAuth: []
   - basicAuth: []
   - cookieAuth: []
 x-ni-routing-key: Skyline.TestMonitor
@@ -34,6 +39,7 @@ definitions:
       code:
         description: Numeric error code
         type: integer
+        format: int32
       resourceType:
         description: Type of resource associated with the error
         type: string
@@ -75,6 +81,7 @@ definitions:
         description: Whether the operation is available to the caller
       version:
         type: integer
+        format: int32
         description: Version of the available operation
     required: [available]
     example:
@@ -165,6 +172,22 @@ definitions:
         description: Status name
         type: string
         example: Passed
+  NamedValueObject:
+    title: Named Value
+    description: Represents a named value or parameter
+    type: object
+    required:
+      - name
+      - value
+    properties:
+      name:
+        description: The name of the value
+        type: string
+        example: Voltage
+      value:
+        description: The value
+        type: object
+        example: 1.3
   ResultField:
     title: Result Field
     description: Result field enum
@@ -202,6 +225,8 @@ definitions:
       - TOTAL_TIME_IN_SECONDS
       - STARTED_AT
       - UPDATED_AT
+      - INPUTS
+      - OUTPUTS
       - DATA_MODEL
       - DATA
   ResultSortDefinitionObject:
@@ -228,6 +253,42 @@ definitions:
       orderByDescending:
         type: boolean
         default: false
+  QueryOperation:
+    title: Query Operation
+    description: >-
+      Query operation enum. Note that 'LESS_THAN', 'GREATER_THAN', 'LESS_THAN_OR_EQUAL', and
+      'GREATER_THAN_OR_EQUAL' are only supported when the data type of the comparison is a string,
+      ISO date time, or numeric value. These are not supported on booleans, arrays, or objects
+      (also known as dictionaries).
+    type: string
+    enum:
+      - EQUAL
+      - NOT_EQUAL
+      - LESS_THAN
+      - GREATER_THAN
+      - LESS_THAN_OR_EQUAL
+      - GREATER_THAN_OR_EQUAL
+  DictionaryQueryObject:
+    title: Dictionary Query
+    description: Dictionary query object
+    type: object
+    required:
+      - name
+      - value
+    properties:
+      name:
+        description: The name of the dictionary key to query for.
+        type: string
+      value:
+        description: >-
+          The value to compare with. This is compared to the value that is stored in the
+          dictionary. When the comparison is performed, the value stored in the dictionary is on
+          the left hand side of the operation and this value is on the right hand side.
+        type: object
+        example: 1.2
+      operation:
+        $ref: '#/definitions/QueryOperation'
+        default: 'EQUAL'
   TimeQueryObject:
     title: Time Query
     description: Time query object
@@ -237,15 +298,7 @@ definitions:
       - comparisonValue
     properties:
       operation:
-        description: Operation enum
-        type: string
-        enum:
-          - EQUAL
-          - NOT_EQUAL
-          - LESS_THAN
-          - GREATER_THAN
-          - LESS_THAN_OR_EQUAL
-          - GREATER_THAN_OR_EQUAL
+        $ref: '#/definitions/QueryOperation'
       comparisonValue:
         description: ISO-8601 formatted timestamp value to compare
         type: string
@@ -271,6 +324,7 @@ definitions:
       value:
         description: Number of whole time units relative to the current server time.
         type: integer
+        format: int32
         example: 30
   TestResultRequestObject:
     title: Test Result Request
@@ -411,6 +465,7 @@ definitions:
         type: object
         additionalProperties:
           type: integer
+          format: int32
         example:
           FAILED: 5
   TestResultUpdateRequestObject:
@@ -680,6 +735,51 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/StatusObject'
+      inputs:
+        description: >-
+          This is a query on the inputs dictionary.  It is represented by an array of an array of
+          objects referred to as 'Dictionary Query Objects'. When querying, all elements of the
+          inner array of 'Dictionary Query Objects' must match (an "and" relationship within the
+          inner array).  Only one element in the outer array needs to match (an "or" relationship
+          within the outer array).
+        type: array
+        items:
+          description: >-
+            Inner array of 'Dictionary Query Objects' to query for. When querying, all elements of
+            the inner array of 'Dictionary Query Objects' must match (an "and" relationship within
+            the inner array).
+          type: array
+          items:
+            $ref: '#/definitions/DictionaryQueryObject'
+        example:
+          - - name: 'Current'
+              value: 1.2
+            - name: 'Voltage'
+              value: 2.3
+              operation: 'LESS_THAN_OR_EQUAL'
+      outputs:
+        description: >-
+          This is a query on the outputs dictionary.  It is represented by an array of an array of
+          objects referred to as 'Dictionary Query Objects'. When querying, all elements of the
+          inner array of 'Dictionary Query Objects' must match (an "and" relationship within the
+          inner array).  Only one element in the outer array needs to match (an "or" relationship
+          within the outer array).
+        type: array
+        items:
+          description: >-
+            Inner array of 'Dictionary Query Objects' to query for. When querying, all elements of
+            the inner array of 'Dictionary Query Objects' must match (an "and" relationship within
+            the inner array).
+          type: array
+          items:
+            $ref: '#/definitions/DictionaryQueryObject'
+        example:
+          - - name: 'Power'
+              value: 1.4
+              operation: 'GREATER_THAN_OR_EQUAL'
+            - name: 'Power'
+              value: 2.3
+              operation: 'LESS_THAN_OR_EQUAL'
       startedAtQuery:
         description: Time query object
         type: array
@@ -743,6 +843,16 @@ definitions:
         format: double
         default: 0
         example: 29.9
+      inputs:
+        description: Inputs and their values passed to this test
+        type: array
+        items:
+          $ref: '#/definitions/NamedValueObject'
+      outputs:
+        description: Outputs and their values logged by this test
+        type: array
+        items:
+          $ref: '#/definitions/NamedValueObject'
   TestStepCreateOrUpdateRequestObject:
     title: Test Step Create or Update Request
     type: object
@@ -807,6 +917,16 @@ definitions:
         type: string
         format: iso-date-time
         example: '2018-05-09T15:07:42.527921Z'
+      inputs:
+        description: Inputs and their values passed to this test
+        type: array
+        items:
+          $ref: '#/definitions/NamedValueObject'
+      outputs:
+        description: Outputs and their values logged by this test
+        type: array
+        items:
+          $ref: '#/definitions/NamedValueObject'
       dataModel:
         description: Custom string defining the model of the data object
         type: string
@@ -837,16 +957,12 @@ responses:
       type: object
       required:
         - results
-        - totalCount
       properties:
         results:
           description: Array of test results
           type: array
           items:
             $ref: '#/definitions/TestResultResponseObject'
-        totalCount:
-          description: Number of matching test results
-          type: integer
   ResultsPartialSuccessResponse:
     description: Test Results Partial Success Response
     schema:
@@ -911,6 +1027,7 @@ responses:
         totalCount:
           description: Number of matching test results
           type: integer
+          format: int64
   StepsSuccessResponse:
     description: Test Steps Success Response
     schema:
@@ -966,6 +1083,7 @@ responses:
         totalCount:
           description: Number of matching test steps
           type: integer
+          format: int64
   StepsDeletePartialSuccessResponse:
     description: Delete Test Steps Partial Success Response
     schema:
@@ -1052,11 +1170,15 @@ paths:
         - in: query
           name: skip
           type: integer
+          format: int32
           default: 0
+          minimum: 0
         - in: query
           name: take
           type: integer
+          format: int32
           default: -1
+          minimum: -1
       responses:
         200:
           $ref: '#/responses/ResultsQueryResponse'
@@ -1076,11 +1198,15 @@ paths:
         - in: query
           name: skip
           type: integer
+          format: int32
           default: 0
+          minimum: 0
         - in: query
           name: take
           type: integer
+          format: int32
           default: -1
+          minimum: -1
       responses:
         200:
           $ref: '#/responses/ResultsQueryResponse'
@@ -1243,11 +1369,15 @@ paths:
         - in: query
           name: skip
           type: integer
+          format: int32
           default: 0
+          minimum: 0
         - in: query
           name: take
           type: integer
+          format: int32
           default: -1
+          minimum: -1
       responses:
         200:
           $ref: '#/responses/StepsQueryResponse'
@@ -1267,11 +1397,15 @@ paths:
         - in: query
           name: skip
           type: integer
+          format: int32
           default: 0
+          minimum: 0
         - in: query
           name: take
           type: integer
+          format: int32
           default: -1
+          minimum: -1
       responses:
         200:
           $ref: '#/responses/StepsQueryResponse'
