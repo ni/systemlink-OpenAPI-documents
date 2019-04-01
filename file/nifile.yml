@@ -140,7 +140,7 @@ definitions:
         description: The 64-bit file size in bytes
         type: integer
         format: int64
-        example: 2147483648
+        example: 7277
   ServiceGroup:
     type: object
     properties:
