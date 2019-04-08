@@ -178,7 +178,6 @@ definitions:
     type: object
     required:
       - name
-      - value
     properties:
       name:
         description: The name of the value
@@ -274,7 +273,6 @@ definitions:
     type: object
     required:
       - name
-      - value
     properties:
       name:
         description: The name of the dictionary key to query for.
