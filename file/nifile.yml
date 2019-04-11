@@ -12,6 +12,10 @@ consumes: [application/json]
 produces: [application/json]
 
 securityDefinitions:
+  apiKeyAuth:
+    type: apiKey
+    name: x-ni-api-key
+    in: header
   basicAuth:
     type: basic
   cookieAuth:
@@ -20,6 +24,7 @@ securityDefinitions:
     name: Cookie
 
 security:
+  - apiKeyAuth: []
   - basicAuth: []
   - cookieAuth: []
 x-ni-routing-key: Skyline.FileIngestion
@@ -43,6 +48,7 @@ definitions:
       code:
         description: Numeric error code
         type: integer
+        format: int32
       resourceType:
         description: Type of resource associated with the error
         type: string
@@ -128,12 +134,13 @@ definitions:
       size:
         description: The 32-bit file size in bytes. If the value is larger than a 32-bit integer, this value is -1 and the size64 parameter contains the correct value.
         type: integer
+        format: int32
         example: 7277
       size64:
         description: The 64-bit file size in bytes
         type: integer
         format: int64
-        example: 2147483648
+        example: 7277
   ServiceGroup:
     type: object
     properties:
@@ -218,6 +225,7 @@ definitions:
       value:
         description: The value of the field to search for
         type: integer
+        format: int32
         example: 5000
     required:
       - operation
@@ -298,6 +306,7 @@ definitions:
         description: Whether the operation is available to the caller
       version:
         type: integer
+        format: int32
         description: The version of the available operation
     required: [available]
     example:
@@ -389,6 +398,7 @@ responses:
         totalCount:
           description: The total number of files that match the query regardless of skip and take values
           type: integer
+          format: int64
           example: 1
   Error:
     description: Error
@@ -513,8 +523,9 @@ paths:
             For example, a list of 100 files with a skip value of 50 and a take
             value of 25 will return entries 51 through 75.
           type: integer
-          x-ni-data-type: U32
+          format: int32
           default: 0
+          minimum: 0
         - in: query
           name: take
           description: >-
@@ -523,8 +534,9 @@ paths:
             For example, a list of 100 files with a skip value of 50 and a take
             value of 25 will return entries 51 through 75.
           type: integer
-          x-ni-data-type: U32
+          format: int32
           default: 0
+          minimum: 0
           maximum: 10000
         - in: query
           name: orderBy
@@ -638,6 +650,7 @@ paths:
       operationId: UpdateMetadata
       x-ni-operation: updateMetadata
       x-ni-privilege: ModifyFiles
+      x-ni-request-variables: [REMOTE_USER]
       parameters:
         - in: body
           name: metadata
@@ -681,6 +694,7 @@ paths:
       operationId: DeleteMultiple
       x-ni-operation: deleteFiles
       x-ni-privilege: ModifyFiles
+      x-ni-request-variables: [REMOTE_USER]
       parameters:
         - in: body
           name: files
@@ -734,16 +748,18 @@ paths:
           name: skip
           description: How many files to skip in the result when paging.  New in version 2 of this operation.
           type: integer
-          x-ni-data-type: U32
+          format: int32
           default: 0
+          minimum: 0
         - in: query
           name: take
           description: >-
             How many files to return in the result, or 0 to use a default.  New in version 2 of this operation.
             The default value is defined by the service.
           type: integer
-          x-ni-data-type: U32
+          format: int32
           default: 1000
+          minimum: 0
           maximum: 1000
         - in: body
           name: query
@@ -787,6 +803,7 @@ paths:
       operationId: Upload
       x-ni-operation: uploadFiles
       x-ni-privilege: UploadFiles
+      x-ni-request-variables: [REMOTE_USER]
       consumes:
         - multipart/form-data
       parameters:

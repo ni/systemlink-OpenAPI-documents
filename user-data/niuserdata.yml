@@ -150,7 +150,7 @@ definitions:
       comparisonValue:
         description: Integer value to compare
         type: integer
-        format: int32
+        format: int64
         example: 360
   JsonQueryObject:
     title: JSON Query
@@ -245,19 +245,6 @@ definitions:
           - '5c4b2c0756c8b455a8f849c4'
           - '5c4ed77d56c8b455a80f86b5'
           - '5c4ed78f56c8b455a80f870a'
-      users:
-        description: >-
-          Array of user names. For normal users, this field is typically not set because the
-          query results will be restricted to the particular user's access level, which for
-          normal users is just user data items that belong to the same user and any user data
-          items that have 'visibleToOthers' set to true. This field is typically intended for
-          administrator use where the desired purpose is to manage the data of other users.
-        type: array
-        items:
-          type: string
-        example:
-          - 'jsmith'
-          - 'jdoe'
       applications:
         description: Array of application names
         type: array
@@ -334,17 +321,6 @@ definitions:
        identified by a combination of its 'user', 'application', 'category', and 'name' fields.
        A specific user data item is also uniquely identified by its assigned ID.
     type: object
-    required:
-      - id
-      - user
-      - application
-      - category
-      - name
-      - value
-      - visibleToOthers
-      - revision
-      - createdAt
-      - updatedAt
     properties:
       id:
         description: The ID for this user data item.
@@ -380,7 +356,6 @@ definitions:
           Whether this user data item is visible to other users. This will allow other users to
           query this data.
         type: boolean
-        default: false
         example: false
       revision:
         description: >-
@@ -388,7 +363,7 @@ definitions:
           revision number starts at 1. Every time it is updated, the revision number is
           incremented by 1.
         type: integer
-        format: int32
+        format: int64
         example: 1
       createdAt:
         description: ISO-8601 formatted timestamp specifying when the user data item was created.
@@ -404,23 +379,15 @@ definitions:
   CreateOrUpdateUserDataItem:
     title: Create or Update User Data Item
     description: >-
-       Create or update a specific user data item. A specific user data item may be uniquely
-       identified by a combination of its 'user', 'application', 'category', and 'name' fields.
+      Create or update a specific user data item. User data items are unique to the currently
+      logged in user. The combination of the 'application', 'category', and 'name' fields identify
+      the specific item to create or update.
     type: object
     required:
       - application
       - name
       - value
     properties:
-      user:
-        description: >-
-          The user that this data item belongs to. When this is not set, the service will
-          automatically use the currently logged in user. For normal use cases, this is the
-          recommended usage (to leave this field unset). This field is intended for the use of
-          administrators, where it may be desired to create or update user data items on behalf of
-          another user.
-        type: string
-        example: jsmith
       application:
         description: >-
           The application name that this user data item belongs to.
@@ -447,7 +414,7 @@ definitions:
           query this data.
         type: boolean
         example: false
-      revisionLock:
+      expectedRevision:
         description: >-
           This is an optional value. When specified, this is an integer that should be set to
           match the last known revision number of the user data item. If it doesn't match at the
@@ -456,7 +423,7 @@ definitions:
           important, for instance, in the case where multiple clients are updating an array value
           at the same time. A value of 0 means that the item must not already exist.
         type: integer
-        format: int32
+        format: int64
         minimum: 0
         example: 5
   UpdateUserDataItem:
@@ -466,6 +433,7 @@ definitions:
     type: object
     required:
       - id
+      - value
     properties:
       id:
         description: The ID for this user data item.
@@ -481,7 +449,7 @@ definitions:
           query this data.
         type: boolean
         example: false
-      revisionLock:
+      expectedRevision:
         description: >-
           This is an optional value. When specified, this is an integer that should be set to
           match the last known revision number of the user data item. If it doesn't match at the
@@ -490,7 +458,7 @@ definitions:
           important, for instance, in the case where multiple clients are updating an array value
           at the same time.
         type: integer
-        format: int32
+        format: int64
         minimum: 1
         example: 5
   CreateOrUpdateUserDataItemsPartialSuccessResponse:
@@ -676,7 +644,7 @@ paths:
           format: int32
           minimum: 0
         - in: query
-          name: orderBy
+          name: sortBy
           description: The name of the field to sort by.
           type: string
           enum:
@@ -719,7 +687,7 @@ paths:
               totalCount:
                 description: Number of matching user data items
                 type: integer
-                format: int32
+                format: int64
     post:
       operationId: CreateOrUpdateUserDataItems
       x-ni-operation: createOrUpdateUserDataItems
@@ -848,7 +816,7 @@ paths:
               totalCount:
                 description: Number of matching user data items
                 type: integer
-                format: int32
+                format: int64
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -893,6 +861,7 @@ paths:
       x-ni-operation: deleteUserDataItems
       x-ni-privilege: Write
       x-ni-request-all-privileges: true
+      x-ni-request-variables: [REMOTE_USER]
       summary: Delete user data items
       description: >-
         Deletes multiple user data items in a single API call.
