@@ -1,0 +1,301 @@
+swagger: '2.0'
+basePath: /niapp/v1
+info:
+  version: '1.0'
+  title: SystemLink Cloud Webapp Service 
+securityDefinitions:
+  ApiKeyAuth:
+    type: apiKey
+    name: x-ni-api-key
+    in: header
+security:
+  - ApiKeyAuth: []
+schemes:
+  - https
+paths:
+  '/webapps/{id}':
+    get:
+      tags:   
+        - Webapp metadata
+      summary: ''
+      responses:
+        '200':
+          description: A webapp record
+          schema: 
+            $ref: '#/definitions/WebappRecord'
+        '401':
+          description: API key is missing or invalid
+        '404':
+          description: Webapp with the given ID not found
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The webapp's ID
+          type: string
+      description: Get webapp metadata by Id
+    put:
+      tags:
+        - Webapp metadata
+      summary: ''
+      responses:
+        '200':
+          description: Updated webapp metadata record
+          schema: 
+            $ref: '#/definitions/WebappRecord'
+        '401':
+          description: API key is missing or invalid
+        '404':
+          description: Webapp with the given ID not found
+        '400':
+          description: Ivalid webapp record
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The webapp's ID
+          type: string
+        - in: body
+          required: true
+          name: webapp-binary-content
+          description: New webapp metadata
+          schema: 
+            $ref: '#/definitions/UpdateWebappMetadatReuqest'
+      operationId: update-webapp-metadata
+      description: Update webapp metadata by ID
+    delete:
+      tags:   
+        - Webapp metadata
+      summary: ''
+      responses:
+        '200':
+          description: Success
+        '401':
+          description: API key is missing or invalid
+        '404':
+          description: Webapp with the given ID not found
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The webapp's ID
+          type: string
+      operationId: delete-webapp
+      description: Delete webapp by id
+  "/webapps":
+    get:
+      tags:   
+        - Webapp metadata
+      responses:
+        '200':
+          description: A list of webapp metadata records
+          schema: 
+            type: array 
+            items: 
+              $ref: '#/definitions/WebappRecord'
+        '401':
+          description: API key is missing or invalid
+      operationId: list-webapps
+      description: List users webapps
+    post:
+      tags:   
+        - Webapp metadata
+      responses:
+        '200':
+          description: Returns newly created webapp record 
+          schema: 
+            $ref: '#/definitions/WebappRecord'
+        '401':
+          description: API key is missing or invalid
+      operationId: create-webapp-record
+      description: Creates a new webapp record
+  "/webapps/shared-emails":
+    get:
+      tags:   
+        - Webapp metadata
+      responses:
+        '200':
+          description: List of emails the user has shared webapps with
+          schema: 
+            type: array 
+            items: 
+              type: string
+              example: john.doe@email.com
+        '401':
+          description: API key is missing or invalid
+      operationId: list-shared-emails
+      description: List the emails the user has shared webapps with
+  '/webapps/{id}/content':
+    get:
+      tags:
+        - Webapp content    
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The webapp's ID
+          type: string
+      responses:
+        '200':
+          description: The webapp's content. JSON for Dashboards, HTML for WebVIs
+        '401':
+          description: API key is missing or invalid
+        '404':
+          description: Webapp with the given id not found
+      operationId: get-webapp-content
+      description: Get webapp content. ContentType varies from JSON for dashboards and templates or redirect to main HTML for WebVIs
+    put:
+      tags:
+        - Webapp content
+      summary: ''
+      responses:
+        '200':
+          description: Success
+        '401':
+          description: API key is missing or invalid
+        '404':
+          description: Webapp with the given ID not found
+        '400':
+          description: Invalid webapp content for webapp's type
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The webapp's ID
+          type: string
+        - in: body
+          required: true
+          name: webapp-binary-content
+          description: The webapp content to upload
+          schema: 
+            $ref: '#/definitions/WebappContent'
+      operationId: update-webapp-content
+      description: Upload content for exisitng webapp
+  '/api/webapps/{id}/content/{path}':
+    get:
+      tags:
+        - Webapp content    
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The webapp's ID
+          type: string
+        - in: path
+          name: path
+          required: true
+          type: string
+          description:  Path to inner webapp file 
+      responses:
+        '200':
+          description: The webapp's file. Content type can vary depending on what resource is (html, png etc.)
+          schema: 
+            type: string
+        '401':
+          description: API key is missing or invalid
+        '404':
+          description: Webapp with the given id not found
+      operationId: get-webapp-inner-content
+      description: Get webapp content at path. For webapps with multiple files (e.g. WebVIs)
+  "/webapps/{id}/duplicate/{sourceId}":
+    post:
+      tags:
+        - Webapp content    
+      parameters:
+        - in: path
+          type: string
+          required: true
+          name: id
+          description: The id of the destination webapp where to duplicate the content
+        - in: path
+          type: string
+          required: true
+          name: sourceId
+          description: The id of the source webapp to get copy content from
+      responses:
+        '200':
+          description: Success
+        '401':
+          description: API key is missing or invalid
+        '404':
+          description: Webapp with the given sourceId not found
+      operationId: duplicate-webapp-content
+      description: Duplicates webapp's content
+definitions:
+  WebappRecord:
+    type: object
+    title: Webapp record
+    properties:
+      id :
+        type: string
+        description: The webapp's
+        example: "asdsad-17a6-45323-b64b-65325287372d"
+      type: 
+        type: string
+        enum:
+          - Dashboard
+          - DashboardTemplate
+          - WebVI
+        description: The webapp's type
+      name:
+        type: string
+        description: The webapp's name
+      shared:
+        type: string
+        enum:
+          - private
+          - direct
+          - public
+        description: The webapp's sharing option
+      sharedEmails: 
+        type: array
+        items:
+          type: string
+          example: john.doe@ni.com
+        description: List of emails of users to share the webapp with. Applies when "shared" option is "direct"
+      policyIds: 
+        type: array
+        items:
+          type: string
+          example: "asdsad-17a6-45323-b64b-65325287372d"
+        description: List of policy IDs associated with the webapp giving it permissions to the user's SistemllinkCloud resources"  
+      properties:
+        type: object
+        description: A map of key value proeprties associated with the webapp
+  UpdateWebappMetadatReuqest:
+    type: object
+    title: Update webapp request
+    properties:
+      name:
+        type: string
+        description: The webapp's name
+      shared:
+        type: string
+        enum:
+          - private
+          - direct
+          - public
+        description: The webapp's sharing option
+      sharedEmails: 
+        type: array
+        items:
+          type: string
+        description: List of emails of users to share the webapp with. Applies when "shared" option is "direct"
+      policyIds: 
+        type: array
+        items:
+          type: string
+          example: "asdsad-17a6-45323-b64b-65325287372d"
+        description: List of policy IDs associated with the webapp giving it permissions to the user's SistemllinkCloud resources"  
+      properties:
+        type: object
+        description: A map of key value proeprties associated with the webapp
+      userMessage:
+        type: string
+        description: Custom message to embedd in the email notification sent out to newly added emails in the sharedEmails property when the shared property is direct
+        
+  WebappContent:
+    type: string
+    format: binary
+    title: Webapp content
+    description: The webapp binary content. Depending on the webapp's type it can be a dashboard, template or *.nipkg file exported from LabVIEW NXG
