@@ -99,7 +99,7 @@ paths:
           schema:
             $ref: '#/definitions/Topic'
       responses:
-        200:
+        204:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
@@ -121,7 +121,7 @@ paths:
           schema:
             $ref: '#/definitions/Topic'
       responses:
-        200:
+        204:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
@@ -144,7 +144,7 @@ paths:
           schema:
             $ref: '#/definitions/TopicAndMessage'
       responses:
-        200:
+        204:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
@@ -183,7 +183,7 @@ paths:
       parameters:
         - $ref: '#/parameters/Token'
       responses:
-        200:
+        204:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
