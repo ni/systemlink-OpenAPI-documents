@@ -637,11 +637,16 @@ definitions:
     type: object
     properties:
       filter:
-        description: Query filter, in Dynamic Linq
+        description: The query filter, in Dynamic Linq
         type: string
         example: (operator == "user1") || ((programName != "MyProgram") && (totalTimeInSeconds < @0))
       substitutions:
-        description: Substitutions to make into the filter expression
+        description: >-
+          Substitutions to make into the query filter expression. Substitutions in the query expression
+          are indicated by a non-negative integer prefixed with the "@" symbol, such as "@3." Each
+          substitution in the given expression will be replaced by the element at the corresponding 
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
         type: array
         items:
           type: object
@@ -1202,7 +1207,7 @@ paths:
   /v2/query-results:
     post:
       tags: [results]
-      summary: Queries test results using a query language
+      summary: Advanced Test Result Query
       description: Uses the Dynamic Linq query language to specify a filter and return test results. An empty request body queries all test results.
       operationId: query-results-v2
       x-ni-operation: queryResults
@@ -1435,8 +1440,8 @@ paths:
   /v2/query-steps:
     post:
       tags: [steps]
-      summary: Queries test steps using a query language
-      description: Uses the Dynamic Linq query language to specify a filter and return test results. An empty request body queries all test results.
+      summary: Advanced Test Step Query
+      description: Uses the Dynamic Linq query language to specify a filter and return test steps. An empty request body queries all test steps.
       operationId: query-steps-v2
       x-ni-operation: querySteps
       x-ni-privilege: Read
