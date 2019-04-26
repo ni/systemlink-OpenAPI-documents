@@ -632,6 +632,21 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/ResultSortDefinitionObject'
+  AdvancedQuery:
+    title: Advanced Query Object for Test Data
+    type: object
+    properties:
+      filter:
+        description: Query filter, in Dynamic Linq
+        type: string
+        example: (operator == "user1") || ((programName != "MyProgram") && (totalTimeInSeconds < @0))
+      substitutions:
+        description: Substitutions to make into the filter expression
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
   StepIdResultIdPair:
     title: Step Id / Result Id Pair
     type: object
@@ -1184,6 +1199,40 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+  /v2/query-results:
+    post:
+      tags: [results]
+      summary: Queries test results using a query language
+      description: Uses the Dynamic Linq query language to specify a filter and return test results. An empty request body queries all test results.
+      operationId: query-results-v2
+      x-ni-operation: queryResults
+      x-ni-privilege: Read
+      parameters:
+        - in: body
+          name: postBody
+          description: Query filter
+          required: false
+          schema:
+            $ref: '#/definitions/AdvancedQuery'
+        - in: query
+          name: skip
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          type: integer
+          format: int32
+          default: -1
+          minimum: -1
+      responses:
+        200:
+          $ref: '#/responses/ResultsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v1/results:
     get:
       tags: [results]
@@ -1364,6 +1413,40 @@ paths:
           required: false
           schema:
             $ref: '#/definitions/TestStepQueryObject'
+        - in: query
+          name: skip
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          type: integer
+          format: int32
+          default: -1
+          minimum: -1
+      responses:
+        200:
+          $ref: '#/responses/StepsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/query-steps:
+    post:
+      tags: [steps]
+      summary: Queries test steps using a query language
+      description: Uses the Dynamic Linq query language to specify a filter and return test results. An empty request body queries all test results.
+      operationId: query-steps-v2
+      x-ni-operation: querySteps
+      x-ni-privilege: Read
+      parameters:
+        - in: body
+          name: postBody
+          description: Query filter
+          required: false
+          schema:
+            $ref: '#/definitions/AdvancedQuery'
         - in: query
           name: skip
           type: integer
