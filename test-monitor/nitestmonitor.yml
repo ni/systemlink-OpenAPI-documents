@@ -1170,40 +1170,6 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/Error'
-  /v1/query-results:
-    post:
-      tags: [results]
-      summary: Queries test results
-      description: Uses input criteria to filter and return test results. An empty request body queries all test results.
-      operationId: query-results
-      x-ni-operation: queryResults
-      x-ni-privilege: Read
-      parameters:
-        - in: body
-          name: postBody
-          description: Result query object
-          required: false
-          schema:
-            $ref: '#/definitions/TestResultQueryObject'
-        - in: query
-          name: skip
-          type: integer
-          format: int32
-          default: 0
-          minimum: 0
-        - in: query
-          name: take
-          type: integer
-          format: int32
-          default: -1
-          minimum: -1
-      responses:
-        200:
-          $ref: '#/responses/ResultsQueryResponse'
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
   /v2/query-results:
     post:
       tags: [results]
@@ -1403,40 +1369,6 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/query-steps:
-    post:
-      tags: [steps]
-      summary: Queries test steps
-      description: Uses input criteria to filter and return test steps. An empty request body queries all test steps.
-      operationId: query-steps
-      x-ni-operation: querySteps
-      x-ni-privilege: Read
-      parameters:
-        - in: body
-          name: postBody
-          description: Step query object
-          required: false
-          schema:
-            $ref: '#/definitions/TestStepQueryObject'
-        - in: query
-          name: skip
-          type: integer
-          format: int32
-          default: 0
-          minimum: 0
-        - in: query
-          name: take
-          type: integer
-          format: int32
-          default: -1
-          minimum: -1
-      responses:
-        200:
-          $ref: '#/responses/StepsQueryResponse'
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
   /v2/query-steps:
     post:
       tags: [steps]
@@ -1624,6 +1556,76 @@ paths:
       responses:
         204:
           description: No Content
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/query-results:
+    post:
+      tags: [deprecated]
+      summary: Queries test results
+      description: Uses input criteria to filter and return test results. An empty request body queries all test results.
+      operationId: query-results
+      x-ni-operation: queryResults
+      x-ni-privilege: Read
+      deprecated: true
+      parameters:
+        - in: body
+          name: postBody
+          description: Result query object
+          required: false
+          schema:
+            $ref: '#/definitions/TestResultQueryObject'
+        - in: query
+          name: skip
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          type: integer
+          format: int32
+          default: -1
+          minimum: -1
+      responses:
+        200:
+          $ref: '#/responses/ResultsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/query-steps:
+    post:
+      tags: [deprecated]
+      summary: Queries test steps
+      description: Uses input criteria to filter and return test steps. An empty request body queries all test steps.
+      operationId: query-steps
+      x-ni-operation: querySteps
+      x-ni-privilege: Read
+      deprecated: true
+      parameters:
+        - in: body
+          name: postBody
+          description: Step query object
+          required: false
+          schema:
+            $ref: '#/definitions/TestStepQueryObject'
+        - in: query
+          name: skip
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          type: integer
+          format: int32
+          default: -1
+          minimum: -1
+      responses:
+        200:
+          $ref: '#/responses/StepsQueryResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
