@@ -1187,16 +1187,26 @@ paths:
             $ref: '#/definitions/AdvancedQuery'
         - in: query
           name: skip
+          description: >-
+            The number of results to skip when paging.
+            For example, if the query filter matches 100 results with a skip
+            value of 50 and a take value of 25, results 51 through 75 will be
+            returned.
           type: integer
           format: int32
           default: 0
           minimum: 0
         - in: query
           name: take
+          description: >-
+            The total number of results to return.
+            For example, if the query filter matches 100 results with a skip
+            value of 50 and a take value of 25, results 51 through 75 will be
+            returned.
           type: integer
           format: int32
-          default: -1
-          minimum: -1
+          default: 1000
+          minimum: 0
       responses:
         200:
           $ref: '#/responses/ResultsQueryResponse'
@@ -1386,16 +1396,26 @@ paths:
             $ref: '#/definitions/AdvancedQuery'
         - in: query
           name: skip
+          description: >-
+            The number of steps to skip when paging.
+            For example, if the query filter matches 100 steps with a skip
+            value of 50 and a take value of 25, steps 51 through 75 will be
+            returned.
           type: integer
           format: int32
           default: 0
           minimum: 0
         - in: query
           name: take
+          description: >-
+            The total number of steps to return.
+            For example, if the query filter matches 100 steps with a skip
+            value of 50 and a take value of 25, steps 51 through 75 will be
+            returned.
           type: integer
           format: int32
-          default: -1
-          minimum: -1
+          default: 1000
+          minimum: 0
       responses:
         200:
           $ref: '#/responses/StepsQueryResponse'
