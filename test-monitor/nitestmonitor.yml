@@ -642,8 +642,8 @@ definitions:
         example: (operator == "user1") || ((programName != "MyProgram") && (totalTimeInSeconds < @0))
       substitutions:
         description: >-
-          Substitutions to make into the query filter expression. Substitutions in the query expression
-          are indicated by a non-negative integer prefixed with the "@" symbol, such as "@3." Each
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
           substitution in the given expression will be replaced by the element at the corresponding 
           index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
           the element at the zeroth index of the substitutions list.
@@ -1188,7 +1188,7 @@ paths:
         - in: query
           name: skip
           description: >-
-            The number of results to skip when paging.
+            The number of matching results to skip when querying.
             For example, if the query filter matches 100 results with a skip
             value of 50 and a take value of 25, results 51 through 75 will be
             returned.
@@ -1397,7 +1397,7 @@ paths:
         - in: query
           name: skip
           description: >-
-            The number of steps to skip when paging.
+            The number of matching steps to skip when querying.
             For example, if the query filter matches 100 steps with a skip
             value of 50 and a take value of 25, steps 51 through 75 will be
             returned.
