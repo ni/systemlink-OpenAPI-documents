@@ -214,7 +214,9 @@ definitions:
       - UPDATED_AT
   NotebookExportFormat:
     title: Notebook Export Format
-    description: Notebook export format enum
+    description: >-
+        Specifies the file format for the notebook execution export. If this value is null or
+        left out then no export is done. 
     type: string 
     enum:
       - HTML
