@@ -212,6 +212,13 @@ definitions:
       - PATH
       - CREATED_AT
       - UPDATED_AT
+  NotebookExportFormat:
+    title: Notebook Export Format
+    description: Notebook export format enum
+    type: string 
+    enum:
+      - HTML
+      - PDF
   NotebookSortDefinitionObject:
     title: Notebook Sort Definition
     description: Defines the field and direction for sorting notebooks.
@@ -407,6 +414,8 @@ definitions:
         format: int32
         default: 86400
         example: 3600
+      exportFormat:
+        $ref: '#/definitions/NotebookExportFormat'
   ExecutionHashInformation:
     title: Execution Hash Information
     description: >-
