@@ -1,0 +1,999 @@
+swagger: '2.0'
+info:
+  description: "Creates and manages states that can be applied to managed systems."
+  version: "1"
+  title: "SystemLink Systems State Manager"
+  contact:
+    name: National Instruments
+    url: https://www.ni.com/systemlink
+    email: support@ni.com
+basePath: "/nisystemsstate"
+x-ni-routing-key: 'Skyline.SystemsStateManager'
+x-ni-privilege-application: 'niws.nisysmgmt'
+consumes: [application/json]
+produces: [application/json]
+
+securityDefinitions:
+  basicAuth:
+    type: basic
+  cookieAuth:
+    type: apiKey
+    in: header
+    name: Cookie
+
+security:
+  - basicAuth: []
+  - cookieAuth: []
+
+responses:
+  Error:
+    description: Error
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+  BadRequest:
+    description: Bad Request indicates that the server was unable to process the request because of invalid syntax.
+    schema:
+      title: Bad Request Error Response
+      description: Bad request error response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+  Unauthorized:
+    description: Not authorized.
+    headers:
+      WWW_Authenticate:
+        description: Information for how to authenticate.
+        type: string
+
+  Conflict:
+    description: This response is sent when a request conflicts with the current state of the server.
+    schema:
+      title: Conflict Error Response
+      description: Conflict error response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+  PartialSuccess:
+    description: Partial Success in the case when only a part of the request body metadata information was processed successfully.
+    schema:
+      title: PartialSuccessResponse
+      description: Partial success response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+  NotFound:
+    description: The requested resource was not found.
+    schema:
+      title: Not Found Request Error Response
+      description: Not found error response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+definitions:
+  StateIDVersionPair:
+    type: object
+    title: StateID-Version Pair
+    properties:
+      stateID:
+        description: The ID of the state.
+        type: string
+      stateVersion:
+        description: The version of the state. The latest content of the state will be used if version is not specified.
+        type: string
+    required:
+      - stateID
+    example:
+      stateID: 5bcde471fc13379595ce9b13
+      stateVersion: 9ae65370c79ac158ad061032944afe6b94d927ca
+
+  ExportStateRequest:
+    type: object
+    title: Export State
+    properties:
+      inline:
+        description: >-
+            Whether to return the state data inline rather than as an attachment.
+            When the inline is true, the
+            Content-Disposition header is set to 'inline'.
+            When the inline is not specified or is
+            false, the state contents are handled as a download. The
+            Content-Disposition header is set to 'attachment' and
+            the MIME type is set to text/x-yaml; charset=UTF-8.
+        type: boolean
+        example: true
+      state:
+        $ref: '#/definitions/StateIDVersionPair'
+    required:
+      - state
+
+  ExportStateFromSystemRequest:
+    type: object
+    title: Export State From System
+    properties:
+      inline:
+        description: >-
+            Whether to return the state data inline rather than as an attachment.
+            When the inline is true, the
+            Content-Disposition header is set to 'inline'.
+            When the inline is not specified or is
+            false, the state contents are handled as a download. The
+            Content-Disposition header is set to 'attachment' and
+            the MIME type is set to text/x-yaml; charset=UTF-8.
+        type: boolean
+        example: true
+      systemID:
+        description: System ID
+        type: string
+        example: cRIO-9064--SN-11111111--MAC-00-01-02-03-04-05
+    required:
+      - systemID
+
+  RevertStateRequest:
+    type: object
+    title: Revert Request
+    properties:
+      id:
+        description: The ID of the state.
+        type: string
+      version:
+        description: The version of the state.
+        type: string
+    required:
+      - id
+      - version
+    example:
+      id: 5bcde471fc13379595ce9b13
+      version: 9ae65370c79ac158ad061032944afe6b94d927ca
+
+  Error:
+    description: Contains error information
+    type: object
+    properties:
+      name:
+        description: The string error code.
+        type: string
+      code:
+        description: Numeric error code.
+        type: integer
+      resourceType:
+        description: The type of resource associated with the error.
+        type: string
+      resourceId:
+        description: The identifier of the resource associated with the error.
+        type: string
+      message:
+        description: The filled in error message.
+        type: string
+      args:
+        description: Positional argument values for the error code.
+        type: array
+        items:
+          type: string
+      innerErrors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+    example:
+      name: Skyline.OneOrMoreErrorsOccurred
+      code: -251040
+      message: >-
+        One or more errors occurred. See the contained list for details of each
+        error.
+      args: []
+      innerErrors:
+        - name: SystemsStateManager.StateNotFound
+          code: -253401
+          resourceType: SystemStateEntry
+          resourceId: 5bc4463af0f06f4585003ae6
+          message: 'The state with identifier 5bc4463af0f06f4585003ae6 was not found.'
+          args: [5bc4463af0f06f4585003ae6]
+
+  Operation:
+    description: An operation provided by the API
+    type: object
+    properties:
+      available:
+        type: boolean
+        description: Whether the operation is available to the caller.
+      version:
+        type: integer
+        description: The version of the available operation.
+    required: [available]
+    example:
+      available: true
+      version: 1
+
+  V1Operations:
+    description: V1 operations
+    type: object
+    properties:
+      operations:
+        description: >-
+          Available operations in the v1 version of the API:
+
+          - getStates: The ability to retrieve the states
+
+          - createOrUpdateStates: The ability to create or update states
+          
+          - deleteStates: The ability to delete states
+        type: object
+        properties:
+          getStates:
+            $ref: '#/definitions/Operation'
+          createOrUpdateStates:
+            $ref: '#/definitions/Operation'
+          deleteStates:
+            $ref: '#/definitions/Operation'
+
+  StateArchitecture:
+    description: Supported architecture by a state.
+    title: State Architecture    
+    type: string
+    enum:
+      - ARM
+      - X64
+      - X86
+    example: ARM
+
+  StateDistribution:
+    description: Supported distribution by a state.
+    title: State Distribution    
+    type: string
+    enum:
+      - NI_LINUXRT
+      - NI_LINUXRT_NXG
+      - WINDOWS
+    example: NI_LINUXRT
+
+  StateMetadata:
+    description: State metadata information.
+    title: State Description
+    type: object
+    properties:
+      id:
+        type: string
+        description: The ID of the state.
+        example: 5bc4463af0f06f4585003ae6
+      name:
+        type: string
+        description: The name of the state.
+        example: crio9064State
+      fileName:
+        type: string
+        description: The file name of the state.
+        example: crio9064State
+      description:
+        type: string
+        description: The description of the state.
+        example: crio9064 Setup State
+      distribution:
+        $ref: '#/definitions/StateDistribution'
+      architecture:
+        $ref: '#/definitions/StateArchitecture'
+      createdTimestamp:
+        description: ISO-8601 formatted timestamp specifying the state creation date.
+        type: string
+        format: iso-date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      lastUpdatedTimestamp:
+        description: ISO-8601 formatted timestamp specifying the last date that the state has been updated.
+        type: string
+        format: iso-date-time
+        example: '2018-05-07T18:58:05.219692Z'
+    required:
+      - id
+      - name
+      - fileName
+      - distribution
+      - architecture
+      - createdTimestamp
+      - lastUpdatedTimestamp
+
+  StateDescriptionListResponse:
+    description: The response containing a list of state metadata.
+    title: State Description List Response
+    type: object
+    properties:
+      totalCount:
+        type: integer
+        description: Total count of states.
+      states:
+        type: array
+        items:
+          $ref: '#/definitions/StateMetadata'
+    example:
+      totalCount: 2
+      states:
+        - id: '5bc5e9092a4fa4c71cfa7197'
+          name: vim
+          description: Having Vim installed on the windows system.
+          distribution: WINDOWS
+          architecture: x64
+          createdTimestamp: '2018-05-07T18:58:05.219692Z'
+          lastUpdatedTimestamp: '2018-05-07T18:58:05.219692Z'
+        - id: '5bcde471fc13379595ce9b13'
+          name: emacs
+          description: Having Emacs installed on the windows system.
+          distribution: WINDOWS
+          architecture: x86
+          createdTimestamp: '2018-05-07T18:58:05.219692Z'
+          lastUpdatedTimestamp: '2018-05-07T18:58:05.219692Z'
+    required:
+      - totalCount
+      - states
+
+  StateRequest:
+    description: System state object.
+    title: State Request
+    type: object
+    properties:
+      name:
+        type: string
+        description: Name of the State
+        example: crio9064State
+      description:
+        type: string
+        description: Description of the State
+        example: crio9064 Setup State
+      distribution:
+        $ref: '#/definitions/StateDistribution'
+      architecture:
+        $ref: '#/definitions/StateArchitecture'
+      feeds:
+        type: array
+        items:
+          $ref: '#/definitions/Feed'
+      packages:
+        type: array
+        items:
+          $ref: '#/definitions/Package'
+    required:
+      - name
+      - distribution
+      - architecture
+
+  StatePatchRequest:
+    description: System state object defining which attributes have to be replaced.
+    title: State Patch Request
+    x-ni-sparse: true
+    type: object
+    properties:
+      name:
+        type: string
+        description: Name of the State.
+        example: crio9064State
+      description:
+        type: string
+        description: Description of the State.
+        example: crio9064 Setup State
+      distribution:
+        $ref: '#/definitions/StateDistribution'
+      architecture:
+        $ref: '#/definitions/StateArchitecture'
+      feeds:
+        type: array
+        items:
+          $ref: '#/definitions/Feed'
+      packages:
+        type: array
+        items:
+          $ref: '#/definitions/Package'
+      changeDescription:
+        type: string
+        description: Description of the change operation.
+        example: I've changed the state
+
+  StateResponse:
+    description: System state object.
+    title: State response
+    type: object
+    properties:
+      id:
+        type: string
+        description: The ID of the state.
+        example: 5bc4463af0f06f4585003ae6
+      name:
+        type: string
+        description: The name of the state.
+        example: crio9064State
+      fileName:
+        type: string
+        description: The file name of the state.
+        example: crio9064State
+      description:
+        type: string
+        description: The description of the state.
+        example: crio9064 Setup State
+      distribution:
+        $ref: '#/definitions/StateDistribution'
+      architecture:
+        $ref: '#/definitions/StateArchitecture'
+      createdTimestamp:
+        description: ISO-8601 formatted timestamp specifying the state creation date.
+        type: string
+        format: iso-date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      lastUpdatedTimestamp:
+        description: ISO-8601 formatted timestamp specifying the last date that the state has been updated.
+        type: string
+        format: iso-date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      feeds:
+        type: array
+        items:
+          $ref: '#/definitions/Feed'
+      packages:
+        type: array
+        items:
+          $ref: '#/definitions/Package'
+      containsExtraOperations:
+        type: boolean
+        description: Whether the state containts extra operations beside feeds and packages or not.
+        example: true
+    required:
+      - id
+      - name
+      - fileName
+      - distribution
+      - architecture
+      - createdTimestamp
+      - lastUpdatedTimestamp
+      - containsExtraOperations
+
+  StateVersion:
+    description: A given version of a state.
+    title: State Version
+    type: object
+    properties:
+      version:
+        type: string
+      description:
+        type: string
+        description: The description of this specific change.
+    required:
+      - version
+    example:
+      version: 26783106b56d87c5ef6c70c549b82e4ab004e590
+      description: added package
+
+  StateHistoryResponse:
+    description: The history of a state.
+    title: State History Response
+    type: object
+    properties:
+      totalCount:
+        type: integer
+        description: Total number of versions of a state.
+      versions:
+        type: array
+        items:
+          $ref: '#/definitions/StateVersion'
+    example:
+      totalCount: 2
+      versions:
+        - version: 4d514a6b31ee6ed72ae509c360be8dca6e68ffb0
+          description: initial version
+        - version: 0520222b9e7edae30c37c244dbce0deb23982c11
+          description: added new package
+    required:
+      - totalCount
+      - versions
+
+  Feed:
+    description: Object defining a feed containing the name, url and whether is enabled/compressed or not.
+    type: object
+    properties:
+      name:
+        type: string
+        description: Name of the feed.
+      url:
+        type: string
+        description: The url for the repository.
+      enabled:
+        type: boolean
+        description: Whether the feed is enabled or not.
+        default: true
+      compressed:
+        type: boolean
+        description: Whether the feed is compressed or not.
+        default: false
+    required:
+      - name
+      - url
+    example:
+      name: ni
+      enabled: true
+      url: ni.com
+      compressed: true
+
+  Package:
+    description: Object defining a package containing the name and version.
+    type: object
+    properties:
+      name:
+        type: string
+        description: Name of the package.
+      version:
+        type: string
+        description: Version of the package.
+    required:
+      - name
+    example:
+      name: vim
+      version: '7.1'
+
+paths:
+  /:
+    get:
+      operationId: HandleGetVersionInfo
+      x-ni-request-all-privileges: true
+      summary: API information
+      tags: [versioning]
+      security: []
+      description: Gets permissions and operations for the StatesService.
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Version information.
+            title: RootEndpointResponse
+            type: object
+            properties:
+              v1:
+                $ref: '#/definitions/V1Operations'
+              version:
+                description: The implementation version of the web service.
+                type: string
+        default:
+            $ref: '#/responses/Error'
+  /{version}:
+    get:
+      operationId: RootEndpointWithVersion
+      x-ni-request-all-privileges: true
+      summary: API version information
+      description: Returns available operations for a single version of the API.
+      tags: [versioning]
+      security: []
+      parameters:
+        - in: path
+          name: version
+          description: The version of the API to retrieve operations.
+          x-example: v1
+          type: string
+          required: true
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/V1Operations'
+        404:
+          description: Not Found
+        default:
+            $ref: '#/responses/Error'
+  /v1/states:
+    get:
+      operationId: GetStates
+      x-ni-privilege: Read
+      x-ni-operation: getStates
+      tags: [states]
+      summary: Get all system states
+      description: Return metadata information of all system states.
+      parameters:
+        - in: query
+          name: skip
+          description: How many states to skip. Used for pagination.
+          type: integer
+          x-ni-data-type: U32
+          default: 0
+        - in: query
+          name: take
+          description: How many states to retrieve. Used for pagination.
+          type: integer
+          x-ni-data-type: U32
+          default: 1000
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/StateDescriptionListResponse'
+        401:
+          $ref: '#/responses/Unauthorized'            
+        default:
+          $ref: '#/responses/Error'
+    post:
+      operationId: CreateState
+      x-ni-privilege: nisystemsstate.Write
+      x-ni-operation: createOrUpdateStates
+      tags: [states]
+      summary: Create a new system state
+      description: Create a new System State by providing metadata and its content. rawState property will be used if it has a non-null value, feeds and packages will be used otherwise.
+      parameters:
+        - in: body
+          name: state
+          description: The state to create.
+          required: true
+          schema:
+            $ref: '#/definitions/StateRequest'
+      responses:
+        201:
+          description: Created
+          schema:
+            $ref: '#/definitions/StateResponse'
+        400:
+          $ref: '#/responses/BadRequest'            
+        401:
+          $ref: '#/responses/Unauthorized'
+        409:
+          $ref: '#/responses/Conflict'
+        default:
+          $ref: '#/responses/Error'
+  /v1/states/{id}:
+    get:
+      operationId: GetState
+      x-ni-privilege: Read
+      x-ni-operation: getStates
+      tags: [states]
+      summary:  Get system state
+      description: Returns the metadata, the feeds and packages from the content of the state. If the state contains only feeds and packages entries the containsExtraOperations from response will be false, otherwise it will be true. The export route could be used in order to get the whole content of the state.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the state to return.
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/StateResponse'
+        401:
+          $ref: '#/responses/Unauthorized'          
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+            $ref: '#/responses/Error'
+    patch:
+      operationId: UpdateState
+      x-ni-privilege: nisystemsstate.Write
+      x-ni-operation: createOrUpdateStates
+      consumes:
+        - application/merge-patch+json      
+      tags: [states]
+      summary: Update a state
+      description: Update a state by providing specific changes of the state. The method overrides any state properties with what is contained in the request. In order to ignore properties update, leave the value off the request. If rawState is specified it will have priority against packages/feeds.
+      parameters:
+        - name: id
+          in: path
+          description: ID of state that needs to be updated.
+          required: true
+          type: string
+        - in: body
+          name: patch
+          required: true
+          description: Json Patch describing the changes.
+          schema:
+            $ref: '#/definitions/StatePatchRequest'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/StateResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        409:
+          $ref: '#/responses/Conflict'
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      operationId: DeleteState
+      x-ni-privilege: nisystemsstate.Write
+      x-ni-operation: deleteStates
+      tags: [states]
+      summary: Delete state
+      description: Delete a state by providing its id.
+      parameters:
+        - name: id
+          in: path
+          description: ID of state that needs to be deleted.
+          required: true
+          type: string
+      responses:
+        204:
+          description: No Content
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/replace-state-content:
+    post:
+      operationId: ReplaceContent
+      x-ni-privilege: nisystemsstate.Write
+      x-ni-operation: createOrUpdateStates
+      tags: [states]
+      summary: Replace the content of a state
+      description: Replace the content of a state by providing the new content of the state.
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: id
+          in: formData
+          description: ID of the state for which to update the content.
+          required: true
+          type: string
+        - in: formData
+          description: New content of the state.
+          name: file
+          type: file
+          required: true
+        - in: formData
+          description: Description of the change operation.
+          name: changeDescription
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/StateResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        409:
+          $ref: '#/responses/Conflict'
+        default:
+          $ref: '#/responses/Error'
+  /v1/states/{id}/history:
+    get:
+      operationId: GetStateHistory
+      x-ni-privilege: Read
+      x-ni-operation: getStates
+      tags: [history]
+      summary: Get state history
+      description: Returns a list of (version, description) pairs defining the history of the state.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the state for which it returns the history.
+          required: true
+          type: string
+        - in: query
+          name: skip
+          description: How many state versions to skip. Used for pagination.
+          type: integer
+          x-ni-data-type: U32
+          default: 0
+        - in: query
+          name: take
+          description: How many state versions to retrieve. Used for pagination.
+          type: integer
+          x-ni-data-type: U32
+          default: 1000
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/StateHistoryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'          
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/states/{id}/history/{version}:
+    get:
+      operationId: GetStateVersion
+      x-ni-privilege: Read
+      x-ni-operation: getStates
+      tags: [history]
+      summary: Get state by version
+      description: Returns the snapshot of a state at a specific version. Returns the metadata, the feeds and packages from the content of the state. If the state contains only feeds and packages entries the containsExtraOperations from response will be false, otherwise it will be true. The export route could be used in order to get the whole content of the state.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the state for which it returns the history.
+          required: true
+          type: string
+        - name: version
+          in: path
+          description: State version to retrieve.
+          type: string
+          required: true
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/StateResponse'
+        401:
+          $ref: '#/responses/Unauthorized'          
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/export-state:
+    post:
+      operationId: ExportState
+      x-ni-privilege: Read
+      x-ni-operation: getStates
+      tags: [states]
+      summary: Export a state
+      description: Export the state content to a file. If the version is not provided in body then the latest content will be exported. 
+      parameters:
+        - name: stateInfo
+          in: body
+          description: State to be exported.
+          required: true
+          schema:
+            $ref: '#/definitions/ExportStateRequest'
+      produces:
+        - text/x-yaml
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            description: The file data
+            type: file
+          examples:
+            application/octet-stream:
+              File data
+        401:
+          $ref: '#/responses/Unauthorized'          
+        default:
+          $ref: '#/responses/Error'
+  /v1/import-state:
+    post:
+      operationId: ImportState
+      x-ni-privilege: nisystemsstate.Write
+      x-ni-operation: createOrUpdateStates
+      tags: [states]
+      summary: Import a state
+      description: Import a state by providing the metadata and content of an existing state file.
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData 
+          name: file
+          type: file
+          required: true
+        - in: formData
+          name: name
+          type: string
+          required: true
+        - in: formData
+          name: description
+          type: string
+        - in: formData
+          name: distribution
+          type: string
+          enum:
+            - NI_LINUXRT
+            - NI_LINUXRT_NXG
+            - WINDOWS       
+        - in: formData
+          name: architecture
+          type: string
+          enum:
+            - ARM
+            - x64
+            - x86
+          required: true
+      responses:
+        201:
+          description: Created
+          schema:
+            $ref: '#/definitions/StateResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        409:
+          $ref: '#/responses/Conflict'
+        default:
+          $ref: '#/responses/Error'
+  /v1/export-state-from-system:
+    post:
+      operationId: ExportStateFromSystem
+      x-ni-privilege: Read
+      x-ni-operation: getStates
+      tags: [states]
+      summary: Export the state of a System by providing its ID.
+      description: Export the state of a System by providing its ID. 
+      parameters:
+        - name: systemInfo
+          in: body
+          description: The information about the system.
+          required: true
+          schema:
+            $ref: '#/definitions/ExportStateFromSystemRequest'
+      produces:
+        - text/x-yaml
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            description: The file data
+            type: file
+          examples:
+            application/octet-stream:
+              File data
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/delete-states:
+    post:
+      operationId: DeleteStates
+      x-ni-privilege: nisystemsstate.Write
+      x-ni-operation: deleteStates
+      tags: [states]
+      summary: Delete states
+      description: Delete a list of states by providing their ids.
+      parameters:
+        - in: body
+          name: StateIDs
+          description: The list of state IDs to delete.
+          required: true
+          schema:
+            type: array
+            items:
+              description: The ID of a state to delete.
+              type: string
+              example: '5bcde471fc13379595ce9b13'
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        204:
+          description: No Content
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/revert-state-version:
+    post:
+      operationId: RevertStateToVersion
+      x-ni-privilege: nisystemsstate.Write
+      x-ni-operation: createOrUpdateStates
+      tags: [history]
+      summary: Revert a state
+      description: Revert a state to a certain version. This operation will create a new version of the state and the contents will be the same as in specified version.
+      parameters:
+        - in: body
+          name: Revert information
+          description: Revert information that contains the stateID and the version.
+          required: true
+          schema:
+            $ref: '#/definitions/RevertStateRequest'
+      responses:
+        204:
+          description: No Content
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        409:
+          $ref: '#/responses/Conflict'
+        default:
+          $ref: '#/responses/Error'
