@@ -86,16 +86,22 @@ definitions:
           type: string
           example: VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
       fun:
-        description: A string or an array of strings each representing an execution module function.
-        type: object
+        description: An array of strings each representing an execution module function.
+        type: array
+        items:
+          type: string
+          example: pkg.remove
         example:
           - pkg.remove
           - pkg.install
       arg: 
-        description: An array of variable type elements that are arguments to the function specified by the "fun" property. If multiple functions are specified, an array of arrays in equivalent order each representing the arguments to a respective function. If multiple functions are specified and at least one requires arguments, an array must be provided for each function, even if it is empty. Keyword arguments may be provided as a parameter of type object with at least one property of type boolean, "__kwarg__", that is evaluated to true.
+        description: An array of arrays of variable type elements that are arguments to the function specified by the "fun" property. If at least one function requires arguments, an array must be provided for each function, even if it is empty. Keyword arguments may be provided as a parameter of type object with at least one property of type boolean, "__kwarg__", that is evaluated to true.
         type: array
         items:
-          type: object
+          type: array
+          items:
+            type: object
+            example: true
           example:
             - __kwarg__: true
               pkgs:
@@ -135,16 +141,22 @@ definitions:
           type: string
           example: VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
       fun:
-        description: A string or an array of strings each representing an execution module function.
-        type: object
+        description: An array of strings each representing an execution module function.
+        type: array
+        items:
+          type: string
+          example: pkg.remove
         example:
           - pkg.remove
           - pkg.install
       arg: 
-        description: An array of variable type elements that are arguments to the function specified by the "fun" property. If multiple functions are specified, an array of arrays in equivalent order each representing the arguments to a respective function. If multiple functions are specified and at least one requires arguments, an array must be provided for each function, even if it is empty. Keyword arguments may be provided as a parameter of type object with at least one property of type boolean, "__kwarg__", that is evaluated to true.
+        description: An array of arrays of variable type elements that are arguments to the function specified by the "fun" property. If at least one function requires arguments, an array must be provided for each function, even if it is empty. Keyword arguments may be provided as a parameter of type object with at least one property of type boolean, "__kwarg__", that is evaluated to true.
         type: array
         items:
-          type: object
+          type: array
+          items:
+            type: object
+            example: true
           example:
             - __kwarg__: true
               pkgs:
@@ -475,16 +487,22 @@ definitions:
               description: String representing the system ID.
               example: VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5
           fun:
-            type: object
-            description: A string or an array of strings each representing an execution module function.
+            type: array
+            description: An array of strings each representing an execution module function.
+            items:
+              type: string
+              example: system.set_computer_desc
             example:
               - system.set_computer_desc
               - nisysmgmt.grains_items
           arg:
-            description: An array of variable type elements that are arguments to the function specified by the "fun" property. If multiple functions are specified, an array of arrays in equivalent order each representing the arguments to a respective function. If multiple functions are specified and at least one requires arguments, an array must be provided for each function, even if it is empty. Keyword arguments may be provided as a parameter of type object with at least one property of type boolean, "__kwarg__", that is evaluated to true.
+            description: An array of arrays of variable type elements that are arguments to the function specified by the "fun" property. If at least one function requires arguments, an array must be provided for each function, even if it is empty. Keyword arguments may be provided as a parameter of type object with at least one property of type boolean, "__kwarg__", that is evaluated to true.
             type: array
             items:
-              type: object
+              type: array
+              items:
+                type: object
+                example: true
               example:
                 - test
         required: [user, tgt, fun]
@@ -494,20 +512,29 @@ definitions:
         title: Job Result
         properties:
           return:
-            type: object
-            description: An object or an array of objects representing return values for each executed function.
+            type: array
+            items:
+              type: object
+              example: 'Computer Description: test'
+            description: An array of objects representing return values for each executed function.
             example: 
               - Computer Description: test
               - null
           retcode:
-            type: object
-            description: An integer or an array of integers representing code values for each executed function.
+            type: array
+            items:
+              type: integer
+              example: 1
+            description: An array of integers representing code values for each executed function.
             example:
               - 0
               - 0
           success:
-            type: object
-            description: A boolean or an array of booleans representing succees values for each executed function.
+            type: array
+            items:
+              type: boolean
+              example: false
+            description: An array of booleans representing succees values for each executed function.
             example:
               - true
               - true
@@ -793,7 +820,7 @@ definitions:
         items:
           $ref: '#/definitions/GroupInfo'
       error:
-        $ref: '#/responses/PartialSuccess'
+        $ref: '#/definitions/Error'
 
   GroupInfo:
     title: Group Info
