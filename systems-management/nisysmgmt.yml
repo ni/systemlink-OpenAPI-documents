@@ -127,7 +127,7 @@ definitions:
       jid:
         description: The ID of the created job.
         type: string
-        example: 20190211135234448026_28320
+        example: '20190211135234448026_28320'
       tgt:
         description: Array of strings representing system IDs.
         type: array
@@ -197,7 +197,7 @@ definitions:
       ip_address:
         type: string
         description: Required if hostname is not provided. A string representing the IP address of the system to register.
-        example: 1.1.1.1
+        example: 10.10.10.10
       password:
         type: string
         description: A string representing the password to use access the system.
@@ -215,7 +215,7 @@ definitions:
       request_id:
         description: The ID of the registration request.
         type: string
-        example: 068530b9-b059-4c0e-9820-9e9cc4e0832c
+        example: '068530b9-b059-4c0e-9820-9e9cc4e0832c'
     required: [request_id]
 
   UnregisterSystemsRequest:
@@ -244,7 +244,7 @@ definitions:
       jid:
         description: The job ID of the unregistration job sent to connected systems.
         type: string
-        example: 20190211135234448026_28320
+        example: '20190211135234448026_28320'
       removed_ids:
         description: An array of system IDs removed from the database immediately.
         type: array
@@ -273,7 +273,7 @@ definitions:
       jid:
         description: The job ID of the job to cancel.
         type: string
-        example: 20190211135234448026_28320
+        example: '20190211135234448026_28320'
       systemId:
         description: The system ID on which the job will be canceled.
         type: string
@@ -365,7 +365,7 @@ definitions:
         description: Last updated timestamp.
         type: string
         format: iso-date-time
-        example: 2019-02-11T13:32:06.030958Z
+        example: '2019-02-11T13:32:06.030958Z'
       master:
         description: Master of the system.
         type: string
@@ -430,7 +430,7 @@ definitions:
       jid:
         type: string
         description: ID of the job.
-        example: 358ddc77-6d1e-4290-ba54-ab08a6fe5774
+        example: '20190211135234448026_28320'
       id:
         type: string
         description: ID of the system.
@@ -439,17 +439,17 @@ definitions:
         type: string
         format: iso-date-time
         description: The date when the job was created.
-        example: 2019-02-11T13:32:06.030958Z
+        example: '2019-02-11T13:32:06.030958Z'
       last_updated_timestamp:
         type: string
         format: iso-date-time
         description: The date when the job was last updated.
-        example: 2019-02-11T13:32:06.030958Z
+        example: '2019-02-11T13:32:06.030958Z'
       dispatched_timestamp:
         type: string
         format: iso-date-time
         description: The date when the job was actually sent to the system.
-        example: 2019-02-11T13:32:06.030958Z
+        example: '2019-02-11T13:32:06.030958Z'
       state:
         $ref: '#/definitions/JobState'
       metadata:
@@ -560,7 +560,7 @@ definitions:
         description: Last updated timestamp.
         type: string
         format: iso-date-time
-        example: 2019-02-11T13:32:06.030958Z
+        example: '2019-02-11T13:32:06.030958Z'
       data:
         description: The actual data.
         type: object
@@ -581,12 +581,12 @@ definitions:
         description: The time when the system has been registered.
         type: string
         format: iso-date-time
-        example: 2019-02-19T11:42:25.078Z
+        example: '2019-02-19T11:42:25.078Z'
       last_updated_timestamp:
         description: Last time when the system information has been updated.
         type: string
         format: iso-date-time
-        example: 2019-02-19T11:42:25.078Z
+        example: '2019-02-19T11:42:25.078Z'
       alias:
         description: The alias of the system.
         type: string
@@ -599,7 +599,7 @@ definitions:
             description: Last time when the system activation information has been updated.
             type: string
             format: iso-date-time
-            example: 2019-02-19T11:42:25.078Z
+            example: '2019-02-19T11:42:25.078Z'
           data:
             $ref: '#/definitions/ManagedSystemActivationData'
         required: [last_updated_timestamp, data]
@@ -611,7 +611,7 @@ definitions:
             description: Last time when the system connection information has been updated.
             type: string
             format: iso-date-time
-            example: 2019-02-19T11:42:25.078Z
+            example: '2019-02-19T11:42:25.078Z'
           data:
             type: object
             properties:
@@ -623,7 +623,7 @@ definitions:
         description: General information about the system.
         $ref: '#/definitions/ManagedSystemDataProperty'
         example:
-          last_updated_timestamp: 2019-02-19T11:42:25.078Z
+          last_updated_timestamp: '2019-02-19T11:42:25.078Z'
           data:
             kernel: Windows
             nodename: WIN-8NTJI2568QV
@@ -639,7 +639,7 @@ definitions:
         description: Software packages that are installed on the system.
         $ref: '#/definitions/ManagedSystemDataProperty'
         example:
-          last_updated_timestamp: 2019-02-19T11:42:25.078Z
+          last_updated_timestamp: '2019-02-19T11:42:25.078Z'
           data:
             ni-package-manager-upgrader:
               description: Application used to upgrade the package manager.
@@ -663,7 +663,7 @@ definitions:
         description: Feeds that are configured on the system.
         $ref: '#/definitions/ManagedSystemDataProperty'
         example:
-          last_updated_timestamp: 2019-02-19T11:42:25.078Z
+          last_updated_timestamp: '2019-02-19T11:42:25.078Z'
           data:
             http://download.ni.com/support/nipkg/products/ni-package-manager/released:
             - configurable: false
@@ -679,7 +679,7 @@ definitions:
         description: System API information.
         $ref: '#/definitions/ManagedSystemDataProperty'
         example:
-          last_updated_timestamp: 2019-02-19T11:42:25.078Z
+          last_updated_timestamp: '2019-02-19T11:42:25.078Z'
           data:
             - resource_uri: nisyscfg//sys/bus/pci/devices/0000:04:00.0
               properties:
@@ -701,7 +701,7 @@ definitions:
         description: Groups information about a system. Specifies on which groups is the system assigned to.
         $ref: '#/definitions/ManagedSystemDataProperty'
         example:
-          last_updated_timestamp: 2019-02-19T11:42:25.078Z
+          last_updated_timestamp: '2019-02-19T11:42:25.078Z'
           data:
             - 121b471c-d7d4-4996-a38f-27f7e58be070
       keywords:
@@ -712,7 +712,7 @@ definitions:
             description: Last updated timestamp.
             type: string
             format: iso-date-time
-            example: 2019-02-19T11:42:25.078Z
+            example: '2019-02-19T11:42:25.078Z'
           data:
             description: A list of strings defining metadata information about a system.
             type: array
@@ -729,6 +729,7 @@ definitions:
             description: Last updated timestamp.
             type: string
             format: iso-date-time
+            example: '2019-02-19T11:42:25.078Z'
           data:
             description: An object defining key-value pairs metadata information about a system.
             type: object
@@ -752,18 +753,16 @@ definitions:
        * Hardware: The report will contain information about the hardware configuration of the system.
 
   SystemsReportRequest:
-    description: Request containing the report type followed by the list of system IDs.
+    description: Request containing the report type followed by a query filter that will be applied on systems.
     title: Systems Report Request
     type: object
     properties:
       type:
         $ref: '#/definitions/ReportType'
-      ids:
-        type: array
-        items:
-          type: string
-          description: The system ID.
-          example: 'VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F9'
+      filter:
+        type: string
+        example: grains.data.os==NILinuxRT
+        description: Specifies the filter criteria for systems.
     required: [ids, type]
 
   CreateGroupRequest:
@@ -783,6 +782,19 @@ definitions:
         example: testVMs
     required: [name]
 
+  CreateGroupsPartialSuccessResponse:
+    title: Create Group Response
+    description: Response containing the IDs of the created groups along with the failures.
+    type: object
+    properties:
+      groups:
+        type: array
+        description: The groups that got created.
+        items:
+          $ref: '#/definitions/GroupInfo'
+      error:
+        $ref: '#/responses/PartialSuccess'
+
   GroupInfo:
     title: Group Info
     description: Information about a group.
@@ -800,7 +812,7 @@ definitions:
         description: The time when the group was alst updated.
         type: string
         format: iso-date-time
-        example: 2019-02-12T14:49:03.013000Z
+        example: '2019-02-12T14:49:03.013000Z'
     required: [gid, name, last_updated_timestamp]
 
   SystemGroupPair:
@@ -834,7 +846,7 @@ definitions:
           ip_address:
             description: The IP of the system.
             type: string
-            example: 1.1.1.1
+            example: 10.10.10.10
       result:
         $ref: '#/definitions/SystemInfo'
       status_code:
@@ -949,7 +961,7 @@ definitions:
         type: string
         example: testVM
 
-  GetAvailablePackagesRequest:
+  QueryAvailablePackagesRequest:
     title: Get Available Packages Request
     description: Request to get the available packages from the feeds specified in the request.
     type: object
@@ -1158,29 +1170,32 @@ definitions:
       name:
         description: The string error code.
         type: string
-        example: InvalidQuerySyntax
+        example: SaltCancelJobFailed
       code:
         description: Numeric error code.
         type: integer
-        example: -254004
+        example: -254003
       resourceType:
         description: The type of resource associated with the error.
         type: string
-        example: System
+        example: Job
       resourceId:
         description: The identifier of the resource associated with the error.
         type: string
-        example: VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F9
+        example: '20190211135234448026_28320'
       message:
         description: The filled in error message.
         type: string
-        example: The provided query is invalid. 
+        example: Cannot cancel the job id '{0}' on system id '{1}'.
       args:
         description: Positional argument values for the error code.
         type: array
         items:
           type: string
-          example: invalidquery
+          example: '20190211135234448026_28320'
+        example:
+          - '20190211135234448026_28320'
+          - VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
       innerErrors:
         type: array
         description: Internal errors that occured in the service.
@@ -1286,7 +1301,7 @@ definitions:
         items:
           type: object
         example:
-          - jid: "20190211135234448026_28320"
+          - jid: '20190211135234448026_28320'
       count:
         description: The total number of resources that matched the query.
         type: integer
@@ -1379,7 +1394,7 @@ paths:
           name: jid
           description: A string defining the job ID.
           type: string
-          x-example: 20190211135234448026_28320
+          x-example: '20190211135234448026_28320'
         - in: query
           name: state
           description: A string defining the job state.
@@ -1655,7 +1670,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/get-systems-report:
+  /v1/generate-systems-report:
     post:
       operationId: GetSystemsReport
       x-ni-privilege: Read
@@ -1707,7 +1722,9 @@ paths:
               $ref: '#/definitions/CreateGroupRequest'
       responses:
         200:
-          $ref: '#/responses/PartialSuccess'
+          description: OK
+          schema:
+            $ref: '#/definitions/CreateGroupsPartialSuccessResponse'
         204:
           description: No Content
         400:
@@ -1716,6 +1733,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+  /v1/groups:
     get:
       operationId: GetGroups
       x-ni-privilege: Read
@@ -1758,6 +1776,7 @@ paths:
             type: array
             items:
               type: string
+              example: de4ccb7b-95e1-447f-a7dd-50782c3e06d6
       responses:
         200:
           $ref: '#/responses/PartialSuccess'
@@ -1825,7 +1844,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/get-systems-info:
+  /v1/obtain-systems-info:
     post:
       operationId: GetSystemsInfo
       x-ni-privilege: Read
@@ -1936,7 +1955,7 @@ paths:
           $ref: '#/responses/NotFound'
         default:
           $ref: '#/responses/Error'
-  /v1/get-available-packages:
+  /v1/query-available-packages:
     post:
       operationId: GetAvailablePackagesByQuery
       x-ni-privilege: Read
@@ -1950,7 +1969,7 @@ paths:
           description: The configurations of the feeds.
           required: true
           schema:
-            $ref: '#/definitions/GetAvailablePackagesRequest'
+            $ref: '#/definitions/QueryAvailablePackagesRequest'
       responses:
         200:
           description: OK
@@ -1964,7 +1983,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/get-jobs-by-query:
+  /v1/query-jobs:
     post:
       operationId: GetJobsByQuery
       x-ni-privilege: Read
@@ -1996,7 +2015,7 @@ paths:
           $ref: '#/responses/NotFound'
         default:
           $ref: '#/responses/Error'
-  /v1/get-systems-by-query:
+  /v1/query-systems:
     post:
       operationId: GetSystemsByQuery
       x-ni-privilege: Read
