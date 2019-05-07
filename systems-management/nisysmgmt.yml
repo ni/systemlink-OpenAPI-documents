@@ -185,7 +185,7 @@ definitions:
     title: Register Systems Request
     type: object
     properties:
-      systems_credentials:
+      systemsCredentials:
         description: An array of objects representing system credentials.
         type: array
         items:
@@ -195,7 +195,7 @@ definitions:
         description: Whether to activate the systems or not.
         default: false
         example: true
-    required: [systems_credentials]
+    required: [systemsCredentials]
 
   SystemCredentials:
     description: Credentials of a system.
@@ -206,7 +206,7 @@ definitions:
         type: string
         description: Required if ip_address is not provided. A string representing the hostname of the system to register.
         example: testvm
-      ip_address:
+      ipAddress:
         type: string
         description: Required if hostname is not provided. A string representing the IP address of the system to register.
         example: 10.10.10.10
@@ -224,11 +224,11 @@ definitions:
     description: Response of a request to register systems.
     type: object
     properties:
-      request_id:
+      requestId:
         description: The ID of the registration request.
         type: string
         example: '068530b9-b059-4c0e-9820-9e9cc4e0832c'
-    required: [request_id]
+    required: [requestId]
 
   UnregisterSystemsRequest:
     title: Unregister Systems Request
@@ -257,13 +257,13 @@ definitions:
         description: The job ID of the unregistration job sent to connected systems.
         type: string
         example: '20190211135234448026_28320'
-      removed_ids:
+      removedIds:
         description: An array of system IDs removed from the database immediately.
         type: array
         items:
           type: string
           example: VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
-      failed_ids:
+      failedIds:
         description: An array of objects defining failed unregister operations.
         type: array
         items:
@@ -297,56 +297,70 @@ definitions:
     description: Summary information about managed systems.
     type: object
     properties:
-      connected_count:
+      connectedCount:
         type: integer
+        x-ni-data-type: I64
+        format: int64
         description: Number of the connected systems.
         example: 4
-      disconnected_count:
+      disconnectedCount:
         type: integer
+        x-ni-data-type: I64
+        format: int64
         description: Number of the disconnected systems.
         example: 2
-    required: [connected_count, disconnected_count]
+    required: [connectedCount, disconnectedCount]
 
   JobsSummary:
     title: Jobs Summary
     description: Summary information about jobs.
     type: object
     properties:
-      active_count:
+      activeCount:
         type: integer
+        x-ni-data-type: I64
+        format: int64
         description: Number of active jobs.
         example: 4
-      failed_count:
+      failedCount:
         type: integer
+        x-ni-data-type: I64
+        format: int64
         description: Number of failed jobs.
         example: 2
-      succeeded_count:
+      succeededCount:
         type: integer
+        x-ni-data-type: I64
+        format: int64
         description: Number of succeeded jobs.
         example: 4
-    required: [active_count, failed_count, succeeded_count]
+    required: [activeCount, failedCount, succeededCount]
 
   DiscoveredSystemsSummary:
     title: Discovered Systems Summary
     description: Summary information about discovered systems.
     type: object
     properties:
-      discovered_count:
+      discoveredCount:
         type: integer
+        x-ni-data-type: I64
+        format: int64
         description: Number of systems that are discovered and not managed.
         example: 100
-    required: [discovered_count]
+    required: [discoveredCount]
 
   PendingSystemsSummary:
     title: Pending Systems Summary
     description: Summary information about the systems that are trying to connect to the server but aren't accepted yet.
     type: object
     properties:
-      pending_count:
+      pendingCount:
         type: integer
+        x-ni-data-type: I64
+        format: int64
         description: Number of systems that are currently pending to be added to the master but have not yet been approved by the master.
         example: 5
-    required: [pending_count]
+    required: [pendingCount]
 
   SystemInfo:
     title: System Information
@@ -357,11 +371,11 @@ definitions:
         description: System description.
         type: string
         example: Test system
-      cpu_arch:
+      cpuArch:
         description: System CPU architecture
         type: string
         example: armv7l
-      device_class:
+      deviceClass:
         description: System device class.
         type: string
         example: FlexRIO
@@ -369,11 +383,11 @@ definitions:
         description: System hostname.
         type: string
         example: testvm
-      ip_address:
+      ipAddress:
         description: System IP address.
         type: string
         example: 10.10.10.10
-      last_updated_timestamp:
+      lastUpdatedTimestamp:
         description: Last updated timestamp.
         type: string
         format: iso-date-time
@@ -382,31 +396,31 @@ definitions:
         description: Master of the system.
         type: string
         example: SystemLinkServer
-      minion_id:
+      minionId:
         description: Salt minion_id of the system.
         type: string
         example: NI-7935R--SN-1111111--MAC-00-12-34-56-78-90
-      model_name:
+      modelName:
         description: System model name.
         type: string
         example: NI-7935R
-      model_number:
+      modelNumber:
         description: System model number.
         type: string
         example: 0x77AC
-      os_family:
+      osFamily:
         description: System OS family.
         type: string
         example: NILinuxRT
-      os_release:
+      osRelease:
         description: System OS release.
         type: string
         example: 7.0
-      serial_number:
+      serialNumber:
         description: System serial number.
         type: string
         example: 1111111
-      vendor_name:
+      vendorName:
         description: System vendor name.
         type: string
         example: National Instruments
@@ -414,25 +428,25 @@ definitions:
         description: Salt version.
         type: string
         example: 2018.3.0-541-g76c6845
-    required: [comments, cpu_arch, device_class, hostname, ip_address, last_updated_timestamp, master, minion_id, model_name, model_number, os_family, os_release, serial_number, vendor_name, version]
+    required: [comments, cpuArch, deviceClass, hostname, ipAddress, lastUpdatedTimestamp, master, minionId, modelName, modelNumber, osFamily, osRelease, serialNumber, vendorName, version]
 
   JobState:
     title: Job State
     type: string
     enum:
-      - Canceled
-      - Failed
-      - Succeeded
-      - InQueue
-      - InProgress
-    example: Succeeded
+      - CANCELED
+      - FAILED
+      - SUCCEEDED
+      - INQUEUE
+      - INPROGRESS
+    example: SUCCEEDED
     description: > 
       The state of the job.
-       * Canceled: The job was canceled by the user.
-       * Failed: The job has completed with failures. The job is failed if at least one of its functions being executed has failed.
-       * Succeeded: The job has completed with success.
-       * InQueue: The job is in queue waiting to be dispatched to the system.
-       * InProgress: The job was dispatched to the system and is still running.
+       * CANCELED: The job was canceled by the user.
+       * FAILED: The job has completed with failures. The job is failed if at least one of its functions being executed has failed.
+       * SUCCEEDED: The job has completed with success.
+       * INQUEUE: The job is in queue waiting to be dispatched to the system.
+       * INPROGRESS: The job was dispatched to the system and is still running.
 
   Job:
     description: Information about a job.
@@ -447,17 +461,17 @@ definitions:
         type: string
         description: ID of the system.
         example: VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5
-      created_timestamp:
+      createdTimestamp:
         type: string
         format: iso-date-time
         description: The date when the job was created.
         example: '2019-02-11T13:32:06.030958Z'
-      last_updated_timestamp:
+      lastUpdatedTimestamp:
         type: string
         format: iso-date-time
         description: The date when the job was last updated.
         example: '2019-02-11T13:32:06.030958Z'
-      dispatched_timestamp:
+      dispatchedTimestamp:
         type: string
         format: iso-date-time
         description: The date when the job was actually sent to the system.
@@ -524,6 +538,7 @@ definitions:
             type: array
             items:
               type: integer
+              format: int32
               example: 1
             description: An array of integers representing code values for each executed function.
             example:
@@ -539,27 +554,27 @@ definitions:
               - true
               - true
         required: [success]
-    required: [jid, id, created_timestamp, last_updated_timestamp, state, config]
+    required: [jid, id, createdTimestamp, lastUpdatedTimestamp, state, config]
 
   ManagedSystemState:
     title: Managed System State
     type: string
     enum:
-      - ActivatedWithoutConnection
-      - Approved
-      - Disconnected
-      - ConnectedRefreshPending
-      - Connected
-      - ConnectedRefreshFailed
-    example: Connected
+      - ACTIVATED_WITHOUT_CONNECTION
+      - APPROVED
+      - DISCONNECTED
+      - CONNECTED_REFRESH_PENDING
+      - CONNECTED
+      - CONNECTED_REFRESH_FAILED
+    example: CONNECTED
     description: >
       The connection state of a system.
-       * ActivatedWithoutConnection: The system is activated but the connection is not established yet.
-       * Approved: The system is approved but it didn't try to connect yet.
-       * Disconnected: The system is disconnected.
-       * ConnectedRefreshPending: The system is connected and the refresh job is running. A refresh job is sent to the system every time the connection is established in order to gather the system information.
-       * Connected: The system is connected. The refresh job has completed with success.
-       * ConnectedRefreshFailed: The system is connected but the refresh job has failed.
+       * ACTIVATED_WITHOUT_CONNECTION: The system is activated but the connection is not established yet.
+       * APPROVED: The system is approved but it didn't try to connect yet.
+       * DISCONNECTED: The system is disconnected.
+       * CONNECTED_REFRESH_PENDING: The system is connected and the refresh job is running. A refresh job is sent to the system every time the connection is established in order to gather the system information.
+       * CONNECTED: The system is connected. The refresh job has completed with success.
+       * CONNECTED_REFRESH_FAILED: The system is connected but the refresh job has failed.
 
   ManagedSystemActivationData:
     description: Information about the license of a system
@@ -569,11 +584,11 @@ definitions:
         type: boolean
         description: Whether the system is activated or not.
         example: true
-      license_name:
+      licenseName:
         type: string
         description: The name of the license.
         example: NILicense
-      license_version:
+      licenseVersion:
         type: string
         description: The license version.
         example: 19.0
@@ -583,7 +598,7 @@ definitions:
     description: Property of a system composed by the last updated timestamp and a dictionary with the actual data.
     type: object
     properties:
-      last_updated_timestamp:
+      lastUpdatedTimestamp:
         description: Last updated timestamp.
         type: string
         format: iso-date-time
@@ -593,7 +608,7 @@ definitions:
         type: object
         example:
           key: value
-    required: [last_updated_timestamp, data]
+    required: [lastUpdatedTimestamp, data]
 
   ManagedSystem:
     description: Information about a managed system.
@@ -604,12 +619,12 @@ definitions:
         type: string
         description: The ID of the system.
         example: VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F9
-      created_timestamp:
+      createdTimestamp:
         description: The time when the system has been registered.
         type: string
         format: iso-date-time
         example: '2019-02-19T11:42:25.078Z'
-      last_updated_timestamp:
+      lastUpdatedTimestamp:
         description: Last time when the system information has been updated.
         type: string
         format: iso-date-time
@@ -622,19 +637,19 @@ definitions:
         description: Activation information.
         type: object
         properties:
-          last_updated_timestamp:
+          lastUpdatedTimestamp:
             description: Last time when the system activation information has been updated.
             type: string
             format: iso-date-time
             example: '2019-02-19T11:42:25.078Z'
           data:
             $ref: '#/definitions/ManagedSystemActivationData'
-        required: [last_updated_timestamp, data]
+        required: [lastUpdatedTimestamp, data]
       connected:
         description: System connection status information.
         type: object
         properties:
-          last_updated_timestamp:
+          lastUpdatedTimestamp:
             description: Last time when the system connection information has been updated.
             type: string
             format: iso-date-time
@@ -645,12 +660,12 @@ definitions:
               state:
                 $ref: '#/definitions/ManagedSystemState'
             required: [state]
-        required: [last_updated_timestamp, data]
+        required: [lastUpdatedTimestamp, data]
       grains:
         description: General information about the system.
         $ref: '#/definitions/ManagedSystemDataProperty'
         example:
-          last_updated_timestamp: '2019-02-19T11:42:25.078Z'
+          lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
           data:
             kernel: Windows
             nodename: WIN-8NTJI2568QV
@@ -666,7 +681,7 @@ definitions:
         description: Software packages that are installed on the system.
         $ref: '#/definitions/ManagedSystemDataProperty'
         example:
-          last_updated_timestamp: '2019-02-19T11:42:25.078Z'
+          lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
           data:
             ni-package-manager-upgrader:
               description: Application used to upgrade the package manager.
@@ -690,7 +705,7 @@ definitions:
         description: Feeds that are configured on the system.
         $ref: '#/definitions/ManagedSystemDataProperty'
         example:
-          last_updated_timestamp: '2019-02-19T11:42:25.078Z'
+          lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
           data:
             http://download.ni.com/support/nipkg/products/ni-package-manager/released:
             - configurable: false
@@ -706,7 +721,7 @@ definitions:
         description: System API information.
         $ref: '#/definitions/ManagedSystemDataProperty'
         example:
-          last_updated_timestamp: '2019-02-19T11:42:25.078Z'
+          lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
           data:
             - resource_uri: nisyscfg//sys/bus/pci/devices/0000:04:00.0
               properties:
@@ -728,14 +743,14 @@ definitions:
         description: Groups information about a system. Specifies on which groups is the system assigned to.
         $ref: '#/definitions/ManagedSystemDataProperty'
         example:
-          last_updated_timestamp: '2019-02-19T11:42:25.078Z'
+          lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
           data:
             - 121b471c-d7d4-4996-a38f-27f7e58be070
       keywords:
         description: Keywords metadata information about a system.
         type: object
         properties:
-          last_updated_timestamp:
+          lastUpdatedTimestamp:
             description: Last updated timestamp.
             type: string
             format: iso-date-time
@@ -747,12 +762,12 @@ definitions:
               type: string
               example: 
                 - testVM
-        required: [last_updated_timestamp, data]
+        required: [lastUpdatedTimestamp, data]
       properties:
         description: Properties metadata information about a system.
         type: object
         properties:
-          last_updated_timestamp:
+          lastUpdatedTimestamp:
             description: Last updated timestamp.
             type: string
             format: iso-date-time
@@ -764,20 +779,20 @@ definitions:
               type: string
             example:
               owner: admin
-        required: [last_updated_timestamp, data]
-    required: [id, created_timestamp, last_updated_timestamp, connected]
+        required: [lastUpdatedTimestamp, data]
+    required: [id, createdTimestamp, lastUpdatedTimestamp, connected]
 
   ReportType:
     title: Report Type
     type: string
     enum:
-      - Software
-      - Hardware
-    example: Software
+      - SOFTWARE
+      - HARDWARE
+    example: SOFTWARE
     description: >
       The type of the report to be created.
-       * Software: The report will contain the installed software packages.
-       * Hardware: The report will contain information about the hardware configuration of the system.
+       * SOFTWARE: The report will contain the installed software packages.
+       * HARDWARE: The report will contain information about the hardware configuration of the system.
 
   SystemsReportRequest:
     description: Request containing the report type followed by a query filter that will be applied on systems.
@@ -835,12 +850,12 @@ definitions:
         description: The name of the group.
         type: string
         example: group
-      last_updated_timestamp:
+      lastUpdatedTimestamp:
         description: The time when the group was alst updated.
         type: string
         format: iso-date-time
         example: '2019-02-12T14:49:03.013000Z'
-    required: [gid, name, last_updated_timestamp]
+    required: [gid, name, lastUpdatedTimestamp]
 
   SystemGroupPair:
     title: System Group Pair
@@ -870,45 +885,45 @@ definitions:
             description: The hostname of the system.
             type: string
             example: testvm
-          ip_address:
+          ipAddress:
             description: The IP of the system.
             type: string
             example: 10.10.10.10
       result:
         $ref: '#/definitions/SystemInfo'
-      status_code:
+      statusCode:
         description: The status of the request to get information about a system.
         type: string
         example: 0
-    required: [request, status_code]
+    required: [request, statusCode]
 
   SystemsKeys:
     description: An object containing pending, denied, approved, and rejected system keys. If there are no entries in a given category, then the key representing that category is omitted. The value for the keys is in itself a dictionary, with the key representing the system ID and the value the public authorization key used.
     title: Systems Keys
     type: object
     properties:
-      systems_pending:
+      systemsPending:
         type: object
         description: An object of system ID to key key/value pairs that are pending approval or rejection. Keys may be pending when they are not pre-seeded via the automated registration process and attempt to connect to the master.
         additionalProperties:
           type: string
         example:
           VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F6: "-----BEGIN PUBLIC KEY-----↵MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFgEKiRwWBD/QSDHCpNQ↵Zml9q224YzIxG6reByDV16BNsQoH0lc2bT9LZ7o6xf6dTpQl7shIMc/abSAcl4/F↵VpKguH1yRmOG2Nhout/9wMP6kYBTlThzpop93rlxIo/I7nDkQDz07cMhNWYDvrut↵PVnjRg70xOCAzQRCHRy4GW3TLvfp2WAbCuoQ5oPHQLx+YBSRYDcgfo9jiW8vNzt4↵Bcg72c2PmHEJjGslzJeqcKdRjK0z4/VFgLYfMUBz4LCoy7DohU/uc9ZbHSlOy/BK↵1/S8O1vUyk8DEq+/kQumJWKh1Cl0SWcZGSDkdhQhoTiWqXGb1BBtU7vkxYgQoYjM↵rwIDAQAB↵-----END PUBLIC KEY-----"
-      systems_denied:
+      systemsDenied:
         type: object
         description: An object of system ID to key key/value pairs that have been denied. A key is denied when a system is trying to connect the master with a different key than the one that is accepted. This can occur if two systems have the same ID or if a key is removed from a system.
         additionalProperties:
           type: string
         example:
           VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F7: "-----BEGIN PUBLIC KEY-----↵MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFgEKiRwWBD/QSDHCpNQ↵Zml9q224YzIxG6reByDV16BNsQoH0lc2bT9LZ7o6xf6dTpQl7shIMc/abSAcl4/F↵VpKguH1yRmOG2Nhout/9wMP6kYBTlThzpop93rlxIo/I7nDkQDz07cMhNWYDvrut↵PVnjRg70xOCAzQRCHRy4GW3TLvfp2WAbCuoQ5oPHQLx+YBSRYDcgfo9jiW8vNzt4↵Bcg72c2PmHEJjGslzJeqcKdRjK0z4/VFgLYfMUBz4LCoy7DohU/uc9ZbHSlOy/BK↵1/S8O1vUyk8DEq+/kQumJWKh1Cl0SWcZGSDkdhQhoTiWqXGb1BBtU7vkxYgQoYjM↵rwIDAQAB↵-----END PUBLIC KEY-----"
-      systems_approved:
+      systemsApproved:
         type: object
         description: An object of system ID to key key/value pairs that have been approved. These could have been approved explicitly by the user or pre-seeded via the automated registration process.
         additionalProperties:
           type: string
         example:
           VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F8: "-----BEGIN PUBLIC KEY-----↵MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFgEKiRwWBD/QSDHCpNQ↵Zml9q224YzIxG6reByDV16BNsQoH0lc2bT9LZ7o6xf6dTpQl7shIMc/abSAcl4/F↵VpKguH1yRmOG2Nhout/9wMP6kYBTlThzpop93rlxIo/I7nDkQDz07cMhNWYDvrut↵PVnjRg70xOCAzQRCHRy4GW3TLvfp2WAbCuoQ5oPHQLx+YBSRYDcgfo9jiW8vNzt4↵Bcg72c2PmHEJjGslzJeqcKdRjK0z4/VFgLYfMUBz4LCoy7DohU/uc9ZbHSlOy/BK↵1/S8O1vUyk8DEq+/kQumJWKh1Cl0SWcZGSDkdhQhoTiWqXGb1BBtU7vkxYgQoYjM↵rwIDAQAB↵-----END PUBLIC KEY-----"
-      systems_rejected:
+      systemsRejected:
         type: object
         description: An object of system ID to key key/value pairs that have been rejected. Keys are rejected explicitly by the user.
         additionalProperties:
@@ -920,29 +935,29 @@ definitions:
     type: string
     title: Key Action
     enum:
-      - accept
-      - reject
-      - delete
-      - activate_accept
-    example: accept
+      - ACCEPT
+      - REJECT
+      - DELETE
+      - ACTIVATE_ACCEPT
+    example: ACCEPT
     description: >
       Action to be performed. 
-        * accept: Accept the associated key.
-        * reject: Reject the associated key.
-        * delete: Delete the associated key.
-        * activate_accept: Activate the system with the associated key and then accept the key.
+        * ACCEPT: Accept the associated key.
+        * REJECT: Reject the associated key.
+        * DELETE: Delete the associated key.
+        * ACTIVATE_ACCEPT: Activate the system with the associated key and then accept the key.
 
   ManageKeysRequest:
     description: Request to perform specific acceptance actions to system keys.
     title: Manage Keys Request
     type: object
     properties:
-      is_async:
+      isAsync:
         description: Whether the request is async or not. If async is true the request will return immediately without waiting for the operation to complete.
         type: boolean
         default: false
         example: true
-      key_actions:
+      keyActions:
         type: array
         items:
           description: Object defining a system ID and the action that should be performed over the key.
@@ -960,7 +975,7 @@ definitions:
               description: A string representing the public authorization key. If this field is specified, verification that the system ID is associated with this auth key will happen before the desired action is executed.
               example: -----BEGIN PUBLIC KEY-----↵MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFgEKiRwWBD/QSDHCpNQ↵Zml9q224YzIxG6reByDV16BNsQoH0lc2bT9LZ7o6xf6dTpQl7shIMc/abSAcl4/F↵VpKguH1yRmOG2Nhout/9wMP6kYBTlThzpop93rlxIo/I7nDkQDz07cMhNWYDvrut↵PVnjRg70xOCAzQRCHRy4GW3TLvfp2WAbCuoQ5oPHQLx+YBSRYDcgfo9jiW8vNzt4↵Bcg72c2PmHEJjGslzJeqcKdRjK0z4/VFgLYfMUBz4LCoy7DohU/uc9ZbHSlOy/BK↵1/S8O1vUyk8DEq+/kQumJWKh1Cl0SWcZGSDkdhQhoTiWqXGb1BBtU7vkxYgQoYjM↵rwIDAQAB↵-----END PUBLIC KEY-----
           required: [id, action]
-        required: [key_actions]
+        required: [keyActions]
 
   SystemPatchRequest:
     description: System data that has to be assigned to the system.
@@ -993,19 +1008,19 @@ definitions:
     description: Request to get the available packages from the feeds specified in the request.
     type: object
     properties:
-      return_duplicates:
+      returnDuplicates:
         description: A boolean representing whether to return packages of equal version for each architecture.
         type: boolean
         default: false
         example: false
-      system_configurations:
+      systemConfigurations:
         description: An array of system configurations.
         type: array
         items:
           type: object
           title: System Configuration
           properties:
-            feed_uris:
+            feedUris:
               type: array
               description: An array of strings representing feed URIs a system(s) has configured.
               items:
@@ -1013,7 +1028,7 @@ definitions:
               example:
                 - http://download.ni.com/ni-linux-rt/feeds/SystemLink/18.5/x64/
                 - http://download.ni.com/ni-linux-rt/feeds/SystemLink/salt/18.5/x64/x64/           
-            os_architectures:
+            osArchitectures:
               type: array 
               description: An array of strings representing OS architectures supported by a system(s) in descending priority.
               items:
@@ -1025,8 +1040,8 @@ definitions:
                 - noarch
                 - any
                 - all
-        required: [feed_uris]
-    required: [system_configurations]
+        required: [feedUris]
+    required: [systemConfigurations]
 
   PackageResponse:
     title: Get Available Packages Response
@@ -1062,11 +1077,11 @@ definitions:
         type: string
         description: The description of the package.
         example: This is an infrastructure package for NI Software.
-      displayname:
+      displayName:
         type: string
         description: The display name of the package.
         example: NI Security Update (KB 67L8LCQW)
-      displayversion:
+      displayVersion:
         type: string
         description: The display version of the package.
         example: 2.0.0
@@ -1079,15 +1094,16 @@ definitions:
           example: "ni-msiproperties (>= 18.0.1)"
       essential:
         type: integer
+        format: int32
         description: Whether the package is essential or not. A value greater than 0 means the package is essential.
         example: 1
-      filename:
+      fileName:
         type: string
         description: |
           The location of the file, including the file extension.
           Depending on the platform you select, you will be able to use the following package extensions: .nipkg for windows feeds, .ipk and .deb for ni-linux-rt feeds.
         example: ni-securityupdate-kb67l8lcqw-killbits_2.0.0.22-0+d22_windows_x64.nipkg
-      hardwaresupport:
+      hardwareSupport:
         type: array
         description: When a package provides functionality for specific hardware product(s), it can list such products in this section
         items: 
@@ -1097,9 +1113,10 @@ definitions:
         type: string
         description: The website of the maintainers for this package.
         example: "http://www.ni.com"
-      installed_size:
+      installedSize:
         type: integer
         x-ni-data-type: I64
+        format: int64
         description: The size of this package after install.
         example: 1024
       maintainer:
@@ -1112,6 +1129,7 @@ definitions:
         example: "ni-securityupdate-kb67l8lcqw-killbits"
       plugin:
         type: integer
+        format: int32
         description: Agent that will be used to install the Package.
         example: 2
       predepends:
@@ -1123,6 +1141,7 @@ definitions:
           example: "ni-teststand-2017-tools (>= 17.0.0)"
       priority:
         type: integer
+        format: int32
         description: The priority of the package.
         example: 4        
       provides:
@@ -1139,7 +1158,7 @@ definitions:
           type: string
           description: The name of a package that this package recommends. This also contains information about the version of the package.
           example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"        
-      releasenotes:
+      releaseNotes:
         type: string
         description: A page containing the release notes of the package.
         example: Refer to the NI website at http://www.ni.com/r/slrm185 for installation instructions, known issues, bug fixes, compatibility information, and other important notices about this product.
@@ -1157,13 +1176,14 @@ definitions:
       size:
         type: integer
         x-ni-data-type: I64
+        format: int64
         description: The size of the package in bytes.
         example: 750070
       source:
         type: string
         description: The source of this package, if any.
         example: "thunar-archive-plugin_0.3.1.bb"
-      storeproduct:
+      storeProduct:
         type: boolean
         description: Whether the package represent a product in the Store or not.
         example: true
@@ -1178,7 +1198,7 @@ definitions:
         type: string
         description: Tags of the package.
         example: "KillBits, Security Update 2013"    
-      uservisible:
+      userVisible:
         type: boolean
         description: The installed packages with this attribute set to true are considered to be installed by a user, thus not installed to fulfill some dependency. This is needed input for the calculation of unneeded packages when removing a package.
         example: true
@@ -1201,6 +1221,7 @@ definitions:
       code:
         description: Numeric error code.
         type: integer
+        format: int32
         example: -254003
       resourceType:
         description: The type of resource associated with the error.
@@ -1239,6 +1260,7 @@ definitions:
         example: true
       version:
         type: integer
+        format: int32
         description: The version of the available operation.
         example: 1
     required: [available]
@@ -1297,25 +1319,30 @@ definitions:
       skip:
         description: How many resources to skip.
         type: integer
+        x-ni-data-type: I64
+        format: int64
         default: 0
+        minimum: 0
         example: 100
       take:
         description: How many resources to take. Maximum value is 1000.
         type: integer
-        default: -1
+        x-ni-data-type: I64
+        format: int64
+        minimum: 0
         maximum: 1000
         example: 100
       filter:
         type: string
-        example: connected.data.state==Connected
+        example: connected.data.state==CONNECTED
         description: Specifies the filter criteria for resources.
       projection:
         type: string
-        example: 'new(id,grains,last_updated_timestamp)'
+        example: 'new(id,grains,lastUpdatedTimestamp)'
         description: Specifies the projection for resources.
       orderBy:
         type: string
-        example: 'last_updated_timestamp descending'
+        example: 'lastUpdatedTimestamp descending'
         description: Specifies the ordering of returned data.
 
   QueryResponse:
@@ -1332,6 +1359,8 @@ definitions:
       count:
         description: The total number of resources that matched the query.
         type: integer
+        x-ni-data-type: I64
+        format: int64
         example: 1
     required: [data, count]
 
@@ -2027,8 +2056,8 @@ paths:
             skip: 100
             take: 100
             filter: 'id == VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5'
-            projection: 'new(jid,id,last_updated_timestamp,state,result)'
-            orderBy: 'last_updated_timestamp descending'
+            projection: 'new(jid,id,lastUpdatedTimestamp,state,result)'
+            orderBy: 'lastUpdatedTimestamp descending'
           schema:
             $ref: '#/definitions/QueryRequest'
       responses:
@@ -2058,8 +2087,8 @@ paths:
           x-example:
             skip: 10
             take: 10
-            filter: 'connected.data.state == Connected && grains.data.os == Windows'
-            projection: 'new(id,last_updated_timestamp,connected,packages)'
+            filter: 'connected.data.state == CONNECTED && grains.data.os == Windows'
+            projection: 'new(id,lastUpdatedTimestamp,connected,packages)'
             orderBy: 'connected.data.state'
           schema:
             $ref: '#/definitions/QueryRequest'
