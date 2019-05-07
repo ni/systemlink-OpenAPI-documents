@@ -299,13 +299,11 @@ definitions:
     properties:
       connectedCount:
         type: integer
-        x-ni-data-type: I64
         format: int64
         description: Number of the connected systems.
         example: 4
       disconnectedCount:
         type: integer
-        x-ni-data-type: I64
         format: int64
         description: Number of the disconnected systems.
         example: 2
@@ -318,19 +316,16 @@ definitions:
     properties:
       activeCount:
         type: integer
-        x-ni-data-type: I64
         format: int64
         description: Number of active jobs.
         example: 4
       failedCount:
         type: integer
-        x-ni-data-type: I64
         format: int64
         description: Number of failed jobs.
         example: 2
       succeededCount:
         type: integer
-        x-ni-data-type: I64
         format: int64
         description: Number of succeeded jobs.
         example: 4
@@ -343,7 +338,6 @@ definitions:
     properties:
       discoveredCount:
         type: integer
-        x-ni-data-type: I64
         format: int64
         description: Number of systems that are discovered and not managed.
         example: 100
@@ -356,7 +350,6 @@ definitions:
     properties:
       pendingCount:
         type: integer
-        x-ni-data-type: I64
         format: int64
         description: Number of systems that are currently pending to be added to the master but have not yet been approved by the master.
         example: 5
@@ -1115,7 +1108,6 @@ definitions:
         example: "http://www.ni.com"
       installedSize:
         type: integer
-        x-ni-data-type: I64
         format: int64
         description: The size of this package after install.
         example: 1024
@@ -1175,7 +1167,6 @@ definitions:
         example: Infrastructure
       size:
         type: integer
-        x-ni-data-type: I64
         format: int64
         description: The size of the package in bytes.
         example: 750070
@@ -1319,7 +1310,6 @@ definitions:
       skip:
         description: How many resources to skip.
         type: integer
-        x-ni-data-type: I64
         format: int64
         default: 0
         minimum: 0
@@ -1327,7 +1317,6 @@ definitions:
       take:
         description: How many resources to take. Maximum value is 1000.
         type: integer
-        x-ni-data-type: I64
         format: int64
         minimum: 0
         maximum: 1000
@@ -1359,7 +1348,6 @@ definitions:
       count:
         description: The total number of resources that matched the query.
         type: integer
-        x-ni-data-type: I64
         format: int64
         example: 1
     required: [data, count]
