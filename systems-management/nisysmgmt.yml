@@ -1086,10 +1086,9 @@ definitions:
           description: The name of a package that this package enhances. This also contains information about the version of the package.
           example: "ni-msiproperties (>= 18.0.1)"
       essential:
-        type: integer
-        format: int32
-        description: Whether the package is essential or not. A value greater than 0 means the package is essential.
-        example: 1
+        type: boolean
+        description: Whether the package is essential or not. If true then the package management system will refuse to remove the package (upgrading and replacing it is still possible).
+        example: true
       fileName:
         type: string
         description: |
