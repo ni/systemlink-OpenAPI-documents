@@ -1,6 +1,6 @@
 ﻿swagger: '2.0'
 info:
-  description: 'Management of distributed systems.'
+  description: 'Systems Management Service HTTP API. Manage and monitor your distributed systems.'
   version: '1'
   title: 'SystemLink Systems Management'
   contact:
@@ -53,7 +53,7 @@ responses:
         type: string
 
   PartialSuccess:
-    description: Partial Success in the case when only a part of the request body metadata information was processed successfully.
+    description: Partial Success indicates only part of the request body metadata information was processed successfully.
     schema:
       title: PartialSuccessResponse
       description: Partial success response containing error information.
@@ -74,7 +74,7 @@ responses:
 
 definitions:
   CreateJobRequest:
-    description: Request describing a job to be sent to systems.
+    description: Request describing a job to send to systems.
     title: Create Job Request
     type: object
     x-ni-cs-json-converter: JsonObjectConverter
@@ -95,7 +95,7 @@ definitions:
           - pkg.remove
           - pkg.install
       arg: 
-        description: An array of arrays of variable type elements that are arguments to the function specified by the "fun" property. If at least one function requires arguments, an array must be provided for each function, even if it is empty. Keyword arguments may be provided as a parameter of type object with at least one property of type boolean, "__kwarg__", that is evaluated to true.
+        description: An array of variable type element arrays, which are arguments to the function specified by the "fun" property. If at least one function requires arguments, an array must be provided for each function, even if it is empty. Keyword arguments may be provided as a parameter of type object with at least one property of type boolean ("__kwarg__") that evaluates to true.
         type: array
         items:
           type: array
@@ -114,7 +114,7 @@ definitions:
               pkgs:
               - acl-dbg: 1.0.0-0
       metadata:
-        description: Additional information passed along with the job.
+        description: Additional information of the job.
         type: object
         additionalProperties:
           type: object
@@ -127,7 +127,7 @@ definitions:
 
   CreateJobResponse:
     title: Create Job Response
-    description: Response describing a job that was sent to systems.
+    description: Response describing a job sent to systems.
     type: object
     properties:
       jid:
@@ -198,7 +198,7 @@ definitions:
     required: [systemsCredentials]
 
   SystemCredentials:
-    description: Credentials of a system.
+    description: The hostname, IP address, and login information of a system.
     title: System Credentials
     type: object
     properties:
@@ -221,7 +221,7 @@ definitions:
 
   RegisterSystemsResponse:
     title: Register Systems Response
-    description: Response of a request to register systems.
+    description: Response to a request to register systems to the server.
     type: object
     properties:
       requestId:
@@ -232,17 +232,17 @@ definitions:
 
   UnregisterSystemsRequest:
     title: Unregister Systems Request
-    description: Request to unregister systems.
+    description: Request to unregister systems from the server.
     type: object
     properties:
       tgt:
-        description: Array of string representing the IDs of systems to be removed.
+        description: Array of strings representing the IDs of systems to remove from SystemLink Server.
         type: array
         items:
           type: string
           example: VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
       force:
-        description: Specify as true to remove systems from the database immediately, or false to wait until the unregister job returns from systems. If true, unregister job failures will not be cached.
+        description: A Boolean which specifies whether to remove systems from the database immediately (True) or wait until the unregister job returns from systems (False). If True, unregister job failures are not cached.
         type: boolean
         default: true
         example: false
@@ -278,7 +278,7 @@ definitions:
               $ref: '#/definitions/Error'
 
   CancelJobRequest:
-    description: Object containing the job ID and a system ID.
+    description: Object containing the job ID and system ID.
     title: Cancel Job Request
     type: object
     properties:
@@ -287,7 +287,7 @@ definitions:
         type: string
         example: '20190211135234448026_28320'
       systemId:
-        description: The system ID on which the job will be canceled.
+        description: The system ID on which the job is canceled.
         type: string
         example: VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F9
     required: [jid, systemId]
@@ -339,19 +339,19 @@ definitions:
       discoveredCount:
         type: integer
         format: int64
-        description: Number of systems that are discovered and not managed.
+        description: Number of systems that are discovered and not managed by your SystemLink Server.
         example: 100
     required: [discoveredCount]
 
   PendingSystemsSummary:
     title: Pending Systems Summary
-    description: Summary information about the systems that are trying to connect to the server but aren't accepted yet.
+    description: Summary information about the systems attempting to connect to the server but aren't accepted yet.
     type: object
     properties:
       pendingCount:
         type: integer
         format: int64
-        description: Number of systems that are currently pending to be added to the master but have not yet been approved by the master.
+        description: Number of systems pending approval to connect to the server.
         example: 5
     required: [pendingCount]
 
@@ -365,7 +365,7 @@ definitions:
         type: string
         example: Test system
       cpuArch:
-        description: System CPU architecture
+        description: System CPU architecture.
         type: string
         example: armv7l
       deviceClass:
@@ -436,9 +436,9 @@ definitions:
     description: > 
       The state of the job.
        * CANCELED: The job was canceled by the user.
-       * FAILED: The job has completed with failures. The job is failed if at least one of its functions being executed has failed.
-       * SUCCEEDED: The job has completed with success.
-       * INQUEUE: The job is in queue waiting to be dispatched to the system.
+       * FAILED: The job completed with failures. The job fails if at least one of the its functions executing fails.
+       * SUCCEEDED: The job completed successfully.
+       * INQUEUE: The job is in queue, waiting to be dispatched to the system.
        * INPROGRESS: The job was dispatched to the system and is still running.
 
   Job:
@@ -542,7 +542,7 @@ definitions:
             items:
               type: boolean
               example: false
-            description: An array of booleans representing succees values for each executed function.
+            description: An array of booleans representing success values for each executed function.
             example:
               - true
               - true
@@ -566,11 +566,11 @@ definitions:
        * APPROVED: The system is approved but it didn't try to connect yet.
        * DISCONNECTED: The system is disconnected.
        * CONNECTED_REFRESH_PENDING: The system is connected and the refresh job is running. A refresh job is sent to the system every time the connection is established in order to gather the system information.
-       * CONNECTED: The system is connected. The refresh job has completed with success.
-       * CONNECTED_REFRESH_FAILED: The system is connected but the refresh job has failed.
+       * CONNECTED: The system is connected. The refresh job completed successfully.
+       * CONNECTED_REFRESH_FAILED: The system is connected but the refresh job failed.
 
   ManagedSystemActivationData:
-    description: Information about the license of a system
+    description: Information about the license of a system.
     type: object
     properties:
       activated:
@@ -613,12 +613,12 @@ definitions:
         description: The ID of the system.
         example: VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F9
       createdTimestamp:
-        description: The time when the system has been registered.
+        description: The time when the system was registered.
         type: string
         format: iso-date-time
         example: '2019-02-19T11:42:25.078Z'
       lastUpdatedTimestamp:
-        description: Last time when the system information has been updated.
+        description: Last time when the system information updated.
         type: string
         format: iso-date-time
         example: '2019-02-19T11:42:25.078Z'
@@ -631,7 +631,7 @@ definitions:
         type: object
         properties:
           lastUpdatedTimestamp:
-            description: Last time when the system activation information has been updated.
+            description: Last time when the system activation information updated.
             type: string
             format: iso-date-time
             example: '2019-02-19T11:42:25.078Z'
@@ -643,7 +643,7 @@ definitions:
         type: object
         properties:
           lastUpdatedTimestamp:
-            description: Last time when the system connection information has been updated.
+            description: Last time when the system connection information updated.
             type: string
             format: iso-date-time
             example: '2019-02-19T11:42:25.078Z'
@@ -671,7 +671,7 @@ definitions:
             osversion: 6.1.7601
             osrelease: 7        
       packages:
-        description: Software packages that are installed on the system.
+        description: Software packages installed on the system.
         $ref: '#/definitions/ManagedSystemDataProperty'
         example:
           lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
@@ -695,7 +695,7 @@ definitions:
               group: Infrastructure
               version: 19.5.0.28-0+d28
       feeds:
-        description: Feeds that are configured on the system.
+        description: Feeds configured on the system.
         $ref: '#/definitions/ManagedSystemDataProperty'
         example:
           lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
@@ -733,7 +733,7 @@ definitions:
                 tag: 16781312
                 value: false
       groups:
-        description: Groups information about a system. Specifies on which groups is the system assigned to.
+        description: Specifies the groups to which the system is assigned.
         $ref: '#/definitions/ManagedSystemDataProperty'
         example:
           lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
@@ -824,7 +824,7 @@ definitions:
     properties:
       groups:
         type: array
-        description: The groups that got created.
+        description: The groups created.
         items:
           $ref: '#/definitions/GroupInfo'
       error:
@@ -897,28 +897,28 @@ definitions:
     properties:
       systemsPending:
         type: object
-        description: An object of system ID to key key/value pairs that are pending approval or rejection. Keys may be pending when they are not pre-seeded via the automated registration process and attempt to connect to the master.
+        description: An object of system ID to key pairs that are pending approval or rejection. Keys may be pending when they are not pre-seeded via the automated registration process and attempt to connect to the master.
         additionalProperties:
           type: string
         example:
           VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F6: "-----BEGIN PUBLIC KEY-----↵MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFgEKiRwWBD/QSDHCpNQ↵Zml9q224YzIxG6reByDV16BNsQoH0lc2bT9LZ7o6xf6dTpQl7shIMc/abSAcl4/F↵VpKguH1yRmOG2Nhout/9wMP6kYBTlThzpop93rlxIo/I7nDkQDz07cMhNWYDvrut↵PVnjRg70xOCAzQRCHRy4GW3TLvfp2WAbCuoQ5oPHQLx+YBSRYDcgfo9jiW8vNzt4↵Bcg72c2PmHEJjGslzJeqcKdRjK0z4/VFgLYfMUBz4LCoy7DohU/uc9ZbHSlOy/BK↵1/S8O1vUyk8DEq+/kQumJWKh1Cl0SWcZGSDkdhQhoTiWqXGb1BBtU7vkxYgQoYjM↵rwIDAQAB↵-----END PUBLIC KEY-----"
       systemsDenied:
         type: object
-        description: An object of system ID to key key/value pairs that have been denied. A key is denied when a system is trying to connect the master with a different key than the one that is accepted. This can occur if two systems have the same ID or if a key is removed from a system.
+        description: An object of system ID to key pairs that have been denied. A key is denied when a system is trying to connect the master with a different key than the one that is accepted. This can occur if two systems have the same ID or if a key is removed from a system.
         additionalProperties:
           type: string
         example:
           VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F7: "-----BEGIN PUBLIC KEY-----↵MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFgEKiRwWBD/QSDHCpNQ↵Zml9q224YzIxG6reByDV16BNsQoH0lc2bT9LZ7o6xf6dTpQl7shIMc/abSAcl4/F↵VpKguH1yRmOG2Nhout/9wMP6kYBTlThzpop93rlxIo/I7nDkQDz07cMhNWYDvrut↵PVnjRg70xOCAzQRCHRy4GW3TLvfp2WAbCuoQ5oPHQLx+YBSRYDcgfo9jiW8vNzt4↵Bcg72c2PmHEJjGslzJeqcKdRjK0z4/VFgLYfMUBz4LCoy7DohU/uc9ZbHSlOy/BK↵1/S8O1vUyk8DEq+/kQumJWKh1Cl0SWcZGSDkdhQhoTiWqXGb1BBtU7vkxYgQoYjM↵rwIDAQAB↵-----END PUBLIC KEY-----"
       systemsApproved:
         type: object
-        description: An object of system ID to key key/value pairs that have been approved. These could have been approved explicitly by the user or pre-seeded via the automated registration process.
+        description: An object of system ID to key pairs that have been approved. These could have been approved explicitly by the user or pre-seeded via the automated registration process.
         additionalProperties:
           type: string
         example:
           VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F8: "-----BEGIN PUBLIC KEY-----↵MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFgEKiRwWBD/QSDHCpNQ↵Zml9q224YzIxG6reByDV16BNsQoH0lc2bT9LZ7o6xf6dTpQl7shIMc/abSAcl4/F↵VpKguH1yRmOG2Nhout/9wMP6kYBTlThzpop93rlxIo/I7nDkQDz07cMhNWYDvrut↵PVnjRg70xOCAzQRCHRy4GW3TLvfp2WAbCuoQ5oPHQLx+YBSRYDcgfo9jiW8vNzt4↵Bcg72c2PmHEJjGslzJeqcKdRjK0z4/VFgLYfMUBz4LCoy7DohU/uc9ZbHSlOy/BK↵1/S8O1vUyk8DEq+/kQumJWKh1Cl0SWcZGSDkdhQhoTiWqXGb1BBtU7vkxYgQoYjM↵rwIDAQAB↵-----END PUBLIC KEY-----"
       systemsRejected:
         type: object
-        description: An object of system ID to key key/value pairs that have been rejected. Keys are rejected explicitly by the user.
+        description: An object of system ID to key pairs that have been rejected. Keys are rejected explicitly by the user.
         additionalProperties:
           type: string
         example:
@@ -971,7 +971,7 @@ definitions:
         required: [keyActions]
 
   SystemPatchRequest:
-    description: System data that has to be assigned to the system.
+    description: System data that needs to be assigned to the system.
     title: System Patch Request
     x-ni-sparse: true
     type: object
@@ -1050,21 +1050,21 @@ definitions:
         description: An array containing information about other packages this package breaks.
         items:
           type: string
-          description: The name of a package that this package breaks. This also contains information about the version of the package.
+          description: The name of a package this package breaks. This also contains information about the version of the package.
           example: "ni-sysapi (>= 18.0.0)"
       conflicts:
         type: array
         description: An array containing information about other packages this package conflicts with.
         items:
           type: string
-          description: The name of a package that this package conflicts with. This also contains information about the version of the package.
+          description: The name of a package this package conflicts with. This also contains information about the version of the package.
           example: "ni-msvcrt-2015 (>= 14.1.4)"
       depends:
         type: array
         description: An array containing information about other packages this package depends on.
         items:
           type: string
-          description: The name of a package that this package depends on. This also contains information about the version of the package.
+          description: The name of a package this package depends on. This also contains information about the version of the package.
           example: "ni-metauninstaller (>= 18.0.1)"
       description:
         type: string
@@ -1083,7 +1083,7 @@ definitions:
         description: An array containing information about other packages this package enhances.
         items:
           type: string
-          description: The name of a package that this package enhances. This also contains information about the version of the package.
+          description: The name of a package this package enhances. This also contains information about the version of the package.
           example: "ni-msiproperties (>= 18.0.1)"
       essential:
         type: boolean
@@ -1121,13 +1121,13 @@ definitions:
       plugin:
         type: integer
         format: int32
-        description: Agent that will be used to install the Package.
+        description: Agent that will be used to install the package.
         example: 2
       predepends:
         type: array
         description: An array containing information about other packages this package predepends.
         items:
-          description: The name of a package that this package predepends. This also contains information about the version of the package.
+          description: The name of a package this package predepends. This also contains information about the version of the package.
           type: string
           example: "ni-teststand-2017-tools (>= 17.0.0)"
       priority:
@@ -1137,17 +1137,17 @@ definitions:
         example: 4        
       provides:
         type: array
-        description: An array containing information about other packages that this package provides.
+        description: An array containing information about other packages this package provides.
         items:
           type: string
           example: "ni-curl (= 17.0.0.49152-0+f0)"
-          description: One of the packages that the containing package provides. This also contains information about the version of the package.      
+          description: One of the packages the containing package provides. This also contains information about the version of the package.      
       recommends:
         type: array
         description: An array containing information about other packages this package recommends.
         items:
           type: string
-          description: The name of a package that this package recommends. This also contains information about the version of the package.
+          description: The name of a package this package recommends. This also contains information about the version of the package.
           example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"        
       releaseNotes:
         type: string
@@ -1158,7 +1158,7 @@ definitions:
         description: An array containing information about other packages this package replaces.
         items:
           type: string
-          description: The name of a package that this package replaces. This also contains information about the version of the package.
+          description: The name of a package this package replaces. This also contains information about the version of the package.
           example: "b235b862-6a92-4a04-a8b2-6d71f777de67 (< 16.99.65535)"       
       section:
         type: string
@@ -1175,14 +1175,14 @@ definitions:
         example: "thunar-archive-plugin_0.3.1.bb"
       storeProduct:
         type: boolean
-        description: Whether the package represent a product in the Store or not.
+        description: Whether the package represent a product in the store or not.
         example: true
       suggests:
         type: array
         description: An array containing information about other packages this package suggests.
         items:
           type: string
-          description: The name of a package that this package suggests. This also contains information about the version of the package.
+          description: The name of a package this package suggests. This also contains information about the version of the package.
           example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"       
       tags:
         type: string
@@ -1263,23 +1263,23 @@ definitions:
         description: >-
           Available operations in the v1 version of the API:
 
-          - getJobs: The ability to retrieve the jobs
+          - getJobs: The ability to retrieve the jobs.
           
-          - getSystems: The ability to retrieve the systems information
+          - getSystems: The ability to retrieve the systems information.
 
-          - getGroups: The ability to retrieve the groups
+          - getGroups: The ability to retrieve the groups.
     
-          - manageSystems: The ability to register/unregister systems
+          - manageSystems: The ability to register or unregister systems.
           
-          - createOrCancelJobs: The ability to create or cancel jobs
+          - createOrCancelJobs: The ability to create or cancel jobs.
           
-          - activateSystems: The ability to activate systems
+          - activateSystems: The ability to activate systems.
           
-          - updateSystemMetadata: The ability to update systems metadata
+          - updateSystemMetadata: The ability to update systems metadata.
           
-          - manageFeeds: The ability to configure feeds and retrieve the available packages
+          - manageFeeds: The ability to configure feeds and retrieve the available packages.
           
-          - createOrUpdateGroups: The ability to create, update or delete groups
+          - createOrUpdateGroups: The ability to create, update, or delete groups.
           
         type: object
         properties:
@@ -1307,14 +1307,14 @@ definitions:
     title: Query Request
     properties:
       skip:
-        description: How many resources to skip.
+        description: The number of resources to skip.
         type: integer
         format: int64
         default: 0
         minimum: 0
         example: 100
       take:
-        description: How many resources to take. Maximum value is 1000.
+        description: The number of resources to return. The maximum value is 1000.
         type: integer
         format: int64
         minimum: 0
@@ -1323,15 +1323,15 @@ definitions:
       filter:
         type: string
         example: connected.data.state==CONNECTED
-        description: Specifies the filter criteria for resources.
+        description: The criteria used to filter resources.
       projection:
         type: string
         example: 'new(id,grains,lastUpdatedTimestamp)'
-        description: Specifies the projection for resources.
+        description: Specifies the projection for resources. This field can be used if we don't want to receive the entire model but only certain properties of the model.  
       orderBy:
         type: string
         example: 'lastUpdatedTimestamp descending'
-        description: Specifies the ordering of returned data.
+        description: The order in which data returns.
 
   QueryResponse:
     description: Response of a query request.
@@ -1362,7 +1362,7 @@ paths:
       description: Gets permissions and operations for the Systems Management Service.
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             description: Version information.
             title: RootEndpointResponse
@@ -1392,11 +1392,11 @@ paths:
           required: true
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             $ref: '#/definitions/V1Operations'
         404:
-          description: Not Found
+          description: Not Found.
         default:
             $ref: '#/responses/Error'
   /v1/jobs:
@@ -1411,7 +1411,7 @@ paths:
         - in: body
           name: CreateJobRequest
           required: true
-          description: The definition of job to be executed
+          description: The definition of job to be executed.
           schema:
             $ref: '#/definitions/CreateJobRequest'
       responses:
@@ -1455,7 +1455,7 @@ paths:
           x-example: VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             type: array
             items:
@@ -1480,7 +1480,7 @@ paths:
           x-example: VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             type: array
             items:
@@ -1508,7 +1508,7 @@ paths:
             $ref: '#/definitions/RegisterSystemsRequest'
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             $ref: '#/definitions/RegisterSystemsResponse'
         401:
@@ -1534,7 +1534,7 @@ paths:
             $ref: '#/definitions/UnregisterSystemsRequest'
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             $ref: '#/definitions/UnregisterSystemsResponse'
         400:
@@ -1550,7 +1550,7 @@ paths:
       x-ni-operation: createOrCancelJobs
       tags: [jobs]
       summary: Cancel jobs
-      description: Cancel jobs that are running on systems. This won't stop the jobs execution on systems if the jobs have already been dispatched to the systems.
+      description: Cancel jobs that are running on systems. This won't stop the jobs from executing on systems if the jobs have already been dispatched to the systems.
       parameters:
         - in: body
           name: CancelJobsRequest
@@ -1564,7 +1564,7 @@ paths:
         200:
           $ref: '#/responses/PartialSuccess'
         204:
-          description: No Content
+          description: No Content.
         400:
           $ref: '#/responses/BadRequest'
         401:
@@ -1595,7 +1595,7 @@ paths:
         200:
           $ref: '#/responses/PartialSuccess'
         204:
-          description: No Content
+          description: No Content.
         400:
           $ref: '#/responses/BadRequest'
         401:
@@ -1614,7 +1614,7 @@ paths:
       description: Get network discovered systems.
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             type: array
             items:
@@ -1629,7 +1629,7 @@ paths:
       description: Get the number of connected and disconnected managed systems.
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             $ref: '#/definitions/ManagedSystemsSummary'
         401:
@@ -1643,10 +1643,10 @@ paths:
       x-ni-operation: getJobs
       tags: [jobs]
       summary: Get jobs summary
-      description: Get the number of active, failed and succeeded jobs.
+      description: Get the number of active, failed, and succeeded jobs.
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             $ref: '#/definitions/JobsSummary'
         401:
@@ -1676,7 +1676,7 @@ paths:
         200:
           $ref: '#/responses/PartialSuccess'
         204:
-          description: No Content
+          description: No Content.
         400:
           $ref: '#/responses/BadRequest'
   /v1/get-discovered-systems-summary:
@@ -1689,7 +1689,7 @@ paths:
       description: Get the number of network discovered systems. This number refers to the count of systems that are discovered and not managed.
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             $ref: '#/definitions/DiscoveredSystemsSummary'
         401:
@@ -1706,7 +1706,7 @@ paths:
       description: Get the number of systems that are currently pending to be added to the master but have not yet been approved by the master.
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             $ref: '#/definitions/PendingSystemsSummary'
         401:
@@ -1733,7 +1733,7 @@ paths:
         - application/json
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             description: The file data
             type: file
@@ -1765,11 +1765,11 @@ paths:
               $ref: '#/definitions/CreateGroupRequest'
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             $ref: '#/definitions/CreateGroupsPartialSuccessResponse'
         204:
-          description: No Content
+          description: No Content.
         400:
           $ref: '#/responses/BadRequest'
         401:
@@ -1791,7 +1791,7 @@ paths:
           description: A group ID.
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             type: array
             items:
@@ -1824,7 +1824,7 @@ paths:
         200:
           $ref: '#/responses/PartialSuccess'
         204:
-          description: No Content
+          description: No Content.
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -1852,7 +1852,7 @@ paths:
         200:
           $ref: '#/responses/PartialSuccess'
         204:
-          description: No Content
+          description: No Content.
         400:
           $ref: '#/responses/BadRequest'
         401:
@@ -1906,7 +1906,7 @@ paths:
               $ref: '#/definitions/SystemCredentials'
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             type: array
             items:
@@ -1927,7 +1927,7 @@ paths:
       description: Returns the pending, denied, approved, and rejected systems keys.
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             $ref: '#/definitions/SystemsKeys'
         401:
@@ -2015,7 +2015,7 @@ paths:
             $ref: '#/definitions/QueryAvailablePackagesRequest'
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             type: array 
             items:
@@ -2049,7 +2049,7 @@ paths:
             $ref: '#/definitions/QueryRequest'
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             $ref: '#/definitions/QueryResponse'
         401:
@@ -2081,7 +2081,7 @@ paths:
             $ref: '#/definitions/QueryRequest'
       responses:
         200:
-          description: OK
+          description: OK.
           schema:
             $ref: '#/definitions/QueryResponse'
         401:
