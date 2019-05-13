@@ -1216,7 +1216,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/results:
+  /v2/results:
     get:
       tags: [results]
       summary: Gets test results
@@ -1224,6 +1224,7 @@ paths:
       operationId: get-results
       x-ni-operation: getResults
       x-ni-privilege: Read
+      x-ni-oldest-compatible-version: 1
       parameters:
         - in: query
           name: skip
@@ -1251,6 +1252,7 @@ paths:
       operationId: update-results
       x-ni-operation: updateResults
       x-ni-privilege: Write
+      x-ni-oldest-compatible-version: 1
       parameters:
         - in: body
           name: requestBody
@@ -1290,6 +1292,7 @@ paths:
       operationId: create-results
       x-ni-operation: createResults
       x-ni-privilege: Write
+      x-ni-oldest-compatible-version: 1
       parameters:
         - in: body
           name: requestBody
@@ -1316,7 +1319,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/results/{resultId}:
+  /v2/results/{resultId}:
     delete:
       tags: [results]
       summary: Deletes a test result
@@ -1324,6 +1327,7 @@ paths:
       operationId: DeleteResult
       x-ni-operation: deleteResult
       x-ni-privilege: Write
+      x-ni-oldest-compatible-version: 1
       parameters:
         - in: path
           name: resultId
@@ -1342,7 +1346,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/delete-results:
+  /v2/delete-results:
     post:
       tags: [results]
       summary: Deletes test results
@@ -1350,6 +1354,7 @@ paths:
       operationId: delete-results
       x-ni-operation: deleteResults
       x-ni-privilege: Write
+      x-ni-oldest-compatible-version: 1
       parameters:
         - in: body
           name: requestBody
@@ -1427,7 +1432,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/steps:
+  /v2/steps:
     get:
       tags: [steps]
       summary: Gets test steps
@@ -1435,6 +1440,7 @@ paths:
       operationId: get-steps
       x-ni-operation: getSteps
       x-ni-privilege: Read
+      x-ni-oldest-compatible-version: 1
       parameters:
         - in: query
           name: skip
@@ -1462,6 +1468,7 @@ paths:
       operationId: update-steps
       x-ni-operation: updateSteps
       x-ni-privilege: Write
+      x-ni-oldest-compatible-version: 1
       parameters:
         - in: body
           name: requestBody
@@ -1488,6 +1495,7 @@ paths:
       operationId: create-steps
       x-ni-operation: createSteps
       x-ni-privilege: Write
+      x-ni-oldest-compatible-version: 1
       parameters:
         - in: body
           name: requestBody
@@ -1509,7 +1517,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/results/{resultId}/steps/{stepId}:
+  /v2/results/{resultId}/steps/{stepId}:
     delete:
       tags: [steps]
       summary: Deletes a test step
@@ -1517,6 +1525,7 @@ paths:
       operationId: DeleteStep
       x-ni-operation: deleteStep
       x-ni-privilege: Write
+      x-ni-oldest-compatible-version: 1
       parameters:
         - in: path
           name: resultId
@@ -1540,7 +1549,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/delete-steps:
+  /v2/delete-steps:
     post:
       tags: [steps]
       summary: Deletes test steps
@@ -1548,6 +1557,7 @@ paths:
       operationId: delete-steps
       x-ni-operation: deleteSteps
       x-ni-privilege: Write
+      x-ni-oldest-compatible-version: 1
       parameters:
         - in: body
           name: requestBody
