@@ -1174,7 +1174,9 @@ paths:
     post:
       tags: [results]
       summary: Advanced Test Result Query
-      description: Uses the Dynamic Linq query language to specify a filter and return test results. An empty request body queries all test results.
+      description: >-
+        Uses the Dynamic Linq query language to specify a filter and return
+        test results. An empty request body queries all test results.
       operationId: query-results-v2
       x-ni-operation: queryResults
       x-ni-privilege: Read
@@ -1383,7 +1385,9 @@ paths:
     post:
       tags: [steps]
       summary: Advanced Test Step Query
-      description: Uses the Dynamic Linq query language to specify a filter and return test steps. An empty request body queries all test steps.
+      description: >-
+        Uses the Dynamic Linq query language to specify a filter and return
+        test steps. An empty request body queries all test steps.
       operationId: query-steps-v2
       x-ni-operation: querySteps
       x-ni-privilege: Read
