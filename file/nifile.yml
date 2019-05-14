@@ -581,6 +581,7 @@ paths:
       operationId: Delete
       x-ni-operation: deleteFiles
       x-ni-privilege: ModifyFiles
+      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       responses:
         204:
           description: No content
