@@ -755,7 +755,7 @@ paths:
         - in: query
           name: take
           description: >-
-            How many files to return in the result, or 0 to use a default.  New in version 2 of this operation.
+            How many files to return in the result.  New in version 2 of this operation.
             The default value is defined by the service.
           type: integer
           format: int32
