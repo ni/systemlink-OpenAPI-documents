@@ -192,11 +192,6 @@ definitions:
           $ref: '#/definitions/OneChannelSpecifier'
         default: null
         description: Channels to use only to filter. Values from these channels are not returned.
-      outputObjectNames:
-        type: array
-        description: Specifies to transpose the data and return an array of objects with these object names.
-        items:
-          type: string
   OneChannelSpecifier:
     description: Specification for a channel of data
     properties:
