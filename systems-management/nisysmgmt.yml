@@ -1033,7 +1033,7 @@ definitions:
                 - noarch
                 - any
                 - all
-        required: [feedUris]
+          required: [feedUris]
     required: [systemConfigurations]
 
   PackageResponse:
