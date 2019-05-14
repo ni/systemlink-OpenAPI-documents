@@ -650,7 +650,7 @@ paths:
       operationId: UpdateMetadata
       x-ni-operation: updateMetadata
       x-ni-privilege: ModifyFiles
-      x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       parameters:
         - in: body
           name: metadata
@@ -694,7 +694,7 @@ paths:
       operationId: DeleteMultiple
       x-ni-operation: deleteFiles
       x-ni-privilege: ModifyFiles
-      x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       parameters:
         - in: body
           name: files
@@ -803,7 +803,7 @@ paths:
       operationId: Upload
       x-ni-operation: uploadFiles
       x-ni-privilege: UploadFiles
-      x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       consumes:
         - multipart/form-data
       parameters:
