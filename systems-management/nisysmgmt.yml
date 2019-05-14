@@ -796,7 +796,7 @@ definitions:
         $ref: '#/definitions/ReportType'
       filter:
         type: string
-        example: grains.data.os==NILinuxRT
+        example: grains.data.os==""NILinuxRT""
         description: Specifies the filter criteria for systems.
     required: [ids, type]
 
@@ -1322,8 +1322,119 @@ definitions:
         example: 100
       filter:
         type: string
-        example: connected.data.state==CONNECTED
-        description: The criteria used to filter resources.
+        example: connected.data.state==""CONNECTED""
+        description: >-
+          The filter criteria for jobs or systems. Consists of a string of queries composed using AND/OR operators.
+          String values and date strings need to be enclosed in double quotes.
+          Parenthesis can be used around filters to better define the order of operations.
+
+          Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+
+
+          Operators:
+
+          - Equals operator '='. Example: 'x = y'
+
+          - Not equal operator '!='. Example: 'x != y'
+
+          - Greater than operator '>'. Example: 'x > y'
+
+          - Greater than or equal operator '>='. Example: 'x >= y'
+
+          - Less than operator '<'. Example: 'x < y'
+
+          - Less than or equal operator '<='. Example: 'x <= y'
+
+          - Logical AND operator 'and' or '&&'. Example: 'x and y'
+
+          - Logical OR operator 'or' or '||'. Example: 'x or y'
+
+          - Contains operator '.Contains()', used to check if a list contains an element. Example: 'x.Contains(y)'
+
+          - Not Contains operator '!.Contains()', used to check if a list does not contain an element. Example: '!x.Contains(y)'
+
+
+          Valid job properties that can be used in the filter:
+
+          - jid : String representing the ID of the job.
+
+          - id : String representing the ID of the system.
+
+          - createdTimestamp: ISO-8601 formatted timestamp string specifying the date when the job was created.
+
+          - lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the job was updated.
+
+          - dispatchedTimestamp: ISO-8601 formatted timestamp string specifying the date when the job was actually sent to the system.
+
+          - state: String representing the state of the job.
+
+          - metadata: Object containg the the metadata of job. Example: metadata.queued
+
+          - config.user: String representing the user who created the job.
+
+          - config.tgt: List of strings representing the targeted systems. Example: config.tgt.Contains(""id"")
+
+          - config.fun: List of strings representing the functions to be executed within the job. Example: config.fun.Contains(""nisysmgmt.set_blackout"")
+
+          - config.arg: An array of arrays of variable type elements that are arguments to the function specified by the "fun" property. Example: config.arg[0].Contains(""test"")
+
+          - result.return: An array of objects representing return values for each executed function. Example:
+            result.return[0].Contains(""Success"")
+
+          - result.retcode: An array of integers representing code values for each executed function. Example: result.retcode
+
+          - result.success: An array of booleans representing success values for each executed function. Example:
+            result.success.Contains(false)
+
+          Valid system properties that can be used in the filter:
+
+          - id : String representing the ID of the system.
+
+          - createdTimestamp: ISO-8601 formatted timestamp string specifying the date when the system was registered.
+
+          - lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system was updated.
+
+          - alias: String representing the alias of the system.
+
+          - activation.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system activation was updated.
+
+          - activation.data.activated: Boolean representing whether the system is activated or not.
+
+          - activation.data.licenseName: String representing the name of the license.
+
+          - activation.data.licenseVersion: String representing the license version.
+
+          - connected.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system connection was updated.
+
+          - connected.data.state: String representing the state of the system.
+
+          - grains.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system grains were updated.
+
+          - grains.data: Dictionary of string to object representing general information about the system. Example: grains.data.os == ""Windows""
+
+          - packages.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system installed packages were updated.
+
+          - packages.data: Dictionary representing software packages installed on the system. Example: packages.data.ni-package-manager-upgrader.version: String representing the installed version of ni-package-manager-upgrader package.
+
+          - feeds.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system configured feeds were updated.
+
+          - feeds.data: Dictionary representing the feeds configured on the system.
+
+          - sysapi.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system sysapi data was updated.
+
+          - sysapi.data: Dictionary representing system API information of a system.
+
+          - groups.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system groups data was updated.
+
+          - groups.data: Array of strings representing the IDs of the groups the system is assigned to. Example: groups.data.Contains(""id"")
+
+          - keywords.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system keywords were updated.
+
+          - keywords.data: Array of strings representing the keywords of the system. Example: keywords.data.Contains(""test"")
+
+          - properties.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system properties were updated.
+
+          - properties.data: Dictionary of string to string representing metadata information about a system. Example: properties.data.owner == ""admin""
       projection:
         type: string
         example: 'new(id,grains,lastUpdatedTimestamp)'
@@ -1406,7 +1517,7 @@ paths:
       x-ni-operation: createOrCancelJobs
       tags: [jobs]
       summary: Create a job
-      description: Create a job.
+      description: Create a job and returns the newly created job including the job ID.
       parameters:
         - in: body
           name: CreateJobRequest
@@ -1619,6 +1730,10 @@ paths:
             type: array
             items:
               $ref: '#/definitions/SystemInfo'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v1/get-systems-summary:
     get:
       operationId: GetSystemsSummary
@@ -1800,6 +1915,8 @@ paths:
           $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
         default:
           $ref: '#/responses/Error'
   /v1/remove-groups:
@@ -2024,6 +2141,8 @@ paths:
           $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
         default:
           $ref: '#/responses/Error'
   /v1/query-jobs:
@@ -2042,7 +2161,7 @@ paths:
           x-example:
             skip: 100
             take: 100
-            filter: 'id == VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5'
+            filter: 'id == ""VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5""'
             projection: 'new(jid,id,lastUpdatedTimestamp,state,result)'
             orderBy: 'lastUpdatedTimestamp descending'
           schema:
@@ -2074,7 +2193,7 @@ paths:
           x-example:
             skip: 10
             take: 10
-            filter: 'connected.data.state == CONNECTED && grains.data.os == Windows'
+            filter: 'connected.data.state == ""CONNECTED"" && grains.data.os == ""Windows""'
             projection: 'new(id,lastUpdatedTimestamp,connected,packages)'
             orderBy: 'connected.data.state'
           schema:
