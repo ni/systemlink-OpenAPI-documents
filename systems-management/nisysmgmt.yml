@@ -1,0 +1,2211 @@
+﻿swagger: '2.0'
+info:
+  description: 'Systems Management Service HTTP API. Manage and monitor your distributed systems.'
+  version: '1'
+  title: 'SystemLink Systems Management'
+  contact:
+    name: National Instruments
+    url: https://www.ni.com/systemlink
+    email: support@ni.com
+basePath: '/nisysmgmt'
+x-ni-routing-key: 'Skyline.Salt'
+consumes: [application/json]
+produces: [application/json]
+
+securityDefinitions:
+  basicAuth:
+    type: basic
+  cookieAuth:
+    type: apiKey
+    in: header
+    name: Cookie
+
+security:
+  - basicAuth: []
+  - cookieAuth: []
+
+responses:
+  Error:
+    description: Error
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+  BadRequest:
+    description: Bad Request indicates that the server was unable to process the request because of invalid syntax.
+    schema:
+      title: Bad Request Error Response
+      description: Bad request error response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+  Unauthorized:
+    description: Not authorized.
+    headers:
+      WWW_Authenticate:
+        description: Information for how to authenticate.
+        type: string
+
+  PartialSuccess:
+    description: Partial Success indicates only part of the request body metadata information was processed successfully.
+    schema:
+      title: PartialSuccessResponse
+      description: Partial success response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+  NotFound:
+    description: The requested resource was not found.
+    schema:
+      title: Not Found Request Error Response
+      description: Not found error response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+definitions:
+  CreateJobRequest:
+    description: Request describing a job to send to systems.
+    title: Create Job Request
+    type: object
+    x-ni-cs-json-converter: JsonObjectConverter
+    properties:
+      tgt:
+        description: Array of strings representing system IDs.
+        type: array
+        items:
+          type: string
+          example: VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
+      fun:
+        description: An array of strings each representing an execution module function.
+        type: array
+        items:
+          type: string
+          example: pkg.remove
+        example:
+          - pkg.remove
+          - pkg.install
+      arg: 
+        description: An array of variable type element arrays, which are arguments to the function specified by the "fun" property. If at least one function requires arguments, an array must be provided for each function, even if it is empty. Keyword arguments may be provided as a parameter of type object with at least one property of type boolean ("__kwarg__") that evaluates to true.
+        type: array
+        items:
+          type: array
+          items:
+            type: object
+            example: true
+          example:
+            - __kwarg__: true
+              pkgs:
+              - acl: ''
+        example:
+          - - __kwarg__: true
+              pkgs:
+              - acl: ''
+          - - __kwarg__: true
+              pkgs:
+              - acl-dbg: 1.0.0-0
+      metadata:
+        description: Additional information of the job.
+        type: object
+        additionalProperties:
+          type: object
+        example:
+          queued: true
+          timeout: 600
+          refresh_minion_cache:
+            grains: true
+    required: [tgt, fun]
+
+  CreateJobResponse:
+    title: Create Job Response
+    description: Response describing a job sent to systems.
+    type: object
+    properties:
+      jid:
+        description: The ID of the created job.
+        type: string
+        example: '20190211135234448026_28320'
+      tgt:
+        description: Array of strings representing system IDs.
+        type: array
+        items:
+          type: string
+          example: VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
+      fun:
+        description: An array of strings each representing an execution module function.
+        type: array
+        items:
+          type: string
+          example: pkg.remove
+        example:
+          - pkg.remove
+          - pkg.install
+      arg: 
+        description: An array of arrays of variable type elements that are arguments to the function specified by the "fun" property. If at least one function requires arguments, an array must be provided for each function, even if it is empty. Keyword arguments may be provided as a parameter of type object with at least one property of type boolean, "__kwarg__", that is evaluated to true.
+        type: array
+        items:
+          type: array
+          items:
+            type: object
+            example: true
+          example:
+            - __kwarg__: true
+              pkgs:
+              - acl: ''
+        example:
+          - - __kwarg__: true
+              pkgs:
+              - acl: ''
+          - - __kwarg__: true
+              pkgs:
+              - acl-dbg: 1.0.0-0
+      metadata:
+        description: Additional information passed along with the job.
+        type: object
+        additionalProperties:
+          type: object
+        example:
+          queued: true
+          timeout: 600
+          refresh_minion_cache:
+            grains: true
+    required: [jid, tgt, fun]
+
+  RegisterSystemsRequest:
+    description: Request for registering systems.
+    title: Register Systems Request
+    type: object
+    properties:
+      systemsCredentials:
+        description: An array of objects representing system credentials.
+        type: array
+        items:
+          $ref: '#/definitions/SystemCredentials'
+      activate:
+        type: boolean
+        description: Whether to activate the systems or not.
+        default: false
+        example: true
+    required: [systemsCredentials]
+
+  SystemCredentials:
+    description: The hostname, IP address, and login information of a system.
+    title: System Credentials
+    type: object
+    properties:
+      hostname:
+        type: string
+        description: Required if ip_address is not provided. A string representing the hostname of the system to register.
+        example: testvm
+      ipAddress:
+        type: string
+        description: Required if hostname is not provided. A string representing the IP address of the system to register.
+        example: 10.10.10.10
+      password:
+        type: string
+        description: A string representing the password to use access the system.
+        example: test
+      username:
+        type: string
+        description: A string representing the username to use access the system.
+        example: root
+
+  RegisterSystemsResponse:
+    title: Register Systems Response
+    description: Response to a request to register systems to the server.
+    type: object
+    properties:
+      requestId:
+        description: The ID of the registration request.
+        type: string
+        example: '068530b9-b059-4c0e-9820-9e9cc4e0832c'
+    required: [requestId]
+
+  UnregisterSystemsRequest:
+    title: Unregister Systems Request
+    description: Request to unregister systems from the server.
+    type: object
+    properties:
+      tgt:
+        description: Array of strings representing the IDs of systems to remove from SystemLink Server.
+        type: array
+        items:
+          type: string
+          example: VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
+      force:
+        description: A Boolean which specifies whether to remove systems from the database immediately (True) or wait until the unregister job returns from systems (False). If True, unregister job failures are not cached.
+        type: boolean
+        default: true
+        example: false
+    required: [tgt]
+
+  UnregisterSystemsResponse:
+    title: Unregister Systems Response
+    description: Response of the request to unregister systems.
+    type: object
+    properties:
+      jid:
+        description: The job ID of the unregistration job sent to connected systems.
+        type: string
+        example: '20190211135234448026_28320'
+      removedIds:
+        description: An array of system IDs removed from the database immediately.
+        type: array
+        items:
+          type: string
+          example: VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
+      failedIds:
+        description: An array of objects defining failed unregister operations.
+        type: array
+        items:
+          type: object
+          title: Failed Unregister Request
+          properties:
+            id:
+              description: The ID of the system on which unregister operation failed.
+              type: string
+              example: VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
+            error:
+              $ref: '#/definitions/Error'
+
+  CancelJobRequest:
+    description: Object containing the job ID and system ID.
+    title: Cancel Job Request
+    type: object
+    properties:
+      jid:
+        description: The job ID of the job to cancel.
+        type: string
+        example: '20190211135234448026_28320'
+      systemId:
+        description: The system ID on which the job is canceled.
+        type: string
+        example: VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F9
+    required: [jid, systemId]
+
+  ManagedSystemsSummary:
+    title: Managed Systems Summary
+    description: Summary information about managed systems.
+    type: object
+    properties:
+      connectedCount:
+        type: integer
+        format: int64
+        description: Number of the connected systems.
+        example: 4
+      disconnectedCount:
+        type: integer
+        format: int64
+        description: Number of the disconnected systems.
+        example: 2
+    required: [connectedCount, disconnectedCount]
+
+  JobsSummary:
+    title: Jobs Summary
+    description: Summary information about jobs.
+    type: object
+    properties:
+      activeCount:
+        type: integer
+        format: int64
+        description: Number of active jobs.
+        example: 4
+      failedCount:
+        type: integer
+        format: int64
+        description: Number of failed jobs.
+        example: 2
+      succeededCount:
+        type: integer
+        format: int64
+        description: Number of succeeded jobs.
+        example: 4
+    required: [activeCount, failedCount, succeededCount]
+
+  DiscoveredSystemsSummary:
+    title: Discovered Systems Summary
+    description: Summary information about discovered systems.
+    type: object
+    properties:
+      discoveredCount:
+        type: integer
+        format: int64
+        description: Number of systems that are discovered and not managed by your SystemLink Server.
+        example: 100
+    required: [discoveredCount]
+
+  PendingSystemsSummary:
+    title: Pending Systems Summary
+    description: Summary information about the systems attempting to connect to the server but aren't accepted yet.
+    type: object
+    properties:
+      pendingCount:
+        type: integer
+        format: int64
+        description: Number of systems pending approval to connect to the server.
+        example: 5
+    required: [pendingCount]
+
+  SystemInfo:
+    title: System Information
+    description: Network published information about a system.
+    type: object
+    properties:
+      comments:
+        description: System description.
+        type: string
+        example: Test system
+      cpuArch:
+        description: System CPU architecture.
+        type: string
+        example: armv7l
+      deviceClass:
+        description: System device class.
+        type: string
+        example: FlexRIO
+      hostname:
+        description: System hostname.
+        type: string
+        example: testvm
+      ipAddress:
+        description: System IP address.
+        type: string
+        example: 10.10.10.10
+      lastUpdatedTimestamp:
+        description: Last updated timestamp.
+        type: string
+        format: iso-date-time
+        example: '2019-02-11T13:32:06.030958Z'
+      master:
+        description: Master of the system.
+        type: string
+        example: SystemLinkServer
+      minionId:
+        description: Salt minion_id of the system.
+        type: string
+        example: NI-7935R--SN-1111111--MAC-00-12-34-56-78-90
+      modelName:
+        description: System model name.
+        type: string
+        example: NI-7935R
+      modelNumber:
+        description: System model number.
+        type: string
+        example: 0x77AC
+      osFamily:
+        description: System OS family.
+        type: string
+        example: NILinuxRT
+      osRelease:
+        description: System OS release.
+        type: string
+        example: 7.0
+      serialNumber:
+        description: System serial number.
+        type: string
+        example: 1111111
+      vendorName:
+        description: System vendor name.
+        type: string
+        example: National Instruments
+      version:
+        description: Salt version.
+        type: string
+        example: 2018.3.0-541-g76c6845
+    required: [comments, cpuArch, deviceClass, hostname, ipAddress, lastUpdatedTimestamp, master, minionId, modelName, modelNumber, osFamily, osRelease, serialNumber, vendorName, version]
+
+  JobState:
+    title: Job State
+    type: string
+    enum:
+      - CANCELED
+      - FAILED
+      - SUCCEEDED
+      - INQUEUE
+      - INPROGRESS
+    example: SUCCEEDED
+    description: > 
+      The state of the job.
+       * CANCELED: The job was canceled by the user.
+       * FAILED: The job completed with failures. The job fails if at least one of the its functions executing fails.
+       * SUCCEEDED: The job completed successfully.
+       * INQUEUE: The job is in queue, waiting to be dispatched to the system.
+       * INPROGRESS: The job was dispatched to the system and is still running.
+
+  Job:
+    description: Information about a job.
+    title: Job
+    type: object
+    properties:
+      jid:
+        type: string
+        description: ID of the job.
+        example: '20190211135234448026_28320'
+      id:
+        type: string
+        description: ID of the system.
+        example: VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5
+      createdTimestamp:
+        type: string
+        format: iso-date-time
+        description: The date when the job was created.
+        example: '2019-02-11T13:32:06.030958Z'
+      lastUpdatedTimestamp:
+        type: string
+        format: iso-date-time
+        description: The date when the job was last updated.
+        example: '2019-02-11T13:32:06.030958Z'
+      dispatchedTimestamp:
+        type: string
+        format: iso-date-time
+        description: The date when the job was actually sent to the system.
+        example: '2019-02-11T13:32:06.030958Z'
+      state:
+        $ref: '#/definitions/JobState'
+      metadata:
+        description: Job metadata.
+        type: object
+        additionalProperties:
+          type: object
+        example:
+          queued: true
+      config:
+        type: object
+        description: Job configuration.
+        title: JobConfig
+        properties:
+          user:
+            type: string
+            description: User who created the job.
+            example: admin
+          tgt:
+            type: array
+            items:
+              type: string
+              description: String representing the system ID.
+              example: VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5
+          fun:
+            type: array
+            description: An array of strings each representing an execution module function.
+            items:
+              type: string
+              example: system.set_computer_desc
+            example:
+              - system.set_computer_desc
+              - nisysmgmt.grains_items
+          arg:
+            description: An array of arrays of variable type elements that are arguments to the function specified by the "fun" property. If at least one function requires arguments, an array must be provided for each function, even if it is empty. Keyword arguments may be provided as a parameter of type object with at least one property of type boolean, "__kwarg__", that is evaluated to true.
+            type: array
+            items:
+              type: array
+              items:
+                type: object
+                example: true
+              example:
+                - test
+        required: [user, tgt, fun]
+      result:
+        description: The result of job execution.
+        type: object
+        title: Job Result
+        properties:
+          return:
+            type: array
+            items:
+              type: object
+              example: 'Computer Description: test'
+            description: An array of objects representing return values for each executed function.
+            example: 
+              - Computer Description: test
+              - null
+          retcode:
+            type: array
+            items:
+              type: integer
+              format: int32
+              example: 1
+            description: An array of integers representing code values for each executed function.
+            example:
+              - 0
+              - 0
+          success:
+            type: array
+            items:
+              type: boolean
+              example: false
+            description: An array of booleans representing success values for each executed function.
+            example:
+              - true
+              - true
+        required: [success]
+    required: [jid, id, createdTimestamp, lastUpdatedTimestamp, state, config]
+
+  ManagedSystemState:
+    title: Managed System State
+    type: string
+    enum:
+      - ACTIVATED_WITHOUT_CONNECTION
+      - APPROVED
+      - DISCONNECTED
+      - CONNECTED_REFRESH_PENDING
+      - CONNECTED
+      - CONNECTED_REFRESH_FAILED
+    example: CONNECTED
+    description: >
+      The connection state of a system.
+       * ACTIVATED_WITHOUT_CONNECTION: The system is activated but the connection is not established yet.
+       * APPROVED: The system is approved but it didn't try to connect yet.
+       * DISCONNECTED: The system is disconnected.
+       * CONNECTED_REFRESH_PENDING: The system is connected and the refresh job is running. A refresh job is sent to the system every time the connection is established in order to gather the system information.
+       * CONNECTED: The system is connected. The refresh job completed successfully.
+       * CONNECTED_REFRESH_FAILED: The system is connected but the refresh job failed.
+
+  ManagedSystemActivationData:
+    description: Information about the license of a system.
+    type: object
+    properties:
+      activated:
+        type: boolean
+        description: Whether the system is activated or not.
+        example: true
+      licenseName:
+        type: string
+        description: The name of the license.
+        example: NILicense
+      licenseVersion:
+        type: string
+        description: The license version.
+        example: 19.0
+    required: [activated]
+
+  ManagedSystemDataProperty:
+    description: Property of a system composed by the last updated timestamp and a dictionary with the actual data.
+    type: object
+    properties:
+      lastUpdatedTimestamp:
+        description: Last updated timestamp.
+        type: string
+        format: iso-date-time
+        example: '2019-02-11T13:32:06.030958Z'
+      data:
+        description: The actual data.
+        type: object
+        example:
+          key: value
+    required: [lastUpdatedTimestamp, data]
+
+  ManagedSystem:
+    description: Information about a managed system.
+    title: Managed System
+    type: object
+    properties:
+      id:
+        type: string
+        description: The ID of the system.
+        example: VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F9
+      createdTimestamp:
+        description: The time when the system was registered.
+        type: string
+        format: iso-date-time
+        example: '2019-02-19T11:42:25.078Z'
+      lastUpdatedTimestamp:
+        description: Last time when the system information updated.
+        type: string
+        format: iso-date-time
+        example: '2019-02-19T11:42:25.078Z'
+      alias:
+        description: The alias of the system.
+        type: string
+        example: testVM
+      activation:
+        description: Activation information.
+        type: object
+        properties:
+          lastUpdatedTimestamp:
+            description: Last time when the system activation information updated.
+            type: string
+            format: iso-date-time
+            example: '2019-02-19T11:42:25.078Z'
+          data:
+            $ref: '#/definitions/ManagedSystemActivationData'
+        required: [lastUpdatedTimestamp, data]
+      connected:
+        description: System connection status information.
+        type: object
+        properties:
+          lastUpdatedTimestamp:
+            description: Last time when the system connection information updated.
+            type: string
+            format: iso-date-time
+            example: '2019-02-19T11:42:25.078Z'
+          data:
+            type: object
+            properties:
+              state:
+                $ref: '#/definitions/ManagedSystemState'
+            required: [state]
+        required: [lastUpdatedTimestamp, data]
+      grains:
+        description: General information about the system.
+        $ref: '#/definitions/ManagedSystemDataProperty'
+        example:
+          lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
+          data:
+            kernel: Windows
+            nodename: WIN-8NTJI2568QV
+            kernelrelease: 6.1.7601
+            kernelversion: 6.1.7601
+            cpuarch: x86
+            os: Windows
+            os_family: Windows
+            mem_total: 1023
+            osversion: 6.1.7601
+            osrelease: 7        
+      packages:
+        description: Software packages installed on the system.
+        $ref: '#/definitions/ManagedSystemDataProperty'
+        example:
+          lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
+          data:
+            ni-package-manager-upgrader:
+              description: Application used to upgrade the package manager.
+              displayname: NI Package Manager Upgrader
+              displayversion: 19.5.0
+              url: http://www.ni.com
+              packager: National Instruments <support@ni.com>
+              priority: required
+              group: Infrastructure
+              version: 19.5.0.28-0+d28
+            system-windows-x64:
+              description: Package that indicates the current system is running a 64-bit Windows operating system.
+              displayname: System Package for 64-Bit Windows OS
+              displayversion: 19.5.0
+              url: http://www.ni.com
+              packager: National Instruments <support@ni.com>
+              priority: standard
+              group: Infrastructure
+              version: 19.5.0.28-0+d28
+      feeds:
+        description: Feeds configured on the system.
+        $ref: '#/definitions/ManagedSystemDataProperty'
+        example:
+          lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
+          data:
+            http://download.ni.com/support/nipkg/products/ni-package-manager/released:
+            - configurable: false
+              enabled: true
+              name: ni-package-manager-released
+              uri: http://download.ni.com/support/nipkg/products/ni-package-manager/released
+            http://download.ni.com/support/nipkg/products/ni-package-manager/eulas:
+            - configurable: false
+              enabled: true
+              name: ni-package-manager-eulas
+              uri: http://download.ni.com/support/nipkg/products/ni-package-manager/eulas
+      sysapi:
+        description: System API information.
+        $ref: '#/definitions/ManagedSystemDataProperty'
+        example:
+          lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
+          data:
+            - resource_uri: nisyscfg//sys/bus/pci/devices/0000:04:00.0
+              properties:
+              - type: string
+                tag: 16777216
+                value: "//localhost/nisyscfg/%2Fsys%2Fbus%2Fpci%2Fdevices%2F0000:04:00.0"
+              - type: bool
+                tag: 16781312
+                value: true
+            - resource_uri: nisyscfg/enp0s25
+              properties:
+              - type: string
+                tag: 16777216
+                value: "//localhost/nisyscfg/enp0s25"
+              - type: bool
+                tag: 16781312
+                value: false
+      groups:
+        description: Specifies the groups to which the system is assigned.
+        $ref: '#/definitions/ManagedSystemDataProperty'
+        example:
+          lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
+          data:
+            - 121b471c-d7d4-4996-a38f-27f7e58be070
+      keywords:
+        description: Keywords metadata information about a system.
+        type: object
+        properties:
+          lastUpdatedTimestamp:
+            description: Last updated timestamp.
+            type: string
+            format: iso-date-time
+            example: '2019-02-19T11:42:25.078Z'
+          data:
+            description: A list of strings defining metadata information about a system.
+            type: array
+            items:
+              type: string
+              example: 
+                - testVM
+        required: [lastUpdatedTimestamp, data]
+      properties:
+        description: Properties metadata information about a system.
+        type: object
+        properties:
+          lastUpdatedTimestamp:
+            description: Last updated timestamp.
+            type: string
+            format: iso-date-time
+            example: '2019-02-19T11:42:25.078Z'
+          data:
+            description: An object defining key-value pairs metadata information about a system.
+            type: object
+            additionalProperties:
+              type: string
+            example:
+              owner: admin
+        required: [lastUpdatedTimestamp, data]
+    required: [id, createdTimestamp, lastUpdatedTimestamp, connected]
+
+  ReportType:
+    title: Report Type
+    type: string
+    enum:
+      - SOFTWARE
+      - HARDWARE
+    example: SOFTWARE
+    description: >
+      The type of the report to be created.
+       * SOFTWARE: The report will contain the installed software packages.
+       * HARDWARE: The report will contain information about the hardware configuration of the system.
+
+  SystemsReportRequest:
+    description: Request containing the report type followed by a query filter that will be applied on systems.
+    title: Systems Report Request
+    type: object
+    properties:
+      type:
+        $ref: '#/definitions/ReportType'
+      filter:
+        type: string
+        example: grains.data.os==""NILinuxRT""
+        description: Specifies the filter criteria for systems.
+    required: [ids, type]
+
+  CreateGroupRequest:
+    title: Create Group Request
+    description: Request to create groups.
+    type: object
+    properties:
+      systems:
+        type: array
+        items:
+          type: string
+          description: A string representing a system ID to be associated with this group.
+          example: VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5
+      name:
+        type: string
+        description: A string of the group name to create.
+        example: testVMs
+    required: [name]
+
+  CreateGroupsPartialSuccessResponse:
+    title: Create Group Response
+    description: Response containing the IDs of the created groups along with the failures.
+    type: object
+    properties:
+      groups:
+        type: array
+        description: The groups created.
+        items:
+          $ref: '#/definitions/GroupInfo'
+      error:
+        $ref: '#/definitions/Error'
+
+  GroupInfo:
+    title: Group Info
+    description: Information about a group.
+    type: object
+    properties:
+      gid:
+        description: The ID of the group.
+        type: string
+        example: de4ccb7b-95e1-447f-a7dd-50782c3e06d6
+      name:
+        description: The name of the group.
+        type: string
+        example: group
+      lastUpdatedTimestamp:
+        description: The time when the group was alst updated.
+        type: string
+        format: iso-date-time
+        example: '2019-02-12T14:49:03.013000Z'
+    required: [gid, name, lastUpdatedTimestamp]
+
+  SystemGroupPair:
+    title: System Group Pair
+    description: Pair containing the system ID and the group ID.
+    type: object
+    properties:
+      id:
+        type: string
+        description: The ID of the system.
+        example: VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5
+      gid:
+        type: string
+        description: The ID of the group.
+        example: de4ccb7b-95e1-447f-a7dd-50782c3e06d6
+    required: [id, gid]
+
+  GetInfoResponse:
+    description: Discoverable information about the system provided in the GetInfo request.
+    title: GetInfoResponse
+    type: object
+    properties:
+      request:
+        description: The original request excluding the username and password.
+        type: object
+        properties:
+          hostname:
+            description: The hostname of the system.
+            type: string
+            example: testvm
+          ipAddress:
+            description: The IP of the system.
+            type: string
+            example: 10.10.10.10
+      result:
+        $ref: '#/definitions/SystemInfo'
+      statusCode:
+        description: The status of the request to get information about a system.
+        type: string
+        example: 0
+    required: [request, statusCode]
+
+  SystemsKeys:
+    description: An object containing pending, denied, approved, and rejected system keys. If there are no entries in a given category, then the key representing that category is omitted. The value for the keys is in itself a dictionary, with the key representing the system ID and the value the public authorization key used.
+    title: Systems Keys
+    type: object
+    properties:
+      systemsPending:
+        type: object
+        description: An object of system ID to key pairs that are pending approval or rejection. Keys may be pending when they are not pre-seeded via the automated registration process and attempt to connect to the master.
+        additionalProperties:
+          type: string
+        example:
+          VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F6: "-----BEGIN PUBLIC KEY-----↵MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFgEKiRwWBD/QSDHCpNQ↵Zml9q224YzIxG6reByDV16BNsQoH0lc2bT9LZ7o6xf6dTpQl7shIMc/abSAcl4/F↵VpKguH1yRmOG2Nhout/9wMP6kYBTlThzpop93rlxIo/I7nDkQDz07cMhNWYDvrut↵PVnjRg70xOCAzQRCHRy4GW3TLvfp2WAbCuoQ5oPHQLx+YBSRYDcgfo9jiW8vNzt4↵Bcg72c2PmHEJjGslzJeqcKdRjK0z4/VFgLYfMUBz4LCoy7DohU/uc9ZbHSlOy/BK↵1/S8O1vUyk8DEq+/kQumJWKh1Cl0SWcZGSDkdhQhoTiWqXGb1BBtU7vkxYgQoYjM↵rwIDAQAB↵-----END PUBLIC KEY-----"
+      systemsDenied:
+        type: object
+        description: An object of system ID to key pairs that have been denied. A key is denied when a system is trying to connect the master with a different key than the one that is accepted. This can occur if two systems have the same ID or if a key is removed from a system.
+        additionalProperties:
+          type: string
+        example:
+          VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F7: "-----BEGIN PUBLIC KEY-----↵MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFgEKiRwWBD/QSDHCpNQ↵Zml9q224YzIxG6reByDV16BNsQoH0lc2bT9LZ7o6xf6dTpQl7shIMc/abSAcl4/F↵VpKguH1yRmOG2Nhout/9wMP6kYBTlThzpop93rlxIo/I7nDkQDz07cMhNWYDvrut↵PVnjRg70xOCAzQRCHRy4GW3TLvfp2WAbCuoQ5oPHQLx+YBSRYDcgfo9jiW8vNzt4↵Bcg72c2PmHEJjGslzJeqcKdRjK0z4/VFgLYfMUBz4LCoy7DohU/uc9ZbHSlOy/BK↵1/S8O1vUyk8DEq+/kQumJWKh1Cl0SWcZGSDkdhQhoTiWqXGb1BBtU7vkxYgQoYjM↵rwIDAQAB↵-----END PUBLIC KEY-----"
+      systemsApproved:
+        type: object
+        description: An object of system ID to key pairs that have been approved. These could have been approved explicitly by the user or pre-seeded via the automated registration process.
+        additionalProperties:
+          type: string
+        example:
+          VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F8: "-----BEGIN PUBLIC KEY-----↵MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFgEKiRwWBD/QSDHCpNQ↵Zml9q224YzIxG6reByDV16BNsQoH0lc2bT9LZ7o6xf6dTpQl7shIMc/abSAcl4/F↵VpKguH1yRmOG2Nhout/9wMP6kYBTlThzpop93rlxIo/I7nDkQDz07cMhNWYDvrut↵PVnjRg70xOCAzQRCHRy4GW3TLvfp2WAbCuoQ5oPHQLx+YBSRYDcgfo9jiW8vNzt4↵Bcg72c2PmHEJjGslzJeqcKdRjK0z4/VFgLYfMUBz4LCoy7DohU/uc9ZbHSlOy/BK↵1/S8O1vUyk8DEq+/kQumJWKh1Cl0SWcZGSDkdhQhoTiWqXGb1BBtU7vkxYgQoYjM↵rwIDAQAB↵-----END PUBLIC KEY-----"
+      systemsRejected:
+        type: object
+        description: An object of system ID to key pairs that have been rejected. Keys are rejected explicitly by the user.
+        additionalProperties:
+          type: string
+        example:
+          VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F9: "-----BEGIN PUBLIC KEY-----↵MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFgEKiRwWBD/QSDHCpNQ↵Zml9q224YzIxG6reByDV16BNsQoH0lc2bT9LZ7o6xf6dTpQl7shIMc/abSAcl4/F↵VpKguH1yRmOG2Nhout/9wMP6kYBTlThzpop93rlxIo/I7nDkQDz07cMhNWYDvrut↵PVnjRg70xOCAzQRCHRy4GW3TLvfp2WAbCuoQ5oPHQLx+YBSRYDcgfo9jiW8vNzt4↵Bcg72c2PmHEJjGslzJeqcKdRjK0z4/VFgLYfMUBz4LCoy7DohU/uc9ZbHSlOy/BK↵1/S8O1vUyk8DEq+/kQumJWKh1Cl0SWcZGSDkdhQhoTiWqXGb1BBtU7vkxYgQoYjM↵rwIDAQAB↵-----END PUBLIC KEY-----"
+
+  KeyAction:
+    type: string
+    title: Key Action
+    enum:
+      - ACCEPT
+      - REJECT
+      - DELETE
+      - ACTIVATE_ACCEPT
+    example: ACCEPT
+    description: >
+      Action to be performed. 
+        * ACCEPT: Accept the associated key.
+        * REJECT: Reject the associated key.
+        * DELETE: Delete the associated key.
+        * ACTIVATE_ACCEPT: Activate the system with the associated key and then accept the key.
+
+  ManageKeysRequest:
+    description: Request to perform specific acceptance actions to system keys.
+    title: Manage Keys Request
+    type: object
+    properties:
+      isAsync:
+        description: Whether the request is async or not. If async is true the request will return immediately without waiting for the operation to complete.
+        type: boolean
+        default: false
+        example: true
+      keyActions:
+        type: array
+        items:
+          description: Object defining a system ID and the action that should be performed over the key.
+          title: Key Request
+          type: object
+          properties:
+            id:
+              type: string
+              description: A string representing the system ID.
+              example: VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
+            action:
+              $ref: '#/definitions/KeyAction'
+            key:
+              type: string
+              description: A string representing the public authorization key. If this field is specified, verification that the system ID is associated with this auth key will happen before the desired action is executed.
+              example: -----BEGIN PUBLIC KEY-----↵MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFgEKiRwWBD/QSDHCpNQ↵Zml9q224YzIxG6reByDV16BNsQoH0lc2bT9LZ7o6xf6dTpQl7shIMc/abSAcl4/F↵VpKguH1yRmOG2Nhout/9wMP6kYBTlThzpop93rlxIo/I7nDkQDz07cMhNWYDvrut↵PVnjRg70xOCAzQRCHRy4GW3TLvfp2WAbCuoQ5oPHQLx+YBSRYDcgfo9jiW8vNzt4↵Bcg72c2PmHEJjGslzJeqcKdRjK0z4/VFgLYfMUBz4LCoy7DohU/uc9ZbHSlOy/BK↵1/S8O1vUyk8DEq+/kQumJWKh1Cl0SWcZGSDkdhQhoTiWqXGb1BBtU7vkxYgQoYjM↵rwIDAQAB↵-----END PUBLIC KEY-----
+          required: [id, action]
+        required: [keyActions]
+
+  SystemPatchRequest:
+    description: System data that needs to be assigned to the system.
+    title: System Patch Request
+    x-ni-sparse: true
+    type: object
+    properties:
+      keywords:
+        description: The new keywords assigned to the system.
+        type: array
+        items:
+          type: string
+        example:
+          - test
+          - vm
+      properties:
+        description: The new properties assigned to the system.
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          owner: admin
+      alias:
+        description: The new  alias of the system.
+        type: string
+        example: testVM
+
+  QueryAvailablePackagesRequest:
+    title: Get Available Packages Request
+    description: Request to get the available packages from the feeds specified in the request.
+    type: object
+    properties:
+      returnDuplicates:
+        description: A boolean representing whether to return packages of equal version for each architecture.
+        type: boolean
+        default: false
+        example: false
+      systemConfigurations:
+        description: An array of system configurations.
+        type: array
+        items:
+          type: object
+          title: System Configuration
+          properties:
+            feedUris:
+              type: array
+              description: An array of strings representing feed URIs a system(s) has configured.
+              items:
+                type: string
+              example:
+                - http://download.ni.com/ni-linux-rt/feeds/SystemLink/18.5/x64/
+                - http://download.ni.com/ni-linux-rt/feeds/SystemLink/salt/18.5/x64/x64/           
+            osArchitectures:
+              type: array 
+              description: An array of strings representing OS architectures supported by a system(s) in descending priority.
+              items:
+                type: string
+              example:
+                - x64
+                - core2-64
+                - x86_64
+                - noarch
+                - any
+                - all
+          required: [feedUris]
+    required: [systemConfigurations]
+
+  PackageResponse:
+    title: Get Available Packages Response
+    description: A list with the available packages.
+    type: object
+    properties:
+      arch:
+        type: string
+        description: The architecture of the package.
+        example: windows_x64
+      breaks:
+        type: array
+        description: An array containing information about other packages this package breaks.
+        items:
+          type: string
+          description: The name of a package this package breaks. This also contains information about the version of the package.
+          example: "ni-sysapi (>= 18.0.0)"
+      conflicts:
+        type: array
+        description: An array containing information about other packages this package conflicts with.
+        items:
+          type: string
+          description: The name of a package this package conflicts with. This also contains information about the version of the package.
+          example: "ni-msvcrt-2015 (>= 14.1.4)"
+      depends:
+        type: array
+        description: An array containing information about other packages this package depends on.
+        items:
+          type: string
+          description: The name of a package this package depends on. This also contains information about the version of the package.
+          example: "ni-metauninstaller (>= 18.0.1)"
+      description:
+        type: string
+        description: The description of the package.
+        example: This is an infrastructure package for NI Software.
+      displayName:
+        type: string
+        description: The display name of the package.
+        example: NI Security Update (KB 67L8LCQW)
+      displayVersion:
+        type: string
+        description: The display version of the package.
+        example: 2.0.0
+      enhances:
+        type: array
+        description: An array containing information about other packages this package enhances.
+        items:
+          type: string
+          description: The name of a package this package enhances. This also contains information about the version of the package.
+          example: "ni-msiproperties (>= 18.0.1)"
+      essential:
+        type: boolean
+        description: Whether the package is essential or not. If true then the package management system will refuse to remove the package (upgrading and replacing it is still possible).
+        example: true
+      fileName:
+        type: string
+        description: |
+          The location of the file, including the file extension.
+          Depending on the platform you select, you will be able to use the following package extensions: .nipkg for windows feeds, .ipk and .deb for ni-linux-rt feeds.
+        example: ni-securityupdate-kb67l8lcqw-killbits_2.0.0.22-0+d22_windows_x64.nipkg
+      hardwareSupport:
+        type: array
+        description: When a package provides functionality for specific hardware product(s), it can list such products in this section
+        items: 
+          type: string
+          example: NI cRIO-9035 (Sync)
+      homepage:
+        type: string
+        description: The website of the maintainers for this package.
+        example: "http://www.ni.com"
+      installedSize:
+        type: integer
+        format: int64
+        description: The size of this package after install.
+        example: 1024
+      maintainer:
+        type: string
+        description: The maintainer of this package.
+        example: "National Instruments <support@ni.com>"
+      name:
+        type: string
+        description: The name of the package.
+        example: "ni-securityupdate-kb67l8lcqw-killbits"
+      plugin:
+        type: integer
+        format: int32
+        description: Agent that will be used to install the package.
+        example: 2
+      predepends:
+        type: array
+        description: An array containing information about other packages this package predepends.
+        items:
+          description: The name of a package this package predepends. This also contains information about the version of the package.
+          type: string
+          example: "ni-teststand-2017-tools (>= 17.0.0)"
+      priority:
+        type: integer
+        format: int32
+        description: The priority of the package.
+        example: 4        
+      provides:
+        type: array
+        description: An array containing information about other packages this package provides.
+        items:
+          type: string
+          example: "ni-curl (= 17.0.0.49152-0+f0)"
+          description: One of the packages the containing package provides. This also contains information about the version of the package.      
+      recommends:
+        type: array
+        description: An array containing information about other packages this package recommends.
+        items:
+          type: string
+          description: The name of a package this package recommends. This also contains information about the version of the package.
+          example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"        
+      releaseNotes:
+        type: string
+        description: A page containing the release notes of the package.
+        example: Refer to the NI website at http://www.ni.com/r/slrm185 for installation instructions, known issues, bug fixes, compatibility information, and other important notices about this product.
+      replaces:
+        type: array
+        description: An array containing information about other packages this package replaces.
+        items:
+          type: string
+          description: The name of a package this package replaces. This also contains information about the version of the package.
+          example: "b235b862-6a92-4a04-a8b2-6d71f777de67 (< 16.99.65535)"       
+      section:
+        type: string
+        description: The section of the package.
+        example: Infrastructure
+      size:
+        type: integer
+        format: int64
+        description: The size of the package in bytes.
+        example: 750070
+      source:
+        type: string
+        description: The source of this package, if any.
+        example: "thunar-archive-plugin_0.3.1.bb"
+      storeProduct:
+        type: boolean
+        description: Whether the package represent a product in the store or not.
+        example: true
+      suggests:
+        type: array
+        description: An array containing information about other packages this package suggests.
+        items:
+          type: string
+          description: The name of a package this package suggests. This also contains information about the version of the package.
+          example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"       
+      tags:
+        type: string
+        description: Tags of the package.
+        example: "KillBits, Security Update 2013"    
+      userVisible:
+        type: boolean
+        description: The installed packages with this attribute set to true are considered to be installed by a user, thus not installed to fulfill some dependency. This is needed input for the calculation of unneeded packages when removing a package.
+        example: true
+      version:
+        type: string
+        description: The version of the package.
+        example: "2.0.0.22-0+d22"
+    required:
+      - name
+      - version
+
+  Error:
+    description: Contains error information
+    type: object
+    properties:
+      name:
+        description: The string error code.
+        type: string
+        example: SaltCancelJobFailed
+      code:
+        description: Numeric error code.
+        type: integer
+        format: int32
+        example: -254003
+      resourceType:
+        description: The type of resource associated with the error.
+        type: string
+        example: Job
+      resourceId:
+        description: The identifier of the resource associated with the error.
+        type: string
+        example: '20190211135234448026_28320'
+      message:
+        description: The filled in error message.
+        type: string
+        example: Cannot cancel the job id '{0}' on system id '{1}'.
+      args:
+        description: Positional argument values for the error code.
+        type: array
+        items:
+          type: string
+          example: '20190211135234448026_28320'
+        example:
+          - '20190211135234448026_28320'
+          - VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
+      innerErrors:
+        type: array
+        description: Internal errors that occured in the service.
+        items:
+          $ref: '#/definitions/Error'
+
+  Operation:
+    description: An operation provided by the API
+    type: object
+    properties:
+      available:
+        type: boolean
+        description: Whether the operation is available to the caller.
+        example: true
+      version:
+        type: integer
+        format: int32
+        description: The version of the available operation.
+        example: 1
+    required: [available]
+
+  V1Operations:
+    description: V1 operations
+    type: object
+    properties:
+      operations:
+        description: >-
+          Available operations in the v1 version of the API:
+
+          - getJobs: The ability to retrieve the jobs.
+          
+          - getSystems: The ability to retrieve the systems information.
+
+          - getGroups: The ability to retrieve the groups.
+    
+          - manageSystems: The ability to register or unregister systems.
+          
+          - createOrCancelJobs: The ability to create or cancel jobs.
+          
+          - activateSystems: The ability to activate systems.
+          
+          - updateSystemMetadata: The ability to update systems metadata.
+          
+          - manageFeeds: The ability to configure feeds and retrieve the available packages.
+          
+          - createOrUpdateGroups: The ability to create, update, or delete groups.
+          
+        type: object
+        properties:
+          getJobs:
+            $ref: '#/definitions/Operation'
+          getSystems:
+            $ref: '#/definitions/Operation'
+          getGroups:
+            $ref: '#/definitions/Operation'
+          manageSystems:
+            $ref: '#/definitions/Operation'
+          createOrCancelJobs:
+            $ref: '#/definitions/Operation'
+          activateSystems:
+            $ref: '#/definitions/Operation'
+          updateSystemMetadata:
+            $ref: '#/definitions/Operation'
+          manageFeeds:
+            $ref: '#/definitions/Operation'
+          createOrUpdateGroups:
+            $ref: '#/definitions/Operation' 
+
+  QueryRequest:
+    description: Request for querying resources. More info here -> https://github.com/StefH/System.Linq.Dynamic.Core/wiki/Dynamic-Expressions and https://stefh.github.io/System.Linq.Dynamic.Core/html/144078bd-d1ad-bece-4daa-7fdd3a7ed7dc.htm
+    title: Query Request
+    properties:
+      skip:
+        description: The number of resources to skip.
+        type: integer
+        format: int64
+        default: 0
+        minimum: 0
+        example: 100
+      take:
+        description: The number of resources to return. The maximum value is 1000.
+        type: integer
+        format: int64
+        minimum: 0
+        maximum: 1000
+        example: 100
+      filter:
+        type: string
+        example: connected.data.state==""CONNECTED""
+        description: >-
+          The filter criteria for jobs or systems. Consists of a string of queries composed using AND/OR operators.
+          String values and date strings need to be enclosed in double quotes.
+          Parenthesis can be used around filters to better define the order of operations.
+
+          Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+
+
+          Operators:
+
+          - Equals operator '='. Example: 'x = y'
+
+          - Not equal operator '!='. Example: 'x != y'
+
+          - Greater than operator '>'. Example: 'x > y'
+
+          - Greater than or equal operator '>='. Example: 'x >= y'
+
+          - Less than operator '<'. Example: 'x < y'
+
+          - Less than or equal operator '<='. Example: 'x <= y'
+
+          - Logical AND operator 'and' or '&&'. Example: 'x and y'
+
+          - Logical OR operator 'or' or '||'. Example: 'x or y'
+
+          - Contains operator '.Contains()', used to check if a list contains an element. Example: 'x.Contains(y)'
+
+          - Not Contains operator '!.Contains()', used to check if a list does not contain an element. Example: '!x.Contains(y)'
+
+
+          Valid job properties that can be used in the filter:
+
+          - jid : String representing the ID of the job.
+
+          - id : String representing the ID of the system.
+
+          - createdTimestamp: ISO-8601 formatted timestamp string specifying the date when the job was created.
+
+          - lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the job was updated.
+
+          - dispatchedTimestamp: ISO-8601 formatted timestamp string specifying the date when the job was actually sent to the system.
+
+          - state: String representing the state of the job.
+
+          - metadata: Object containg the the metadata of job. Example: metadata.queued
+
+          - config.user: String representing the user who created the job.
+
+          - config.tgt: List of strings representing the targeted systems. Example: config.tgt.Contains(""id"")
+
+          - config.fun: List of strings representing the functions to be executed within the job. Example: config.fun.Contains(""nisysmgmt.set_blackout"")
+
+          - config.arg: An array of arrays of variable type elements that are arguments to the function specified by the "fun" property. Example: config.arg[0].Contains(""test"")
+
+          - result.return: An array of objects representing return values for each executed function. Example:
+            result.return[0].Contains(""Success"")
+
+          - result.retcode: An array of integers representing code values for each executed function. Example: result.retcode
+
+          - result.success: An array of booleans representing success values for each executed function. Example:
+            result.success.Contains(false)
+
+          Valid system properties that can be used in the filter:
+
+          - id : String representing the ID of the system.
+
+          - createdTimestamp: ISO-8601 formatted timestamp string specifying the date when the system was registered.
+
+          - lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system was updated.
+
+          - alias: String representing the alias of the system.
+
+          - activation.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system activation was updated.
+
+          - activation.data.activated: Boolean representing whether the system is activated or not.
+
+          - activation.data.licenseName: String representing the name of the license.
+
+          - activation.data.licenseVersion: String representing the license version.
+
+          - connected.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system connection was updated.
+
+          - connected.data.state: String representing the state of the system.
+
+          - grains.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system grains were updated.
+
+          - grains.data: Dictionary of string to object representing general information about the system. Example: grains.data.os == ""Windows""
+
+          - packages.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system installed packages were updated.
+
+          - packages.data: Dictionary representing software packages installed on the system. Example: packages.data.ni-package-manager-upgrader.version: String representing the installed version of ni-package-manager-upgrader package.
+
+          - feeds.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system configured feeds were updated.
+
+          - feeds.data: Dictionary representing the feeds configured on the system.
+
+          - sysapi.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system sysapi data was updated.
+
+          - sysapi.data: Dictionary representing system API information of a system.
+
+          - groups.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system groups data was updated.
+
+          - groups.data: Array of strings representing the IDs of the groups the system is assigned to. Example: groups.data.Contains(""id"")
+
+          - keywords.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system keywords were updated.
+
+          - keywords.data: Array of strings representing the keywords of the system. Example: keywords.data.Contains(""test"")
+
+          - properties.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system properties were updated.
+
+          - properties.data: Dictionary of string to string representing metadata information about a system. Example: properties.data.owner == ""admin""
+      projection:
+        type: string
+        example: 'new(id,grains,lastUpdatedTimestamp)'
+        description: Specifies the projection for resources. This field can be used if we don't want to receive the entire model but only certain properties of the model.  
+      orderBy:
+        type: string
+        example: 'lastUpdatedTimestamp descending'
+        description: The order in which data returns.
+
+  QueryResponse:
+    description: Response of a query request.
+    title: Query Response
+    properties:
+      data:
+        description: The data returned by query.
+        type: array
+        items:
+          type: object
+        example:
+          - jid: '20190211135234448026_28320'
+      count:
+        description: The total number of resources that matched the query.
+        type: integer
+        format: int64
+        example: 1
+    required: [data, count]
+
+paths:
+  /:
+    get:
+      operationId: HandleGetVersionInfo
+      x-ni-request-all-privileges: true
+      summary: API information
+      tags: [versioning]
+      security: []
+      description: Gets permissions and operations for the Systems Management Service.
+      responses:
+        200:
+          description: OK.
+          schema:
+            description: Version information.
+            title: RootEndpointResponse
+            type: object
+            properties:
+              v1:
+                $ref: '#/definitions/V1Operations'
+              version:
+                description: The implementation version of the web service.
+                type: string
+        default:
+            $ref: '#/responses/Error'
+  /{version}:
+    get:
+      operationId: RootEndpointWithVersion
+      x-ni-request-all-privileges: true
+      summary: API version information
+      description: Returns available operations for a single version of the API.
+      tags: [versioning]
+      security: []
+      parameters:
+        - in: path
+          name: version
+          description: The version of the API to retrieve operations.
+          x-example: v1
+          type: string
+          required: true
+      responses:
+        200:
+          description: OK.
+          schema:
+            $ref: '#/definitions/V1Operations'
+        404:
+          description: Not Found.
+        default:
+            $ref: '#/responses/Error'
+  /v1/jobs:
+    post:
+      operationId: CreateJob
+      x-ni-privilege: Write
+      x-ni-operation: createOrCancelJobs
+      tags: [jobs]
+      summary: Create a job
+      description: Create a job and returns the newly created job including the job ID.
+      parameters:
+        - in: body
+          name: CreateJobRequest
+          required: true
+          description: The definition of job to be executed.
+          schema:
+            $ref: '#/definitions/CreateJobRequest'
+      responses:
+        201:
+          description: Created
+          schema:
+            $ref: '#/definitions/CreateJobResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    get:
+      operationId: GetJobs
+      x-ni-privilege: Read
+      x-ni-operation: getJobs
+      tags: [jobs]
+      summary: Get jobs
+      description: Get jobs from the jobs cache.
+      parameters:
+        - in: query
+          name: jid
+          description: A string defining the job ID.
+          type: string
+          x-example: '20190211135234448026_28320'
+        - in: query
+          name: state
+          description: A string defining the job state.
+          type: string
+          x-example: Succeeded
+        - in: query
+          name: fun
+          description: A string defining the function executed by the job.
+          type: string
+          x-example: test.ping
+        - in: query
+          name: systemId
+          description: A string defining the system ID.
+          type: string
+          x-example: VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
+      responses:
+        200:
+          description: OK.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Job'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/systems:
+    get:
+      operationId: GetSystems
+      x-ni-privilege: Read
+      x-ni-operation: getSystems
+      tags: [systems]
+      summary: Get systems information
+      description: Get the systems information cached on the server.
+      parameters:
+        - in: query
+          name: id
+          description: A string defining the system ID.
+          type: string
+          x-example: VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
+      responses:
+        200:
+          description: OK.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ManagedSystem'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/register-systems:
+    post:
+      operationId: RegisterSystems
+      x-ni-privilege: Write
+      x-ni-operation: manageSystems
+      tags: [systems]
+      summary: Register systems
+      description: Make a request to register systems. This is an asynchronous request. A successful status code informs that the request has been acknowledged and not that all the registration procedures have completed successfully.
+      parameters:
+        - in: body
+          name: RegisterRequest
+          description: Registration information.
+          required: true
+          schema:
+            $ref: '#/definitions/RegisterSystemsRequest'
+      responses:
+        200:
+          description: OK.
+          schema:
+            $ref: '#/definitions/RegisterSystemsResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        400:
+          $ref: '#/responses/BadRequest'
+        default:
+          $ref: '#/responses/Error'
+  /v1/remove-systems:
+    post:
+      operationId: UnregisterSystems
+      x-ni-privilege: Write
+      x-ni-operation: manageSystems
+      tags: [systems]
+      summary: Unregister Systems
+      description: Request to unregister systems.
+      parameters:
+        - in: body
+          name: UnregisterSystemsRequest
+          description: Request data to unregister systems.
+          required: true
+          schema:
+            $ref: '#/definitions/UnregisterSystemsRequest'
+      responses:
+        200:
+          description: OK.
+          schema:
+            $ref: '#/definitions/UnregisterSystemsResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/cancel-jobs:
+    post:
+      operationId: CancelJobs
+      x-ni-privilege: Write
+      x-ni-operation: createOrCancelJobs
+      tags: [jobs]
+      summary: Cancel jobs
+      description: Cancel jobs that are running on systems. This won't stop the jobs from executing on systems if the jobs have already been dispatched to the systems.
+      parameters:
+        - in: body
+          name: CancelJobsRequest
+          description: An array of pairs defining the job ID and the targeted systems.
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CancelJobRequest'
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        204:
+          description: No Content.
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/activate-systems:
+    post:
+      operationId: ActivateSystems
+      x-ni-privilege: Write
+      x-ni-operation: activateSystems
+      tags: [systems]
+      summary: Activate systems
+      description: Activate managed systems.
+      parameters:
+        - in: body
+          name: ActivateSystemsRequest
+          description: Array of system IDs to activate.
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              example: VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F9
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        204:
+          description: No Content.
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/get-discovered-systems:
+    get:
+      operationId: GetDiscoveredSystems
+      x-ni-privilege: Read
+      x-ni-operation: getSystems
+      tags: [systems]
+      summary: Get discovered systems
+      description: Get network discovered systems.
+      responses:
+        200:
+          description: OK.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SystemInfo'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/get-systems-summary:
+    get:
+      operationId: GetSystemsSummary
+      x-ni-privilege: Read
+      x-ni-operation: getSystems
+      tags: [systems]
+      summary: Get systems summary
+      description: Get the number of connected and disconnected managed systems.
+      responses:
+        200:
+          description: OK.
+          schema:
+            $ref: '#/definitions/ManagedSystemsSummary'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/get-jobs-summary:
+    get:
+      operationId: GetJobsSummary
+      x-ni-privilege: Read
+      x-ni-operation: getJobs
+      tags: [jobs]
+      summary: Get jobs summary
+      description: Get the number of active, failed, and succeeded jobs.
+      responses:
+        200:
+          description: OK.
+          schema:
+            $ref: '#/definitions/JobsSummary'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/configure-feeds:
+    post:
+      operationId: ConfigureAndUpdateMultipleFeeds
+      x-ni-privilege: Read
+      x-ni-operation: manageFeeds
+      tags: [feeds]
+      summary: Configure and update multiple feeds
+      description: Configure and update multiple feeds.
+      parameters:
+        - in: body
+          name: FeedUris
+          required: true
+          description: Feeds to be configured and updated.
+          schema:
+            type: array
+            items:
+              type: string
+              description: The URI of the feed.
+              example: 'http://download.ni.com/support/nipkg/products/ni-package-manager/released'
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        204:
+          description: No Content.
+        400:
+          $ref: '#/responses/BadRequest'
+  /v1/get-discovered-systems-summary:
+    get:
+      operationId: GetDiscoveredSystemsSummary
+      x-ni-privilege: Read
+      x-ni-operation: getSystems
+      tags: [systems]
+      summary: Get discovered systems summary
+      description: Get the number of network discovered systems. This number refers to the count of systems that are discovered and not managed.
+      responses:
+        200:
+          description: OK.
+          schema:
+            $ref: '#/definitions/DiscoveredSystemsSummary'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/get-pending-systems-summary:
+    get:
+      operationId: GetPendingSystemsSummary
+      x-ni-privilege: Read
+      x-ni-operation: getSystems
+      tags: [systems]
+      summary: Get pending systems summary
+      description: Get the number of systems that are currently pending to be added to the master but have not yet been approved by the master.
+      responses:
+        200:
+          description: OK.
+          schema:
+            $ref: '#/definitions/PendingSystemsSummary'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/generate-systems-report:
+    post:
+      operationId: GetSystemsReport
+      x-ni-privilege: Read
+      x-ni-operation: getSystems
+      tags: [systems]
+      summary: Get systems report
+      description: Get a report containing software/hardware information about the requested systems.
+      parameters:
+        - in: body
+          name: SystemsReportRequest
+          description: The type of the request followed by the list of system Ids.
+          required: true
+          schema:
+            $ref: '#/definitions/SystemsReportRequest'
+      produces:
+        - text/csv
+        - application/json
+      responses:
+        200:
+          description: OK.
+          schema:
+            description: The file data
+            type: file
+          examples:
+            application/octet-stream:
+              File data
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/create-groups:
+    post:
+      operationId: CreateGroups
+      x-ni-privilege: Write
+      x-ni-operation: createOrUpdateGroups
+      tags: [groups]
+      summary: Create groups
+      description: Create groups.
+      parameters:
+        - in: body
+          name: CreateGroupRequest
+          description: Request for creating groups.
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CreateGroupRequest'
+      responses:
+        200:
+          description: OK.
+          schema:
+            $ref: '#/definitions/CreateGroupsPartialSuccessResponse'
+        204:
+          description: No Content.
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/groups:
+    get:
+      operationId: GetGroups
+      x-ni-privilege: Read
+      x-ni-operation: getGroups
+      tags: [groups]
+      summary: Get groups
+      description: Get groups information.
+      parameters:
+        - in: query
+          name: gid
+          type: string
+          description: A group ID.
+      responses:
+        200:
+          description: OK.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/GroupInfo'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/remove-groups:
+    post:
+      operationId: RemoveGroups
+      x-ni-privilege: Write
+      x-ni-operation: createOrUpdateGroups
+      tags: [groups]
+      summary: Remove groups
+      description: Remove groups.
+      parameters:
+        - in: body
+          name: Groups
+          description: Array of strings representing group ids.
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              example: de4ccb7b-95e1-447f-a7dd-50782c3e06d6
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        204:
+          description: No Content.
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/add-systems-to-groups:
+    post:
+      operationId: AddSystemsToGroups
+      x-ni-privilege: Write
+      x-ni-operation: createOrUpdateGroups
+      tags: [groups]
+      summary: Add systems to groups
+      description: Add systems to groups.
+      parameters:
+        - in: body
+          name: SystemGroupPairs
+          description: An array of objects representing system group pairs.
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SystemGroupPair'
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        204:
+          description: No Content.
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/remove-systems-from-groups:
+    post:
+      operationId: RemoveSystemsFromGroups
+      x-ni-privilege: Write
+      x-ni-operation: createOrUpdateGroups
+      tags: [groups]
+      summary: Remove systems from groups
+      description: Remove systems from groups.
+      parameters:
+        - in: body
+          name: SystemGroupPairs
+          description: An array of objects representing system group pairs.
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SystemGroupPair'
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        204:
+          description: No Content
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/obtain-systems-info:
+    post:
+      operationId: GetSystemsInfo
+      x-ni-privilege: Read
+      x-ni-operation: getSystems
+      tags: [systems]
+      summary: Get systems info
+      description: Get information about a specific set of systems by providing their credentials.
+      parameters:
+        - in: body
+          name: SystemsCredentials
+          description: Credentials of the systems to get the information
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SystemCredentials'
+      responses:
+        200:
+          description: OK.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/GetInfoResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/get-systems-keys:
+    get:
+      operationId: GetSystemsKeys
+      x-ni-privilege: Read
+      tags: [systems]
+      x-ni-operation: getSystems
+      summary: Get systems keys
+      description: Returns the pending, denied, approved, and rejected systems keys.
+      responses:
+        200:
+          description: OK.
+          schema:
+            $ref: '#/definitions/SystemsKeys'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/manage-systems-keys:
+    post:
+      operationId: ManageSystemsKeys
+      x-ni-privilege: Write
+      x-ni-operation: manageSystems
+      tags: [systems]
+      summary: Manage systems keys
+      description: Perform actions over system keys.
+      parameters:
+        - in: body
+          name: ManageKeysRequest
+          required: true
+          description: Request indicating actions like accept, reject, delete, activate_accept to systems keys.
+          schema:
+            $ref: '#/definitions/ManageKeysRequest'
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        204:
+          description: No Content
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/systems/managed/{id}:
+    patch:
+      operationId: UpdateMetadata
+      x-ni-privilege: Write
+      x-ni-operation: updateSystemMetadata
+      consumes:
+        - application/merge-patch+json
+      tags: [systems]
+      summary: Update system metadata
+      description: Update keywords or properties of a system.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the system to be updated.
+          required: true
+          type: string
+          x-example: VMware_Virtual_Platform--SN-VMware-56_4d_30_26_4f_c9_5c_05-b7_68_d1_cd_99_6e_22_16--MAC-02-01-02-03-04-08
+        - in: body
+          name: SystemPatchRequest
+          required: true
+          description: The new metadata associated with this system.
+          schema:
+            $ref: '#/definitions/SystemPatchRequest'
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        204:
+          description: No Content
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/query-available-packages:
+    post:
+      operationId: GetAvailablePackagesByQuery
+      x-ni-privilege: Read
+      x-ni-operation: manageFeeds
+      tags: [feeds]
+      summary: Get Available Packages
+      description: Get available packages for a set of system configurations. If multiple system configurations are provided, only packages available to all applicable systems are returned. If OS architectures are provided, only the package with highest priority will be returned for packages of equal version.
+      parameters:
+        - in: body
+          name: FeedsConfigurations
+          description: The configurations of the feeds.
+          required: true
+          schema:
+            $ref: '#/definitions/QueryAvailablePackagesRequest'
+      responses:
+        200:
+          description: OK.
+          schema:
+            type: array 
+            items:
+              $ref: '#/definitions/PackageResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/query-jobs:
+    post:
+      operationId: GetJobsByQuery
+      x-ni-privilege: Read
+      x-ni-operation: getJobs
+      tags: [jobs]
+      summary: Get jobs by query
+      description: Get jobs by query.
+      parameters:
+        - in: body
+          name: Query
+          description: Query for getting jobs data.
+          required: true
+          x-example:
+            skip: 100
+            take: 100
+            filter: 'id == ""VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5""'
+            projection: 'new(jid,id,lastUpdatedTimestamp,state,result)'
+            orderBy: 'lastUpdatedTimestamp descending'
+          schema:
+            $ref: '#/definitions/QueryRequest'
+      responses:
+        200:
+          description: OK.
+          schema:
+            $ref: '#/definitions/QueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'          
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/query-systems:
+    post:
+      operationId: GetSystemsByQuery
+      x-ni-privilege: Read
+      x-ni-operation: getSystems
+      tags: [systems]
+      summary: Get systems by query.
+      description: Get systems by query.
+      parameters:
+        - in: body
+          name: Query
+          description: Query for getting systems data.
+          required: true
+          x-example:
+            skip: 10
+            take: 10
+            filter: 'connected.data.state == ""CONNECTED"" && grains.data.os == ""Windows""'
+            projection: 'new(id,lastUpdatedTimestamp,connected,packages)'
+            orderBy: 'connected.data.state'
+          schema:
+            $ref: '#/definitions/QueryRequest'
+      responses:
+        200:
+          description: OK.
+          schema:
+            $ref: '#/definitions/QueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'          
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
