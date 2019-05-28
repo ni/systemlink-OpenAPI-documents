@@ -374,7 +374,7 @@ definitions:
         type: string
         example: admin
       product:
-        description: The type of device under test. Added in version 2.
+        description: The type of device under test.
         type: string
         example: cRIO-9030
       fileIds:
@@ -433,7 +433,7 @@ definitions:
         type: string
         example: admin
       product:
-        description: The type of device under test. Added in version 2.
+        description: The type of device under test.
         type: string
         example: cRIO-9030
       serialNumber:
@@ -522,7 +522,7 @@ definitions:
         type: string
         example: admin
       product:
-        description: The type of device under test. Added in version 2.
+        description: The type of device under test.
         type: string
         example: cRIO-9030
       fileIds:
@@ -575,7 +575,7 @@ definitions:
         example:
           - 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
       products:
-        description: Array of products. Added in version 2.
+        description: Array of products.
         type: array
         items:
           type: string
@@ -1501,7 +1501,7 @@ paths:
             $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
         - in: query
           name: updateResultTotalTime
-          description: Determine test result total time from the test step total times. Added in version 2.
+          description: Determine test result total time from the test step total times.
           type: boolean
           default: false
       responses:
@@ -1528,7 +1528,7 @@ paths:
             $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
         - in: query
           name: updateResultTotalTime
-          description: Determine test result total time from the test step total times. Added in version 2.
+          description: Determine test result total time from the test step total times.
           type: boolean
           default: false
       responses:
@@ -1562,7 +1562,7 @@ paths:
           required: true
         - in: query
           name: updateResultTotalTime
-          description: Determine test result total time from the test step total times. Added in version 2.
+          description: Determine test result total time from the test step total times.
           type: boolean
           default: false
       responses:
@@ -1590,7 +1590,7 @@ paths:
             $ref: '#/definitions/TestStepsDeleteRequest'
         - in: query
           name: updateResultTotalTime
-          description: Determine test result total time from the test step total times. Added in version 2.
+          description: Determine test result total time from the test step total times.
           type: boolean
           default: false
       responses:
