@@ -93,32 +93,40 @@ definitions:
     type: object
     properties:
       operations:
-        description: >-
-          Available operations in the v1 version of the API:
-          - getResults: The ability to get test results
-
-          - queryResults: The ability to query test results
-
-          - createResults: The ability to create test results
-
-          - updateResults: The ability to update test results
-
-          - deleteResult: The ability to delete test results
-
-          - deleteManyResults: The ability to delete multiple test results
-
-          - getSteps: The ability to get test steps
-
-          - querySteps: The ability to query test steps
-
-          - createSteps: The ability to create test steps
-
-          - updateSteps: The ability to update test steps
-
-          - deleteStep: The ability to delete test steps
-
-          - deleteManySteps: The ability to delete multiple test steps
-
+        description: Available operations in the v1 version of the API.
+        type: object
+        properties:
+          getResults:
+            $ref: '#/definitions/Operation'
+          queryResults:
+            $ref: '#/definitions/Operation'
+          createResults:
+            $ref: '#/definitions/Operation'
+          updateResults:
+            $ref: '#/definitions/Operation'
+          deleteResult:
+            $ref: '#/definitions/Operation'
+          deleteManyResults:
+            $ref: '#/definitions/Operation'
+          getSteps:
+            $ref: '#/definitions/Operation'
+          querySteps:
+            $ref: '#/definitions/Operation'
+          createSteps:
+            $ref: '#/definitions/Operation'
+          updateSteps:
+            $ref: '#/definitions/Operation'
+          deleteStep:
+            $ref: '#/definitions/Operation'
+          deleteManySteps:
+            $ref: '#/definitions/Operation'
+  V2Operations:
+    title: V2 Operations
+    description: V2 operations
+    type: object
+    properties:
+      operations:
+        description: Available operations in the v2 version of the API.
         type: object
         properties:
           getResults:
@@ -1142,21 +1150,17 @@ paths:
             properties:
               v1:
                 $ref: '#/definitions/V1Operations'
+              v2:
+                $ref: '#/definitions/V2Operations'
               version:
                 description: Implementation version of the web service
                 type: string
-  /{version}:
-    parameters:
-      - in: path
-        name: version
-        description: Version of the API to retrieve operations.
-        type: string
-        required: true
+  /v1:
     get:
       tags: [versioning]
-      summary: API version information
-      description: Returns available operations for a single version of the API.
-      operationId: RootEndpointWithVersion
+      summary: API version 1 information
+      description: Returns available operations for version 1 of the API.
+      operationId: RootEndpointV1
       x-ni-request-all-privileges: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
@@ -1166,6 +1170,25 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/V1Operations'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+  /v2:
+    get:
+      tags: [versioning]
+      summary: API version 2 information
+      description: Returns available operations for version 2 of the API.
+      operationId: RootEndpointV2
+      x-ni-request-all-privileges: true
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/V2Operations'
         404:
           description: Not Found
           schema:
