@@ -1043,7 +1043,6 @@ responses:
       type: object
       required:
         - results
-        - totalCount
       properties:
         results:
           description: Array of test results
@@ -1051,7 +1050,9 @@ responses:
           items:
             $ref: '#/definitions/TestResultResponseObject'
         totalCount:
-          description: Number of matching test results
+          description: >-
+            The number of matching test results, if returnCount is true.
+            This value is not present if returnCount is false.
           type: integer
           format: int64
   StepsSuccessResponse:
@@ -1099,7 +1100,6 @@ responses:
       type: object
       required:
         - steps
-        - totalCount
       properties:
         steps:
           description: Array of test steps
@@ -1107,7 +1107,9 @@ responses:
           items:
             $ref: '#/definitions/TestStepResponseObject'
         totalCount:
-          description: Number of matching test steps
+          description: >-
+            The number of matching test steps, if returnCount is true.
+            This value is not present if returnCount is false.
           type: integer
           format: int64
   StepsDeletePartialSuccessResponse:
@@ -1232,6 +1234,13 @@ paths:
           format: int32
           default: 1000
           minimum: 0
+        - in: query
+          name: returnCount
+          description: >-
+            Whether to return the total number of results which match the
+            provided filter, disregarding the take value.
+          type: boolean
+          default: false
       responses:
         200:
           $ref: '#/responses/ResultsQueryResponse'
@@ -1247,7 +1256,6 @@ paths:
       operationId: get-results
       x-ni-operation: getResults
       x-ni-privilege: Read
-      x-ni-oldest-compatible-version: 1
       parameters:
         - in: query
           name: skip
@@ -1261,6 +1269,13 @@ paths:
           format: int32
           default: -1
           minimum: -1
+        - in: query
+          name: returnCount
+          description: >-
+            Whether to return the total number of results,
+            disregarding the take value.
+          type: boolean
+          default: false
       responses:
         200:
           $ref: '#/responses/ResultsQueryResponse'
@@ -1448,6 +1463,13 @@ paths:
           format: int32
           default: 1000
           minimum: 0
+        - in: query
+          name: returnCount
+          description: >-
+            Whether to return the total number of steps which match the
+            provided filter, disregarding the take value.
+          type: boolean
+          default: false
       responses:
         200:
           $ref: '#/responses/StepsQueryResponse'
@@ -1463,7 +1485,6 @@ paths:
       operationId: get-steps
       x-ni-operation: getSteps
       x-ni-privilege: Read
-      x-ni-oldest-compatible-version: 1
       parameters:
         - in: query
           name: skip
@@ -1477,6 +1498,13 @@ paths:
           format: int32
           default: -1
           minimum: -1
+        - in: query
+          name: returnCount
+          description: >-
+            Whether to return the total number of results,
+            disregarding the take value.
+          type: boolean
+          default: false
       responses:
         200:
           $ref: '#/responses/StepsQueryResponse'
@@ -1617,6 +1645,35 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+  /v1/results:
+    get:
+      tags: [deprecated]
+      summary: Gets test results
+      description: Gets a list of test results.
+      operationId: get-results-v1
+      x-ni-operation: getResults
+      x-ni-privilege: Read
+      deprecated: true
+      parameters:
+        - in: query
+          name: skip
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          type: integer
+          format: int32
+          default: -1
+          minimum: -1
+      responses:
+        200:
+          $ref: '#/responses/ResultsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v1/query-results:
     post:
       tags: [deprecated]
@@ -1648,6 +1705,35 @@ paths:
       responses:
         200:
           $ref: '#/responses/ResultsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/steps:
+    get:
+      tags: [deprecated]
+      summary: Gets test steps
+      description: Gets a list of test steps.
+      operationId: get-steps-v1
+      x-ni-operation: getSteps
+      x-ni-privilege: Read
+      deprecated: true
+      parameters:
+        - in: query
+          name: skip
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          type: integer
+          format: int32
+          default: -1
+          minimum: -1
+      responses:
+        200:
+          $ref: '#/responses/StepsQueryResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
