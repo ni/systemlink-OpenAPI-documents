@@ -810,9 +810,13 @@ paths:
       parameters:
         - in: formData
           name: file
-          description: The file to upload. May be specified multiple times.
+          description: The file to upload.
           type: file
           required: true
+        - in: formData
+          name: metadata
+          description: JSON Dictionary with key/value pairs
+          type: string
       responses:
         201:
           description: OK
