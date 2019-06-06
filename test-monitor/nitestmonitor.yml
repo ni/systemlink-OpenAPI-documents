@@ -215,6 +215,8 @@ definitions:
       - PROPERTIES
       - FILE_IDS
       - STATUS_TYPE_SUMMARY
+    example:
+      PROGRAM_NAME
   StepField:
     title: Step Field
     description: Step field enum
@@ -236,6 +238,8 @@ definitions:
       - OUTPUTS
       - DATA_MODEL
       - DATA
+    example:
+      STEP_TYPE
   ResultSortDefinitionObject:
     title: Result Sort Definition
     description: Defines the field and direction for sorting test results.
@@ -640,12 +644,12 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/ResultSortDefinitionObject'
-  AdvancedQuery:
-    title: Advanced Query Object for Test Data
+  ResultsAdvancedQuery:
+    title: Advanced Query Object for Test Results
     type: object
     properties:
       filter:
-        description: The query filter, in Dynamic Linq
+        description: The query filter in Dynamic Linq
         type: string
         example: (operator == "user1") || ((programName != "MyProgram") && (totalTimeInSeconds < @0))
       substitutions:
@@ -660,6 +664,58 @@ definitions:
           type: object
         example:
           - 2.5
+      orderBy:
+        description: >-
+          Defines the sort ordering of the returned results. If this field is not
+          present, the returned results will not be sorted.
+        type: array
+        items:
+          $ref: '#/definitions/ResultSortDefinitionObject'
+      projection:
+        description: >-
+          Specifies the result fields to project. When a field value is given here,
+          the corresponding field will be present in all returned results, and all
+          unspecified fields will be excluded. If no projection is specified,
+          all result fields will be returned.
+        type: array
+        items:
+          $ref: '#/definitions/ResultField'
+  StepsAdvancedQuery:
+    title: Advanced Query Object for Test Steps
+    type: object
+    properties:
+      filter:
+        description: The query filter in Dynamic Linq
+        type: string
+        example: (operator == "user1") || ((programName != "MyProgram") && (totalTimeInSeconds < @0))
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding 
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
+      orderBy:
+        description: >-
+          Defines the sort ordering of the returned steps. If this field is not
+          present, the returned steps will not be sorted.
+        type: array
+        items:
+          $ref: '#/definitions/StepSortDefinitionObject'
+      projection:
+        description: >-
+          Specifies the step fields to project. When a field value is given here,
+          the corresponding field will be present in all returned steps, and all
+          unspecified fields will be excluded. If no projection is specified,
+          all step fields will be returned.
+        type: array
+        items:
+          $ref: '#/definitions/StepField'
   StepIdResultIdPair:
     title: Step Id / Result Id Pair
     type: object
@@ -1211,7 +1267,7 @@ paths:
           description: Query filter
           required: false
           schema:
-            $ref: '#/definitions/AdvancedQuery'
+            $ref: '#/definitions/ResultsAdvancedQuery'
         - in: query
           name: skip
           description: >-
@@ -1440,7 +1496,7 @@ paths:
           description: Query filter
           required: false
           schema:
-            $ref: '#/definitions/AdvancedQuery'
+            $ref: '#/definitions/StepsAdvancedQuery'
         - in: query
           name: skip
           description: >-
