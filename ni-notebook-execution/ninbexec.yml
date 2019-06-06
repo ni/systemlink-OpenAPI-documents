@@ -212,10 +212,6 @@ definitions:
       - PATH
       - CREATED_AT
       - UPDATED_AT
-    type: string 
-    enum:
-      - HTML
-      - PDF
   NotebookSortDefinitionObject:
     title: Notebook Sort Definition
     description: Defines the field and direction for sorting notebooks.
