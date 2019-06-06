@@ -407,8 +407,6 @@ definitions:
         format: int32
         default: 86400
         example: 3600
-      exportFormat:
-        $ref: '#/definitions/NotebookExportFormat'
   ExecutionHashInformation:
     title: Execution Hash Information
     description: >-
