@@ -128,10 +128,6 @@ definitions:
     type: object
     title: Http Historical Value
     properties:
-      path:
-        description: The path of the tag corresponding to the historical value.
-        type: string
-        example: system1.tag1
       value:
         description: The value of the tag at the time it was written, converted to a string.
         type: string
@@ -209,31 +205,37 @@ definitions:
         type: string
         format: iso-date-time
         example: '2019-03-13T09:51:38Z'
+  TypeAndValues:
+    type: object
+    title: TypeAndValues
+    properties:
+      type:
+        description: The type of the values
+        type: string
+        enum: [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
+      values:
+        description: The values, encoded as strings
+        type: array
+        items:
+          $ref: '#/definitions/HttpHistoricalValue'
   TagHistorianValues:
     type: object
     title: Tag Historian Values
     properties:
-      values:
-        description: An object containing the historical value for the requested tag if it was
-          successfully queried. The object's property name is the tag path.
+      results:
+        description: An object containing the historical values for each requested tag that
+          was successfully queried. The object's property names correspond to a tag path.
         type: object
         additionalProperties:
-          type: array
-          items:
-            $ref: '#/definitions/HistoricalValue'
+          $ref: '#/definitions/TypeAndValues'
         example:
           system1.tag1:
-            - path: system1.tag1
-              value: '12.87'
-              timestamp: '2019-03-13T09:51:38Z'
-      tagTypes:
-          description: Dictionary mapping tag paths to their types. Useful for determining the types
-                  associated with the values returned in the response.
-          type: object
-          additionalProperties:
-            type: string
-          example:
-            tag1: DOUBLE
+            type: DOUBLE
+            values:
+              - value: '12.87'
+                timestamp: '2019-03-13T09:51:38Z'
+              - value: '3.2'
+                timestamp: '2019-03-14T09:51:38Z'
       errors:
         description: This value is always null.
         type: object
@@ -516,7 +518,7 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/Error'
-  /v1/tags/query-history:
+  /v2/tags/query-history:
     post:
       tags: [history]
       summary: Read historical tag values
@@ -525,7 +527,6 @@ paths:
       x-ni-operation: queryHistoricalTagValues
       produces:
         - application/json
-        - text/csv
       parameters:
         - in: body
           name: Request body
@@ -536,15 +537,11 @@ paths:
             type: object
             title: Http Query Request Body
             properties:
-              paths:
-                description: One or more paths identifying the tags whose historical values should
+              path:
+                description: A tag path identifying the tag whose historical values should
                   be returned.
-                type: array
-                items:
-                  type: string
-                example:
-                  - system1.tag1
-                  - system2.tag1
+                type: string
+                example: system1.tag1
               startTime:
                 description: Limits the returned historical values to those written at or after at the
                   given time in ISO-6801 format.
@@ -576,47 +573,19 @@ paths:
                 type: string
                 enum: [ASCENDING, DESCENDING]
                 default: ASCENDING
-              responseFormat:
-                description: The data format for the returned historical values. The values can
-                  either be returned as a JSON document (default) or comma-separated values.
-                type: string
-                enum: [JSON, CSV]
-                default: JSON
       responses:
         200:
           description: OK
           schema:
             type: object
             title: Http Query Response Body
+            allOf:
+              - $ref: '#/definitions/TypeAndValues'
             properties:
-              values:
-                description: An object containing the historical values for each requested tag that
-                  was successfully queried. The object's property names correspond to a tag path.
-                type: object
-                additionalProperties:
-                  type: array
-                  items:
-                    $ref: '#/definitions/HttpHistoricalValue'
-                example:
-                  system1.tag1:
-                    - path: system1.tag1
-                      value: '12.87'
-                      timestamp: '2019-03-13T09:51:38Z'
-                    - path: system1.tag1
-                      value: '3.2'
-                      timestamp: '2019-03-14T09:51:38Z'
               continuationToken:
                 description: For non-decimated queries, a value generated by the server which should be sent
                   in the next request to retrieve the next page of values.
                 type: string
-              tagTypes:
-                description: Dictionary mapping tag paths to their types. Useful for determining the types
-                  associated with the values returned in the response.
-                type: object
-                additionalProperties:
-                  type: string
-                example:
-                  tag1: DOUBLE
               errors:
                 $ref: '#/definitions/ErrorEntry'
               failed:
@@ -629,7 +598,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/tags/query-decimated-history:
+  /v2/tags/query-decimated-history:
     post:
       tags: [history]
       summary: Read decimated historical tag values
@@ -638,7 +607,6 @@ paths:
       x-ni-operation: queryDecimatedHistoricalTagValues
       produces:
         - application/json
-        - text/csv
       parameters:
         - in: body
           name: Request body
@@ -684,12 +652,6 @@ paths:
                 type: string
                 enum: [ASCENDING, DESCENDING]
                 default: ASCENDING
-              responseFormat:
-                description: The data format for the returned historical values. The values can
-                  either be returned as a JSON document (default) or comma-separated values.
-                type: string
-                enum: [JSON, CSV]
-                default: JSON
       responses:
         200:
           description: OK
@@ -697,34 +659,20 @@ paths:
             type: object
             title: Http Query Response Body
             properties:
-              values:
+              results:
                 description: An object containing the historical values for each requested tag that
                   was successfully queried. The object's property names correspond to a tag path.
                 type: object
                 additionalProperties:
-                  type: array
-                  items:
-                    $ref: '#/definitions/HttpHistoricalValue'
+                  $ref: '#/definitions/TypeAndValues'
                 example:
                   system1.tag1:
-                    - path: system1.tag1
-                      value: '12.87'
-                      timestamp: '2019-03-13T09:51:38Z'
-                    - path: system1.tag1
-                      value: '3.2'
-                      timestamp: '2019-03-14T09:51:38Z'
-              continuationToken:
-                description: For non-decimated queries, a value generated by the server which should be sent
-                  in the next request to retrieve the next page of values.
-                type: string
-              tagTypes:
-                description: Dictionary mapping tag paths to their types. Useful for determining the types
-                  associated with the values returned in the response.
-                type: object
-                additionalProperties:
-                  type: string
-                example:
-                  tag1: DOUBLE
+                    type: DOUBLE
+                    values:
+                      - value: '12.87'
+                        timestamp: '2019-03-13T09:51:38Z'
+                      - value: '3.2'
+                        timestamp: '2019-03-14T09:51:38Z'
               errors:
                 $ref: '#/definitions/ErrorEntry'
               failed:
@@ -737,7 +685,42 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/tags/delete-values-by-range:
+  /v2/tags/download-csv:
+    post:
+      tags: [history]
+      summary: Download the undecimated data of one or more tags to a CSV file
+      description: Downloads the undecimated of one or more tags to a single CSV file.
+        The conents of the file are streamed.
+      operationId: DownloadCsv
+      x-ni-operation: downloadCsv
+      produces:
+        - text/csv
+      parameters:
+        - in: body
+          name: Request body
+          required: true
+          description: Contains the paths of the tags whose data should be downloaded
+          schema:
+            description: Contains the paths of the tags whose data should be downloaded
+            type: object
+            title: Tag Historian Download Csv Request
+            properties:
+              paths:
+                description: The paths whose data should be downloaded
+                type: array
+                items:
+                  type: string
+                example:
+                  - tag1
+                  - tag2
+      responses:
+        200:
+          description: OK
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/delete-values-by-range:
     post:
       tags: [history]
       summary: Deletes a range of historical values
@@ -787,7 +770,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/tags/flush-values:
+  /v2/tags/flush-values:
     post:
       tags: [utility]
       summary: Process buffered tag updates
@@ -802,7 +785,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/websocket:
+  /v2/websocket:
     get:
       tags:
         - web socket
