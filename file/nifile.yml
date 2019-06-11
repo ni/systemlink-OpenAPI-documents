@@ -580,7 +580,7 @@ paths:
       description: Deletes the file indicated by the resource ID.
       operationId: Delete
       x-ni-operation: deleteFiles
-      x-ni-privilege: ModifyFiles
+      x-ni-privilege: DeleteFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       responses:
         204:
@@ -694,7 +694,7 @@ paths:
         an array of file ids to delete.
       operationId: DeleteMultiple
       x-ni-operation: deleteFiles
-      x-ni-privilege: ModifyFiles
+      x-ni-privilege: DeleteFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       parameters:
         - in: body
