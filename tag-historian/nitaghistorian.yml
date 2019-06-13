@@ -770,9 +770,9 @@ paths:
   /v2/tags/export-history:
     post:
       tags: [history]
-      summary: Download the undecimated data of one or more tags to a CSV file
-      description: Downloads the undecimated of one or more tags to a single CSV file.
-        The conents of the file are streamed.
+      summary: Exports the undecimated data of one or more tags
+      description: Exports the undecimated data of one or more tags. If "CSV" is specified as the responseFormat,
+        the data is streamed as a single CSV file.
       operationId: ExportHistory
       x-ni-operation: exportHistory
       produces:
@@ -781,14 +781,14 @@ paths:
         - in: body
           name: Request body
           required: true
-          description: Contains the paths of the tags whose data should be downloaded
+          description: Contains the paths of the tags whose data should be exported
           schema:
-            description: Contains the paths of the tags whose data should be downloaded
+            description: Contains the paths of the tags whose data should be exported
             type: object
             title: Tag Historian Export History Request
             properties:
               paths:
-                description: The paths whose data should be downloaded
+                description: The paths whose data should be exported
                 type: array
                 items:
                   type: string
