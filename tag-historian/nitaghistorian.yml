@@ -767,14 +767,14 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v2/tags/download-csv:
+  /v2/tags/export-history:
     post:
       tags: [history]
       summary: Download the undecimated data of one or more tags to a CSV file
       description: Downloads the undecimated of one or more tags to a single CSV file.
         The conents of the file are streamed.
-      operationId: DownloadCsv
-      x-ni-operation: downloadCsv
+      operationId: ExportHistory
+      x-ni-operation: exportHistory
       produces:
         - text/csv
       parameters:
@@ -785,7 +785,7 @@ paths:
           schema:
             description: Contains the paths of the tags whose data should be downloaded
             type: object
-            title: Tag Historian Download Csv Request
+            title: Tag Historian Export History Request
             properties:
               paths:
                 description: The paths whose data should be downloaded
@@ -795,6 +795,11 @@ paths:
                 example:
                   - tag1
                   - tag2
+              responseFormat:
+                description: The format of the response. Currently only supports "CSV"
+                type: string
+                enum: [CSV]
+                default: CSV
       responses:
         200:
           description: OK
