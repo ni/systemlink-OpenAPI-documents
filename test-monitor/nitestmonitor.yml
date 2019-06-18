@@ -224,7 +224,6 @@ definitions:
     enum:
       - NAME
       - STEP_TYPE
-      - ID
       - STEP_ID
       - PARENT_ID
       - RESULT_ID
