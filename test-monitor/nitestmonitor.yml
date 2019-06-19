@@ -153,6 +153,8 @@ definitions:
             $ref: '#/definitions/Operation'
           deleteManySteps:
             $ref: '#/definitions/Operation'
+          createProducts:
+            $ref: '#/definitions/Operation'
   StatusObject:
     title: Status Object
     description: Status object comprised of a type and display name
@@ -335,6 +337,84 @@ definitions:
         type: integer
         format: int32
         example: 30
+  ProductRequestObject:
+    title: Product Request
+    type: object
+    properties:
+      partNumber:
+        description: The part number associated with the product
+        type: string
+        example: 123-abc
+      name:
+        description: The product's name
+        type: string
+        example: cRIO-9030
+      family:
+        description: The product's family
+        type: string
+        example: cRIO
+      keywords:
+        description: Words or phrases associated with the product
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      properties:
+        description: Key-value pairs associated with the product
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      fileIds:
+        description: Array of file IDs attached to the product
+        type: array
+        items:
+          type: string
+        example: [5ccb19ce5aa0a3348872c3e3]
+  ProductResponseObject:
+    title: Product Response
+    type: object
+    properties:
+      id:
+        description: ID of the product
+        type: string
+        example: 0365cee9-0e5d-4802-b0f6-9fedb8f08800
+      partNumber:
+        description: The part number associated with the product
+        type: string
+        example: 1A0CF15
+      name:
+        description: The product's name
+        type: string
+        example: 156502A-11L
+      family:
+        description: The product's family
+        type: string
+        example: cRIO
+      keywords:
+        description: Words or phrases associated with the product
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      properties:
+        description: Key-value pairs associated with the product
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      fileIds:
+        description: Array of file IDs attached to the product
+        type: array
+        items:
+          type: string
+        example: [5ccb19ce5aa0a3348872c3e3]
   TestResultRequestObject:
     title: Test Result Request
     type: object
@@ -1030,6 +1110,43 @@ responses:
       WWW_Authenticate:
         description: Information for how to authenticate
         type: string
+  ProductsSuccessResponse:
+    description: Products Success Response
+    schema:
+      description: Products Success Response
+      title: ProductsSuccessResponse
+      type: object
+      required:
+        - products
+      properties:
+        products:
+          description: Array of products
+          type: array
+          items:
+            $ref: '#/definitions/ProductResponseObject'
+  ProductsPartialSuccessResponse:
+    description: Products Partial Success Response
+    schema:
+      description: Products Partial Success Response
+      title: ProductsPartialSuccessResponse
+      type: object
+      required:
+        - products
+        - failed
+        - error
+      properties:
+        products:
+          description: Array of products
+          type: array
+          items:
+            $ref: '#/definitions/ProductResponseObject'
+        failed:
+          description: Array of product requests that failed
+          type: array
+          items:
+            $ref: '#/definitions/ProductRequestObject'
+        error:
+          $ref: '#/definitions/Error'
   ResultsSuccessResponse:
     description: Test Results Success Response
     schema:
@@ -1250,6 +1367,40 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/Error'
+  /v2/products:
+    post:
+      tags: [products]
+      summary: Creates new products
+      description: Creates new products from the supplied models. The server automatically generates the product ids.
+      operationId: create-products
+      x-ni-operation: createProducts
+      x-ni-privilege: Write
+      parameters:
+        - in: body
+          name: requestBody
+          description: Product object
+          required: true
+          schema:
+            description: Array of products to create
+            title: CreateProductsRequest
+            type: object
+            required:
+              - products
+            properties:
+              products:
+                description: Array of products to create
+                type: array
+                items:
+                  $ref: '#/definitions/ProductRequestObject'
+      responses:
+        200:
+          $ref: '#/responses/ProductsPartialSuccessResponse'
+        201:
+          $ref: '#/responses/ProductsSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v2/query-results:
     post:
       tags: [results]
