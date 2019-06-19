@@ -307,6 +307,11 @@ definitions:
         description: AlarmId query. The service will return alarm instances whose *alarmId* fields are equal
           to the query, taking case into account.
         example: System.Health.DiskSpaceLow.Bdd9u!4aMd!$pYrf*CnaIZ2tbu$-Ct%?
+      description:
+        type: string
+        description: Description query. The service will return alarm instances whose *description* fields
+          contain the description query string, without taking case into account.
+        example: Disk usage
       displayName:
         type: string
         description: Display name query. The service will return alarm instances whose *displayName* fields
@@ -378,6 +383,11 @@ definitions:
         description: Channel query. The service will return instances whose *channel* fields are equal to the
           query, taking case into account. Supports wildcard match checking with glob-style wildcards.
         example: '*.System.Health.DiskSpaceUsePercentage'
+      resourceType:
+        type: string
+        description: Resource type query. The service will return instances whose *resourceType* fields are
+          equal to the query, taking case into account.
+        example: Tag
       properties:
         type: object
         description: Property query. The service will return instances whose *properties* fields contain all
