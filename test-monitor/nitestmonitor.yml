@@ -153,6 +153,10 @@ definitions:
             $ref: '#/definitions/Operation'
           deleteManySteps:
             $ref: '#/definitions/Operation'
+          getProducts:
+            $ref: '#/definitions/Operation'
+          queryProducts:
+            $ref: '#/definitions/Operation'
           createProducts:
             $ref: '#/definitions/Operation'
   StatusObject:
@@ -197,6 +201,20 @@ definitions:
         description: The value
         type: object
         example: 1.3
+  ProductField:
+    title: Product Field
+    description: An enumeration of all fields in a Product.
+    type: string
+    enum:
+      - ID
+      - PART_NUMBER
+      - NAME
+      - FAMILY
+      - KEYWORDS
+      - PROPERTIES
+      - FILE_IDS
+    example:
+      FAMILY
   ResultField:
     title: Result Field
     description: Result field enum
@@ -241,6 +259,18 @@ definitions:
       - DATA
     example:
       STEP_TYPE
+  ProductSortDefinitionObject:
+    title: Product Sort Definition
+    description: Defines the field and direction for sorting products.
+    type: object
+    required:
+      - field
+    properties:
+      field:
+        $ref: '#/definitions/ProductField'
+      orderByDescending:
+        type: boolean
+        default: false
   ResultSortDefinitionObject:
     title: Result Sort Definition
     description: Defines the field and direction for sorting test results.
@@ -723,6 +753,42 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/ResultSortDefinitionObject'
+  ProductsAdvancedQuery:
+    title: Advanced Query Object for Products
+    type: object
+    properties:
+      filter:
+        description: The query filter in Dynamic Linq
+        type: string
+        example: (name != "cRIO-9030") && (family == @0)
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding 
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - "cRIO"
+      orderBy:
+        description: >-
+          Defines the sort ordering of the returned products. If this field is not
+          present, the returned products will not be sorted.
+        type: array
+        items:
+          $ref: '#/definitions/ProductSortDefinitionObject'
+      projection:
+        description: >-
+          Specifies the product fields to project. When a field value is given here,
+          the corresponding field will be present in all returned products, and all
+          unspecified fields will be excluded. If no projection is specified,
+          all product fields will be returned.
+        type: array
+        items:
+          $ref: '#/definitions/ProductField'
   ResultsAdvancedQuery:
     title: Advanced Query Object for Test Results
     type: object
@@ -1147,6 +1213,24 @@ responses:
             $ref: '#/definitions/ProductRequestObject'
         error:
           $ref: '#/definitions/Error'
+  ProductsQueryResponse:
+    description: Products Query Response
+    schema:
+      description: Products Query Response
+      title: ProductsQueryResponse
+      type: object
+      required:
+        - products
+      properties:
+        products:
+          description: Array of products
+          type: array
+          items:
+            $ref: '#/definitions/ProductResponseObject'
+        totalCount:
+          description: Number of matching products
+          type: integer
+          format: int64
   ResultsSuccessResponse:
     description: Test Results Success Response
     schema:
@@ -1367,7 +1451,94 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/Error'
+  /v2/query-products:
+    post:
+      tags: [products]
+      summary: Advanced Product Query
+      description: >-
+        Uses the Dynamic Linq query language to specify a filter and return
+        product. An empty request body queries all products.
+      operationId: query-products-v2
+      x-ni-operation: queryProducts
+      x-ni-privilege: Read
+      parameters:
+        - in: body
+          name: postBody
+          description: Query filter
+          required: false
+          schema:
+            $ref: '#/definitions/ProductsAdvancedQuery'
+        - in: query
+          name: skip
+          description: >-
+            The number of matching products to skip when querying.
+            For example, if the query filter matches 100 products with a skip
+            value of 50 and a take value of 25, products 51 through 75 will be
+            returned.
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          description: >-
+            The total number of products to return.
+            For example, if the query filter matches 100 products with a skip
+            value of 50 and a take value of 25, products 51 through 75 will be
+            returned.
+          type: integer
+          format: int32
+          default: 1000
+          minimum: 0
+        - in: query
+          name: returnCount
+          description: >-
+            Whether to return the total number of products which match the
+            provided filter, disregarding the take value.
+          type: boolean
+          default: false
+      responses:
+        200:
+          $ref: '#/responses/ProductsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v2/products:
+    get:
+      tags: [products]
+      summary: Gets products
+      description: Gets a list of products.
+      operationId: get-products
+      x-ni-operation: getProducts
+      x-ni-privilege: Read
+      parameters:
+        - in: query
+          name: skip
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          type: integer
+          format: int32
+          default: -1
+          minimum: -1
+        - in: query
+          name: returnCount
+          description: >-
+            Whether to return the total number of products,
+            disregarding the take value.
+          type: boolean
+          default: false
+      responses:
+        200:
+          $ref: '#/responses/ProductsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
     post:
       tags: [products]
       summary: Creates new products
