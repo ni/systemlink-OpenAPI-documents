@@ -161,6 +161,10 @@ definitions:
             $ref: '#/definitions/Operation'
           updateProducts:
             $ref: '#/definitions/Operation'
+          deleteProducts:
+            $ref: '#/definitions/Operation'
+          deleteManyProducts:
+            $ref: '#/definitions/Operation'
   StatusObject:
     title: Status Object
     description: Status object comprised of a type and display name
@@ -374,15 +378,15 @@ definitions:
     type: object
     properties:
       partNumber:
-        description: The part number associated with the product
+        description: The part number of the product
         type: string
-        example: 123-abc
+        example: 156502A-11L
       name:
-        description: The product's name
+        description: The name of the product
         type: string
         example: cRIO-9030
       family:
-        description: The product's family
+        description: The family of the product
         type: string
         example: cRIO
       keywords:
@@ -415,15 +419,15 @@ definitions:
         type: string
         example: 0365cee9-0e5d-4802-b0f6-9fedb8f08800
       partNumber:
-        description: The part number associated with the product
-        type: string
-        example: 1A0CF15
-      name:
-        description: The product's name
+        description: The part number of the product
         type: string
         example: 156502A-11L
+      name:
+        description: The name of the product
+        type: string
+        example: cRIO-9030
       family:
-        description: The product's family
+        description: The family of the product
         type: string
         example: cRIO
       keywords:
@@ -456,11 +460,11 @@ definitions:
         type: string
         example: 0365cee9-0e5d-4802-b0f6-9fedb8f08800
       name:
-        description: The product's name
+        description: The name of the product
         type: string
         example: cRIO-9030
       family:
-        description: The product's family
+        description: The family of the product
         type: string
         example: cRIO
       keywords:
@@ -1252,6 +1256,29 @@ responses:
             $ref: '#/definitions/ProductRequestObject'
         error:
           $ref: '#/definitions/Error'
+  DeleteProductsResponse:
+    description: Delete Products Response
+    schema:
+      description: Delete Products Response
+      title: DeleteProductsResponse
+      type: object
+      required:
+        - ids
+        - failed
+        - error
+      properties:
+        ids:
+          description: Array of product ids to delete
+          type: array
+          items:
+            type: string
+        failed:
+          description: Array of product ids that failed to delete
+          type: array
+          items:
+            type: string
+        error:
+          $ref: '#/definitions/Error'
   ProductsQueryResponse:
     description: Products Query Response
     schema:
@@ -1642,6 +1669,62 @@ paths:
           $ref: '#/responses/ProductsPartialSuccessResponse'
         201:
           $ref: '#/responses/ProductsSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/products/{productId}:
+    delete:
+      tags: [products]
+      summary: Deletes a product
+      description: Deletes the product with the specified id. The request succeeds for products that do not exist.
+      operationId: DeleteProduct
+      x-ni-operation: deleteProduct
+      x-ni-privilege: Write
+      parameters:
+        - in: path
+          name: productId
+          description: Id of the product to delete
+          type: string
+          required: true
+      responses:
+        204:
+          description: The resource was deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/delete-products:
+    post:
+      tags: [products]
+      summary: Deletes products
+      description: Deletes multiple products in a single request.
+      operationId: delete-products
+      x-ni-operation: deleteProducts
+      x-ni-privilege: Write
+      parameters:
+        - in: body
+          name: requestBody
+          description: Array of products
+          required: true
+          schema:
+            description: Array of products
+            title: DeleteProductsRequest
+            type: object
+            required:
+              - ids
+            properties:
+              ids:
+                description: Array of product ids to delete
+                type: array
+                items:
+                  type: string
+                  example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+      responses:
+        200:
+          $ref: '#/responses/DeleteProductsResponse'
+        204:
+          description: The resources were deleted successfully.
         401:
           $ref: '#/responses/Unauthorized'
         default:
