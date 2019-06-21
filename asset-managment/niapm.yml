@@ -95,6 +95,8 @@ definitions:
           - writeAssets: Write information related to assets.
           
           - deleteAssets: Delete information related to assets.
+
+          - readAssetUtilization: Read information related to asset utilization.
         type: object
         properties:
           readAssets:
@@ -102,6 +104,8 @@ definitions:
           writeAssets:
             $ref: '#/definitions/Operation'
           deleteAssets:
+            $ref: '#/definitions/Operation'
+          readAssetUtilization:
             $ref: '#/definitions/Operation'
   BusType:
     title: Bus Type
@@ -402,6 +406,10 @@ definitions:
         example: '2018-05-07T18:58:05.219692Z'
       isNIAsset:
         description: Whether this asset is an NI asset (true) or a third-party asset (false).
+        type: boolean
+        example: true
+      isSystemController:
+        description: Whether this asset represents a System Controller.
         type: boolean
         example: true
       properties:
@@ -716,7 +724,7 @@ parameters:
             
             - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
 
-            - Not Contains operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
+            - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
 
             
             Valid asset properties that can be used in the filter:
@@ -797,6 +805,174 @@ parameters:
     description: The request to update properties of the current service policy.
     schema:
       $ref: '#/definitions/ServicePolicy'
+  QueryAssetUtilizationRequest:
+    in: body
+    name: queryAssetUtilizationRequestBody
+    description: Request body consisting of filters for asset utilization, assets, and time intervals.
+    schema:
+      title: Query Asset Utilizations Request
+      description: Object containing filters for asset utilization, assets, and time intervals.
+      type: object
+      required:
+        - utilizationIntervals
+      properties:
+        utilizationFilter:
+          description: >-
+            The filter criteria for asset utilization. Consists of a string of queries composed using AND/OR operators.
+            String values and date strings need to be enclosed in double quotes.
+            Parenthesis can be used around filters to better define the order of operations.
+            
+            Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+            
+
+            Operators:
+
+            - Equals operator '='. Example: 'x = y'
+            
+            - Not equal operator '!='. Example: 'x != y'
+            
+            - Greater than operator '>'. Example: 'x > y'
+            
+            - Greater than or equal operator '>='. Example: 'x >= y'
+            
+            - Less than operator '<'. Example: 'x < y'
+            
+            - Less than or equal operator '<='. Example: 'x <= y'
+            
+            - Logical AND operator 'and'. Example: 'x and y'
+            
+            - Logical OR operator 'or'. Example: 'x or y'
+            
+            - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
+
+            - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
+
+            
+            Valid asset utilization properties that can be used in the filter:
+
+            - AssetIdentifier: String representing the unique identifier of an asset.
+
+            - MinionId:  String representing the identifier of a minion in which an asset might be located in.
+
+            - UtilizationCategory: String representing the utilization task category.
+
+            - User: : String representing the name of the operator who utilized the asset.
+          type: string
+          example: UtilizationCategory = "Test"
+        assetFilter: 
+          description: >-
+              The filter criteria for assets. Consists of a string of queries composed using AND/OR operators.
+              String values and date strings need to be enclosed in double quotes.
+              Parenthesis can be used around filters to better define the order of operations.
+              
+              Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+              
+
+              Operators:
+
+              - Equals operator '='. Example: 'x = y'
+              
+              - Not equal operator '!='. Example: 'x != y'
+              
+              - Greater than operator '>'. Example: 'x > y'
+            
+              - Greater than or equal operator '>='. Example: 'x >= y'
+              
+              - Less than operator '<'. Example: 'x < y'
+              
+              - Less than or equal operator '<='. Example: 'x <= y'
+              
+              - Logical AND operator 'and'. Example: 'x and y'
+              
+              - Logical OR operator 'or'. Example: 'x or y'
+              
+              - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
+
+              - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
+
+              
+              Valid asset properties that can be used in the filter:
+            
+              - AssetIdentifier: String representing the unique identifier of an asset.
+              
+              - AssetClass: String enumeration representing the class of an asset. Possible values are: UNDEFINED, DISCOVERED, ASSET, DUT, FIXTURE.
+
+              - SerialNumber: String representing the serial number of an asset.
+
+              - ModelName: String representing the model name of an asset.
+
+              - ModelNumber: Unsigned integer representing the model number of an asset.
+
+              - VendorName: String representing the vendor name of an asset.
+
+              - VendorNumber: Unsigned integer representing the vendor number of an asset.
+
+              - AssetName: String representing the asset name.
+
+              - FirmwareVersion: String representing the firmware version of an asset.
+
+              - HardwareVersion: String representing the hardware version of an asset.
+
+              - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE.
+
+              - IsNIAsset: Boolean flag specifying whether the asset is an NI asset or a third-party asset.
+
+              - Keywords: Collection of string values representing asset metadata keywords. Example: 'Keywords=["keyword1", "keyword2"]'.
+
+              - Properties: Collection of key-value pairs, each key-value pair representing an asset metadata property. Example: 'Properties=["key1":"value1", "key2":"value2"]'.
+
+              - Location.MinionId: String representing the identifier of the minion in which the asset is located in.
+
+              - Location.SystemName: String representing the name of the system that the asset is located in.
+
+              - Location.SlotNumber: Unsigned integer representing the slot number the asset is located in.
+
+              - Location.AssetState.SystemConnection: String enumeration representing the connection state of the system the asset is currently located in. Possible values are: APPROVED, DISCONNECTED, CONNECTED_UPDATE_PENDING, CONNECTED_UPDATE_SUCCESSFUL, CONNECTED_UPDATE_FAILED, UNSUPPORTED, ACTIVATED.
+
+              - Location.AssetState.AssetPresence: String enumeration representing the present status of an asset in a system. Possible values are: INITIALIZING, UNKNOWN, NOT_PRESENT, PRESENT.
+
+              - SupportsSelfCalibration: Boolean flag specifying whether the asset supports self-calibration.
+
+              - SelfCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was self-calibrated. Example: "2018-05-20T00:00:00Z"
+
+              - SupportsExternalCalibration: Boolean flag specifying whether the asset supports external calibration.
+
+              - ExternalCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was externally-calibrated. Example: "2018-05-20T00:00:00Z"
+
+              - ExternalCalibration.NextRecommendedDate: ISO-8601 formatted timestamp string specifying the recommended date for the next external calibration. Example: "2018-05-20T00:00:00Z"
+
+              - ExternalCalibration.RecommendedInterval: Integer representing the manufacturer-recommended calibration interval, in months.
+
+              - ExternalCalibration.Comments: String representing any external calibration comments.
+
+              - ExternalCalibration.IsLimited: Boolean flag specifying whether the last external calibration was a limited calibration.
+
+              - ExternalCalibration.Operator.DisplayName: String representing the name of the operator which performed an external calibration on a third-party asset.
+          type: string
+          example: AssetName = "APMPXI1Slot3" and ExternalCalibration.NextRecommendedDate > "2018-05-01T00:00:00.519Z"
+        utilizationIntervals:
+          description: Multiple time intervals for which to retrieve asset utilization.
+          type: array
+          items:
+            title: Utilization Time Interval
+            type: object
+            properties:
+              startDate:
+                description: >-
+                  A date time value which can be used to specify the beginning of a timespan. 
+                  
+                  This parameter is required to have the "ISO 8601" format in order to be considered valid.
+                type: string
+                format: iso-date-time
+                example: '2019-05-01T00:00:00.519Z'
+              endDate:
+                description: >- 
+                  A date time value which can be used to specify the end of a timespan.
+                  
+                  This parameter is required to have the "ISO 8601" format in order to be considered valid.
+                type: string
+                format: iso-date-time
+                example: '2019-05-20T00:00:00Z'
 responses:
   Error:
     description: Error
@@ -957,6 +1133,59 @@ responses:
     description: Service policy response containing the service calibration policy with the number of days for an asset to be considered as approaching calibration.
     schema:
       $ref: '#/definitions/ServicePolicy'
+  AssetUtilizationResponse:
+    description: Asset Utilization response containing the collection of utilizations matching the provided filters, in a specific time interval. Besides a time interval, each element contains an asset identifier, an asset utilization category, and a percentage of time that the asset was utilized in the time interval.
+    schema:
+      title: Asset Utilization Response
+      description: Response for the asset utilization query containing the collection of utilizations. Besides a time interval, each element contains an asset identifier, an asset utilization category, and a percentage of time that the asset was utilized in the time interval.
+      type: array
+      items:
+          type: object
+          required:
+            - startDate
+            - endDate
+            - assetIdentifier
+            - minionIdentifier
+            - utilizationCategory
+            - percentage
+          properties:
+            startDate:
+              description: >-
+                A date time value representing the beginning of an asset utilization interval.
+                
+                This parameter has the "ISO 8601" format in order to be considered valid.
+              type: string
+              format: iso-date-time
+              example: '2019-05-01T00:00:00.519Z'
+            endDate:
+              description: >-
+                A date time value representing the end of an asset utilization interval.
+                
+                This parameter has the "ISO 8601" format in order to be considered valid.
+              type: string
+              format: iso-date-time
+              example: '2019-05-20T00:00:00Z'
+            assetIdentifier: 
+              description: String representing the unique identifier of an asset.
+              type: string
+              example: "29162;01B245D6;4243;0"
+            minionIdentifier:
+              description: Identifier of the minion where the asset is located.
+              type: string
+              example: NI_PXIe-8135_Embedded_Controller--MAC-00-80-2F-23-52-65
+            utilizationCategory: 
+              description: String representing the utilization task category.
+              type: string
+              example: Test
+            user:
+              description: String representing the name of the operator who utilized the asset.
+              type: string
+              example: Test Engineer1
+            percentage: 
+              description: Percentage of time that the asset was utilized in the specified time interval.
+              type: number
+              format: double
+              example: 7.38958 
 paths:
   /:
     get:
@@ -1361,6 +1590,27 @@ paths:
           $ref: '#/responses/PartialSuccess'
         400:
           $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/query-asset-utilization:
+    post:
+      tags: [utilization]
+      summary: Query Asset Utilization
+      description: Retrieves asset utilization matching the provided filters. 
+      operationId: read-asset-utilization
+      x-ni-operation: readAssetUtilization
+      x-ni-priviledge: Read
+      parameters:
+        - $ref: '#/parameters/QueryAssetUtilizationRequest'
+      responses:
+        200:
+          $ref: '#/responses/AssetUtilizationResponse'
+        400:
+          $ref: '#/responses/BadRequest' 
         401:
           $ref: '#/responses/Unauthorized'
         404:
