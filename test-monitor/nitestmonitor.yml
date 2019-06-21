@@ -159,6 +159,8 @@ definitions:
             $ref: '#/definitions/Operation'
           createProducts:
             $ref: '#/definitions/Operation'
+          updateProducts:
+            $ref: '#/definitions/Operation'
   StatusObject:
     title: Status Object
     description: Status object comprised of a type and display name
@@ -217,7 +219,7 @@ definitions:
       FAMILY
   ResultField:
     title: Result Field
-    description: Result field enum
+    description: An enumeration of all fields in a Result.
     type: string
     enum:
       - ID
@@ -239,7 +241,7 @@ definitions:
       PROGRAM_NAME
   StepField:
     title: Step Field
-    description: Step field enum
+    description: An enumeration of all fields in a Step.
     type: string
     enum:
       - NAME
@@ -445,6 +447,43 @@ definitions:
         items:
           type: string
         example: [5ccb19ce5aa0a3348872c3e3]
+  ProductUpdateRequestObject:
+    title: Product Update Request
+    type: object
+    properties:
+      id:
+        description: ID of the product to update
+        type: string
+        example: 0365cee9-0e5d-4802-b0f6-9fedb8f08800
+      name:
+        description: The product's name
+        type: string
+        example: cRIO-9030
+      family:
+        description: The product's family
+        type: string
+        example: cRIO
+      keywords:
+        description: Words or phrases associated with the product
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      properties:
+        description: Key-value pairs associated with the product
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      fileIds:
+        description: Array of file IDs attached to the product
+        type: array
+        items:
+          type: string
+        example: [5ccb19ce5aa0a3348872c3e3]
   TestResultRequestObject:
     title: Test Result Request
     type: object
@@ -471,7 +510,7 @@ definitions:
         example:
           key1: value1
       keywords:
-        description: Keywords associated with the test result
+        description: Words or phrases associated with the test result
         type: array
         items:
           type: string
@@ -559,7 +598,7 @@ definitions:
         format: double
         example: 29.9
       keywords:
-        description: Keywords associated with the test result
+        description: Words or phrases associated with the test result
         type: array
         items:
           type: string
@@ -619,7 +658,7 @@ definitions:
         example:
           key1: value1
       keywords:
-        description: Keywords associated with the test result
+        description: Words or phrases associated with the test result
         type: array
         items:
           type: string
@@ -1071,12 +1110,12 @@ definitions:
         default: 0
         example: 29.9
       inputs:
-        description: Inputs and their values passed to this test
+        description: Inputs and their values passed to the test
         type: array
         items:
           $ref: '#/definitions/NamedValueObject'
       outputs:
-        description: Outputs and their values logged by this test
+        description: Outputs and their values logged by the test
         type: array
         items:
           $ref: '#/definitions/NamedValueObject'
@@ -1145,12 +1184,12 @@ definitions:
         format: iso-date-time
         example: '2018-05-09T15:07:42.527921Z'
       inputs:
-        description: Inputs and their values passed to this test
+        description: Inputs and their values passed to the test
         type: array
         items:
           $ref: '#/definitions/NamedValueObject'
       outputs:
-        description: Outputs and their values logged by this test
+        description: Outputs and their values logged by the test
         type: array
         items:
           $ref: '#/definitions/NamedValueObject'
@@ -1539,6 +1578,41 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+    put:
+      tags: [products]
+      summary: Updates existing products
+      description: Updates existing products by merging or replacing values.
+      operationId: update-products
+      x-ni-operation: updateProducts
+      x-ni-privilege: Write
+      parameters:
+        - in: body
+          name: requestBody
+          description: Array of products to update
+          required: true
+          schema:
+            description: Array of products to update
+            title: UpdateProductsRequest
+            type: object
+            required:
+              - products
+            properties:
+              products:
+                description: Array of products to update
+                type: array
+                items:
+                  $ref: '#/definitions/ProductUpdateRequestObject'
+              replace:
+                description: Replace the existing fields instead of merging them
+                type: boolean
+                default: false
+      responses:
+        200:
+          $ref: '#/responses/ProductsPartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
     post:
       tags: [products]
       summary: Creates new products
@@ -1796,7 +1870,7 @@ paths:
         200:
           $ref: '#/responses/DeleteResultsResponse'
         204:
-          description: The resource was deleted successfully.
+          description: The resources were deleted successfully.
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -2002,7 +2076,7 @@ paths:
         200:
           $ref: '#/responses/StepsDeletePartialSuccessResponse'
         204:
-          description: The resource was deleted successfully.
+          description: The resources were deleted successfully.
         401:
           $ref: '#/responses/Unauthorized'
         default:
