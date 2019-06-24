@@ -305,17 +305,17 @@ definitions:
       alarmId:
         type: string
         description: AlarmId query. The service will return alarm instances whose *alarmId* fields are equal
-          to the query, taking case into account.
+          to the query. This query takes case into account.
         example: System.Health.DiskSpaceLow.Bdd9u!4aMd!$pYrf*CnaIZ2tbu$-Ct%?
       description:
         type: string
         description: Description query. The service will return alarm instances whose *description* fields
-          contain the description query string, without taking case into account.
+          contain the description query string. This query does not take case into account.
         example: Disk usage
       displayName:
         type: string
         description: Display name query. The service will return alarm instances whose *displayName* fields
-          contain the display name query string, without taking case into account.
+          contain the display name query string. This query does not take case into account.
         example: Low disk space on CRIO1
       active:
         type: boolean
@@ -376,17 +376,17 @@ definitions:
       createdBy:
         type: string
         description: Created by query. The service will return instances whose *createdBy* fields are equal to
-          the query, taking case into account.
+          the query. This query takes case into account.
         example: TagRuleEngine
       channel:
         type: string
         description: Channel query. The service will return instances whose *channel* fields are equal to the
-          query, taking case into account. Supports wildcard match checking with glob-style wildcards.
+          query. This query takes case into account and supports wildcard match checking with glob-style wildcards.
         example: '*.System.Health.DiskSpaceUsePercentage'
       resourceType:
         type: string
         description: Resource type query. The service will return instances whose *resourceType* fields are
-          equal to the query, taking case into account.
+          equal to the query. This query takes case into account.
         example: Tag
       properties:
         type: object
