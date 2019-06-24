@@ -1682,6 +1682,28 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v2/products/{productId}:
+    get:
+      tags: [products]
+      summary: Gets a product
+      description: Gets a single product.
+      operationId: get-product
+      x-ni-operation: getProducts
+      x-ni-privilege: Read
+      parameters:
+        - in: path
+          name: productId
+          description: The id of the product to get.
+          type: string
+          required: true
+      responses:
+        200:
+          description: Get Product Response
+          schema:
+            $ref: '#/definitions/ProductResponseObject'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
     delete:
       tags: [products]
       summary: Deletes a product
@@ -1900,6 +1922,28 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v2/results/{resultId}:
+    get:
+      tags: [results]
+      summary: Gets a test result
+      description: Gets a single test result.
+      operationId: get-result
+      x-ni-operation: getResults
+      x-ni-privilege: Read
+      parameters:
+        - in: path
+          name: resultId
+          description: The id of the result to get.
+          type: string
+          required: true
+      responses:
+        200:
+          description: Get Test Result Response
+          schema:
+            $ref: '#/definitions/TestResultResponseObject'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
     delete:
       tags: [results]
       summary: Deletes a test result
@@ -2111,6 +2155,33 @@ paths:
         default:
           $ref: '#/responses/Error'
   /v2/results/{resultId}/steps/{stepId}:
+    get:
+      tags: [steps]
+      summary: Gets a test step
+      description: Gets a single test step.
+      operationId: get-step
+      x-ni-operation: getSteps
+      x-ni-privilege: Read
+      parameters:
+        - in: path
+          name: resultId
+          description: The resultId of the step to get.
+          type: string
+          required: true
+        - in: path
+          name: stepId
+          description: The stepId of the step to get.
+          type: string
+          required: true
+      responses:
+        200:
+          description: Get Test Step Response
+          schema:
+            $ref: '#/definitions/TestStepResponseObject'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
     delete:
       tags: [steps]
       summary: Deletes a test step
