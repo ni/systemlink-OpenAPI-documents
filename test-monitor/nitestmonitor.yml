@@ -216,6 +216,7 @@ definitions:
       - PART_NUMBER
       - NAME
       - FAMILY
+      - UPDATED_AT
       - KEYWORDS
       - PROPERTIES
       - FILE_IDS
@@ -430,6 +431,13 @@ definitions:
         description: The family of the product
         type: string
         example: cRIO
+      updatedAt:
+        description: >-
+          ISO-8601 formatted timestamp indicating when the product
+          was last updated.
+        type: string
+        format: iso-date-time
+        example: '2018-05-09T15:07:42.527921Z'
       keywords:
         description: Words or phrases associated with the product
         type: array
