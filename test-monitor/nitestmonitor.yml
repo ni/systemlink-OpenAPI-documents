@@ -804,6 +804,25 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/ResultSortDefinitionObject'
+  UpdateTestResultsRequest:
+    title: Update Test Results Request
+    type: object
+    required:
+      - results
+    properties:
+      results:
+        description: Array of test results to update
+        type: array
+        items:
+          $ref: '#/definitions/TestResultUpdateRequestObject'
+      replace:
+        description: Replace the existing fields instead of merging them
+        type: boolean
+        default: false
+      determineStatusFromSteps:
+        description: Determine test result status from the test step statuses
+        type: boolean
+        default: false
   ProductsAdvancedQuery:
     title: Advanced Query Object for Products
     type: object
@@ -1142,6 +1161,10 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/TestStepRequestObject'
+      updateResultTotalTime:
+        description: Determine test result total time from the test step total times.
+        type: boolean
+        default: false
   TestStepResponseObject:
     title: Test Step Response
     type: object
@@ -1528,7 +1551,7 @@ paths:
   /v2/query-products:
     post:
       tags: [products]
-      summary: Advanced Product Query
+      summary: Queries products
       description: >-
         Uses the Dynamic Linq query language to specify a filter and return
         product. An empty request body queries all products.
@@ -1613,41 +1636,6 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-    put:
-      tags: [products]
-      summary: Updates existing products
-      description: Updates existing products by merging or replacing values.
-      operationId: update-products
-      x-ni-operation: updateProducts
-      x-ni-privilege: Write
-      parameters:
-        - in: body
-          name: requestBody
-          description: Array of products to update
-          required: true
-          schema:
-            description: Array of products to update
-            title: UpdateProductsRequest
-            type: object
-            required:
-              - products
-            properties:
-              products:
-                description: Array of products to update
-                type: array
-                items:
-                  $ref: '#/definitions/ProductUpdateRequestObject'
-              replace:
-                description: Replace the existing fields instead of merging them
-                type: boolean
-                default: false
-      responses:
-        200:
-          $ref: '#/responses/ProductsPartialSuccessResponse'
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
     post:
       tags: [products]
       summary: Creates new products
@@ -1724,6 +1712,42 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+  /v2/update-products:
+    post:
+      tags: [products]
+      summary: Updates existing products
+      description: Updates existing products by merging or replacing values.
+      operationId: update-products
+      x-ni-operation: updateProducts
+      x-ni-privilege: Write
+      parameters:
+        - in: body
+          name: requestBody
+          description: Array of products to update
+          required: true
+          schema:
+            description: Array of products to update
+            title: UpdateProductsRequest
+            type: object
+            required:
+              - products
+            properties:
+              products:
+                description: Array of products to update
+                type: array
+                items:
+                  $ref: '#/definitions/ProductUpdateRequestObject'
+              replace:
+                description: Replace the existing fields instead of merging them
+                type: boolean
+                default: false
+      responses:
+        200:
+          $ref: '#/responses/ProductsPartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v2/delete-products:
     post:
       tags: [products]
@@ -1762,7 +1786,7 @@ paths:
   /v2/query-results:
     post:
       tags: [results]
-      summary: Advanced Test Result Query
+      summary: Queries test results
       description: >-
         Uses the Dynamic Linq query language to specify a filter and return
         test results. An empty request body queries all test results.
@@ -1843,46 +1867,6 @@ paths:
       responses:
         200:
           $ref: '#/responses/ResultsQueryResponse'
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-    put:
-      tags: [results]
-      summary: Updates existing test results
-      description: Updates existing test results by merging or replacing values.
-      operationId: update-results
-      x-ni-operation: updateResults
-      x-ni-privilege: Write
-      x-ni-oldest-compatible-version: 1
-      parameters:
-        - in: body
-          name: requestBody
-          description: Array of test results to update
-          required: true
-          schema:
-            description: Array of test results to update
-            title: UpdateTestResultsRequest
-            type: object
-            required:
-              - results
-            properties:
-              results:
-                description: Array of test results to update
-                type: array
-                items:
-                  $ref: '#/definitions/TestResultUpdateRequestObject'
-              replace:
-                description: Replace the existing fields instead of merging them
-                type: boolean
-                default: false
-              determineStatusFromSteps:
-                description: Determine test result status from the test step statuses
-                type: boolean
-                default: false
-      responses:
-        200:
-          $ref: '#/responses/ResultsPartialSuccessResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -1970,6 +1954,28 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+  /v2/update-results:
+    post:
+      tags: [results]
+      summary: Updates existing test results
+      description: Updates existing test results by merging or replacing values.
+      operationId: update-results-v2
+      x-ni-operation: updateResults
+      x-ni-privilege: Write
+      parameters:
+        - in: body
+          name: requestBody
+          description: Array of test results to update
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateTestResultsRequest'
+      responses:
+        200:
+          $ref: '#/responses/ResultsPartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v2/delete-results:
     post:
       tags: [results]
@@ -2013,7 +2019,7 @@ paths:
   /v2/query-steps:
     post:
       tags: [steps]
-      summary: Advanced Test Step Query
+      summary: Queries test steps
       description: >-
         Uses the Dynamic Linq query language to specify a filter and return
         test steps. An empty request body queries all test steps.
@@ -2098,41 +2104,13 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-    put:
-      tags: [steps]
-      summary: Update test steps
-      description: Updates existing test steps by replacing values for the specified fields.
-      operationId: update-steps
-      x-ni-operation: updateSteps
-      x-ni-privilege: Write
-      x-ni-oldest-compatible-version: 1
-      parameters:
-        - in: body
-          name: requestBody
-          description: Array of test steps
-          required: true
-          schema:
-            $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
-        - in: query
-          name: updateResultTotalTime
-          description: Determine test result total time from the test step total times.
-          type: boolean
-          default: false
-      responses:
-        200:
-          $ref: '#/responses/StepsPartialSuccessResponse'
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
     post:
       tags: [steps]
-      summary: Create test steps
+      summary: Creates new test steps
       description: Creates new test steps from the supplied models. The result associated with the step must exist prior to step creation. The server automatically generates step ids if not supplied.
-      operationId: create-steps
+      operationId: create-steps-v2
       x-ni-operation: createSteps
       x-ni-privilege: Write
-      x-ni-oldest-compatible-version: 1
       parameters:
         - in: body
           name: requestBody
@@ -2140,11 +2118,6 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
-        - in: query
-          name: updateResultTotalTime
-          description: Determine test result total time from the test step total times.
-          type: boolean
-          default: false
       responses:
         200:
           $ref: '#/responses/StepsPartialSuccessResponse'
@@ -2209,6 +2182,28 @@ paths:
       responses:
         204:
           description: The resource was deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/update-steps:
+    post:
+      tags: [steps]
+      summary: Updates existing test steps
+      description: Updates existing steps by merging or replacing values.
+      operationId: update-steps-v2
+      x-ni-operation: updateSteps
+      x-ni-privilege: Write
+      parameters:
+        - in: body
+          name: requestBody
+          description: Array of test steps
+          required: true
+          schema:
+            $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
+      responses:
+        200:
+          $ref: '#/responses/StepsPartialSuccessResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -2287,6 +2282,28 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+    put:
+      tags: [deprecated]
+      summary: Updates existing test results
+      description: Updates existing test results by merging or replacing values.
+      operationId: update-results
+      x-ni-operation: updateResults
+      x-ni-privilege: Write
+      deprecated: true
+      parameters:
+        - in: body
+          name: requestBody
+          description: Array of test results to update
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateTestResultsRequest'
+      responses:
+        200:
+          $ref: '#/responses/ResultsPartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v1/query-results:
     post:
       tags: [deprecated]
@@ -2347,6 +2364,62 @@ paths:
       responses:
         200:
           $ref: '#/responses/StepsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    put:
+      tags: [deprecated]
+      summary: Update test steps
+      description: Updates existing test steps by replacing values for the specified fields.
+      operationId: update-steps
+      x-ni-operation: updateSteps
+      x-ni-privilege: Write
+      deprecated: true
+      parameters:
+        - in: body
+          name: requestBody
+          description: Array of test steps
+          required: true
+          schema:
+            $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
+        - in: query
+          name: updateResultTotalTime
+          description: Determine test result total time from the test step total times.
+          type: boolean
+          default: false
+      responses:
+        200:
+          $ref: '#/responses/StepsPartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    post:
+      tags: [deprecated]
+      summary: Creates new test steps
+      description: Creates new test steps from the supplied models. The result associated with the step must exist prior to step creation. The server automatically generates step ids if not supplied.
+      operationId: create-steps
+      x-ni-operation: createSteps
+      x-ni-privilege: Write
+      deprecated: true
+      parameters:
+        - in: body
+          name: requestBody
+          description: Test step object
+          required: true
+          schema:
+            $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
+        - in: query
+          name: updateResultTotalTime
+          description: Determine test result total time from the test step total times.
+          type: boolean
+          default: false
+      responses:
+        200:
+          $ref: '#/responses/StepsPartialSuccessResponse'
+        201:
+          $ref: '#/responses/StepsSuccessResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
