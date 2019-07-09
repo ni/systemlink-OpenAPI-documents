@@ -215,8 +215,8 @@ definitions:
   NotebookExportFormat:
     title: Notebook Export Format
     description: >-
-        Specifies the file format for the notebook execution export. If this value is null or
-        omitted then no export is performed.
+      Specifies the file format for the notebook execution export. If this value is null or
+      omitted then no export is performed.
     type: string 
     enum:
       - HTML
@@ -418,7 +418,9 @@ definitions:
         example: 3600
       exportFormat:
         description: >-
-          If the user specifies an export format and a resultCachePeriod, the export format would be honored and resultCachePeriod will be ignored. The file will be exported to the File Ingestion Service.
+          Renders the executed notebook and uploads it to the File Ingestion Service. If the user
+          specifies an export format and a resultCachePeriod, the export format would be honored
+          and resultCachePeriod will be ignored. The file will be exported to the File Ingestion Service.
         $ref: '#/definitions/NotebookExportFormat'
   ExecutionHashInformation:
     title: Execution Hash Information
@@ -689,9 +691,9 @@ definitions:
         example: true
       exportFileId:
         description: >-
-          File ID of notebook report exported to the File Ingestion Service. 
+          File ID of notebook report exported to the File Ingestion Service.
         type: string
-        example: '46fc8c2b-bcc9-4bac-b016-34d9396d3f99'
+        example: '5d1b72663629224d047d1c77'
   CreateExecutionsPartialSuccessResponse:
     title: Create Executions Partial Success Response
     description: Create executions partial success response
