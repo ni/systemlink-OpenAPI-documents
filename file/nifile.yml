@@ -127,6 +127,11 @@ definitions:
         example:
           Name: myfile.txt
           MyProperty: Value
+      metaDataRevision:
+        description: The file's properties revision number. When a file is uploaded, the revision number starts at 1. Every time metadata is updated, the revision number is incremented by 1. New in version 3 of the listFiles operation.
+        type: integer
+        format: int32
+        example: 1
       serviceGroup:
         description: The service group that owns the file
         type: string
@@ -668,6 +673,10 @@ paths:
                   replaced by the specified list or merged with the existing
                   list.
                 type: boolean
+              expectedRevision:
+                description: This is an optional value. When specified, this is an integer that should be set to match the last known revision number of the metadata. If it doesn't match at the time of execution, the update request will be rejected. This is used to ensure that changes to this file metadata are correctly using the previous state.
+                type: integer
+                format: int32
               properties:
                 description: The properties to set
                 type: object
