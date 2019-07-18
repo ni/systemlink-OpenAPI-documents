@@ -266,18 +266,6 @@ definitions:
       - DATA
     example:
       STEP_TYPE
-  ProductSortDefinitionObject:
-    title: Product Sort Definition
-    description: Defines the field and direction for sorting products.
-    type: object
-    required:
-      - field
-    properties:
-      field:
-        $ref: '#/definitions/ProductField'
-      orderByDescending:
-        type: boolean
-        default: false
   ResultSortDefinitionObject:
     title: Result Sort Definition
     description: Defines the field and direction for sorting test results.
@@ -844,12 +832,13 @@ definitions:
         example:
           - "cRIO"
       orderBy:
-        description: >-
-          Defines the sort ordering of the returned products. If this field is not
-          present, the returned products will not be sorted.
-        type: array
-        items:
-          $ref: '#/definitions/ProductSortDefinitionObject'
+        $ref: '#/definitions/ProductField'
+      descending:
+        description: ->
+          Whether to return the products in descending order.
+        type: boolean
+        default: false
+        example: false
       projection:
         description: >-
           Specifies the product fields to project. When a field value is given here,
@@ -880,12 +869,13 @@ definitions:
         example:
           - 2.5
       orderBy:
-        description: >-
-          Defines the sort ordering of the returned results. If this field is not
-          present, the returned results will not be sorted.
-        type: array
-        items:
-          $ref: '#/definitions/ResultSortDefinitionObject'
+        $ref: '#/definitions/ResultField'
+      descending:
+        description: ->
+          Whether to return the results in descending order.
+        type: boolean
+        default: false
+        example: false
       projection:
         description: >-
           Specifies the result fields to project. When a field value is given here,
@@ -916,12 +906,13 @@ definitions:
         example:
           - 2.5
       orderBy:
-        description: >-
-          Defines the sort ordering of the returned steps. If this field is not
-          present, the returned steps will not be sorted.
-        type: array
-        items:
-          $ref: '#/definitions/StepSortDefinitionObject'
+        $ref: '#/definitions/StepField'
+      descending:
+        description: ->
+          Whether to return the steps in descending order.
+        type: boolean
+        default: false
+        example: false
       projection:
         description: >-
           Specifies the step fields to project. When a field value is given here,
