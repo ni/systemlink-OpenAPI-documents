@@ -362,6 +362,14 @@ definitions:
         type: integer
         format: int32
         example: 30
+  ResponseFormat:
+    title: Response Format
+    description: Enum indicating the expected response format (CSV or JSON). If unspecified, JSON is the default.
+    type: string
+    enum:
+      - JSON
+      - CSV
+    default: 'JSON'
   ProductRequestObject:
     title: Product Request
     type: object
@@ -885,6 +893,8 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/ResultField'
+      responseFormat:
+        $ref: '#/definitions/ResponseFormat'
   StepsAdvancedQuery:
     title: Advanced Query Object for Test Steps
     type: object
@@ -922,6 +932,8 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/StepField'
+      responseFormat:
+        $ref: '#/definitions/ResponseFormat'
   StepIdResultIdPair:
     title: Step Id / Result Id Pair
     type: object
@@ -1855,6 +1867,9 @@ paths:
             provided filter, disregarding the take value.
           type: boolean
           default: false
+      produces:
+        - application/json
+        - text/csv
       responses:
         200:
           $ref: '#/responses/ResultsQueryResponse'
@@ -2088,6 +2103,9 @@ paths:
             provided filter, disregarding the take value.
           type: boolean
           default: false
+      produces: 
+        - application/json
+        - text/csv
       responses:
         200:
           $ref: '#/responses/StepsQueryResponse'
