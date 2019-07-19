@@ -1315,8 +1315,21 @@ responses:
           type: array
           items:
             $ref: '#/definitions/ProductResponseObject'
+        continuationToken:
+          description: >-
+            A token which allows the user to resume this query at the next item
+            in the matching product set. In order to continue paginating a
+            query, pass this token to the service on a subsequent request. The
+            service will respond with a new continuation token. To paginate a
+            set of products, continue sending requests with the newest
+            continuation token provided by the service, until this value is
+            null.
+          type: string
+          example: "token"
         totalCount:
-          description: Number of matching products
+          description: >-
+            The number of matching products, if returnCount is true.
+            This value is not present if returnCount is false.
           type: integer
           format: int64
   ResultsSuccessResponse:
@@ -1393,6 +1406,17 @@ responses:
           type: array
           items:
             $ref: '#/definitions/TestResultResponseObject'
+        continuationToken:
+          description: >-
+            A token which allows the user to resume this query at the next item
+            in the matching result set. In order to continue paginating a
+            query, pass this token to the service on a subsequent request. The
+            service will respond with a new continuation token. To paginate a
+            set of results, continue sending requests with the newest
+            continuation token provided by the service, until this value is
+            null.
+          type: string
+          example: "token"
         totalCount:
           description: >-
             The number of matching test results, if returnCount is true.
@@ -1450,6 +1474,17 @@ responses:
           type: array
           items:
             $ref: '#/definitions/TestStepResponseObject'
+        continuationToken:
+          description: >-
+            A token which allows the user to resume this query at the next item
+            in the matching step set. In order to continue paginating a
+            query, pass this token to the service on a subsequent request. The
+            service will respond with a new continuation token. To paginate a
+            set of steps, continue sending requests with the newest
+            continuation token provided by the service, until this value is
+            null.
+          type: string
+          example: "token"
         totalCount:
           description: >-
             The number of matching test steps, if returnCount is true.
