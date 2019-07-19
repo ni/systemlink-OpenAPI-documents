@@ -1632,6 +1632,7 @@ paths:
     post:
       operationId: UnregisterSystems
       x-ni-privilege: Write
+      x-ni-request-timeout: 180000
       x-ni-operation: manageSystems
       tags: [systems]
       summary: Unregister Systems
@@ -1772,6 +1773,7 @@ paths:
     post:
       operationId: ConfigureAndUpdateMultipleFeeds
       x-ni-privilege: Read
+      x-ni-request-timeout: 360000
       x-ni-operation: manageFeeds
       tags: [feeds]
       summary: Configure and update multiple feeds
@@ -2055,6 +2057,7 @@ paths:
     post:
       operationId: ManageSystemsKeys
       x-ni-privilege: Write
+      x-ni-request-timeout: 300000
       x-ni-operation: manageSystems
       tags: [systems]
       summary: Manage systems keys
@@ -2119,6 +2122,7 @@ paths:
     post:
       operationId: GetAvailablePackagesByQuery
       x-ni-privilege: Read
+      x-ni-request-timeout: 300000
       x-ni-operation: manageFeeds
       tags: [feeds]
       summary: Get Available Packages
