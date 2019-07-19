@@ -1185,9 +1185,12 @@ definitions:
           description: The name of a package this package suggests. This also contains information about the version of the package.
           example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"       
       tags:
-        type: string
-        description: Tags of the package.
-        example: "KillBits, Security Update 2013"    
+        type: array
+        description: An array containing tags for the package.
+        items:
+          type: string
+          description: Tag for the package.
+          example: ".NET"
       userVisible:
         type: boolean
         description: The installed packages with this attribute set to true are considered to be installed by a user, thus not installed to fulfill some dependency. This is needed input for the calculation of unneeded packages when removing a package.
