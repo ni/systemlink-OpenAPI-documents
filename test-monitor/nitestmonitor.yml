@@ -856,6 +856,29 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/ProductField'
+      take:
+        description: >-
+          The maximum number of products to return.
+        type: integer
+        format: int32
+        default: 1000
+        minimum: 0
+        example: 1000
+      continuationToken:
+        description: >-
+          A token which allows the user to resume a query at the next item in
+          the matching product set. When querying for products, a token will
+          be returned if a query may be continued. To obtain the next page of
+          products, pass the token to the service on a subsequent request.
+        type: string
+        example: token
+      returnCount:
+        description: >-
+          Whether to return the total number of products which match the
+          provided filter, disregarding the take value.
+        type: boolean
+        default: false
+        example: false
   ResultsAdvancedQuery:
     title: Advanced Query Object for Test Results
     type: object
@@ -893,6 +916,29 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/ResultField'
+      take:
+        description: >-
+          The maximum number of products to return.
+        type: integer
+        format: int32
+        default: 1000
+        minimum: 0
+        example: 1000
+      continuationToken:
+        description: >-
+          A token which allows the user to resume a query at the next item in
+          the matching product set. When querying for products, a token will
+          be returned if a query may be continued. To obtain the next page of
+          products, pass the token to the service on a subsequent request.
+        type: string
+        example: token
+      returnCount:
+        description: >-
+          Whether to return the total number of products which match the
+          provided filter, disregarding the take value.
+        type: boolean
+        default: false
+        example: false
       responseFormat:
         $ref: '#/definitions/ResponseFormat'
   StepsAdvancedQuery:
@@ -932,6 +978,29 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/StepField'
+      take:
+        description: >-
+          The maximum number of steps to return.
+        type: integer
+        format: int32
+        default: 1000
+        minimum: 0
+        example: 1000
+      continuationToken:
+        description: >-
+          A token which allows the user to resume a query at the next item in
+          the matching step set. When querying for steps, a token will
+          be returned if a query may be continued. To obtain the next page of
+          steps, pass the token to the service on a subsequent request.
+        type: string
+        example: token
+      returnCount:
+        description: >-
+          Whether to return the total number of steps which match the
+          provided filter, disregarding the take value.
+        type: boolean
+        default: false
+        example: false
       responseFormat:
         $ref: '#/definitions/ResponseFormat'
   StepIdResultIdPair:
@@ -1319,6 +1388,7 @@ responses:
       description: Products Query Response
       title: ProductsQueryResponse
       type: object
+      x-ni-sparse: true
       required:
         - products
       properties:
@@ -1410,6 +1480,7 @@ responses:
       description: Test Results Query Response
       title: ResultsQueryResponse
       type: object
+      x-ni-sparse: true
       required:
         - results
       properties:
@@ -1478,6 +1549,7 @@ responses:
       description: Test Steps Query Response
       title: StepsQueryResponse
       type: object
+      x-ni-sparse: true
       required:
         - steps
       properties:
@@ -1603,35 +1675,6 @@ paths:
           required: false
           schema:
             $ref: '#/definitions/ProductsAdvancedQuery'
-        - in: query
-          name: skip
-          description: >-
-            The number of matching products to skip when querying.
-            For example, if the query filter matches 100 products with a skip
-            value of 50 and a take value of 25, products 51 through 75 will be
-            returned.
-          type: integer
-          format: int32
-          default: 0
-          minimum: 0
-        - in: query
-          name: take
-          description: >-
-            The total number of products to return.
-            For example, if the query filter matches 100 products with a skip
-            value of 50 and a take value of 25, products 51 through 75 will be
-            returned.
-          type: integer
-          format: int32
-          default: 1000
-          minimum: 0
-        - in: query
-          name: returnCount
-          description: >-
-            Whether to return the total number of products which match the
-            provided filter, disregarding the take value.
-          type: boolean
-          default: false
       responses:
         200:
           $ref: '#/responses/ProductsQueryResponse'
@@ -1649,13 +1692,17 @@ paths:
       x-ni-privilege: Read
       parameters:
         - in: query
-          name: skip
-          type: integer
-          format: int32
-          default: 0
-          minimum: 0
+          name: continuationToken
+          description: >-
+            A token which allows the user to resume a query at the next item in
+            the matching product set. When querying for products, a token will
+            be returned if a query may be continued. To obtain the next page of
+            products, pass the token to the service on a subsequent request.
+          type: string
         - in: query
           name: take
+          description: >-
+            The maximum number of products to return.
           type: integer
           format: int32
           default: -1
@@ -1838,35 +1885,6 @@ paths:
           required: false
           schema:
             $ref: '#/definitions/ResultsAdvancedQuery'
-        - in: query
-          name: skip
-          description: >-
-            The number of matching results to skip when querying.
-            For example, if the query filter matches 100 results with a skip
-            value of 50 and a take value of 25, results 51 through 75 will be
-            returned.
-          type: integer
-          format: int32
-          default: 0
-          minimum: 0
-        - in: query
-          name: take
-          description: >-
-            The total number of results to return.
-            For example, if the query filter matches 100 results with a skip
-            value of 50 and a take value of 25, results 51 through 75 will be
-            returned.
-          type: integer
-          format: int32
-          default: 1000
-          minimum: 0
-        - in: query
-          name: returnCount
-          description: >-
-            Whether to return the total number of results which match the
-            provided filter, disregarding the take value.
-          type: boolean
-          default: false
       produces:
         - application/json
         - text/csv
@@ -1887,13 +1905,17 @@ paths:
       x-ni-privilege: Read
       parameters:
         - in: query
-          name: skip
-          type: integer
-          format: int32
-          default: 0
-          minimum: 0
+          name: continuationToken
+          description: >-
+            A token which allows the user to resume a query at the next item in
+            the matching result set. When querying for results, a token will
+            be returned if a query may be continued. To obtain the next page of
+            results, pass the token to the service on a subsequent request.
+          type: string
         - in: query
           name: take
+          description: >-
+            The maximum number of results to return.
           type: integer
           format: int32
           default: -1
@@ -2074,35 +2096,6 @@ paths:
           required: false
           schema:
             $ref: '#/definitions/StepsAdvancedQuery'
-        - in: query
-          name: skip
-          description: >-
-            The number of matching steps to skip when querying.
-            For example, if the query filter matches 100 steps with a skip
-            value of 50 and a take value of 25, steps 51 through 75 will be
-            returned.
-          type: integer
-          format: int32
-          default: 0
-          minimum: 0
-        - in: query
-          name: take
-          description: >-
-            The total number of steps to return.
-            For example, if the query filter matches 100 steps with a skip
-            value of 50 and a take value of 25, steps 51 through 75 will be
-            returned.
-          type: integer
-          format: int32
-          default: 1000
-          minimum: 0
-        - in: query
-          name: returnCount
-          description: >-
-            Whether to return the total number of steps which match the
-            provided filter, disregarding the take value.
-          type: boolean
-          default: false
       produces: 
         - application/json
         - text/csv
@@ -2123,13 +2116,17 @@ paths:
       x-ni-privilege: Read
       parameters:
         - in: query
-          name: skip
-          type: integer
-          format: int32
-          default: 0
-          minimum: 0
+          name: continuationToken
+          description: >-
+            A token which allows the user to resume a query at the next item in
+            the matching step set. When querying for steps, a token will
+            be returned if a query may be continued. To obtain the next page of
+            steps, pass the token to the service on a subsequent request.
+          type: string
         - in: query
           name: take
+          description: >-
+            The maximum number of steps to return.
           type: integer
           format: int32
           default: -1
