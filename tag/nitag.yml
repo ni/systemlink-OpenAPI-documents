@@ -282,7 +282,7 @@ paths:
     post:
       tags:
         - subscriptions
-      summary: Update the heartbeat timer for multiple subscriptions (SystemLink Server only)
+      summary: Update the heartbeat timer for multiple subscriptions
       description: Updates the heartbeat timers for multiple subscriptions
       operationId: UpdateSubscriptionHeartbeats
       parameters:
@@ -325,7 +325,7 @@ paths:
     post:
       tags:
         - subscriptions
-      summary: Get the current values for the tags from multiple subscriptions (SystemLink Server only)
+      summary: Get the current values for the tags from multiple subscriptions
       description: Returns tag values from multiple subscriptions.
       operationId: GetSubscriptionsTagValues
       parameters:
@@ -377,7 +377,7 @@ paths:
     post:
       tags:
         - subscriptions
-      summary: Delete multiple subscriptions (SystemLink Server only)
+      summary: Delete multiple subscriptions
       description: Delete one or more subscriptions based on the request body.
       operationId: DeleteSubscriptions
       parameters:
@@ -1319,7 +1319,7 @@ paths:
     post:
       tags:
         - tags
-      summary: Update the current values of multiple tags (SystemLink Server only)
+      summary: Update the current values of multiple tags
       description: Updates multiple tags to their current values.
       operationId: UpdateTagCurrentValues
       parameters:
