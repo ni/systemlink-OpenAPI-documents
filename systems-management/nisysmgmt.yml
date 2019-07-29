@@ -587,7 +587,25 @@ definitions:
         example: 19.0
     required: [activated]
 
-  ManagedSystemDataProperty:
+  ManagedSystemDataPropertyList:
+    description: Property of a system composed by the last updated timestamp and a list with the actual data.
+    type: object
+    properties:
+      lastUpdatedTimestamp:
+        description: Last updated timestamp.
+        type: string
+        format: iso-date-time
+        example: '2019-02-11T13:32:06.030958Z'
+      data:
+        description: The actual data.
+        type: array
+        items:
+          type: object
+          example: 
+            - Lab1
+    required: [lastUpdatedTimestamp, data]
+
+  ManagedSystemDataPropertyMap:
     description: Property of a system composed by the last updated timestamp and a dictionary with the actual data.
     type: object
     properties:
@@ -599,6 +617,8 @@ definitions:
       data:
         description: The actual data.
         type: object
+        additionalProperties:
+          type: object
         example:
           key: value
     required: [lastUpdatedTimestamp, data]
@@ -656,7 +676,7 @@ definitions:
         required: [lastUpdatedTimestamp, data]
       grains:
         description: General information about the system.
-        $ref: '#/definitions/ManagedSystemDataProperty'
+        $ref: '#/definitions/ManagedSystemDataPropertyMap'
         example:
           lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
           data:
@@ -672,7 +692,7 @@ definitions:
             osrelease: 7        
       packages:
         description: Software packages installed on the system.
-        $ref: '#/definitions/ManagedSystemDataProperty'
+        $ref: '#/definitions/ManagedSystemDataPropertyMap'
         example:
           lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
           data:
@@ -696,7 +716,7 @@ definitions:
               version: 19.5.0.28-0+d28
       feeds:
         description: Feeds configured on the system.
-        $ref: '#/definitions/ManagedSystemDataProperty'
+        $ref: '#/definitions/ManagedSystemDataPropertyMap'
         example:
           lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
           data:
@@ -712,7 +732,7 @@ definitions:
               uri: http://download.ni.com/support/nipkg/products/ni-package-manager/eulas
       sysapi:
         description: System API information.
-        $ref: '#/definitions/ManagedSystemDataProperty'
+        $ref: '#/definitions/ManagedSystemDataPropertyList'
         example:
           lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
           data:
@@ -734,11 +754,21 @@ definitions:
                 value: false
       groups:
         description: Specifies the groups to which the system is assigned.
-        $ref: '#/definitions/ManagedSystemDataProperty'
-        example:
-          lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
+        type: object
+        properties:
+          lastUpdatedTimestamp:
+            description: Last updated timestamp.
+            type: string
+            format: iso-date-time
+            example: '2019-02-19T11:42:25.078Z'
           data:
-            - 121b471c-d7d4-4996-a38f-27f7e58be070
+            description: A list of strings defining metadata information about a system.
+            type: array
+            items:
+              type: string
+              example: 
+                - Lab1
+        required: [lastUpdatedTimestamp, data]
       keywords:
         description: Keywords metadata information about a system.
         type: object
@@ -796,7 +826,7 @@ definitions:
         $ref: '#/definitions/ReportType'
       filter:
         type: string
-        example: grains.data.os==""NILinuxRT""
+        example: grains.data.os=="NILinuxRT"
         description: Specifies the filter criteria for systems.
     required: [ids, type]
 
@@ -1119,10 +1149,9 @@ definitions:
         description: The name of the package.
         example: "ni-securityupdate-kb67l8lcqw-killbits"
       plugin:
-        type: integer
-        format: int32
+        type: string
         description: Agent that will be used to install the package.
-        example: 2
+        example: "wininst"
       predepends:
         type: array
         description: An array containing information about other packages this package predepends.
@@ -1131,10 +1160,9 @@ definitions:
           type: string
           example: "ni-teststand-2017-tools (>= 17.0.0)"
       priority:
-        type: integer
-        format: int32
+        type: string
         description: The priority of the package.
-        example: 4        
+        example: "standard"        
       provides:
         type: array
         description: An array containing information about other packages this package provides.
@@ -1189,7 +1217,7 @@ definitions:
         description: An array containing tags for the package.
         items:
           type: string
-          description: Tag for the package.
+          description: The tag for the package.
           example: ".NET"
       userVisible:
         type: boolean
@@ -1325,7 +1353,7 @@ definitions:
         example: 100
       filter:
         type: string
-        example: connected.data.state==""CONNECTED""
+        example: connected.data.state=="CONNECTED"
         description: >-
           The filter criteria for jobs or systems. Consists of a string of queries composed using AND/OR operators.
           String values and date strings need to be enclosed in double quotes.
@@ -1375,14 +1403,14 @@ definitions:
 
           - config.user: String representing the user who created the job.
 
-          - config.tgt: List of strings representing the targeted systems. Example: config.tgt.Contains(""id"")
+          - config.tgt: List of strings representing the targeted systems. Example: config.tgt.Contains("id")
 
-          - config.fun: List of strings representing the functions to be executed within the job. Example: config.fun.Contains(""nisysmgmt.set_blackout"")
+          - config.fun: List of strings representing the functions to be executed within the job. Example: config.fun.Contains("nisysmgmt.set_blackout")
 
-          - config.arg: An array of arrays of variable type elements that are arguments to the function specified by the "fun" property. Example: config.arg[0].Contains(""test"")
+          - config.arg: An array of arrays of variable type elements that are arguments to the function specified by the "fun" property. Example: config.arg[0].Contains("test")
 
           - result.return: An array of objects representing return values for each executed function. Example:
-            result.return[0].Contains(""Success"")
+            result.return[0].Contains("Success")
 
           - result.retcode: An array of integers representing code values for each executed function. Example: result.retcode
 
@@ -1413,7 +1441,7 @@ definitions:
 
           - grains.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system grains were updated.
 
-          - grains.data: Dictionary of string to object representing general information about the system. Example: grains.data.os == ""Windows""
+          - grains.data: Dictionary of string to object representing general information about the system. Example: grains.data.os == "Windows"
 
           - packages.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system installed packages were updated.
 
@@ -1429,15 +1457,15 @@ definitions:
 
           - groups.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system groups data was updated.
 
-          - groups.data: Array of strings representing the IDs of the groups the system is assigned to. Example: groups.data.Contains(""id"")
+          - groups.data: Array of strings representing the IDs of the groups the system is assigned to. Example: groups.data.Contains("id")
 
           - keywords.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system keywords were updated.
 
-          - keywords.data: Array of strings representing the keywords of the system. Example: keywords.data.Contains(""test"")
+          - keywords.data: Array of strings representing the keywords of the system. Example: keywords.data.Contains("test")
 
           - properties.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system properties were updated.
 
-          - properties.data: Dictionary of string to string representing metadata information about a system. Example: properties.data.owner == ""admin""
+          - properties.data: Dictionary of string to string representing metadata information about a system. Example: properties.data.owner == "admin"
       projection:
         type: string
         example: 'new(id,grains,lastUpdatedTimestamp)'
@@ -2168,7 +2196,7 @@ paths:
           x-example:
             skip: 100
             take: 100
-            filter: 'id == ""VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5""'
+            filter: 'id == "VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5"'
             projection: 'new(jid,id,lastUpdatedTimestamp,state,result)'
             orderBy: 'lastUpdatedTimestamp descending'
           schema:
@@ -2200,7 +2228,7 @@ paths:
           x-example:
             skip: 10
             take: 10
-            filter: 'connected.data.state == ""CONNECTED"" && grains.data.os == ""Windows""'
+            filter: 'connected.data.state == "CONNECTED" && grains.data.os == "Windows"'
             projection: 'new(id,lastUpdatedTimestamp,connected,packages)'
             orderBy: 'connected.data.state'
           schema:
