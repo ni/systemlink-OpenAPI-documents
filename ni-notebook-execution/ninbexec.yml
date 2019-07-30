@@ -560,6 +560,7 @@ definitions:
       - ID
       - NOTEBOOK_PATH
       - PARAMETERS
+      - EXECUTION_HASH
       - TIMEOUT
       - QUEUED_AT
       - STARTED_AT
@@ -574,6 +575,7 @@ definitions:
     enum:
       - ID
       - NOTEBOOK_PATH
+      - EXECUTION_HASH
       - TIMEOUT
       - QUEUED_AT
       - STARTED_AT
@@ -751,6 +753,14 @@ definitions:
           dictParam:
             key1: val1
             key2: val2
+      executionHash:
+        description: >-
+          Execution hashes are used internally to identify a distinct execution, where if this
+          hash matches, it means that the result may be reused. This hash is based on information
+          including the notebook path, the last modified timestamp of the notebook, and the given
+          parameters of the notebook overriding the default parameters of the notebook.
+        type: string
+        example: 'ac6d0228705ad33f91d53aee16acbc012298192f'
       timeout:
         description: >-
           The number of seconds the execution runs before it aborts if uncompleted.
