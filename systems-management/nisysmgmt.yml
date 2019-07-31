@@ -587,8 +587,8 @@ definitions:
         example: 19.0
     required: [activated]
 
-  ManagedSystemDataPropertyList:
-    description: Property of a system composed by the last updated timestamp and a list with the actual data.
+  ManagedSystemSysApiData:
+    description: Contains the SysAPI information, represented as a list of property bags.
     type: object
     properties:
       lastUpdatedTimestamp:
@@ -601,8 +601,6 @@ definitions:
         type: array
         items:
           type: object
-          example: 
-            - Lab1
     required: [lastUpdatedTimestamp, data]
 
   ManagedSystemDataPropertyMap:
@@ -732,7 +730,7 @@ definitions:
               uri: http://download.ni.com/support/nipkg/products/ni-package-manager/eulas
       sysapi:
         description: System API information.
-        $ref: '#/definitions/ManagedSystemDataPropertyList'
+        $ref: '#/definitions/ManagedSystemSysApiData'
         example:
           lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
           data:
@@ -766,8 +764,7 @@ definitions:
             type: array
             items:
               type: string
-              example: 
-                - Lab1
+              example: Lab1
         required: [lastUpdatedTimestamp, data]
       keywords:
         description: Keywords metadata information about a system.
@@ -783,8 +780,7 @@ definitions:
             type: array
             items:
               type: string
-              example: 
-                - testVM
+              example: testVM
         required: [lastUpdatedTimestamp, data]
       properties:
         description: Properties metadata information about a system.
