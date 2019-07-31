@@ -1344,8 +1344,6 @@ responses:
       type: object
       required:
         - products
-        - failed
-        - error
       properties:
         products:
           description: Array of products
@@ -1367,8 +1365,6 @@ responses:
       type: object
       required:
         - ids
-        - failed
-        - error
       properties:
         ids:
           description: Array of product ids to delete
@@ -1436,8 +1432,6 @@ responses:
       type: object
       required:
         - results
-        - failed
-        - error
       properties:
         results:
           description: Array of test results
@@ -1459,8 +1453,6 @@ responses:
       type: object
       required:
         - ids
-        - failed
-        - error
       properties:
         ids:
           description: Array of test result ids to delete
@@ -1528,8 +1520,6 @@ responses:
       type: object
       required:
         - steps
-        - failed
-        - error
       properties:
         steps:
           description: Array of test steps
@@ -1581,6 +1571,8 @@ responses:
       description: Delete Test Steps Partial Success Response
       title: StepsDeletePartialSuccessResponse
       type: object
+      required:
+        - steps
       properties:
         steps:
           description: Array of test step id result id pairs that were deleted
