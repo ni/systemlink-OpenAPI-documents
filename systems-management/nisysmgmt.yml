@@ -588,7 +588,7 @@ definitions:
     required: [activated]
 
   ManagedSystemSysApiData:
-    description: Contains the SysAPI information, represented as a list of property bags.
+    description: Contains the SysAPI information.
     type: object
     properties:
       lastUpdatedTimestamp:
@@ -597,9 +597,21 @@ definitions:
         format: iso-date-time
         example: '2019-02-11T13:32:06.030958Z'
       data:
-        description: The actual data.
+        description: The lists of SysAPI property-bags.
         type: array
         items:
+          description: >
+            A property-bag tend to look like
+            {
+              resource_uri = <str>,
+              [
+                {
+                  type = <str>,
+                  tag = <int64>,
+                  value = <str>
+                }
+              ]
+            }
           type: object
     required: [lastUpdatedTimestamp, data]
 
@@ -613,7 +625,7 @@ definitions:
         format: iso-date-time
         example: '2019-02-11T13:32:06.030958Z'
       data:
-        description: The actual data.
+        description: This map is used for grains/packages/feeds. All these are heterogeneous (integers, booleans, lists, dictionaries, ...) collections containing open-ended properties and flags.
         type: object
         additionalProperties:
           type: object
