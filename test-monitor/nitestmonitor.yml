@@ -338,7 +338,7 @@ definitions:
       comparisonValue:
         description: ISO-8601 formatted timestamp value to compare
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2017-11-14T15:41:06.106Z'
   RelativeTimeQueryObject:
     title: Relative Time Query
@@ -432,7 +432,7 @@ definitions:
           ISO-8601 formatted timestamp indicating when the product
           was last updated.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-09T15:07:42.527921Z'
       keywords:
         description: Words or phrases associated with the product
@@ -546,7 +546,7 @@ definitions:
       startedAt:
         description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-07T18:58:05.219692Z'
       totalTimeInSeconds:
         description: Total run-time of the test in seconds
@@ -565,12 +565,12 @@ definitions:
       startedAt:
         description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-07T18:58:05.219692Z'
       updatedAt:
         description: ISO-8601 formatted timestamp indicating when the result was last updated
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-09T15:07:42.527921Z'
       programName:
         description: Program name
@@ -694,7 +694,7 @@ definitions:
       startedAt:
         description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-07T18:58:05.219692Z'
       totalTimeInSeconds:
         description: Total run-time of the test in seconds
@@ -831,7 +831,7 @@ definitions:
         description: >-
           Makes substitutions in the query filter expression. Substitutions for the query expression
           are indicated by non-negative integers that are prefixed with the "at" symbol. Each
-          substitution in the given expression will be replaced by the element at the corresponding 
+          substitution in the given expression will be replaced by the element at the corresponding
           index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
           the element at the zeroth index of the substitutions list.
         type: array
@@ -891,7 +891,7 @@ definitions:
         description: >-
           Makes substitutions in the query filter expression. Substitutions for the query expression
           are indicated by non-negative integers that are prefixed with the "at" symbol. Each
-          substitution in the given expression will be replaced by the element at the corresponding 
+          substitution in the given expression will be replaced by the element at the corresponding
           index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
           the element at the zeroth index of the substitutions list.
         type: array
@@ -953,7 +953,7 @@ definitions:
         description: >-
           Makes substitutions in the query filter expression. Substitutions for the query expression
           are indicated by non-negative integers that are prefixed with the "at" symbol. Each
-          substitution in the given expression will be replaced by the element at the corresponding 
+          substitution in the given expression will be replaced by the element at the corresponding
           index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
           the element at the zeroth index of the substitutions list.
         type: array
@@ -1198,7 +1198,7 @@ definitions:
       startedAt:
         description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-07T18:58:05.219692Z'
       status:
         $ref: '#/definitions/StatusObject'
@@ -1283,12 +1283,12 @@ definitions:
       startedAt:
         description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-07T18:58:05.219692Z'
       updatedAt:
         description: ISO-8601 formatted timestamp indicating when the result was last updated
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-09T15:07:42.527921Z'
       inputs:
         description: Inputs and their values passed to the test
@@ -2088,7 +2088,7 @@ paths:
           required: false
           schema:
             $ref: '#/definitions/StepsAdvancedQuery'
-      produces: 
+      produces:
         - application/json
         - text/csv
       responses:
