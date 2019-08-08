@@ -182,7 +182,7 @@ definitions:
       comparisonValue:
         description: ISO-8601 formatted timestamp value to compare.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2017-11-14T15:41:06.106Z'
   UserDataItemField:
     title: User Data Item Field
@@ -368,13 +368,13 @@ definitions:
       createdAt:
         description: ISO-8601 formatted timestamp specifying when the user data item was created.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2017-11-14T15:41:06.106Z'
       updatedAt:
         description: >-
           ISO-8601 formatted timestamp specifying when the user data item was last updated.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2017-11-14T15:41:06.106Z'
   CreateOrUpdateUserDataItem:
     title: Create or Update User Data Item

@@ -207,7 +207,7 @@ definitions:
       comparisonValue:
         description: ISO-8601 formatted timestamp value to compare.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2017-11-14T15:41:06.106Z'
   ArrayContainsObject:
     title: Array Contains
@@ -423,12 +423,12 @@ definitions:
       createdAt:
         description: File timestamp of when the notebook was created
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2017-11-14T15:41:06.106Z'
       updatedAt:
         description: File timestamp of when the notebook was last modified
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2017-11-14T15:41:06.106Z'
       parameters:
         description: >-
@@ -773,17 +773,17 @@ definitions:
       queuedAt:
         description: Timestamp of when the notebook execution was queued
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2017-11-14T15:41:06.106Z'
       startedAt:
         description: Timestamp of when the notebook execution was started
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2017-11-14T15:41:06.106Z'
       completedAt:
         description: Timestamp of when the notebook execution was completed
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2017-11-14T15:41:06.106Z'
       exception:
         description: >-

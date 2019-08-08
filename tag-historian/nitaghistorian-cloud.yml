@@ -135,7 +135,7 @@ definitions:
       timestamp:
         description: The ISO-8601 formatted timestamp when the historical value was written, in UTC.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-03-13T09:51:38Z'
   HistoricalTagDecimatedQuery:
     description: Defines how decimated historical values are queried and for which tags. Only used for web
@@ -155,14 +155,14 @@ definitions:
         description: Limits the returned historical values to those written at or after the given
           time in ISO-6801 format.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-09-04T18:45:08Z'
         default: '0001-01-01T00:00:00Z'
       endTime:
         description: Limits the returned historical values to those written at or before the given
           time in ISO-8601 format.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-09-04T18:45:08Z'
         default: '0001-01-01T00:00:00Z'
       decimation:
@@ -195,14 +195,14 @@ definitions:
         description: Limits the returned historical values to those written at or after the given
           time in ISO-6801 format.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-09-04T18:45:08Z'
         default: '0001-01-01T00:00:00Z'
       endTime:
         description: Limits the returned historical values to those written at or before the given
           time in ISO-8601 format.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-09-04T18:45:08Z'
         default: '0001-01-01T00:00:00Z'
       take:
@@ -237,7 +237,7 @@ definitions:
       timestamp:
         description: The ISO-8601 formatted timestamp that the historical value was written, in UTC.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-03-13T09:51:38Z'
   TypeAndValues:
     type: object
@@ -628,14 +628,14 @@ paths:
                 description: Limits the returned historical values to those written at or after at the
                   given time in ISO-6801 format.
                 type: string
-                format: iso-date-time
+                format: date-time
                 example: '2018-09-04T18:45:08Z'
                 default: '0001-01-01T00:00:00Z'
               endTime:
                 description: Limits the returned historical values to those written at or before the
                   given time in ISO-8601 format.
                 type: string
-                format: iso-date-time
+                format: date-time
                 example: '2018-09-04T18:45:08Z'
                 default: '9999-12-31T23:59:59Z'
               take:
@@ -712,14 +712,14 @@ paths:
                 description: Limits the returned historical values to those written at or after at the
                   given time in ISO-6801 format.
                 type: string
-                format: iso-date-time
+                format: date-time
                 example: '2018-09-04T18:45:08Z'
                 default: '0001-01-01T00:00:00Z'
               endTime:
                 description: Limits the returned historical values to those written at or before the
                   given time in ISO-8601 format.
                 type: string
-                format: iso-date-time
+                format: date-time
                 example: '2018-09-04T18:45:08Z'
                 default: '9999-12-31T23:59:59Z'
               decimation:
@@ -841,13 +841,13 @@ paths:
                       description: The ISO-8601 formatted timestamp indicating the start of the
                         range. Any historical values from this time until endTime will be deleted.
                       type: string
-                      format: iso-date-time
+                      format: date-time
                       example: '2019-03-13T09:51:38Z'
                     endTime:
                       description: The ISO-8601 formatted timestamp indicating the end of the range.
                         Any historical values from startTime to and including this time will be deleted.
                       type: string
-                      format: iso-date-time
+                      format: date-time
                       example: '2020-03-13T09:51:38Z'
             required: [ranges]
       responses:

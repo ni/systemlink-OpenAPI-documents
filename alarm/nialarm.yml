@@ -101,7 +101,7 @@ definitions:
         example: CRIO1.System.Health.DiskSpaceUsePercentage.Bdd9u!4aMd!$pYrf*CnaIZ2tbu$-Ct%?
       active:
         description: Whether or not the alarm instance is active. An active alarm deserves human or automated
-          attention. Alarm instances always begin life with *active*/true. This field will be automatically 
+          attention. Alarm instances always begin life with *active*/true. This field will be automatically
           set to false when the *clear* and *acknowledged* fields are set to true.
         type: boolean
       clear:
@@ -124,7 +124,7 @@ definitions:
         description: ISO-8601 formatted timestamp specifying when the alarm instance was acknowledged. This
           field will be cleared when an alarm instance's *highestSeverityLevel* field increases.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-01-14T23:15:53.7270539Z'
       acknowledgedBy:
         description: An identifier for who acknowledged a given alarm instance. This field will be cleared
@@ -134,12 +134,12 @@ definitions:
       occurredAt:
         description: ISO-8601 formatted timestamp specifying when the alarm instance was created
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-01-14T23:15:53.7270539Z'
       updatedAt:
         description: ISO-8601 formatted timestamp specifying when the alarm instance was last updated
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-01-14T23:15:53.7270539Z'
       createdBy:
         description: An identifier for who or what created a given alarm instance. This is usually used to
@@ -199,7 +199,7 @@ definitions:
       properties:
         description: Key-value-pair metadata associated with an alarm instance. Alarm instances can be tagged
           with properties to make it easier to find them with queries. Additionally, alarm instance properties
-          are used to expand message templates in the notification strategies associated with a given alarm 
+          are used to expand message templates in the notification strategies associated with a given alarm
           instance.
         type: object
         additionalProperties:
@@ -225,7 +225,7 @@ definitions:
       createdAt:
         description: ISO-8601 formatted timestamp specifying when the note was created
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-01-14T23:15:53.7270539Z'
       user:
         description: The user who created the note
@@ -249,11 +249,11 @@ definitions:
       occurredAt:
         description: ISO-8601 formatted timestamp specifying when the transition occurred
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-01-14T23:15:53.7270539Z'
       severityLevel:
-        description: The severity of the transition. Valid values for CLEAR transitions are [-1,-1]. Valid 
-          values for SET transitions are [1, infinity]. Note that the SystemLink Alarm UI only has display 
+        description: The severity of the transition. Valid values for CLEAR transitions are [-1,-1]. Valid
+          values for SET transitions are [1, infinity]. Note that the SystemLink Alarm UI only has display
           strings for SET severities in the range [1, 4].
         type: integer
         example: 2
@@ -333,25 +333,25 @@ definitions:
         type: string
         description: Acknowledged at minimum date query. The service will return instances which were
           acknowledged between *acknowledgedAtMin* and *acknowledgedAtMax*, inclusive.
-        format: iso-date-time
+        format: date-time
         example: '2019-01-14T23:15:53.7270539Z'
       acknowledgedAtMax:
         type: string
         description: Acknowledged at maximum date query. The service will return instances which were
           acknowledged between *acknowledgedAtMin* and *acknowledgedAtMax*, inclusive.
-        format: iso-date-time
+        format: date-time
         example: '2019-01-15T23:15:53.7270539Z'
       occurredAtMin:
         type: string
         description: Occurred at minimum date query. The service will return instances which occurred between
           *occurredAtMin* and *occurredAtMax*, inclusive.
-        format: iso-date-time
+        format: date-time
         example: '2019-01-14T23:15:53.7270539Z'
       occurredAtMax:
         type: string
         description: Occurred at maximum date query. The service will return instances which occurred between
           *occurredAtMin* and *occurredAtMax*, inclusive.
-        format: iso-date-time
+        format: date-time
         example: '2019-01-15T23:15:53.7270539Z'
       currentSeverityLevelMin:
         type: integer
@@ -639,7 +639,7 @@ paths:
                 type: string
                 example: Disk space on tester-1 is high. Disk usage was 95% when this alarm was created.
               keywords:
-                description: Words or phrases associated with an alarm instance. Alarm instances can be 
+                description: Words or phrases associated with an alarm instance. Alarm instances can be
                   tagged with keywords to make it easier to find them with queries.
                 type: array
                 items:
