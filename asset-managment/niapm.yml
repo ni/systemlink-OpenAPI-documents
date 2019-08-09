@@ -1142,14 +1142,14 @@ responses:
       items:
           type: object
           required:
-            - startDate
-            - endDate
+            - startTimestamp
+            - endTimestamp
             - assetIdentifier
-            - minionIdentifier
-            - utilizationCategory
+            - minionId
+            - category
             - percentage
           properties:
-            startDate:
+            startTimestamp:
               description: >-
                 A date time value representing the beginning of an asset utilization interval.
                 
@@ -1157,7 +1157,7 @@ responses:
               type: string
               format: iso-date-time
               example: '2019-05-01T00:00:00.519Z'
-            endDate:
+            endTimestamp:
               description: >-
                 A date time value representing the end of an asset utilization interval.
                 
@@ -1169,18 +1169,14 @@ responses:
               description: String representing the unique identifier of an asset.
               type: string
               example: "29162;01B245D6;4243;0"
-            minionIdentifier:
+            minionId:
               description: Identifier of the minion where the asset is located.
               type: string
               example: NI_PXIe-8135_Embedded_Controller--MAC-00-80-2F-23-52-65
-            utilizationCategory: 
+            category: 
               description: String representing the utilization task category.
               type: string
               example: Test
-            user:
-              description: String representing the name of the operator who utilized the asset.
-              type: string
-              example: Test Engineer1
             percentage: 
               description: Percentage of time that the asset was utilized in the specified time interval.
               type: number
