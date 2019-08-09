@@ -264,6 +264,7 @@ definitions:
       - OUTPUTS
       - DATA_MODEL
       - DATA
+      - HAS_CHILDREN
     example:
       STEP_TYPE
   ResultSortDefinitionObject:
@@ -1306,6 +1307,12 @@ definitions:
         example: TestStand
       data:
         $ref: '#/definitions/StepDataObject'
+      hasChildren:
+        description: >-
+          Whether this step object has any children step objects. When false, this means
+          that this step object is a leaf node.
+        type: boolean
+        example: false
 responses:
   Error:
     description: Error
