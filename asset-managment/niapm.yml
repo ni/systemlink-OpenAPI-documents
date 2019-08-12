@@ -573,20 +573,24 @@ parameters:
           example: ["29162;01B245D6;4243;0"]
         startDate:
           description: >-
-            A date time value which can be used to specify the beginning of a timespan.
-
-            This parameter is required to have the "ISO 8601" format in order to be considered valid.
-
+            A date value which can be used to specify the beginning of a timespan. 
+            
+            This parameter is required to have the "ISO 8601" format in order to be considered valid. 
+            
             If the parameter is not specified, the value will be set to the 1st day of the current month.
+            
+            The time component of the request is ignored.
           type: string
           example: '2018-05-01T00:00:00.519Z'
         endDate:
-          description: >-
-            A date time value which can be used to specify the end of a timespan.
-
-            This parameter is required to have the "ISO 8601" format in order to be considered valid.
-
+          description: >- 
+            A date value which can be used to specify the end of a timespan.
+            
+            This parameter is required to have the "ISO 8601" format in order to be considered valid. 
+            
             If the parameter is not specified, the value will be set to the current date in UTC.
+            
+            The time component of the request is ignored.
           type: string
           example: '2018-05-20T00:00:00Z'
     required: true
@@ -1368,21 +1372,25 @@ paths:
         - in: query
           name: startDate
           description: >-
-            A date time value which can be used to specify the beginning of a timespan.
-
-            This parameter is required to have the "ISO 8601" format in order to be considered valid.
-
+            A date value which can be used to specify the beginning of a timespan. 
+            
+            This parameter is required to have the "ISO 8601" format in order to be considered valid. 
+            
             If the parameter is not specified, the value will be set to the 1st day of the current month.
+            
+            The time component of the request is ignored.
           type: string
           x-example: '2018-05-01T00:00:00.519Z'
         - in: query
           name: endDate
-          description: >-
-            A date time value which can be used to specify the end of a timespan.
-
-            This parameter is required to have the "ISO 8601" format in order to be considered valid.
-
+          description: >- 
+            A date value which can be used to specify the end of a timespan.
+            
+            This parameter is required to have the "ISO 8601" format in order to be considered valid. 
+            
             If the parameter is not specified, the value will be set to the current date in UTC.
+            
+            The time component of the request is ignored.
           type: string
           x-example: '2018-05-20T00:00:00Z'
         - $ref: '#/parameters/AssetAvailabilityGranularity'
