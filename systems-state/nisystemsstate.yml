@@ -228,7 +228,7 @@ definitions:
           - getStates: The ability to retrieve states
 
           - createOrUpdateStates: The ability to create or update states
-          
+
           - deleteStates: The ability to delete states
         type: object
         properties:
@@ -241,7 +241,7 @@ definitions:
 
   StateArchitecture:
     description: Supported architecture by a state.
-    title: State Architecture    
+    title: State Architecture
     type: string
     enum:
       - ARM
@@ -251,7 +251,7 @@ definitions:
 
   StateDistribution:
     description: Supported distribution by a state.
-    title: State Distribution    
+    title: State Distribution
     type: string
     enum:
       - NI_LINUXRT
@@ -287,12 +287,12 @@ definitions:
       createdTimestamp:
         description: ISO-8601 formatted timestamp specifying the state creation date.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-07T18:58:05.219692Z'
       lastUpdatedTimestamp:
         description: ISO-8601 formatted timestamp specifying the last date that the state was updated.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-07T18:58:05.219692Z'
     required:
       - id
@@ -425,12 +425,12 @@ definitions:
       createdTimestamp:
         description: ISO-8601 formatted timestamp specifying the state creation date.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-07T18:58:05.219692Z'
       lastUpdatedTimestamp:
         description: ISO-8601 formatted timestamp specifying the last date that the state has been updated.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-07T18:58:05.219692Z'
       feeds:
         type: array
@@ -611,7 +611,7 @@ paths:
           schema:
             $ref: '#/definitions/StateDescriptionListResponse'
         401:
-          $ref: '#/responses/Unauthorized'            
+          $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
     post:
@@ -634,7 +634,7 @@ paths:
           schema:
             $ref: '#/definitions/StateResponse'
         400:
-          $ref: '#/responses/BadRequest'            
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
         409:
@@ -661,7 +661,7 @@ paths:
           schema:
             $ref: '#/definitions/StateResponse'
         401:
-          $ref: '#/responses/Unauthorized'          
+          $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
         default:
@@ -671,7 +671,7 @@ paths:
       x-ni-privilege: nisystemsstate.Write
       x-ni-operation: createOrUpdateStates
       consumes:
-        - application/merge-patch+json      
+        - application/merge-patch+json
       tags: [states]
       summary: Update a state
       description: Update a state by providing specific changes to the state. The method overrides all state properties with those contained in the request. Therefore, if you want to ignore a properties update, leave the value off the request.
@@ -794,7 +794,7 @@ paths:
           schema:
             $ref: '#/definitions/StateHistoryResponse'
         401:
-          $ref: '#/responses/Unauthorized'          
+          $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
         default:
@@ -824,7 +824,7 @@ paths:
           schema:
             $ref: '#/definitions/StateResponse'
         401:
-          $ref: '#/responses/Unauthorized'          
+          $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
         default:
@@ -857,7 +857,7 @@ paths:
             application/octet-stream:
               File data
         401:
-          $ref: '#/responses/Unauthorized'          
+          $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
   /v1/import-state:
@@ -871,7 +871,7 @@ paths:
       consumes:
         - multipart/form-data
       parameters:
-        - in: formData 
+        - in: formData
           name: file
           type: file
           required: true
@@ -888,7 +888,7 @@ paths:
           enum:
             - NI_LINUXRT
             - NI_LINUXRT_NXG
-            - WINDOWS       
+            - WINDOWS
         - in: formData
           name: architecture
           type: string

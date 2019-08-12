@@ -94,7 +94,7 @@ definitions:
         example:
           - pkg.remove
           - pkg.install
-      arg: 
+      arg:
         description: An array of variable type element arrays, which are arguments to the function specified by the "fun" property. If at least one function requires arguments, an array must be provided for each function, even if it is empty. Keyword arguments may be provided as a parameter of type object with at least one property of type boolean ("__kwarg__") that evaluates to true.
         type: array
         items:
@@ -149,7 +149,7 @@ definitions:
         example:
           - pkg.remove
           - pkg.install
-      arg: 
+      arg:
         description: An array of arrays of variable type elements that are arguments to the function specified by the "fun" property. If at least one function requires arguments, an array must be provided for each function, even if it is empty. Keyword arguments may be provided as a parameter of type object with at least one property of type boolean, "__kwarg__", that is evaluated to true.
         type: array
         items:
@@ -383,7 +383,7 @@ definitions:
       lastUpdatedTimestamp:
         description: Last updated timestamp.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-02-11T13:32:06.030958Z'
       master:
         description: Master of the system.
@@ -433,7 +433,7 @@ definitions:
       - INQUEUE
       - INPROGRESS
     example: SUCCEEDED
-    description: > 
+    description: >
       The state of the job.
        * CANCELED: The job was canceled by the user.
        * FAILED: The job completed with failures. The job fails if at least one of the its functions executing fails.
@@ -456,17 +456,17 @@ definitions:
         example: VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5
       createdTimestamp:
         type: string
-        format: iso-date-time
+        format: date-time
         description: The date when the job was created.
         example: '2019-02-11T13:32:06.030958Z'
       lastUpdatedTimestamp:
         type: string
-        format: iso-date-time
+        format: date-time
         description: The date when the job was last updated.
         example: '2019-02-11T13:32:06.030958Z'
       dispatchedTimestamp:
         type: string
-        format: iso-date-time
+        format: date-time
         description: The date when the job was actually sent to the system.
         example: '2019-02-11T13:32:06.030958Z'
       state:
@@ -524,7 +524,7 @@ definitions:
               type: object
               example: 'Computer Description: test'
             description: An array of objects representing return values for each executed function.
-            example: 
+            example:
               - Computer Description: test
               - null
           retcode:
@@ -594,7 +594,7 @@ definitions:
       lastUpdatedTimestamp:
         description: Last updated timestamp.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-02-11T13:32:06.030958Z'
       data:
         description: The lists of SysAPI property-bags.
@@ -622,7 +622,7 @@ definitions:
       lastUpdatedTimestamp:
         description: Last updated timestamp.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-02-11T13:32:06.030958Z'
       data:
         description: This map is used for grains/packages/feeds. All these are heterogeneous (integers, booleans, lists, dictionaries, ...) collections containing open-ended properties and flags.
@@ -645,12 +645,12 @@ definitions:
       createdTimestamp:
         description: The time when the system was registered.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-02-19T11:42:25.078Z'
       lastUpdatedTimestamp:
         description: Last time when the system information updated.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-02-19T11:42:25.078Z'
       alias:
         description: The alias of the system.
@@ -663,7 +663,7 @@ definitions:
           lastUpdatedTimestamp:
             description: Last time when the system activation information updated.
             type: string
-            format: iso-date-time
+            format: date-time
             example: '2019-02-19T11:42:25.078Z'
           data:
             $ref: '#/definitions/ManagedSystemActivationData'
@@ -675,7 +675,7 @@ definitions:
           lastUpdatedTimestamp:
             description: Last time when the system connection information updated.
             type: string
-            format: iso-date-time
+            format: date-time
             example: '2019-02-19T11:42:25.078Z'
           data:
             type: object
@@ -699,7 +699,7 @@ definitions:
             os_family: Windows
             mem_total: 1023
             osversion: 6.1.7601
-            osrelease: 7        
+            osrelease: 7
       packages:
         description: Software packages installed on the system.
         $ref: '#/definitions/ManagedSystemDataPropertyMap'
@@ -769,7 +769,7 @@ definitions:
           lastUpdatedTimestamp:
             description: Last updated timestamp.
             type: string
-            format: iso-date-time
+            format: date-time
             example: '2019-02-19T11:42:25.078Z'
           data:
             description: A list of strings defining metadata information about a system.
@@ -785,7 +785,7 @@ definitions:
           lastUpdatedTimestamp:
             description: Last updated timestamp.
             type: string
-            format: iso-date-time
+            format: date-time
             example: '2019-02-19T11:42:25.078Z'
           data:
             description: A list of strings defining metadata information about a system.
@@ -801,7 +801,7 @@ definitions:
           lastUpdatedTimestamp:
             description: Last updated timestamp.
             type: string
-            format: iso-date-time
+            format: date-time
             example: '2019-02-19T11:42:25.078Z'
           data:
             description: An object defining key-value pairs metadata information about a system.
@@ -884,7 +884,7 @@ definitions:
       lastUpdatedTimestamp:
         description: The time when the group was alst updated.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-02-12T14:49:03.013000Z'
     required: [gid, name, lastUpdatedTimestamp]
 
@@ -972,7 +972,7 @@ definitions:
       - ACTIVATE_ACCEPT
     example: ACCEPT
     description: >
-      Action to be performed. 
+      Action to be performed.
         * ACCEPT: Accept the associated key.
         * REJECT: Reject the associated key.
         * DELETE: Delete the associated key.
@@ -1058,9 +1058,9 @@ definitions:
                 type: string
               example:
                 - http://download.ni.com/ni-linux-rt/feeds/SystemLink/18.5/x64/
-                - http://download.ni.com/ni-linux-rt/feeds/SystemLink/salt/18.5/x64/x64/           
+                - http://download.ni.com/ni-linux-rt/feeds/SystemLink/salt/18.5/x64/x64/
             osArchitectures:
-              type: array 
+              type: array
               description: An array of strings representing OS architectures supported by a system(s) in descending priority.
               items:
                 type: string
@@ -1136,7 +1136,7 @@ definitions:
       hardwareSupport:
         type: array
         description: When a package provides functionality for specific hardware product(s), it can list such products in this section
-        items: 
+        items:
           type: string
           example: NI cRIO-9035 (Sync)
       homepage:
@@ -1170,21 +1170,21 @@ definitions:
       priority:
         type: string
         description: The priority of the package.
-        example: "standard"        
+        example: "standard"
       provides:
         type: array
         description: An array containing information about other packages this package provides.
         items:
           type: string
           example: "ni-curl (= 17.0.0.49152-0+f0)"
-          description: One of the packages the containing package provides. This also contains information about the version of the package.      
+          description: One of the packages the containing package provides. This also contains information about the version of the package.
       recommends:
         type: array
         description: An array containing information about other packages this package recommends.
         items:
           type: string
           description: The name of a package this package recommends. This also contains information about the version of the package.
-          example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"        
+          example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"
       releaseNotes:
         type: string
         description: A page containing the release notes of the package.
@@ -1195,7 +1195,7 @@ definitions:
         items:
           type: string
           description: The name of a package this package replaces. This also contains information about the version of the package.
-          example: "b235b862-6a92-4a04-a8b2-6d71f777de67 (< 16.99.65535)"       
+          example: "b235b862-6a92-4a04-a8b2-6d71f777de67 (< 16.99.65535)"
       section:
         type: string
         description: The section of the package.
@@ -1219,7 +1219,7 @@ definitions:
         items:
           type: string
           description: The name of a package this package suggests. This also contains information about the version of the package.
-          example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"       
+          example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"
       tags:
         type: array
         description: An array containing tags for the package.
@@ -1303,23 +1303,23 @@ definitions:
           Available operations in the v1 version of the API:
 
           - getJobs: The ability to retrieve the jobs.
-          
+
           - getSystems: The ability to retrieve the systems information.
 
           - getGroups: The ability to retrieve the groups.
-    
+
           - manageSystems: The ability to register or unregister systems.
-          
+
           - createOrCancelJobs: The ability to create or cancel jobs.
-          
+
           - activateSystems: The ability to activate systems.
-          
+
           - updateSystemMetadata: The ability to update systems metadata.
-          
+
           - manageFeeds: The ability to configure feeds and retrieve the available packages.
-          
+
           - createOrUpdateGroups: The ability to create, update, or delete groups.
-          
+
         type: object
         properties:
           getJobs:
@@ -1339,7 +1339,7 @@ definitions:
           manageFeeds:
             $ref: '#/definitions/Operation'
           createOrUpdateGroups:
-            $ref: '#/definitions/Operation' 
+            $ref: '#/definitions/Operation'
 
   QueryRequest:
     description: Request for querying resources. More info here -> https://github.com/StefH/System.Linq.Dynamic.Core/wiki/Dynamic-Expressions and https://stefh.github.io/System.Linq.Dynamic.Core/html/144078bd-d1ad-bece-4daa-7fdd3a7ed7dc.htm
@@ -1477,7 +1477,7 @@ definitions:
       projection:
         type: string
         example: 'new(id,grains,lastUpdatedTimestamp)'
-        description: Specifies the projection for resources. This field can be used if we don't want to receive the entire model but only certain properties of the model.  
+        description: Specifies the projection for resources. This field can be used if we don't want to receive the entire model but only certain properties of the model.
       orderBy:
         type: string
         example: 'lastUpdatedTimestamp descending'
@@ -2178,7 +2178,7 @@ paths:
         200:
           description: OK.
           schema:
-            type: array 
+            type: array
             items:
               $ref: '#/definitions/PackageResponse'
         400:
@@ -2216,7 +2216,7 @@ paths:
           schema:
             $ref: '#/definitions/QueryResponse'
         401:
-          $ref: '#/responses/Unauthorized'          
+          $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
         default:
@@ -2248,7 +2248,7 @@ paths:
           schema:
             $ref: '#/definitions/QueryResponse'
         401:
-          $ref: '#/responses/Unauthorized'          
+          $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
         default:
