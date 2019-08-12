@@ -518,7 +518,7 @@ definitions:
             type: integer
             example: 30
 parameters:
-  AssetAvailabilityGranularity:
+  TimespanGranularity:
     in: query
     name: granularity
     description: The possible granularities that can be used to obtain asset availability.
@@ -1393,7 +1393,7 @@ paths:
             The time component of the request is ignored.
           type: string
           x-example: '2018-05-20T00:00:00Z'
-        - $ref: '#/parameters/AssetAvailabilityGranularity'
+        - $ref: '#/parameters/TimespanGranularity'
       responses:
         200:
           $ref: '#/responses/AvailabilityInSystemResponse'
