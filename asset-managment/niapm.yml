@@ -506,8 +506,6 @@ definitions:
     title: Service policy
     description: An object containing the service policy.
     type: object
-    required:
-      - calibrationPolicy
     properties:
       calibrationPolicy:
         description: Calibration policy
@@ -517,6 +515,18 @@ definitions:
             description: The number of days for an asset to be considered as approaching calibration.
             type: integer
             example: 30
+      workingHoursPolicy:
+        description: An object that describes the start time and end time of a working day.
+        type: object
+        properties:
+          startTime:
+            description: A string formatted as an hour with minutes and seconds representing the start time of a working day.
+            type: string
+            example: "09:00:00"
+          endTime:
+            description: A string formatted as an hour with minutes and seconds representing the end time of a working day.
+            type: string
+            example: "17:00:00"
 parameters:
   TimespanGranularity:
     in: query
