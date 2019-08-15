@@ -100,6 +100,20 @@ definitions:
     example:
       available: true
       version: 1
+  CreateExecutionOperation:
+    title: Create Executions Operation
+    description: Create Executions array object including export formats
+    allOf: 
+      - $ref: '#/definitions/Operation'
+      - type: object
+        properties: 
+          exportFormats: 
+            description: List of export formats 
+            type: array
+            items: 
+              $ref: '#/definitions/NotebookExportFormat'
+        example:
+          exportFormats: [PDF, HTML]
   V1Operations:
     title: Version 1 Operations
     description: V1 operations
@@ -131,7 +145,7 @@ definitions:
           queryExecutions:
             $ref: '#/definitions/Operation'
           createExecutions:
-            $ref: '#/definitions/Operation'
+            $ref: '#/definitions/CreateExecutionOperation'
           cancelExecutions:
             $ref: '#/definitions/Operation'
   V2Operations:
@@ -165,7 +179,7 @@ definitions:
           queryExecutions:
             $ref: '#/definitions/Operation'
           createExecutions:
-            $ref: '#/definitions/Operation'
+            $ref: '#/definitions/CreateExecutionOperation'
           cancelExecutions:
             $ref: '#/definitions/Operation'
   QueryOperation:
