@@ -1554,7 +1554,7 @@ paths:
       operationId: CreateJob
       x-ni-privilege: Write
       x-ni-operation: createOrCancelJobs
-      x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       tags: [jobs]
       summary: Create a job
       description: Create a job and returns the newly created job including the job ID.
