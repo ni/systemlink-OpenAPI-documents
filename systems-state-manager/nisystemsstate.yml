@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  description: "Creates and manages states that can be applied to managed systems."
+  description: "Creates and manages states you can apply applied to managed systems."
   version: "1"
   title: "SystemLink Systems State Manager"
   contact:
@@ -92,7 +92,7 @@ definitions:
         description: The ID of the state.
         type: string
       stateVersion:
-        description: The version of the state. The latest content of the state will be used if version is not specified.
+        description: The version of the state. The latest package/feed set of the state will be used if the version is not specified.
         type: string
     required:
       - stateID
@@ -106,7 +106,7 @@ definitions:
     properties:
       inline:
         description: >-
-            Whether to return the state data inline rather than as an attachment.
+            Whether to return the state data inline or as an attachment.
             When the inline is true, the
             Content-Disposition header is set to 'inline'.
             When the inline is not specified or is
@@ -126,7 +126,7 @@ definitions:
     properties:
       inline:
         description: >-
-            Whether to return the state data inline rather than as an attachment.
+            Whether to return the state data inline or as an attachment.
             When the inline is true, the
             Content-Disposition header is set to 'inline'.
             When the inline is not specified or is
@@ -136,7 +136,7 @@ definitions:
         type: boolean
         example: true
       systemID:
-        description: System ID
+        description: System ID.
         type: string
         example: cRIO-9064--SN-11111111--MAC-00-01-02-03-04-05
     required:
@@ -176,7 +176,7 @@ definitions:
         description: The identifier of the resource associated with the error.
         type: string
       message:
-        description: The filled in error message.
+        description: The filled-in error message.
         type: string
       args:
         description: Positional argument values for the error code.
@@ -225,7 +225,7 @@ definitions:
         description: >-
           Available operations in the v1 version of the API:
 
-          - getStates: The ability to retrieve the states
+          - getStates: The ability to retrieve states
 
           - createOrUpdateStates: The ability to create or update states
           
@@ -290,7 +290,7 @@ definitions:
         format: iso-date-time
         example: '2018-05-07T18:58:05.219692Z'
       lastUpdatedTimestamp:
-        description: ISO-8601 formatted timestamp specifying the last date that the state has been updated.
+        description: ISO-8601 formatted timestamp specifying the last date that the state was updated.
         type: string
         format: iso-date-time
         example: '2018-05-07T18:58:05.219692Z'
@@ -343,11 +343,11 @@ definitions:
     properties:
       name:
         type: string
-        description: Name of the State
+        description: Name of the state.
         example: crio9064State
       description:
         type: string
-        description: Description of the State
+        description: Description of the state.
         example: crio9064 Setup State
       distribution:
         $ref: '#/definitions/StateDistribution'
@@ -374,11 +374,11 @@ definitions:
     properties:
       name:
         type: string
-        description: Name of the State.
+        description: Name of the state.
         example: crio9064State
       description:
         type: string
-        description: Description of the State.
+        description: Description of the state.
         example: crio9064 Setup State
       distribution:
         $ref: '#/definitions/StateDistribution'
@@ -442,7 +442,7 @@ definitions:
           $ref: '#/definitions/Package'
       containsExtraOperations:
         type: boolean
-        description: Whether the state containts extra operations beside feeds and packages or not.
+        description: Whether the state contains extra operations in addition to feeds and packages.
         example: true
     required:
       - id
@@ -494,7 +494,7 @@ definitions:
       - versions
 
   Feed:
-    description: Object defining a feed containing the name, url and whether is enabled/compressed or not.
+    description: Object defining a feed, which contains the name, url, and Booleans for whether the feed is enabled and compressed.
     type: object
     properties:
       name:
@@ -544,7 +544,7 @@ paths:
       summary: API information
       tags: [versioning]
       security: []
-      description: Gets permissions and operations for the StatesService.
+      description: Gets permissions and operations for the States Service.
       responses:
         200:
           description: OK
@@ -620,7 +620,7 @@ paths:
       x-ni-operation: createOrUpdateStates
       tags: [states]
       summary: Create a new system state
-      description: Create a new System State by providing metadata and its content. rawState property will be used if it has a non-null value, feeds and packages will be used otherwise.
+      description: Create a new System State by providing the required metadata and content.
       parameters:
         - in: body
           name: state
@@ -648,7 +648,7 @@ paths:
       x-ni-operation: getStates
       tags: [states]
       summary:  Get system state
-      description: Returns the metadata, the feeds and packages from the content of the state. If the state contains only feeds and packages entries the containsExtraOperations from response will be false, otherwise it will be true. The export route could be used in order to get the whole content of the state.
+      description: Returns the metadata, feeds, and packages from the state content. If the state contains only feed and package entries, the containsExtraOperations property of the response will be false. Otherwise, it will be true. You may use the export route to get all state content.
       parameters:
         - name: id
           in: path
@@ -674,7 +674,7 @@ paths:
         - application/merge-patch+json      
       tags: [states]
       summary: Update a state
-      description: Update a state by providing specific changes of the state. The method overrides any state properties with what is contained in the request. In order to ignore properties update, leave the value off the request. If rawState is specified it will have priority against packages/feeds.
+      description: Update a state by providing specific changes to the state. The method overrides all state properties with those contained in the request. Therefore, if you want to ignore a properties update, leave the value off the request.
       parameters:
         - name: id
           in: path
@@ -731,7 +731,7 @@ paths:
       x-ni-operation: createOrUpdateStates
       tags: [states]
       summary: Replace the content of a state
-      description: Replace the content of a state by providing the new content of the state.
+      description: Replace the existing content of a state with new content.
       consumes:
         - multipart/form-data
       parameters:
@@ -769,7 +769,7 @@ paths:
       x-ni-operation: getStates
       tags: [history]
       summary: Get state history
-      description: Returns a list of (version, description) pairs defining the history of the state.
+      description: Returns a list of version-description pairs defining the history of the state.
       parameters:
         - name: id
           in: path
@@ -778,13 +778,13 @@ paths:
           type: string
         - in: query
           name: skip
-          description: How many state versions to skip. Used for pagination.
+          description: Number of state versions to skip. Used for pagination.
           type: integer
           x-ni-data-type: U32
           default: 0
         - in: query
           name: take
-          description: How many state versions to retrieve. Used for pagination.
+          description: Number of state versions to retrieve. Used for pagination.
           type: integer
           x-ni-data-type: U32
           default: 1000
@@ -806,7 +806,7 @@ paths:
       x-ni-operation: getStates
       tags: [history]
       summary: Get state by version
-      description: Returns the snapshot of a state at a specific version. Returns the metadata, the feeds and packages from the content of the state. If the state contains only feeds and packages entries the containsExtraOperations from response will be false, otherwise it will be true. The export route could be used in order to get the whole content of the state.
+      description: Returns the snapshot of a state at a specific version. Returns the metadata, feeds, and packages from the state content. If the state contains only feed and package entries, the containsExtraOperations property of the response will be false. Otherwise, it will be true. You may use the export route to get all state content.
       parameters:
         - name: id
           in: path
@@ -836,7 +836,7 @@ paths:
       x-ni-operation: getStates
       tags: [states]
       summary: Export a state
-      description: Export the state content to a file. If the version is not provided in body then the latest content will be exported. 
+      description: Export the state content to a file. If the version is not provided in body, then the latest content will be exported. 
       parameters:
         - name: stateInfo
           in: body
@@ -916,8 +916,8 @@ paths:
       x-ni-privilege: Read
       x-ni-operation: getStates
       tags: [states]
-      summary: Export the state of a System by providing its ID.
-      description: Export the state of a System by providing its ID. 
+      summary: Export the state of a system by providing its ID.
+      description: Export the state of a system by providing its ID. 
       parameters:
         - name: systemInfo
           in: body
@@ -948,7 +948,7 @@ paths:
       x-ni-operation: deleteStates
       tags: [states]
       summary: Delete states
-      description: Delete a list of states by providing their ids.
+      description: Delete a list of states by providing their IDs.
       parameters:
         - in: body
           name: StateIDs
