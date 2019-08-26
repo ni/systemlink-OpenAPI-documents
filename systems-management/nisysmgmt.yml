@@ -1341,9 +1341,9 @@ definitions:
           createOrUpdateGroups:
             $ref: '#/definitions/Operation'
 
-  QueryRequest:
+  QuerySystemsRequest:
     description: Request for querying resources. More info here -> https://github.com/StefH/System.Linq.Dynamic.Core/wiki/Dynamic-Expressions and https://stefh.github.io/System.Linq.Dynamic.Core/html/144078bd-d1ad-bece-4daa-7fdd3a7ed7dc.htm
-    title: Query Request
+    title: Query Systems Request
     properties:
       skip:
         description: The number of resources to skip.
@@ -1351,7 +1351,7 @@ definitions:
         format: int64
         default: 0
         minimum: 0
-        example: 100
+        example: 0
       take:
         description: The number of resources to return. The maximum value is 1000.
         type: integer
@@ -1362,6 +1362,116 @@ definitions:
       filter:
         type: string
         example: connected.data.state=="CONNECTED"
+        description: >-
+          The filter criteria for jobs or systems. Consists of a string of queries composed using AND/OR operators.
+          String values and date strings need to be enclosed in double quotes.
+          Parenthesis can be used around filters to better define the order of operations.
+
+          Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+
+
+          Operators:
+
+          - Equals operator '='. Example: 'x = y'
+
+          - Not equal operator '!='. Example: 'x != y'
+
+          - Greater than operator '>'. Example: 'x > y'
+
+          - Greater than or equal operator '>='. Example: 'x >= y'
+
+          - Less than operator '<'. Example: 'x < y'
+
+          - Less than or equal operator '<='. Example: 'x <= y'
+
+          - Logical AND operator 'and' or '&&'. Example: 'x and y'
+
+          - Logical OR operator 'or' or '||'. Example: 'x or y'
+
+          - Contains operator '.Contains()', used to check if a list contains an element. Example: 'x.Contains(y)'
+
+          - Not Contains operator '!.Contains()', used to check if a list does not contain an element. Example: '!x.Contains(y)'
+
+
+          Valid system properties that can be used in the filter:
+
+          - id : String representing the ID of the system.
+
+          - createdTimestamp: ISO-8601 formatted timestamp string specifying the date when the system was registered.
+
+          - lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system was updated.
+
+          - alias: String representing the alias of the system.
+
+          - activation.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system activation was updated.
+
+          - activation.data.activated: Boolean representing whether the system is activated or not.
+
+          - activation.data.licenseName: String representing the name of the license.
+
+          - activation.data.licenseVersion: String representing the license version.
+
+          - connected.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system connection was updated.
+
+          - connected.data.state: String representing the state of the system.
+
+          - grains.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system grains were updated.
+
+          - grains.data: Dictionary of string to object representing general information about the system. Example: grains.data.os == "Windows"
+
+          - packages.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system installed packages were updated.
+
+          - packages.data: Dictionary representing software packages installed on the system. Example: packages.data.ni-package-manager-upgrader.version: String representing the installed version of ni-package-manager-upgrader package.
+
+          - feeds.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system configured feeds were updated.
+
+          - feeds.data: Dictionary representing the feeds configured on the system.
+
+          - sysapi.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system sysapi data was updated.
+
+          - sysapi.data: Dictionary representing system API information of a system.
+
+          - groups.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system groups data was updated.
+
+          - groups.data: Array of strings representing the IDs of the groups the system is assigned to. Example: groups.data.Contains("id")
+
+          - keywords.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system keywords were updated.
+
+          - keywords.data: Array of strings representing the keywords of the system. Example: keywords.data.Contains("test")
+
+          - properties.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system properties were updated.
+
+          - properties.data: Dictionary of string to string representing metadata information about a system. Example: properties.data.owner == "admin"
+      projection:
+        type: string
+        example: 'new(id,grains,lastUpdatedTimestamp)'
+        description: Specifies the projection for resources. This field can be used if we don't want to receive the entire model but only certain properties of the model.
+      orderBy:
+        type: string
+        example: 'lastUpdatedTimestamp descending'
+        description: The order in which data returns.
+
+  QueryJobsRequest:
+    description: Request for querying jobs resources. More info here -> https://github.com/StefH/System.Linq.Dynamic.Core/wiki/Dynamic-Expressions and https://stefh.github.io/System.Linq.Dynamic.Core/html/144078bd-d1ad-bece-4daa-7fdd3a7ed7dc.htm
+    title: Query Jobs Request
+    properties:
+      skip:
+        description: The number of resources to skip.
+        type: integer
+        format: int64
+        default: 0
+        minimum: 0
+        example: 0
+      take:
+        description: The number of resources to return. The maximum value is 1000.
+        type: integer
+        format: int64
+        minimum: 0
+        maximum: 1000
+        example: 100
+      filter:
+        type: string
+        example: state=="SUCCEEDED"
         description: >-
           The filter criteria for jobs or systems. Consists of a string of queries composed using AND/OR operators.
           String values and date strings need to be enclosed in double quotes.
@@ -1424,59 +1534,9 @@ definitions:
 
           - result.success: An array of booleans representing success values for each executed function. Example:
             result.success.Contains(false)
-
-          Valid system properties that can be used in the filter:
-
-          - id : String representing the ID of the system.
-
-          - createdTimestamp: ISO-8601 formatted timestamp string specifying the date when the system was registered.
-
-          - lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system was updated.
-
-          - alias: String representing the alias of the system.
-
-          - activation.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system activation was updated.
-
-          - activation.data.activated: Boolean representing whether the system is activated or not.
-
-          - activation.data.licenseName: String representing the name of the license.
-
-          - activation.data.licenseVersion: String representing the license version.
-
-          - connected.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system connection was updated.
-
-          - connected.data.state: String representing the state of the system.
-
-          - grains.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system grains were updated.
-
-          - grains.data: Dictionary of string to object representing general information about the system. Example: grains.data.os == "Windows"
-
-          - packages.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system installed packages were updated.
-
-          - packages.data: Dictionary representing software packages installed on the system. Example: packages.data.ni-package-manager-upgrader.version: String representing the installed version of ni-package-manager-upgrader package.
-
-          - feeds.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system configured feeds were updated.
-
-          - feeds.data: Dictionary representing the feeds configured on the system.
-
-          - sysapi.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system sysapi data was updated.
-
-          - sysapi.data: Dictionary representing system API information of a system.
-
-          - groups.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system groups data was updated.
-
-          - groups.data: Array of strings representing the IDs of the groups the system is assigned to. Example: groups.data.Contains("id")
-
-          - keywords.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system keywords were updated.
-
-          - keywords.data: Array of strings representing the keywords of the system. Example: keywords.data.Contains("test")
-
-          - properties.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system properties were updated.
-
-          - properties.data: Dictionary of string to string representing metadata information about a system. Example: properties.data.owner == "admin"
       projection:
         type: string
-        example: 'new(id,grains,lastUpdatedTimestamp)'
+        example: 'new(id,jid,state,lastUpdatedTimestamp,config.fun as fun)'
         description: Specifies the projection for resources. This field can be used if we don't want to receive the entire model but only certain properties of the model.
       orderBy:
         type: string
@@ -2202,14 +2262,8 @@ paths:
           name: Query
           description: Query for getting jobs data.
           required: true
-          x-example:
-            skip: 100
-            take: 100
-            filter: 'id == "VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5"'
-            projection: 'new(jid,id,lastUpdatedTimestamp,state,result)'
-            orderBy: 'lastUpdatedTimestamp descending'
           schema:
-            $ref: '#/definitions/QueryRequest'
+            $ref: '#/definitions/QueryJobsRequest'
       responses:
         200:
           description: OK.
@@ -2234,14 +2288,8 @@ paths:
           name: Query
           description: Query for getting systems data.
           required: true
-          x-example:
-            skip: 10
-            take: 10
-            filter: 'connected.data.state == "CONNECTED" && grains.data.os == "Windows"'
-            projection: 'new(id,lastUpdatedTimestamp,connected,packages)'
-            orderBy: 'connected.data.state'
           schema:
-            $ref: '#/definitions/QueryRequest'
+            $ref: '#/definitions/QuerySystemsRequest'
       responses:
         200:
           description: OK.
