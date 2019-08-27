@@ -1147,11 +1147,11 @@ responses:
     description: Service policy response containing the service calibration policy with the number of days for an asset to be considered as approaching calibration.
     schema:
       $ref: '#/definitions/ServicePolicy'
-  AssetUtilizationResponse:
-    description: Asset Utilization response containing the collection of utilizations matching the provided filters, in a specific time interval. Besides a time interval, each element contains an asset identifier, an asset utilization category, and a percentage of time that the asset was utilized in the time interval.
+  UtilizationWithPercentageResponse:
+    description: Utilization response containing the collection of utilizations matching the provided filters, in a specific time interval. Besides a time interval, each element contains an asset identifier, a minion id, an utilization category, and a percentage of time that the asset was utilized in the time interval.
     schema:
-      title: Asset Utilization Response
-      description: Response for the asset utilization query containing the collection of utilizations. Besides a time interval, each element contains an asset identifier, an asset utilization category, and a percentage of time that the asset was utilized in the time interval.
+      title: Utilization with Percentage Response
+      description: Response for the utilization query containing the collection of utilizations. Besides a time interval, each element contains an asset identifier, a minion id, an utilization category, and a percentage of time that the asset was utilized in the time interval.
       type: array
       items:
           type: object
@@ -1622,7 +1622,7 @@ paths:
         - $ref: '#/parameters/QueryAssetUtilizationRequest'
       responses:
         200:
-          $ref: '#/responses/AssetUtilizationResponse'
+          $ref: '#/responses/UtilizationWithPercentageResponse'
         400:
           $ref: '#/responses/BadRequest'
         401:
