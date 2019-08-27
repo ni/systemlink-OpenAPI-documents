@@ -1,0 +1,1488 @@
+swagger: '2.0'
+info:
+  version: '1'
+  title: Test Monitor Web Service
+  description: Test Monitor HTTP API
+  contact:
+    name: National Instruments
+    url: 'https://www.ni.com/systemlink'
+    email: support@ni.com
+basePath: /nitestmonitor
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  apiKeyAuth:
+    type: apiKey
+    name: x-ni-api-key
+    in: header
+  basicAuth:
+    type: basic
+  cookieAuth:
+    type: apiKey
+    in: header
+    name: Cookie
+security:
+  - apiKeyAuth: []
+  - basicAuth: []
+  - cookieAuth: []
+x-ni-routing-key: Skyline.TestMonitor
+definitions:
+  Error:
+    description: Contains error information
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+        format: int32
+      resourceType:
+        description: Type of resource associated with the error
+        type: string
+      resourceId:
+        description: Identifier of the resource associated with the error
+        type: string
+      message:
+        description: Complete error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+      innerErrors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+    example:
+      name: Skyline.OneOrMoreErrorsOccurred
+      code: -251040
+      message: >-
+        One or more errors occurred. See the contained list for details of each
+        error.
+      args: []
+      innerErrors:
+        - name: TestMonitor.InvalidId
+          code: -253700
+          resourceType: TestResult
+          resourceId: 4afb2ce3741fe11d88838cc9
+          message: Invalid Id.
+          args: []
+  Operation:
+    description: Operation provided by the API
+    type: object
+    properties:
+      available:
+        type: boolean
+        description: Whether the operation is available to the caller
+      version:
+        type: integer
+        format: int32
+        description: Version of the available operation
+    required: [available]
+    example:
+      available: true
+      version: 1
+  V1Operations:
+    title: V1 Operations
+    description: V1 operations
+    type: object
+    properties:
+      operations:
+        description: Available operations in the v1 version of the API.
+        type: object
+        properties:
+          getResults:
+            $ref: '#/definitions/Operation'
+          queryResults:
+            $ref: '#/definitions/Operation'
+          createResults:
+            $ref: '#/definitions/Operation'
+          updateResults:
+            $ref: '#/definitions/Operation'
+          deleteResult:
+            $ref: '#/definitions/Operation'
+          deleteManyResults:
+            $ref: '#/definitions/Operation'
+          getSteps:
+            $ref: '#/definitions/Operation'
+          querySteps:
+            $ref: '#/definitions/Operation'
+          createSteps:
+            $ref: '#/definitions/Operation'
+          updateSteps:
+            $ref: '#/definitions/Operation'
+          deleteStep:
+            $ref: '#/definitions/Operation'
+          deleteManySteps:
+            $ref: '#/definitions/Operation'
+  StatusObject:
+    title: Status Object
+    description: Status object comprised of a type and display name
+    type: object
+    required:
+      - statusType
+    properties:
+      statusType:
+        description: Status type enum
+        type: string
+        enum:
+          - LOOPING
+          - SKIPPED
+          - CUSTOM
+          - DONE
+          - PASSED
+          - FAILED
+          - RUNNING
+          - WAITING
+          - TERMINATED
+          - ERRORED
+          - TIMED_OUT
+        example: PASSED
+      statusName:
+        description: Status name
+        type: string
+        example: Passed
+  NamedValueObject:
+    title: Named Value
+    description: Represents a named value or parameter
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        description: The name of the value
+        type: string
+        example: Voltage
+      value:
+        description: The value
+        type: object
+        example: 1.3
+  ResultField:
+    title: Result Field
+    description: Result field enum
+    type: string
+    enum:
+      - ID
+      - STATUS
+      - STARTED_AT
+      - UPDATED_AT
+      - PROGRAM_NAME
+      - SYSTEM_ID
+      - HOST_NAME
+      - OPERATOR
+      - SERIAL_NUMBER
+      - PRODUCT
+      - TOTAL_TIME_IN_SECONDS
+      - KEYWORDS
+      - PROPERTIES
+      - FILE_IDS
+      - STATUS_TYPE_SUMMARY
+  StepField:
+    title: Step Field
+    description: Step field enum
+    type: string
+    enum:
+      - NAME
+      - STEP_TYPE
+      - ID
+      - STEP_ID
+      - PARENT_ID
+      - RESULT_ID
+      - PATH
+      - PATH_IDS
+      - STATUS
+      - TOTAL_TIME_IN_SECONDS
+      - STARTED_AT
+      - UPDATED_AT
+      - INPUTS
+      - OUTPUTS
+      - DATA_MODEL
+      - DATA
+  ResultSortDefinitionObject:
+    title: Result Sort Definition
+    description: Defines the field and direction for sorting test results.
+    type: object
+    required:
+      - field
+    properties:
+      field:
+        $ref: '#/definitions/ResultField'
+      orderByDescending:
+        type: boolean
+        default: false
+  StepSortDefinitionObject:
+    title: Step Sort Definition
+    description: Defines the field and direction for sorting test steps.
+    type: object
+    required:
+      - field
+    properties:
+      field:
+        $ref: '#/definitions/StepField'
+      orderByDescending:
+        type: boolean
+        default: false
+  QueryOperation:
+    title: Query Operation
+    description: >-
+      Query operation enum. Note that 'LESS_THAN', 'GREATER_THAN', 'LESS_THAN_OR_EQUAL', and
+      'GREATER_THAN_OR_EQUAL' are only supported when the data type of the comparison is a string,
+      ISO date time, or numeric value. These are not supported on booleans, arrays, or objects
+      (also known as dictionaries).
+    type: string
+    enum:
+      - EQUAL
+      - NOT_EQUAL
+      - LESS_THAN
+      - GREATER_THAN
+      - LESS_THAN_OR_EQUAL
+      - GREATER_THAN_OR_EQUAL
+  DictionaryQueryObject:
+    title: Dictionary Query
+    description: Dictionary query object
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        description: The name of the dictionary key to query for.
+        type: string
+      value:
+        description: >-
+          The value to compare with. This is compared to the value that is stored in the
+          dictionary. When the comparison is performed, the value stored in the dictionary is on
+          the left hand side of the operation and this value is on the right hand side.
+        type: object
+        example: 1.2
+      operation:
+        $ref: '#/definitions/QueryOperation'
+        default: 'EQUAL'
+  TimeQueryObject:
+    title: Time Query
+    description: Time query object
+    type: object
+    required:
+      - operation
+      - comparisonValue
+    properties:
+      operation:
+        $ref: '#/definitions/QueryOperation'
+      comparisonValue:
+        description: ISO-8601 formatted timestamp value to compare
+        type: string
+        format: iso-date-time
+        example: '2017-11-14T15:41:06.106Z'
+  RelativeTimeQueryObject:
+    title: Relative Time Query
+    description: 'Object describing a number of time units used for calculating a date and time relative to the current server time. The calculated date and time will be whole values of the smallest time unit provided; 30 days evaluates to 30 days ago at midnight, and 10 hours evaluates to 10 hours ago at 0 minutes.'
+    type: object
+    required:
+      - unit
+      - value
+    properties:
+      unit:
+        description: The unit of time that the value represents.
+        type: string
+        enum:
+          - DAYS
+          - HOURS
+          - MINUTES
+          - SECONDS
+        example: DAYS
+      value:
+        description: Number of whole time units relative to the current server time.
+        type: integer
+        format: int32
+        example: 30
+  TestResultRequestObject:
+    title: Test Result Request
+    type: object
+    properties:
+      programName:
+        description: Program name
+        type: string
+        example: My Program Name
+      status:
+        $ref: '#/definitions/StatusObject'
+      systemId:
+        description: System id
+        type: string
+        example: my-system
+      hostName:
+        description: Host name
+        type: string
+        example: My-Host
+      properties:
+        description: Test result properties
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      keywords:
+        description: Keywords associated with the test result
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      serialNumber:
+        description: Serial number
+        type: string
+        example: 123-456
+      operator:
+        description: Operator
+        type: string
+        example: admin
+      product:
+        description: The type of device under test. Added in version 2.
+        type: string
+        example: cRIO-9030
+      fileIds:
+        description: Array of file ids attached to the test result
+        type: array
+        items:
+          type: string
+        example: [df1b63da-4fd8-4466-b721-5a28de036f56]
+      startedAt:
+        description: ISO-8601 formatted timestamp indicating when the test result began
+        type: string
+        format: iso-date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      totalTimeInSeconds:
+        description: Total run-time of the test in seconds
+        type: number
+        format: double
+        default: 0
+        example: 29.9
+  TestResultResponseObject:
+    title: Test Result Response
+    type: object
+    required:
+      - id
+    properties:
+      status:
+        $ref: '#/definitions/StatusObject'
+      startedAt:
+        description: ISO-8601 formatted timestamp indicating when the test result began
+        type: string
+        format: iso-date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      updatedAt:
+        description: ISO-8601 formatted timestamp indicating when the result was last updated
+        type: string
+        format: iso-date-time
+        example: '2018-05-09T15:07:42.527921Z'
+      programName:
+        description: Program name
+        type: string
+        example: My test program
+      id:
+        description: Id of the test result
+        type: string
+        example: df1b63da-4fd8-4466-b721-5a28de036f56
+      systemId:
+        description: Id of the system
+        type: string
+        example: 9c75f1b5-5882-490e-a2e2-1c14123d68b2
+      hostName:
+        description: Host name of the system
+        type: string
+        example: My-Host
+      operator:
+        description: Name of the operator running the test
+        type: string
+        example: admin
+      product:
+        description: The type of device under test. Added in version 2.
+        type: string
+        example: cRIO-9030
+      serialNumber:
+        description: Sequential number of the device under test
+        type: string
+        example: abc-123
+      totalTimeInSeconds:
+        description: Total run-time of the test in seconds
+        type: number
+        format: double
+        example: 29.9
+      keywords:
+        description: Keywords associated with the test result
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      properties:
+        description: Test result properties
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      fileIds:
+        description: Array of file ids attached to the test result
+        type: array
+        items:
+          type: string
+        example: []
+      statusTypeSummary:
+        description: Status type summary
+        type: object
+        additionalProperties:
+          type: integer
+          format: int32
+        example:
+          FAILED: 5
+  TestResultUpdateRequestObject:
+    title: Test Result Update
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        description: Test result id to update
+        type: string
+        example: df1b63da-4fd8-4466-b721-5a28de036f56
+      programName:
+        description: Program name
+        type: string
+        example: My Program Name
+      status:
+        $ref: '#/definitions/StatusObject'
+      systemId:
+        description: System id
+        type: string
+        example: my-system
+      hostName:
+        description: Host name
+        type: string
+        example: My-Host
+      properties:
+        description: Test result properties
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      keywords:
+        description: Keywords associated with the test result
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      serialNumber:
+        description: Serial number
+        type: string
+        example: 123-456
+      operator:
+        description: Operator
+        type: string
+        example: admin
+      product:
+        description: The type of device under test. Added in version 2.
+        type: string
+        example: cRIO-9030
+      fileIds:
+        description: Array of file ids attached to the test result
+        type: array
+        items:
+          type: string
+        example: [df1b63da-4fd8-4466-b721-5a28de036f56]
+      startedAt:
+        description: ISO-8601 formatted timestamp indicating when the test result began
+        type: string
+        format: iso-date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      totalTimeInSeconds:
+        description: Total run-time of the test in seconds
+        type: number
+        format: double
+        default: 0
+        example: 29.9
+  TestResultQueryObject:
+    title: Test Result Query
+    type: object
+    properties:
+      ids:
+        description: Array of test result ids
+        type: array
+        items:
+          type: string
+        example:
+          - 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+      programNames:
+        description: Array of program names
+        type: array
+        items:
+          type: string
+        example:
+          - Result Creation Test
+      operators:
+        description: Array of operators
+        type: array
+        items:
+          type: string
+        example:
+          - admin
+      serialNumbers:
+        description: Array of serial numbers
+        type: array
+        items:
+          type: string
+        example:
+          - 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+      products:
+        description: Array of products. Added in version 2.
+        type: array
+        items:
+          type: string
+        example:
+          - cRIO-9030
+      systemIds:
+        description: Array of system ids
+        type: array
+        items:
+          type: string
+        example:
+          - 9c75f1b5-5882-490e-a2e2-1c14123d68b2
+      hostNames:
+        description: Array of host names
+        type: array
+        items:
+          type: string
+        example:
+          - My-Host
+      keywords:
+        description: Array of keywords
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      properties:
+        description: Dictionary of key-value property pairs
+        type: object
+        additionalProperties:
+          type: string
+          example:
+            key1: value1
+      updatedAtQuery:
+        description: Time query object for the test result's last updated timestamp
+        type: array
+        items:
+          $ref: '#/definitions/TimeQueryObject'
+      startedAtQuery:
+        description: Time query object for the test result's started at timestamp
+        type: array
+        items:
+          $ref: '#/definitions/TimeQueryObject'
+      updatedWithin:
+        $ref: '#/definitions/RelativeTimeQueryObject'
+      startedWithin:
+        $ref: '#/definitions/RelativeTimeQueryObject'
+      fileIds:
+        description: Array of file ids
+        type: array
+        items:
+          type: string
+        example:
+          - 5982002b5d67371430c80e73
+      statuses:
+        description: Array of result statuses
+        type: array
+        items:
+          $ref: '#/definitions/StatusObject'
+      sortBy:
+        type: array
+        items:
+          $ref: '#/definitions/ResultSortDefinitionObject'
+  StepIdResultIdPair:
+    title: Step Id / Result Id Pair
+    type: object
+    required:
+      - stepId
+      - resultId
+    properties:
+      stepId:
+        type: string
+        example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+      resultId:
+        type: string
+        example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+  StepDataObject:
+    title: Step Data
+    description: Data returned by the test step
+    type: object
+    properties:
+      text:
+        description: Text string describing the output data
+        type: string
+        example: My output string
+      parameters:
+        description: Array of properties objects
+        type: array
+        items:
+          description: Dictionary of key-value property pairs
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+        example:
+          - key1: value1
+            key2: value2
+          - key1: value3
+  TestStepsDeleteRequest:
+    title: Test Steps Delete Request
+    type: object
+    required:
+      - steps
+    properties:
+      steps:
+        description: Array of test step id and result id pairs to delete
+        type: array
+        items:
+          $ref: '#/definitions/StepIdResultIdPair'
+  TestStepQueryObject:
+    title: Test Step Query
+    type: object
+    properties:
+      excludeFields:
+        description: Array of step field names to exclude
+        type: array
+        items:
+          $ref: '#/definitions/StepField'
+      names:
+        description: Array of test step names
+        type: array
+        items:
+          type: string
+        example:
+          - My Test Step
+      stepIds:
+        description: Array of step ids
+        type: array
+        items:
+          type: string
+        example:
+          - Step1
+      parentIds:
+        description: Array of parent step ids
+        type: array
+        items:
+          type: string
+        example:
+          - 3265bc91-f214-4efa-adfd-56f8ea717349
+      resultIds:
+        description: Array of result ids
+        type: array
+        items:
+          type: string
+        example:
+          - 9c75f1b5-5882-490e-a2e2-1c14123d68b2
+      path:
+        description: Step path
+        type: string
+        example: root.step1.step2
+      pathIds:
+        description: Array of path ids
+        type: array
+        items:
+          type: string
+        example:
+          - 9c75f1b5-5882-490e-a2e2-1c14123d68b2
+          - 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+      statuses:
+        description: Array of step statuses
+        type: array
+        items:
+          $ref: '#/definitions/StatusObject'
+      inputs:
+        description: >-
+          This is a query on the inputs dictionary.  It is represented by an array of an array of
+          objects referred to as 'Dictionary Query Objects'. When querying, all elements of the
+          inner array of 'Dictionary Query Objects' must match (an "and" relationship within the
+          inner array).  Only one element in the outer array needs to match (an "or" relationship
+          within the outer array).
+        type: array
+        items:
+          description: >-
+            Inner array of 'Dictionary Query Objects' to query for. When querying, all elements of
+            the inner array of 'Dictionary Query Objects' must match (an "and" relationship within
+            the inner array).
+          type: array
+          items:
+            $ref: '#/definitions/DictionaryQueryObject'
+        example:
+          - - name: 'Current'
+              value: 1.2
+            - name: 'Voltage'
+              value: 2.3
+              operation: 'LESS_THAN_OR_EQUAL'
+      outputs:
+        description: >-
+          This is a query on the outputs dictionary.  It is represented by an array of an array of
+          objects referred to as 'Dictionary Query Objects'. When querying, all elements of the
+          inner array of 'Dictionary Query Objects' must match (an "and" relationship within the
+          inner array).  Only one element in the outer array needs to match (an "or" relationship
+          within the outer array).
+        type: array
+        items:
+          description: >-
+            Inner array of 'Dictionary Query Objects' to query for. When querying, all elements of
+            the inner array of 'Dictionary Query Objects' must match (an "and" relationship within
+            the inner array).
+          type: array
+          items:
+            $ref: '#/definitions/DictionaryQueryObject'
+        example:
+          - - name: 'Power'
+              value: 1.4
+              operation: 'GREATER_THAN_OR_EQUAL'
+            - name: 'Power'
+              value: 2.3
+              operation: 'LESS_THAN_OR_EQUAL'
+      startedAtQuery:
+        description: Time query object
+        type: array
+        items:
+          $ref: '#/definitions/TimeQueryObject'
+      updatedAtQuery:
+        description: Time query object
+        type: array
+        items:
+          $ref: '#/definitions/TimeQueryObject'
+      sortBy:
+        type: array
+        items:
+          $ref: '#/definitions/StepSortDefinitionObject'
+  TestStepRequestObject:
+    title: Test Step Request
+    type: object
+    properties:
+      stepId:
+        description: Step id
+        type: string
+        example: Step1
+      parentId:
+        description: Parent step id
+        type: string
+        example: root
+      resultId:
+        description: Result id
+        type: string
+        example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+      children:
+        description: Nested child steps
+        type: array
+        items:
+          $ref: '#/definitions/TestStepRequestObject'
+        example: []
+      data:
+        $ref: '#/definitions/StepDataObject'
+      dataModel:
+        description: Data model for the step
+        type: string
+        example: TestStand
+      name:
+        description: Step name
+        type: string
+        example: My Step
+      startedAt:
+        description: ISO-8601 formatted timestamp indicating when the test result began
+        type: string
+        format: iso-date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      status:
+        $ref: '#/definitions/StatusObject'
+      stepType:
+        description: Step type
+        type: string
+        example: NumericLimitTest
+      totalTimeInSeconds:
+        description: Total number of seconds the step took to execute
+        type: number
+        format: double
+        default: 0
+        example: 29.9
+      inputs:
+        description: Inputs and their values passed to this test
+        type: array
+        items:
+          $ref: '#/definitions/NamedValueObject'
+      outputs:
+        description: Outputs and their values logged by this test
+        type: array
+        items:
+          $ref: '#/definitions/NamedValueObject'
+  TestStepCreateOrUpdateRequestObject:
+    title: Test Step Create or Update Request
+    type: object
+    required:
+      - steps
+    properties:
+      steps:
+        description: Array of test steps to create
+        type: array
+        items:
+          $ref: '#/definitions/TestStepRequestObject'
+  TestStepResponseObject:
+    title: Test Step Response
+    type: object
+    properties:
+      name:
+        description: Step name
+        type: string
+        example: My Step Name
+      stepType:
+        description: Step type
+        type: string
+        example: NumericLimitTest
+      stepId:
+        description: Step id
+        type: string
+        example: Step1
+      parentId:
+        description: Parent step id
+        type: string
+        example: root
+      resultId:
+        description: Result id
+        type: string
+        example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+      path:
+        description: Step path
+        type: string
+        example: root.My Step Name
+      pathIds:
+        description: Ids of the steps in the path
+        type: array
+        items:
+          type: string
+        example:
+          - root
+          - Step1
+      status:
+        $ref: '#/definitions/StatusObject'
+      totalTimeInSeconds:
+        description: Total number of seconds the step took to execute
+        type: number
+        format: double
+        example: 0
+      startedAt:
+        description: ISO-8601 formatted timestamp indicating when the test result began
+        type: string
+        format: iso-date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      updatedAt:
+        description: ISO-8601 formatted timestamp indicating when the result was last updated
+        type: string
+        format: iso-date-time
+        example: '2018-05-09T15:07:42.527921Z'
+      inputs:
+        description: Inputs and their values passed to this test
+        type: array
+        items:
+          $ref: '#/definitions/NamedValueObject'
+      outputs:
+        description: Outputs and their values logged by this test
+        type: array
+        items:
+          $ref: '#/definitions/NamedValueObject'
+      dataModel:
+        description: Custom string defining the model of the data object
+        type: string
+        example: TestStand
+      data:
+        $ref: '#/definitions/StepDataObject'
+responses:
+  Error:
+    description: Error
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  Unauthorized:
+    description: Not authorized
+    headers:
+      WWW_Authenticate:
+        description: Information for how to authenticate
+        type: string
+  ResultsSuccessResponse:
+    description: Test Results Success Response
+    schema:
+      description: Test Results Success Response
+      title: ResultsSuccessResponse
+      type: object
+      required:
+        - results
+      properties:
+        results:
+          description: Array of test results
+          type: array
+          items:
+            $ref: '#/definitions/TestResultResponseObject'
+  ResultsPartialSuccessResponse:
+    description: Test Results Partial Success Response
+    schema:
+      description: Test Results Partial Success Response
+      title: ResultsPartialSuccessResponse
+      type: object
+      required:
+        - results
+        - failed
+        - error
+      properties:
+        results:
+          description: Array of test results
+          type: array
+          items:
+            $ref: '#/definitions/TestResultResponseObject'
+        failed:
+          description: Array of test result requests that failed
+          type: array
+          items:
+            $ref: '#/definitions/TestResultRequestObject'
+        error:
+          $ref: '#/definitions/Error'
+  DeleteResultsResponse:
+    description: Delete Test Results Response
+    schema:
+      description: Delete Test Results Response
+      title: DeleteResultsResponse
+      type: object
+      required:
+        - ids
+        - failed
+        - error
+      properties:
+        ids:
+          description: Array of test result ids to delete
+          type: array
+          items:
+            type: string
+        failed:
+          description: Array of test result ids that failed to delete
+          type: array
+          items:
+            type: string
+        error:
+          $ref: '#/definitions/Error'
+  ResultsQueryResponse:
+    description: Test Results Query Response
+    schema:
+      description: Test Results Query Response
+      title: ResultsQueryResponse
+      type: object
+      required:
+        - results
+        - totalCount
+      properties:
+        results:
+          description: Array of test results
+          type: array
+          items:
+            $ref: '#/definitions/TestResultResponseObject'
+        totalCount:
+          description: Number of matching test results
+          type: integer
+          format: int64
+  StepsSuccessResponse:
+    description: Test Steps Success Response
+    schema:
+      description: Test Steps Success Response
+      title: StepsSuccessResponse
+      type: object
+      required:
+        - steps
+      properties:
+        steps:
+          description: Array of test steps
+          type: array
+          items:
+            $ref: '#/definitions/TestStepResponseObject'
+  StepsPartialSuccessResponse:
+    description: Test Steps Partial Success Response
+    schema:
+      description: Test Steps Partial Success Response
+      title: StepsPartialSuccessResponse
+      type: object
+      required:
+        - steps
+        - failed
+        - error
+      properties:
+        steps:
+          description: Array of test steps
+          type: array
+          items:
+            $ref: '#/definitions/TestStepResponseObject'
+        failed:
+          description: Array of test step requests that failed
+          type: array
+          items:
+            $ref: '#/definitions/TestStepRequestObject'
+        error:
+          $ref: '#/definitions/Error'
+  StepsQueryResponse:
+    description: Test Steps Query Response
+    schema:
+      description: Test Steps Query Response
+      title: StepsQueryResponse
+      type: object
+      required:
+        - steps
+        - totalCount
+      properties:
+        steps:
+          description: Array of test steps
+          type: array
+          items:
+            $ref: '#/definitions/TestStepResponseObject'
+        totalCount:
+          description: Number of matching test steps
+          type: integer
+          format: int64
+  StepsDeletePartialSuccessResponse:
+    description: Delete Test Steps Partial Success Response
+    schema:
+      description: Delete Test Steps Partial Success Response
+      title: StepsDeletePartialSuccessResponse
+      type: object
+      properties:
+        steps:
+          description: Array of test step id result id pairs that were deleted
+          type: array
+          items:
+            $ref: '#/definitions/StepIdResultIdPair'
+        failed:
+          description: Array of test step id result id pairs that failed to delete
+          type: array
+          items:
+            $ref: '#/definitions/StepIdResultIdPair'
+        error:
+          $ref: '#/definitions/Error'
+paths:
+  /v1:
+    get:
+      tags: [versioning]
+      summary: API version 1 information
+      description: Returns available operations for version 1 of the API.
+      operationId: root-endpoint-v1
+      x-ni-request-all-privileges: true
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/V1Operations'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/query-results:
+    post:
+      tags: [results]
+      summary: Queries test results
+      description: Uses input criteria to filter and return test results. An empty request body queries all test results.
+      operationId: query-results
+      x-ni-operation: queryResults
+      x-ni-privilege: Read
+      parameters:
+        - in: body
+          name: postBody
+          description: Result query object
+          required: false
+          schema:
+            $ref: '#/definitions/TestResultQueryObject'
+        - in: query
+          name: skip
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          type: integer
+          format: int32
+          default: -1
+          minimum: -1
+      responses:
+        200:
+          $ref: '#/responses/ResultsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/results:
+    get:
+      tags: [results]
+      summary: Gets test results
+      description: Gets a list of test results.
+      operationId: get-results
+      x-ni-operation: getResults
+      x-ni-privilege: Read
+      parameters:
+        - in: query
+          name: skip
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          type: integer
+          format: int32
+          default: -1
+          minimum: -1
+      responses:
+        200:
+          $ref: '#/responses/ResultsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    put:
+      tags: [results]
+      summary: Updates existing test results
+      description: Updates existing test results by merging or replacing values.
+      operationId: update-results
+      x-ni-operation: updateResults
+      x-ni-privilege: Write
+      parameters:
+        - in: body
+          name: requestBody
+          description: Array of test results to update
+          required: true
+          schema:
+            description: Array of test results to update
+            title: UpdateTestResultsRequest
+            type: object
+            required:
+              - results
+            properties:
+              results:
+                description: Array of test results to update
+                type: array
+                items:
+                  $ref: '#/definitions/TestResultUpdateRequestObject'
+              replace:
+                description: Replace the existing fields instead of merging them
+                type: boolean
+                default: false
+              determineStatusFromSteps:
+                description: Determine test result status from the test step statuses
+                type: boolean
+                default: false
+      responses:
+        200:
+          $ref: '#/responses/ResultsPartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    post:
+      tags: [results]
+      summary: Creates new test results
+      description: Creates new test results from the supplied models. The server automatically generates the result ids. The server will populate the start time if one is not provided.
+      operationId: create-results
+      x-ni-operation: createResults
+      x-ni-privilege: Write
+      parameters:
+        - in: body
+          name: requestBody
+          description: Result object
+          required: true
+          schema:
+            description: Array of test results to create
+            title: CreateTestResultsRequest
+            type: object
+            required:
+              - results
+            properties:
+              results:
+                description: Array of test results to create
+                type: array
+                items:
+                  $ref: '#/definitions/TestResultRequestObject'
+      responses:
+        200:
+          $ref: '#/responses/ResultsPartialSuccessResponse'
+        201:
+          $ref: '#/responses/ResultsSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/results/{resultId}:
+    delete:
+      tags: [results]
+      summary: Deletes a test result
+      description: Deletes the test result with the specified id. The request succeeds for result ids that do not exist.
+      operationId: DeleteResult
+      x-ni-operation: deleteResult
+      x-ni-privilege: Write
+      parameters:
+        - in: path
+          name: resultId
+          description: Id of the test result to delete
+          type: string
+          required: true
+        - in: query
+          name: deleteSteps
+          description: Indicates whether to delete the test steps associated with the test result
+          type: boolean
+          default: true
+      responses:
+        204:
+          description: The resource was deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/delete-results:
+    post:
+      tags: [results]
+      summary: Deletes test results
+      description: Deletes multiple test results in a single request.
+      operationId: delete-results
+      x-ni-operation: deleteResults
+      x-ni-privilege: Write
+      parameters:
+        - in: body
+          name: requestBody
+          description: Array of test result ids
+          required: true
+          schema:
+            description: Array of test result ids
+            title: DeleteResultsRequest
+            type: object
+            required:
+              - ids
+            properties:
+              ids:
+                description: Array of test result ids to delete
+                type: array
+                items:
+                  type: string
+                  example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+              deleteSteps:
+                description: Indicates whether to delete the test steps associated with the test result
+                type: boolean
+                default: true
+      responses:
+        200:
+          $ref: '#/responses/DeleteResultsResponse'
+        204:
+          description: The resource was deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/query-steps:
+    post:
+      tags: [steps]
+      summary: Queries test steps
+      description: Uses input criteria to filter and return test steps. An empty request body queries all test steps.
+      operationId: query-steps
+      x-ni-operation: querySteps
+      x-ni-privilege: Read
+      parameters:
+        - in: body
+          name: postBody
+          description: Step query object
+          required: false
+          schema:
+            $ref: '#/definitions/TestStepQueryObject'
+        - in: query
+          name: skip
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          type: integer
+          format: int32
+          default: -1
+          minimum: -1
+      responses:
+        200:
+          $ref: '#/responses/StepsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/steps:
+    get:
+      tags: [steps]
+      summary: Gets test steps
+      description: Gets a list of test steps.
+      operationId: get-steps
+      x-ni-operation: getSteps
+      x-ni-privilege: Read
+      parameters:
+        - in: query
+          name: skip
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          type: integer
+          format: int32
+          default: -1
+          minimum: -1
+      responses:
+        200:
+          $ref: '#/responses/StepsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    put:
+      tags: [steps]
+      summary: Update test steps
+      description: Updates existing test steps by replacing values for the specified fields.
+      operationId: update-steps
+      x-ni-operation: updateSteps
+      x-ni-privilege: Write
+      parameters:
+        - in: body
+          name: requestBody
+          description: Array of test steps
+          required: true
+          schema:
+            $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
+        - in: query
+          name: updateResultTotalTime
+          description: Determine test result total time from the test step total times. Added in version 2.
+          type: boolean
+          default: false
+      responses:
+        200:
+          $ref: '#/responses/StepsPartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    post:
+      tags: [steps]
+      summary: Create test steps
+      description: Creates new test steps from the supplied models. The result associated with the step must exist prior to step creation. The server automatically generates step ids if not supplied.
+      operationId: create-steps
+      x-ni-operation: createSteps
+      x-ni-privilege: Write
+      parameters:
+        - in: body
+          name: requestBody
+          description: Test step object
+          required: true
+          schema:
+            $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
+        - in: query
+          name: updateResultTotalTime
+          description: Determine test result total time from the test step total times. Added in version 2.
+          type: boolean
+          default: false
+      responses:
+        200:
+          $ref: '#/responses/StepsPartialSuccessResponse'
+        201:
+          $ref: '#/responses/StepsSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/results/{resultId}/steps/{stepId}:
+    delete:
+      tags: [steps]
+      summary: Deletes a test step
+      description: Deletes the test step with the specified id. The request succeeds for step ids that do not exist.
+      operationId: DeleteStep
+      x-ni-operation: deleteStep
+      x-ni-privilege: Write
+      parameters:
+        - in: path
+          name: resultId
+          description: Id of the test result the step belongs to
+          type: string
+          required: true
+        - in: path
+          name: stepId
+          description: Id of the test step to delete
+          type: string
+          required: true
+        - in: query
+          name: updateResultTotalTime
+          description: Determine test result total time from the test step total times. Added in version 2.
+          type: boolean
+          default: false
+      responses:
+        204:
+          description: The resource was deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/delete-steps:
+    post:
+      tags: [steps]
+      summary: Deletes test steps
+      description: Deletes multiple test steps in a single request.
+      operationId: delete-steps
+      x-ni-operation: deleteSteps
+      x-ni-privilege: Write
+      parameters:
+        - in: body
+          name: requestBody
+          description: Delete steps request
+          required: true
+          schema:
+            $ref: '#/definitions/TestStepsDeleteRequest'
+        - in: query
+          name: updateResultTotalTime
+          description: Determine test result total time from the test step total times. Added in version 2.
+          type: boolean
+          default: false
+      responses:
+        200:
+          $ref: '#/responses/StepsDeletePartialSuccessResponse'
+        204:
+          description: The resource was deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/ping:
+    get:
+      tags: [deprecated]
+      summary: Pings the test monitor service
+      description: Deprecated. Pings the test monitor service to ensure that it is online.
+      operationId: ping
+      x-ni-privilege: Read
+      deprecated: true
+      responses:
+        204:
+          description: No Content
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
