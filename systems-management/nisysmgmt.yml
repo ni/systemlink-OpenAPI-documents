@@ -71,6 +71,16 @@ responses:
       properties:
         error:
           $ref: '#/definitions/Error'
+  
+  ServerNotActivated:
+    description: The server is not activated.
+    schema:
+      title: Server Not Activated Error Response
+      description: Server not activated response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
 
 definitions:
   CreateJobRequest:
@@ -1814,6 +1824,8 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/ServerNotActivated'
         default:
           $ref: '#/responses/Error'
   /v1/get-discovered-systems:
