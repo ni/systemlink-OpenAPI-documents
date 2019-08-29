@@ -1624,6 +1624,7 @@ paths:
       operationId: CreateJob
       x-ni-privilege: Write
       x-ni-operation: createOrCancelJobs
+      x-ni-request-timeout: 300000
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       tags: [jobs]
       summary: Create a job
@@ -1650,6 +1651,7 @@ paths:
       operationId: GetJobs
       x-ni-privilege: Read
       x-ni-operation: getJobs
+      x-ni-request-timeout: 120000
       tags: [jobs]
       summary: Get jobs
       description: Get jobs from the jobs cache.
@@ -1690,6 +1692,7 @@ paths:
       operationId: GetSystems
       x-ni-privilege: Read
       x-ni-operation: getSystems
+      x-ni-request-timeout: 120000
       tags: [systems]
       summary: Get systems information
       description: Get the systems information cached on the server.
@@ -1770,6 +1773,7 @@ paths:
       operationId: CancelJobs
       x-ni-privilege: Write
       x-ni-operation: createOrCancelJobs
+      x-ni-request-timeout: 120000
       tags: [jobs]
       summary: Cancel jobs
       description: Cancel jobs that are running on systems. This won't stop the jobs from executing on systems if the jobs have already been dispatched to the systems.
@@ -1800,6 +1804,7 @@ paths:
       operationId: ActivateSystems
       x-ni-privilege: Write
       x-ni-operation: activateSystems
+      x-ni-request-timeout: 120000
       tags: [systems]
       summary: Activate systems
       description: Activate managed systems.
@@ -1930,6 +1935,7 @@ paths:
       operationId: GetPendingSystemsSummary
       x-ni-privilege: Read
       x-ni-operation: getSystems
+      x-ni-request-timeout: 120000
       tags: [systems]
       summary: Get pending systems summary
       description: Get the number of systems that are currently pending to be added to the master but have not yet been approved by the master.
@@ -1947,6 +1953,7 @@ paths:
       operationId: GetSystemsReport
       x-ni-privilege: Read
       x-ni-operation: getSystems
+      x-ni-request-timeout: 120000
       tags: [systems]
       summary: Get systems report
       description: Get a report containing software/hardware information about the requested systems.
@@ -2152,6 +2159,7 @@ paths:
     get:
       operationId: GetSystemsKeys
       x-ni-privilege: Read
+      x-ni-request-timeout: 120000
       tags: [systems]
       x-ni-operation: getSystems
       summary: Get systems keys
@@ -2266,6 +2274,7 @@ paths:
       operationId: GetJobsByQuery
       x-ni-privilege: Read
       x-ni-operation: getJobs
+      x-ni-request-timeout: 120000
       tags: [jobs]
       summary: Get jobs by query
       description: Get jobs by query.
@@ -2292,6 +2301,7 @@ paths:
       operationId: GetSystemsByQuery
       x-ni-privilege: Read
       x-ni-operation: getSystems
+      x-ni-request-timeout: 120000
       tags: [systems]
       summary: Get systems by query.
       description: Get systems by query.
