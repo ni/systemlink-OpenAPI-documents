@@ -236,7 +236,7 @@ definitions:
       - HOST_NAME
       - OPERATOR
       - SERIAL_NUMBER
-      - PRODUCT
+      - PART_NUMBER
       - TOTAL_TIME_IN_SECONDS
       - KEYWORDS
       - PROPERTIES
@@ -438,8 +438,8 @@ definitions:
         description: Operator
         type: string
         example: admin
-      product:
-        description: The type of device under test.
+      partNumber:
+        description: The part number of the device under test.
         type: string
         example: cRIO-9030
       fileIds:
@@ -497,8 +497,8 @@ definitions:
         description: Name of the operator running the test
         type: string
         example: admin
-      product:
-        description: The type of device under test.
+      partNumber:
+        description: The part number of the device under test.
         type: string
         example: cRIO-9030
       serialNumber:
@@ -586,8 +586,8 @@ definitions:
         description: Operator
         type: string
         example: admin
-      product:
-        description: The type of device under test.
+      partNumber:
+        description: The part number of the device under test.
         type: string
         example: cRIO-9030
       fileIds:
