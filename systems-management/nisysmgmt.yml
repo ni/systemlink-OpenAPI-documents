@@ -1237,7 +1237,7 @@ definitions:
           type: string
           description: The tag for the package.
           example: ".NET"
-      userVisible:
+      uservisible:
         type: boolean
         description: The installed packages with this attribute set to true are considered to be installed by a user, thus not installed to fulfill some dependency. This is needed input for the calculation of unneeded packages when removing a package.
         example: true
