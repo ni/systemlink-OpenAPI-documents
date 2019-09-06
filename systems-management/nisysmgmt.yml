@@ -1665,7 +1665,7 @@ paths:
           name: state
           description: A string defining the job state.
           type: string
-          x-example: Succeeded
+          x-example: SUCCEEDED
         - in: query
           name: fun
           description: A string defining the function executed by the job.
@@ -2063,6 +2063,8 @@ paths:
           $ref: '#/responses/PartialSuccess'
         204:
           description: No Content.
+        400:
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -2290,6 +2292,8 @@ paths:
           description: OK.
           schema:
             $ref: '#/definitions/QueryResponse'
+        400:
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -2317,6 +2321,8 @@ paths:
           description: OK.
           schema:
             $ref: '#/definitions/QueryResponse'
+        400:
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
         404:
