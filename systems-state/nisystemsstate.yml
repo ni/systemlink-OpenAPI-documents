@@ -530,11 +530,16 @@ definitions:
       version:
         type: string
         description: Version of the package.
+      installRecommends:
+        type: boolean
+        description: A boolean variable whose value controls the installation of the recommended packages. This property is available starting with version 2 of the getStates and createOrUpdateStates operations.
+        default: true
     required:
       - name
     example:
       name: vim
       version: '7.1'
+      installRecommends: true
 
 paths:
   /:
