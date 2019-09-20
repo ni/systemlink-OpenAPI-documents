@@ -1318,7 +1318,9 @@ definitions:
 
           - getGroups: The ability to retrieve the groups.
 
-          - manageSystems: The ability to register or unregister systems.
+          - manageSystems: The ability to manage keys and unregister systems.
+
+          - discoverSystems: The ability to discover and register systems.
 
           - createOrCancelJobs: The ability to create or cancel jobs.
 
@@ -1339,6 +1341,8 @@ definitions:
           getGroups:
             $ref: '#/definitions/Operation'
           manageSystems:
+            $ref: '#/definitions/Operation'
+          discoverSystems:
             $ref: '#/definitions/Operation'
           createOrCancelJobs:
             $ref: '#/definitions/Operation'
