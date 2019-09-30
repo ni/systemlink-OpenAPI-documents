@@ -128,18 +128,6 @@ definitions:
     type: object
     title: Http Historical Value
     properties:
-      id:
-        description: The unique identifier for referencing the historical value in other requests.
-        type: string
-        example: '5c88d2ae26b41e22f08b4407'
-      path:
-        description: The path of the tag corresponding to the historical value.
-        type: string
-        example: system1.tag1
-      type:
-        description: The value's data type.
-        type: string
-        enum: [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
       value:
         description: The value of the tag at the time it was written, converted to a string.
         type: string
@@ -149,65 +137,14 @@ definitions:
         type: string
         format: date-time
         example: '2019-03-13T09:51:38Z'
-      properties:
-        description: Key-value pairs associated with the historical value after the fact. Tag
-          properties are not copied to the historical value.
-        type: object
-        additionalProperties:
-          type: string
-        example:
-          note: This value is an outlier and needs investigation.
-      expirationDate:
-        description: For historical values of tags that aren't using a count-based retention policy,
-          the expiration date is the ISO-8601 formatted timestamp at which the historical value will
-          be deleted automatically.
-        type: string
-        format: date-time
-        example: '2020-03-13T09:51:38Z'
-  HttpHistoricalValueUpdate:
-    description: An update for a single historical value.
-    type: object
-    title: Http Historical Value Update
-    properties:
-      id:
-        description: The identifier of the historical value to update.
-        type: string
-        example: '5c88d2ae26b41e22f08b4407'
-      properties:
-        description: Key-value pairs to associate with the historical value.
-        type: object
-        additionalProperties:
-          type: string
-        example:
-          note: This value is an outlier and needs investigation.
-      expirationDate:
-        description: The expiration date is the ISO-8601 formatted timestamp at which the historical
-          value will be deleted automatically. Do not specify this value for tags that use
-          count-based retention.
-        type: string
-        format: date-time
-        example: '2020-03-13T09:51:38Z'
-    required: [id]
-  HttpUpdateValuesResponseBody:
-    description: Describes one or more errors that ocurred while updating historical values.
-    title: Http Update Values Response Body
-    type: object
-    properties:
-      failed:
-        description: The historical value updates that failed to apply.
-        type: array
-        items:
-          $ref: '#/definitions/HttpHistoricalValueUpdate'
-      error:
-        $ref: '#/definitions/ErrorEntry'
-  HistoricalTagQuery:
-    description: Defines how historical values are queried and for which tags. Only used for web
+  HistoricalTagDecimatedQuery:
+    description: Defines how decimated historical values are queried and for which tags. Only used for web
       socket messages.
     type: object
-    title: Historical Tag Query
+    title: Historical Tag Decimated Query
     properties:
       paths:
-        description: One or more paths identifying the tags whose historical values should be returned.
+        description: One or more paths identifying the tags whose decimated historical values should be returned.
         type: array
         items:
           type: string
@@ -228,20 +165,6 @@ definitions:
         format: date-time
         example: '2018-09-04T18:45:08Z'
         default: '0001-01-01T00:00:00Z'
-      skip:
-        description: Limits the returned historical values to those after the given number of values.
-          Use with the take property to implement pagination. Only applies when not specifying a
-          decimation.
-        type: integer
-        minimum: 0
-        default: 0
-      take:
-        description: Limits the returned historical values to the specified number of values. Use
-          with the skip property to implement pagination. Only applies when not specifying a decimation.
-        type: integer
-        minimum: 0
-        default: 0
-        example: 1
       decimation:
         description: When non-zero, the returned historical values are decimated across requested time
           span divided into the specified number of equal-sized intervals.
@@ -254,22 +177,59 @@ definitions:
         type: string
         enum: [ASCENDING, DESCENDING]
         default: ASCENDING
+  HistoricalTagUndecimatedQuery:
+    description: Defines how undecimated historical values are queried and for which tags. Only used for web
+      socket messages.
+    type: object
+    title: Historical Tag Undecimated Query
+    properties:
+      paths:
+        description: One or more paths identifying the tags whose undecimated historical values should be returned.
+        type: array
+        items:
+          type: string
+        example:
+          - system1.tag1
+          - system2.tag1
+      startTime:
+        description: Limits the returned historical values to those written at or after the given
+          time in ISO-6801 format.
+        type: string
+        format: date-time
+        example: '2018-09-04T18:45:08Z'
+        default: '0001-01-01T00:00:00Z'
+      endTime:
+        description: Limits the returned historical values to those written at or before the given
+          time in ISO-8601 format.
+        type: string
+        format: date-time
+        example: '2018-09-04T18:45:08Z'
+        default: '0001-01-01T00:00:00Z'
+      take:
+        description: Limits the returned historical values to the specified number of values. Use
+          with the continuationToken property to implement pagination. Only applies when not specifying a decimation.
+        type: integer
+        minimum: 0
+        default: 0
+        example: 1
+      continuationToken:
+        type: string
+        description: For non-decimated queries, a value generated by the server which should be sent
+          in the next request to retrieve the next page of values.
+      sortOrder:
+        description: Specifies ascending or descending order to return historical values, based
+          on when each tag was written.
+        type: string
+        enum: [ASCENDING, DESCENDING]
+        default: ASCENDING
   HistoricalValue:
     type: object
     title: Historical Value
     properties:
-      id:
-        description: The unique identifier of the retrieved historical value.
-        type: string
-        example: '5c88d2ae26b41e22f08b4407'
       path:
         description: The path of the tag corresponding to the historical value.
         type: string
         example: system1.tag1
-      type:
-        description: The data type of the value.
-        type: string
-        enum: [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
       value:
         description: The value of the tag at the time it was written, converted to a string.
         type: string
@@ -279,49 +239,37 @@ definitions:
         type: string
         format: date-time
         example: '2019-03-13T09:51:38Z'
-      properties:
-        description: Key-value pairs associated with the historical value after the fact. Tag properties
-          are not copied to the historical value.
-        type: object
-        additionalProperties:
-          type: string
-        example:
-          note: This value is an outlier and needs investigation.
-      expirationDate:
-        description: For historical values of tags that aren't using a count-based retention policy,
-          the expiration date is the ISO-8601 formatted timestamp at which the historical value will
-          be deleted automatically.
+  TypeAndValues:
+    type: object
+    title: TypeAndValues
+    properties:
+      type:
+        description: The type of the values
         type: string
-        format: date-time
-        example: '2020-03-13T09:51:38Z'
+        enum: [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
+      values:
+        description: The values, encoded as strings
+        type: array
+        items:
+          $ref: '#/definitions/HttpHistoricalValue'
   TagHistorianValues:
     type: object
     title: Tag Historian Values
     properties:
-      values:
-        description: An object containing the historical value for the requested tag if it was
-          successfully queried. The object's property name is the tag path.
+      results:
+        description: An object containing the historical values for each requested tag that
+          was successfully queried. The object's property names correspond to a tag path.
         type: object
         additionalProperties:
-          type: array
-          items:
-            $ref: '#/definitions/HistoricalValue'
+          $ref: '#/definitions/TypeAndValues'
         example:
           system1.tag1:
-            - id: '5c88d2ae26b41e22f08b4407'
-              path: system1.tag1
-              type: DOUBLE
-              value: '12.87'
-              timestamp: '2019-03-13T09:51:38Z'
-              properties:
-                note: This value is an outlier and needs investigation.
-              expirationDate: '2020-03-13T09:51:38Z'
-      totalCount:
-        description: '1 if the historical value was found, or 0 if not.'
-        type: integer
-        minimum: 0
-        maximum: 1
-        example: 1
+            type: DOUBLE
+            values:
+              - value: '12.87'
+                timestamp: '2019-03-13T09:51:38Z'
+              - value: '3.2'
+                timestamp: '2019-03-14T09:51:38Z'
       errors:
         description: This value is always null.
         type: object
@@ -330,13 +278,13 @@ definitions:
         description: This value is always null.
         type: object
         example: null
-  HistoricalTagAsyncQueryJob:
-    description: Information about an asynchronous query.
-    title: Historical Tag Async Query Job
+  HistoricalTagAsyncDecimatedQueryJob:
+    description: Information about an asynchronous decimated query.
+    title: Historical Tag Async Decimated Query Job
     type: object
     properties:
       query:
-        $ref: '#/definitions/HistoricalTagQuery'
+          $ref: '#/definitions/HistoricalTagDecimatedQuery'
       requestId:
         description: The identifier of the asynchronous query to associate with a result in a later message.
         type: string
@@ -344,79 +292,111 @@ definitions:
       hasError:
         description: Whether the query had an error and cannot be completed.
         type: boolean
-  WebSocketQueryRequest:
-    title: Web Socket Query Request
-    description: A web socket message sent by the client to query for historical tag values. The server
-      will respond with a *WebSocketQueryResponse* message once the query has been completed.
-    required: [action]
-    allOf:
-      - type: object
-        properties:
-          action:
-            description: The action to perform. Must be set to "TagHistorianQueryRequest".
-            type: string
-            enum: ['TagHistorianQueryRequest']
-            example: TagHistorianQueryRequest
-      - $ref: '#/definitions/HistoricalTagQuery'
-  WebSocketQueryResponse:
-    title: Web Socket Query Response
-    description: A web socket message sent by the server in response to a *WebSocketQueryRequest*
-      containing the result of the query.
+  HistoricalTagAsyncUndecimatedQueryJob:
+    description: Information about an asynchronous undecimated query.
+    title: Historical Tag Async Undecimated Query Job
     type: object
     properties:
-      action:
-        description: The action performed. Must be set to "TagHistorianQueryResponse".
+      query:
+        $ref: '#/definitions/HistoricalTagUndecimatedQuery'
+      requestId:
+        description: The identifier of the asynchronous query to associate with a result in a later message.
         type: string
-        enum: ['TagHistorianQueryResponse']
-        example: TagHistorianQueryResponse
-      tagHistorianValues:
-        $ref: '#/definitions/TagHistorianValues'
-  WebSocketAsyncQueryRequest:
-    title: Web Socket Async Query Request
-    description: A web socket message sent by the client to asynchronously query for historical tag
-      values. The server will respond with a *WebSocketAsyncQueryResponse* message confirming the start
+        example: '4cbba25a-c1b8-4fbe-8829-9ddfde555188'
+      hasError:
+        description: Whether the query had an error and cannot be completed.
+        type: boolean
+  WebSocketAsyncDecimatedQueryRequest:
+    title: Web Socket Async Decimated Query Request
+    description: A web socket message sent by the client to asynchronously query for decimated historical tag
+      values. The server will respond with a *WebSocketAsyncDecimatedQueryResponse* message confirming the start
       of the query, a *WebSocketAsyncQueryData* message for each query as they complete, and finally
-      a *WebSocketAsyncQueryComplete* once all queries have completed.
+      a *WebSocketAsyncDecimatedQueryComplete* once all queries have completed.
     type: object
     required:
       - action
       - queries
     properties:
       action:
-        description: The action to perform. Must be set to "TagHistorianAsyncQueryRequest".
+        description: The action to perform. Must be set to "TagHistorianAsyncDecimatedQueryRequest".
         type: string
-        enum: ['TagHistorianAsyncQueryRequest']
-        example: TagHistorianAsyncQueryRequest
+        enum: ['TagHistorianAsyncDecimatedQueryRequest']
+        example: TagHistorianAsyncDecimatedQueryRequest
       queries:
         description: The list of historical queries to perform.
         type: array
         items:
-          $ref: '#/definitions/HistoricalTagQuery'
+          $ref: '#/definitions/HistoricalTagDecimatedQuery'
     example:
-      action: TagHistorianAsyncQueryRequest
+      action: TagHistorianAsyncDecimatedQueryRequest
       queries:
         - decimation: 1000
           endTime: '9999-01-01T00:00:00Z'
           sortOrder: ASCENDING
           startTime: '0001-01-01T00:00:00Z'
           paths: [system1.tag1]
-  WebSocketAsyncQueryResponse:
-    title: Web Socket Async Query Response
-    description: A web socket message sent by the server to confirm a *WebSocketAsyncQueryRequest* sent
+  WebSocketAsyncUndecimatedQueryRequest:
+    title: Web Socket Async Undecimated Query Request
+    description: A web socket message sent by the client to asynchronously query for undecimated historical tag
+      values. The server will respond with a *WebSocketAsyncUndecimatedQueryResponse* message confirming the start
+      of the query, a *WebSocketAsyncQueryData* message for each query as they complete, and finally
+      a *WebSocketAsyncUndecimatedQueryComplete* once all queries have completed.
+    type: object
+    required:
+      - action
+      - queries
+    properties:
+      action:
+        description: The action to perform. Must be set to "TagHistorianAsyncUndecimatedQueryRequest".
+        type: string
+        enum: ['TagHistorianAsyncUndecimatedQueryRequest']
+        example: TagHistorianAsyncUndecimatedQueryRequest
+      queries:
+        description: The list of historical queries to perform.
+        type: array
+        items:
+          $ref: '#/definitions/HistoricalTagDecimatedQuery'
+    example:
+      action: TagHistorianAsyncUndecimatedQueryRequest
+      queries:
+        - endTime: '9999-01-01T00:00:00Z'
+          sortOrder: ASCENDING
+          startTime: '0001-01-01T00:00:00Z'
+          paths: [system1.tag1]
+  WebSocketAsyncDecimatedQueryResponse:
+    title: Web Socket Async Decimated Query Response
+    description: A web socket message sent by the server to confirm a *WebSocketAsyncDecimatedQueryRequest* sent
       by the client. A *WebSocketAsyncQueryData* message will be sent for each query as they complete
-      and a *WebSocketAsyncQueryComplete* once all queries have completed.
+      and a *WebSocketAsyncDecimatedQueryComplete* once all queries have completed.
     type: object
     properties:
       action:
-        description: The action performed. Must be set to "TagHistorianAsyncQueryResponse".
+        description: The action performed. Must be set to "TagHistorianAsyncDecimatedQueryResponse".
         type: string
-        enum: ['TagHistorianAsyncQueryResponse']
+        enum: ['TagHistorianAsyncDecimatedQueryResponse']
         example: TagHistorianAsyncQueryResponse
       queryJobs:
         description: A list containing the information about each query started.
         type: array
         items:
-          $ref: '#/definitions/HistoricalTagAsyncQueryJob'
+          $ref: '#/definitions/HistoricalTagAsyncDecimatedQueryJob'
+  WebSocketAsyncUndecimatedQueryResponse:
+    title: Web Socket Async Undecimated Query Response
+    description: A web socket message sent by the server to confirm a *WebSocketAsyncUndecimatedQueryRequest* sent
+      by the client. A *WebSocketAsyncQueryData* message will be sent for each query as they complete
+      and a *WebSocketAsyncUndecimatedQueryComplete* once all queries have completed.
+    type: object
+    properties:
+      action:
+        description: The action performed. Must be set to "TagHistorianAsyncUndecimatedQueryResponse".
+        type: string
+        enum: ['TagHistorianAsyncUndecimatedQueryResponse']
+        example: TagHistorianAsyncQueryResponse
+      queryJobs:
+        description: A list containing the information about each query started.
+        type: array
+        items:
+          $ref: '#/definitions/HistoricalTagAsyncUndecimatedQueryJob'
   WebSocketAsyncQueryData:
     title: Web Socket Async Query Data
     description: A web socket message sent by the server containing the result of a single completed
@@ -437,22 +417,38 @@ definitions:
             type: string
             example: '4cbba25a-c1b8-4fbe-8829-9ddfde555188'
       - $ref: '#/definitions/TagHistorianValues'
-  WebSocketAsyncQueryComplete:
-    title: Web Socket Async Query Complete
+  WebSocketAsyncDecimatedQueryComplete:
+    title: Web Socket Async Decimated Query Complete
     description: A web socket message sent by the server indicating that all asynchronous queries
-      for a single request are complete.
+      for a single decimated query request are complete.
     type: object
     properties:
       action:
-        description: The action performed. Must be set to "TagHistorianAsyncQueryCompleteRoutedMessage".
+        description: The action performed. Must be set to "TagHistorianAsyncDecimatedQueryCompleteRoutedMessage".
         type: string
-        enum: ['TagHistorianAsyncQueryCompleteRoutedMessage']
-        example: TagHistorianAsyncQueryCompleteRoutedMessage
+        enum: ['TagHistorianAsyncDecimatedQueryCompleteRoutedMessage']
+        example: TagHistorianAsyncDecimatedQueryCompleteRoutedMessage
       queryJobs:
         description: A list containing the information about each query started.
         type: array
         items:
-          $ref: '#/definitions/HistoricalTagAsyncQueryJob'
+          $ref: '#/definitions/HistoricalTagAsyncDecimatedQueryJob'
+  WebSocketAsyncUndecimatedQueryComplete:
+    title: Web Socket Async Undecimated Query Complete
+    description: A web socket message sent by the server indicating that all asynchronous undecimated queries
+      for a single request are complete.
+    type: object
+    properties:
+      action:
+        description: The action performed. Must be set to "TagHistorianAsyncUndecimatedQueryCompleteRoutedMessage".
+        type: string
+        enum: ['TagHistorianAsyncUndecimatedQueryCompleteRoutedMessage']
+        example: TagHistorianAsyncUndecimatedQueryCompleteRoutedMessage
+      queryJobs:
+        description: A list containing the information about each query started.
+        type: array
+        items:
+          $ref: '#/definitions/HistoricalTagAsyncUndecimatedQueryJob'
   WebSocketSubscribeRequest:
     title: Web Socket Subscribe Request
     description: A web socket message sent by the client to subscribe to notifications when one or more
@@ -604,16 +600,95 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/Error'
-  /v1/tags/query-history:
+  /v2/tags/query-history:
     post:
       tags: [history]
       summary: Read historical tag values
-      description: Queries for the historical values of one or more tags, with optional decimation.
+      description: Queries for the historical values of one or more tags.
       operationId: QueryHistory
       x-ni-operation: queryHistoricalTagValues
       produces:
         - application/json
-        - text/csv
+      parameters:
+        - in: body
+          name: Request body
+          required: true
+          description: Defines how historical values are queried and for which tags.
+          schema:
+            description: Defines how historical values are queried and for which tags.
+            type: object
+            title: Http Query Request Body
+            properties:
+              path:
+                description: A tag path identifying the tag whose historical values should
+                  be returned.
+                type: string
+                example: system1.tag1
+              startTime:
+                description: Limits the returned historical values to those written at or after at the
+                  given time in ISO-6801 format.
+                type: string
+                format: date-time
+                example: '2018-09-04T18:45:08Z'
+                default: '0001-01-01T00:00:00Z'
+              endTime:
+                description: Limits the returned historical values to those written at or before the
+                  given time in ISO-8601 format.
+                type: string
+                format: date-time
+                example: '2018-09-04T18:45:08Z'
+                default: '9999-12-31T23:59:59Z'
+              take:
+                description: Limits the returned historical values to the specified number of values. Use
+                  with the continuationToken property to implement pagination. Only applies when not specifying a decimation.
+                type: integer
+                minimum: 0
+                default: 0
+                example: 1
+              continuationToken:
+                description: For non-decimated queries, a value generated by the server which should be sent
+                  in the next request to retrieve the next page of values.
+                type: string
+              sortOrder:
+                description: Specifies the order to return historical values, either ascending or
+                  descending order based on when each tag value was written.
+                type: string
+                enum: [ASCENDING, DESCENDING]
+                default: ASCENDING
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            title: Http Query Response Body
+            allOf:
+              - $ref: '#/definitions/TypeAndValues'
+            properties:
+              continuationToken:
+                description: For non-decimated queries, a value generated by the server which should be sent
+                  in the next request to retrieve the next page of values.
+                type: string
+              errors:
+                $ref: '#/definitions/ErrorEntry'
+              failed:
+                description: The paths of the tags that had errors.
+                type: array
+                items:
+                  type: string
+                example: [system2.tag1]
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/query-decimated-history:
+    post:
+      tags: [history]
+      summary: Read decimated historical tag values
+      description: Queries for the decimated historical data for one or more tags
+      operationId: QueryDecimatedHistory
+      x-ni-operation: queryDecimatedHistoricalTagValues
+      produces:
+        - application/json
       parameters:
         - in: body
           name: Request body
@@ -647,39 +722,18 @@ paths:
                 format: date-time
                 example: '2018-09-04T18:45:08Z'
                 default: '9999-12-31T23:59:59Z'
-              skip:
-                description: Limits the returned historical values to those after the given number of
-                  values. Use with the take property to implement pagination. Only applies when not
-                  specifying a decimation.
-                type: integer
-                minimum: 0
-                default: 0
-              take:
-                description: Limits the returned historical values to the specified number of values.
-                  Use with the skip property to implement pagination. Only applies when not specifying
-                  a decimation.
-                type: integer
-                minimum: 0
-                default: 1000
-                example: 2
               decimation:
-                description: When non-zero, the returned historical values are decimated across
-                  requested time span divided into the specified number of equal-sized intervals.
+                description: The number of intervals to break the data between start and end time up into. The
+                  service will return the entry, exit, min, and max value for each interval.
                 type: integer
-                minimum: 0
-                default: 0
+                minimum: 1
+                default: 500
               sortOrder:
                 description: Specifies the order to return historical values, either ascending or
                   descending order based on when each tag value was written.
                 type: string
                 enum: [ASCENDING, DESCENDING]
                 default: ASCENDING
-              responseFormat:
-                description: The data format for the returned historical values. The values can
-                  either be returned as a JSON document (default) or comma-separated values.
-                type: string
-                enum: [JSON, CSV]
-                default: JSON
       responses:
         200:
           description: OK
@@ -687,38 +741,20 @@ paths:
             type: object
             title: Http Query Response Body
             properties:
-              values:
+              results:
                 description: An object containing the historical values for each requested tag that
                   was successfully queried. The object's property names correspond to a tag path.
                 type: object
                 additionalProperties:
-                  type: array
-                  items:
-                    $ref: '#/definitions/HttpHistoricalValue'
+                  $ref: '#/definitions/TypeAndValues'
                 example:
                   system1.tag1:
-                    - id: '5c88d2ae26b41e22f08b4407'
-                      path: system1.tag1
-                      type: DOUBLE
-                      value: '12.87'
-                      timestamp: '2019-03-13T09:51:38Z'
-                      properties:
-                        note: This value is an outlier and needs investigation.
-                      expirationDate: '2020-03-13T09:51:38Z'
-                    - id: '5c88d2ae26b41e22f08b4408'
-                      path: system1.tag1
-                      type: DOUBLE
-                      value: '3.2'
-                      timestamp: '2019-03-14T09:51:38Z'
-                      properties: null
-                      expirationDate: '2020-03-14T09:51:38Z'
-              totalCount:
-                description: The total number of historical values matched by the query regardless of
-                  the take parameter. When applying decimation, this value is always equal to the
-                  number of returned values.
-                type: integer
-                minimum: 0
-                example: 1100
+                    type: DOUBLE
+                    values:
+                      - value: '12.87'
+                        timestamp: '2019-03-13T09:51:38Z'
+                      - value: '3.2'
+                        timestamp: '2019-03-14T09:51:38Z'
               errors:
                 $ref: '#/definitions/ErrorEntry'
               failed:
@@ -731,187 +767,47 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/tags/history/{path}/update-values:
+  /v2/tags/export-history:
     post:
       tags: [history]
-      summary: Modify historical value metadata
-      description: Updates one or more historical values' properties or expiration.
-      operationId: UpdateHistoricalValues
-      x-ni-operation: modifyHistoricalTagValues
+      summary: Exports the undecimated data of one or more tags
+      description: Exports the undecimated data of one or more tags. If "CSV" is specified as the responseFormat,
+        the data is streamed as a single CSV file.
+      operationId: ExportHistory
+      x-ni-operation: exportHistory
+      produces:
+        - text/csv
       parameters:
-        - in: path
-          name: path
-          type: string
-          required: true
-          description: The path of the tag whose historical values are being updated.
-          x-example: system1.tag1
         - in: body
           name: Request body
           required: true
-          description: Contains the updates to apply to the tag's historical values.
+          description: Contains the paths of the tags whose data should be exported
           schema:
-            description: Contains the updates to apply to the tag's historical values.
+            description: Contains the paths of the tags whose data should be exported
             type: object
-            title: HttpUpdateValuesRequestBody
+            title: Tag Historian Export History Request
             properties:
-              values:
-                description: An array of updates to apply to the tag's historical values.
-                type: array
-                items:
-                  $ref: '#/definitions/HttpHistoricalValueUpdate'
-            required: [values]
-      responses:
-        200:
-          description: Partial success
-          schema:
-            $ref: '#/definitions/HttpUpdateValuesResponseBody'
-        204:
-          description: Success
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-  /v1/tags/history/{path}/delete-values-by-id:
-    post:
-      tags: [history]
-      summary: Delete historical values
-      description: Deletes one or more historical tag values.
-      operationId: DeleteHistoricalValuesById
-      x-ni-operation: deleteHistoricalTagValues
-      parameters:
-        - in: path
-          name: path
-          type: string
-          required: true
-          description: The path of the tag whose historical values are being deleted.
-          x-example: system1.tag1
-        - in: body
-          name: Request body
-          required: true
-          description: Contains the identifiers of the historical values to delete.
-          schema:
-            description: Contains the identifiers of the historical values to delete.
-            type: object
-            title: Tag Historian Delete Values By Id Request
-            properties:
-              ids:
-                description: The identifiers of the historical values to delete.
+              paths:
+                description: The paths whose data should be exported
                 type: array
                 items:
                   type: string
-                  example: '5c88d2ae26b41e22f08b4407'
-            required: [ids]
-      responses:
-        204:
-          description: Success
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-  /v1/tags/history/{path}/values/{id}:
-    get:
-      tags: [history]
-      summary: Read a historical value
-      description: Retrieves a single historical value and its metadata.
-      operationId: GetHistoricalValue
-      x-ni-operation: queryHistoricalTagValues
-      parameters:
-        - in: path
-          name: path
-          type: string
-          required: true
-          description: The path of the tag that owns the historical value being retrieved.
-          x-example: system1.tag1
-        - in: path
-          name: id
-          type: string
-          required: true
-          description: The identifier of the historical value to retrieve.
-          x-example: '5c88d2ae26b41e22f08b4407'
+                example:
+                  - tag1
+                  - tag2
+              responseFormat:
+                description: The format of the response. Currently only supports "CSV"
+                type: string
+                enum: [CSV]
+                default: CSV
       responses:
         200:
-          description: Success
-          schema:
-            description: Contains the historical value, if found.
-            title: TagHistorianQueryResponseBody
-            type: object
-            properties:
-              tagHistorianValues:
-                $ref: '#/definitions/TagHistorianValues'
+          description: OK
         401:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-    put:
-      tags: [history]
-      summary: Update a historical value
-      description: Updates a single historical value's metadata.
-      operationId: UpdateHistoricalValue
-      x-ni-operation: modifyHistoricalTagValues
-      parameters:
-        - in: path
-          name: path
-          type: string
-          required: true
-          description: The path of the tag that owns the historical value being modified.
-          x-example: system1.tag1
-        - in: path
-          name: id
-          type: string
-          required: true
-          description: The identifier of the historical value to modify. This value is used in preference to
-            the identifier contained in the request body.
-          x-example: '5c88d2ae26b41e22f08b4407'
-        - in: body
-          name: Request body
-          required: true
-          description: Contains the update to apply to the historical value.
-          schema:
-            description: Contains the update to apply to the historical value.
-            type: object
-            title: Http Update Value Request Body
-            properties:
-              value:
-                $ref: '#/definitions/HttpHistoricalValueUpdate'
-            required: [value]
-      responses:
-        200:
-          description: Partial success
-          schema:
-            $ref: '#/definitions/HttpUpdateValuesResponseBody'
-        204:
-          description: Success
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-    delete:
-      tags: [history]
-      summary: Delete a historical value
-      description: Deletes a single historical value.
-      operationId: DeleteHistoricalValue
-      x-ni-operation: deleteHistoricalTagValues
-      parameters:
-        - in: path
-          name: path
-          type: string
-          required: true
-          description: The path of the tag that owns the historical value being deleted.
-          x-example: system1.tag1
-        - in: path
-          name: id
-          type: string
-          required: true
-          description: The identifier of the historical value to delete.
-          x-example: '5c88d2ae26b41e22f08b4407'
-      responses:
-        204:
-          description: Success
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-  /v1/tags/delete-values-by-range:
+  /v2/tags/delete-values-by-range:
     post:
       tags: [history]
       summary: Deletes a range of historical values
@@ -961,22 +857,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/tags/flush-values:
-    post:
-      tags: [utility]
-      summary: Process buffered tag updates
-      description: Triggers the tag historian to immediately begin processing tag updates. Clients do
-        not need to call this method for updates to be processed normally.
-      operationId: FlushValues
-      x-ni-operation: modifyHistoricalTagValues
-      responses:
-        204:
-          description: Success
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-  /v1/websocket:
+  /v2/websocket:
     get:
       tags:
         - web socket
