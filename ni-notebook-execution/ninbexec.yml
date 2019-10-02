@@ -1,0 +1,1432 @@
+swagger: '2.0'
+info:
+  version: '1'
+  title: Notebook Execution Service
+  description: Execute Jupyter notebooks.
+  contact:
+    name: National Instruments
+    url: https://www.ni.com/systemlink
+    email: support@ni.com
+basePath: /ninbexec
+x-ni-routing-key: Skyline.NotebookExecution
+consumes: [application/json]
+produces: [application/json]
+
+securityDefinitions:
+  basicAuth:
+    type: basic
+  cookieAuth:
+    type: apiKey
+    in: header
+    name: Cookie
+
+security:
+  - basicAuth: []
+  - cookieAuth: []
+
+definitions:
+  Error:
+    title: Error
+    description: Contains error information.
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+        example: Skyline.OneOrMoreErrorsOccurred
+      code:
+        description: Numeric error code
+        type: integer
+        format: int32
+        example: -251040
+      resourceType:
+        description: Type of resource associated with the error
+        type: string
+        example: string
+      resourceId:
+        description: Identifier of the resource associated with the error
+        type: string
+        example: '46fc8c2b-bcc9-4bac-b016-34d9396d3f99'
+      message:
+        description: Complete error message
+        type: string
+        example: One or more errors occurred. See the contained list for details of each error
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+          example: '46fc8c2b-bcc9-4bac-b016-34d9396d3f99'
+      innerErrors:
+        type: array
+        example:
+          - name: NotebookExecution.InvalidProperty
+            code: -253700
+            resourceType: string
+            resourceId: '46fc8c2b-bcc9-4bac-b016-34d9396d3f99'
+            message: Invalid property.
+            args: []
+        items:
+          $ref: '#/definitions/Error'
+    example:
+      name: Skyline.OneOrMoreErrorsOccurred
+      code: -251040
+      message: One or more errors occurred. See the contained list for details of each error.
+      args: []
+      innerErrors:
+        - name: NotebookExecution.InvalidProperty
+          code: -253700
+          resourceType: string
+          resourceId: '46fc8c2b-bcc9-4bac-b016-34d9396d3f99'
+          message: Invalid property.
+          args: []
+  Operation:
+    title: Operation
+    description: An operation provided by the API
+    type: object
+    required:
+      - available
+    properties:
+      available:
+        description: Whether the operation is available to the caller
+        type: boolean
+        example: true
+      version:
+        description: Version of the available operation
+        type: integer
+        format: int32
+        default: 1
+        example: 1
+    example:
+      available: true
+      version: 1
+  CreateExecutionOperation:
+    title: Create Executions Operation
+    description: Create Executions array object including export formats
+    allOf: 
+      - $ref: '#/definitions/Operation'
+      - type: object
+        properties: 
+          exportFormats: 
+            description: List of export formats 
+            type: array
+            items: 
+              $ref: '#/definitions/NotebookExportFormat'
+        example:
+          exportFormats: [PDF, HTML]
+  V1Operations:
+    title: Version 1 Operations
+    description: V1 operations
+    type: object
+    properties:
+      operations:
+        description: >-
+          Available operations in the v1 version of the API:
+
+          - queryNotebooks: Query a set of notebooks
+
+          - downloadNotebook: Download notebook file data
+
+          - deleteExecutions: Delete a set of executions
+
+          - queryExecutions: Query a set of executions
+
+          - createExecutions: Create a set of executions
+
+          - cancelExecutions: Cancel a set of executions
+        type: object
+        properties:
+          queryNotebooks:
+            $ref: '#/definitions/Operation'
+          downloadNotebook:
+            $ref: '#/definitions/Operation'
+          deleteExecutions:
+            $ref: '#/definitions/Operation'
+          queryExecutions:
+            $ref: '#/definitions/Operation'
+          createExecutions:
+            $ref: '#/definitions/CreateExecutionOperation'
+          cancelExecutions:
+            $ref: '#/definitions/Operation'
+  V2Operations:
+    title: Version 2 Operations
+    description: V2 operations
+    type: object
+    properties:
+      operations:
+        description: >-
+          Available operations in the v2 version of the API:
+
+          - queryNotebooks: Query a set of notebooks
+
+          - downloadNotebook: Download notebook file data
+
+          - deleteExecutions: Delete a set of executions
+
+          - queryExecutions: Query a set of executions
+
+          - createExecutions: Create a set of executions
+
+          - cancelExecutions: Cancel a set of executions
+        type: object
+        properties:
+          queryNotebooks:
+            $ref: '#/definitions/Operation'
+          downloadNotebook:
+            $ref: '#/definitions/Operation'
+          deleteExecutions:
+            $ref: '#/definitions/Operation'
+          queryExecutions:
+            $ref: '#/definitions/Operation'
+          createExecutions:
+            $ref: '#/definitions/CreateExecutionOperation'
+          cancelExecutions:
+            $ref: '#/definitions/Operation'
+  QueryOperation:
+    title: Query Operation
+    description: Query operation enum
+    type: string
+    enum:
+      - EQUAL
+      - NOT_EQUAL
+      - LESS_THAN
+      - GREATER_THAN
+      - LESS_THAN_OR_EQUAL
+      - GREATER_THAN_OR_EQUAL
+  IntegerQueryObject:
+    title: Integer Query
+    description: Integer query object
+    type: object
+    required:
+      - operation
+      - comparisonValue
+    properties:
+      operation:
+        $ref: '#/definitions/QueryOperation'
+      comparisonValue:
+        description: Integer value to compare
+        type: integer
+        format: int32
+        example: 360
+  TimeQueryObject:
+    title: Time Query
+    description: Time query object
+    type: object
+    required:
+      - operation
+      - comparisonValue
+    properties:
+      operation:
+        $ref: '#/definitions/QueryOperation'
+      comparisonValue:
+        description: ISO-8601 formatted timestamp value to compare.
+        type: string
+        format: date-time
+        example: '2017-11-14T15:41:06.106Z'
+  ArrayContainsObject:
+    title: Array Contains
+    description: >-
+      Array contains object. This searches an array to find at least one element that matches the
+      provided value.
+    type: object
+    required:
+      - name
+      - contains
+    properties:
+      name:
+        description: >-
+          The name of the key in the parent object that corresponds to the array to search.
+        type: string
+        example: 'namespaces'
+      contains:
+        description: The value to search for inside the array.
+        type: object
+        example: 'namespace 1'
+  NotebookField:
+    title: Notebook Field
+    description: Notebook field enum
+    type: string
+    enum:
+      - PATH
+      - CREATED_AT
+      - UPDATED_AT
+      - PARAMETERS
+      - METADATA
+  NotebookSortField:
+    title: Notebook Sort Field
+    description: Notebook sort field enum
+    type: string
+    enum:
+      - PATH
+      - CREATED_AT
+      - UPDATED_AT
+  NotebookExportFormat:
+    title: Notebook Export Format
+    description: >-
+      Specifies the file format for the notebook execution export. If this value is null or
+      omitted then no export is performed.
+    type: string
+    enum:
+      - HTML
+      - PDF
+  NotebookSortDefinitionObject:
+    title: Notebook Sort Definition
+    description: Defines the field and direction for sorting notebooks.
+    type: object
+    required:
+      - field
+    properties:
+      field:
+        $ref: '#/definitions/NotebookSortField'
+      orderByDescending:
+        type: boolean
+        default: false
+  NotebookQueryObject:
+    title: Notebook Query
+    type: object
+    properties:
+      paths:
+        description: Array of notebook paths
+        type: array
+        items:
+          type: string
+        example:
+          - '_shared/reports/First Pass Yield.ipynb'
+      createdAtQuery:
+        description: Array of time query objects for when the notebook was created
+        type: array
+        items:
+          $ref: '#/definitions/TimeQueryObject'
+      updatedAtQuery:
+        description: Array of time query objects for when the notebook was modified
+        type: array
+        items:
+          $ref: '#/definitions/TimeQueryObject'
+      parameters:
+        description: >-
+          Array of input parameter dictionaries and their default values. When querying, entries
+          in the same dictionary must all match (an "and" relationship within dictionaries).
+          Only one of the dictionaries need to match the query (an "or" relationship between
+          different dictionaries).
+        type: array
+        items:
+          type: object
+          additionalProperties:
+            type: object
+        example:
+          - stringParam: 'my default string value'
+            dictParam:
+              key1: val1
+              key2: val2
+          - stringParam: 'my other string value'
+            dictParam:
+              key1: val3
+              key2: val4
+      metadata:
+        description: >-
+          Array of metadata dictionaries to query for. When querying, entries within the same
+          dictionary must all match (an "and" relationship within dictionaries). Only one of the
+          dictionaries need to match the query (an "or" relationship between different
+          dictionaries).
+        type: array
+        items:
+          type: object
+          additionalProperties:
+            type: object
+        example:
+          - metadataString: 'my first string value'
+            metadataDict:
+              key1: val1
+              key2: val2
+          - metadataString: 'my alternative string value'
+            metadataDict:
+              key1: val3
+              key2: val4
+      metadataArrayContains:
+        description: >-
+          This is a specialized query on the metadata dictionary. It is designed to query one or
+          more arrays inside the metadata dictionary such that these arrays contain at least one
+          instance of the specified value. It is represented by an array of an array of objects
+          referred to as 'Array Contains Objects'. When querying, all elements of the inner array
+          of 'Array Contains Objects' must match (an "and" relationship within the inner array).
+          Only one element in the outer array needs to match (an "or" relationship within the
+          outer array).
+        type: array
+        items:
+          description: >-
+            Inner array of 'Array Contains Objects' to query for. When querying, all elements of
+            the inner array of 'Array Contains Objects' must match (an "and" relationship within
+            the inner array).
+          type: array
+          items:
+            $ref: '#/definitions/ArrayContainsObject'
+        example:
+          - - name: 'namespaces'
+              contains: 'namespace 1'
+      sortBy:
+        description: Array of notebook sort definition objects to define how to sort the results
+        type: array
+        items:
+          $ref: '#/definitions/NotebookSortDefinitionObject'
+      projection:
+        description: >-
+          Array of notebook fields. If you specify an array, the query returns a result with the
+          notebook objects containing the fields that are both specified and available. If you do
+          not specify an array, the query will return a result with the notebook objects containing
+          all available fields.
+        type: array
+        items:
+          $ref: '#/definitions/NotebookField'
+  NotebookAdvancedQuery:
+    title: Advanced Query Object for Notebooks
+    type: object
+    properties:
+      filter:
+        description: The query filter in Dynamic Linq
+        type: string
+        example: (metadata.key1 == "value1") || ((parameters.key2 != "value2") && (updatedAt >= "2002-12-25T01:01:01.1234567Z"))
+      orderBy:
+        $ref: '#/definitions/NotebookSortField'
+      descending:
+        description: ->
+          Whether to return the notebooks in descending order.
+        type: boolean
+        default: false
+        example: false
+      projection:
+        description: >-
+          Array of notebook fields. If you specify an array, the query returns a result with the
+          notebook objects containing the fields that are both specified and available. If you do
+          not specify an array, the query will return a result with the notebook objects containing
+          all available fields.
+        type: array
+        items:
+          $ref: '#/definitions/NotebookField'
+      skip:
+        description: >-
+          The number of notebooks to skip over when returning the result. Used for paging.
+        type: integer
+        format: int32
+        default: 0
+        minimum: 0
+        example: 1000
+      take:
+        description: >-
+          The maximum number of notebooks to return.
+        type: integer
+        format: int32
+        default: 1000
+        minimum: 0
+        example: 1000
+      returnCount:
+        description: >-
+          Whether to return the total number of notebooks which match the
+          provided filter, disregarding the take value.
+        type: boolean
+        default: false
+        example: false
+  Notebook:
+    title: Notebook
+    description: Information about a Jupyter notebook
+    type: object
+    properties:
+      path:
+        description: The notebook path.
+        type: string
+        example: '_shared/reports/First Pass Yield.ipynb'
+      createdAt:
+        description: File timestamp of when the notebook was created
+        type: string
+        format: date-time
+        example: '2017-11-14T15:41:06.106Z'
+      updatedAt:
+        description: File timestamp of when the notebook was last modified
+        type: string
+        format: date-time
+        example: '2017-11-14T15:41:06.106Z'
+      parameters:
+        description: >-
+          Input parameters of this notebook and their default values. The keys are strings and
+          the values can be of any valid JSON type.
+        type: object
+        additionalProperties:
+          type: object
+        example:
+          stringParam: 'my default string value'
+          dictParam:
+            key1: val1
+            key2: val2
+      metadata:
+        description: >-
+          Metadata associated with this notebook. The keys are strings and the values can be
+          of any valid JSON type.
+        type: object
+        additionalProperties:
+          type: object
+        example:
+          metadataString: 'my metadata string value'
+          metadataDict:
+            key1: val1
+            key2: val2
+  CreateExecution:
+    title: Create Execution
+    description: Creation information about an execution of a Jupyter notebook
+    type: object
+    required:
+      - notebookPath
+    properties:
+      notebookPath:
+        description: The notebook path associated with the execution.
+        type: string
+        example: '_shared/reports/First Pass Yield.ipynb'
+      parameters:
+        description: >-
+          The input parameters for this execution of the notebook. The keys are strings and the
+          values can be of any valid JSON type.
+        type: object
+        additionalProperties:
+          type: object
+        example:
+          stringParam: 'my default string value'
+          dictParam:
+            key1: val1
+            key2: val2
+      timeout:
+        description: >-
+          The number of seconds the execution runs before it aborts if uncompleted.
+          The timer starts once status is IN_PROGRESS. 0 means infinite. The default is 1 hour
+          (3600 seconds).
+        type: integer
+        format: int32
+        default: 3600
+        example: 300
+      resultCachePeriod:
+        description: >-
+          The period of time, in seconds, when the result of a previous notebook execution can be
+          used as the result of the current notebook execution. Results will only be reused if the
+          notebook paths and input parameters match. A value of 0 means that the service will not
+          reuse results from any previous notebook executions. A value of -1 means that the
+          service will always reuse results if possible. If not possible, return an error. This
+          prevents actual execution of a notebook. The default is 24 hours (86400 seconds).
+        type: integer
+        format: int32
+        default: 86400
+        example: 3600
+      exportFormat:
+        description: >-
+          Renders the executed notebook and uploads it to the File Ingestion Service. If the user
+          specifies an export format and a resultCachePeriod, the export format would be honored
+          and resultCachePeriod will be ignored. The file will be exported to the File Ingestion Service.
+        $ref: '#/definitions/NotebookExportFormat'
+  ExecutionHashInformation:
+    title: Execution Hash Information
+    description: >-
+      Information used to calculate an execution hash. Execution hashes are used
+      internally to identify a distinct execution, where if this hash matches, it
+      means that the result may be reused. This hash is based on information
+      including the notebook path, the last modified timestamp of the notebook, and
+      the given parameters of the notebook overriding the default parameters of
+      the notebook. This will use the current last modified timestamp of the
+      notebook as well as the current default parameters of the notebook. It is
+      not possible to calculate hashes based on notebooks that have since been
+      modified because the default parameters may have changed. Historical
+      versions of default parameters are not tracked.
+    type: object
+    required:
+      - notebookPath
+    properties:
+      notebookPath:
+        description: The notebook path associated with the execution.
+        type: string
+        example: '_shared/reports/First Pass Yield.ipynb'
+      parameters:
+        description: >-
+          The input parameters for the execution of the notebook. The keys are strings and the
+          values can be of any valid JSON type. The hash is calculated, in part, by applying
+          these input parameters on top of the default parameters of the notebook. Hence, if the
+          value of an input parameter matches the value of the default parameter, the resulting
+          hash is the same whether or not that input parameter is present.
+        type: object
+        additionalProperties:
+          type: object
+        example:
+          stringParam: 'my default string value'
+          dictParam:
+            key1: val1
+            key2: val2
+  ExecutionStatus:
+    title: Execution Status
+    description: Status of the execution
+    type: string
+    enum:
+      - QUEUED
+      - IN_PROGRESS
+      - FAILED
+      - SUCCEEDED
+      - CANCELED
+      - TIMED_OUT
+    example: SUCCEEDED
+  ExecutionField:
+    title: Execution Field
+    description: Execution field enum
+    type: string
+    enum:
+      - ID
+      - NOTEBOOK_PATH
+      - PARAMETERS
+      - EXECUTION_HASH
+      - TIMEOUT
+      - QUEUED_AT
+      - STARTED_AT
+      - COMPLETED_AT
+      - STATUS
+      - EXCEPTION
+      - RESULT
+  ExecutionSortField:
+    title: Execution Sort Field
+    description: Execution sort field enum
+    type: string
+    enum:
+      - ID
+      - NOTEBOOK_PATH
+      - EXECUTION_HASH
+      - TIMEOUT
+      - QUEUED_AT
+      - STARTED_AT
+      - COMPLETED_AT
+      - STATUS
+  ExecutionSortDefinitionObject:
+    title: Execution Sort Definition
+    description: Defines the field and direction for sorting executions.
+    type: object
+    required:
+      - field
+    properties:
+      field:
+        $ref: '#/definitions/ExecutionSortField'
+      orderByDescending:
+        type: boolean
+        default: false
+  ExecutionQueryObject:
+    title: Execution Query
+    type: object
+    properties:
+      ids:
+        description: Array of execution IDs.
+        type: array
+        items:
+          type: string
+        example:
+          - 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+      notebookPaths:
+        description: Array of notebook paths.
+        type: array
+        items:
+          type: string
+        example:
+          - '_shared/reports/First Pass Yield.ipynb'
+      parameters:
+        description: >-
+          Array of input parameter dictionaries. When querying, entries within the same dictionary
+          must all match (an "and" relationship within dictionaries). Only one of the dictionaries
+          needs to match the query (an "or" relationship between different dictionaries).
+        type: array
+        items:
+          type: object
+          additionalProperties:
+            type: object
+        example:
+          - stringParam: 'my default string value'
+            dictParam:
+              key1: val1
+              key2: val2
+          - stringParam: 'my other string value'
+            dictParam:
+              key1: val3
+              key2: val4
+      timeoutQuery:
+        description: Array of integer query objects for the execution's timeout
+        type: array
+        items:
+          $ref: '#/definitions/IntegerQueryObject'
+      executionHashes:
+        description: >-
+          Array of objects used to calculate execution hashes. Execution hashes are used
+          internally to identify a distinct execution, where if this hash matches, it
+          means that the result may be reused. This hash is based on information
+          including the notebook path, the last modified timestamp of the notebook, and
+          the given parameters of the notebook overriding the default parameters of
+          the notebook.
+        type: array
+        items:
+          $ref: '#/definitions/ExecutionHashInformation'
+      statuses:
+        description: Array of execution statuses.
+        type: array
+        items:
+          $ref: '#/definitions/ExecutionStatus'
+      queuedAtQuery:
+        description: Array of time query objects for the execution's queue timestamp
+        type: array
+        items:
+          $ref: '#/definitions/TimeQueryObject'
+      startedAtQuery:
+        description: Array of time query objects for the execution's started timestamp
+        type: array
+        items:
+          $ref: '#/definitions/TimeQueryObject'
+      completedAtQuery:
+        description: Array of time query objects for the execution's completed timestamp
+        type: array
+        items:
+          $ref: '#/definitions/TimeQueryObject'
+      sortBy:
+        description: Array of execution sort definition objects that define how to sort the results
+        type: array
+        items:
+          $ref: '#/definitions/ExecutionSortDefinitionObject'
+      projection:
+        description: >-
+          Array of execution fields. If this is not specified, the query returns a result with
+          the execution objects containing all available fields. If this is specified, the query
+          returns a result with the execution objects containing only the fields that are both
+          specified and available.
+        type: array
+        items:
+          $ref: '#/definitions/ExecutionField'
+  ExecutionAdvancedQuery:
+    title: Advanced Query Object for Notebook Executions
+    type: object
+    properties:
+      filter:
+        description: The query filter in Dynamic Linq
+        type: string
+        example: ((status == "SUCCEEDED") && (result.key1 == "value1")) || ((status == "FAILED") && (completedAt >= "2002-12-25T01:01:01.1234567Z"))
+      orderBy:
+        $ref: '#/definitions/ExecutionSortField'
+      descending:
+        description: ->
+          Whether to return the notebook executions in descending order.
+        type: boolean
+        default: false
+        example: false
+      projection:
+        description: >-
+          Array of execution fields. If this is not specified, the query returns a result with
+          the execution objects containing all available fields. If this is specified, the query
+          returns a result with the execution objects containing only the fields that are both
+          specified and available.
+        type: array
+        items:
+          $ref: '#/definitions/ExecutionField'
+      skip:
+        description: >-
+          The number of notebook executions to skip over when returning the result. Used for paging.
+        type: integer
+        format: int32
+        default: 0
+        minimum: 0
+        example: 1000
+      take:
+        description: >-
+          The maximum number of notebook executions to return.
+        type: integer
+        format: int32
+        default: 1000
+        minimum: 0
+        example: 1000
+      returnCount:
+        description: >-
+          Whether to return the total number of notebook executions which match the
+          provided filter, disregarding the take value.
+        type: boolean
+        default: false
+        example: false
+  Execution:
+    title: Execution
+    description: Information about an execution of a Jupyter notebook.
+    type: object
+    properties:
+      id:
+        description: Execution ID
+        type: string
+        example: '6d958d07-2d85-4655-90ba-8ff84a0482aa'
+      notebookPath:
+        description: Notebook path associated with the execution
+        type: string
+        example: '_shared/reports/First Pass Yield.ipynb'
+      parameters:
+        description: >-
+          Input parameters for this execution of the notebook. The keys are strings and the
+          values can be of any valid JSON type.
+        type: object
+        additionalProperties:
+          type: object
+        example:
+          stringParam: 'my default string value'
+          dictParam:
+            key1: val1
+            key2: val2
+      executionHash:
+        description: >-
+          Execution hashes are used internally to identify a distinct execution, where if this
+          hash matches, it means that the result may be reused. This hash is based on information
+          including the notebook path, the last modified timestamp of the notebook, and the given
+          parameters of the notebook overriding the default parameters of the notebook.
+        type: string
+        example: 'ac6d0228705ad33f91d53aee16acbc012298192f'
+      timeout:
+        description: >-
+          The number of seconds the execution runs before it aborts if uncompleted.
+          The timer starts once status is IN_PROGRESS. 0 means infinite.
+        type: integer
+        format: int32
+        example: 300
+      status:
+        $ref: '#/definitions/ExecutionStatus'
+      queuedAt:
+        description: Timestamp of when the notebook execution was queued
+        type: string
+        format: date-time
+        example: '2017-11-14T15:41:06.106Z'
+      startedAt:
+        description: Timestamp of when the notebook execution was started
+        type: string
+        format: date-time
+        example: '2017-11-14T15:41:06.106Z'
+      completedAt:
+        description: Timestamp of when the notebook execution was completed
+        type: string
+        format: date-time
+        example: '2017-11-14T15:41:06.106Z'
+      exception:
+        description: >-
+          Exception information. This is used only when status is FAILED.
+        type: string
+        example: 'Traceback (most recent call last):\n  File "<stdin>", line 1, in <module>\n  File "D:\Perforce\MAX\skyline\components\notebook_execution_service\trunk\18.5\objects\export\installers\allos\allproc\systemlink\messagebus\paths.py", line 200, in load_utf8_file_to_string\n    with codecs.open(filename, ''r\'', encoding=''utf-8-sig'') as fp_:\n  File "C:\Program Files\National Instruments\Shared\Skyline\Python\lib\codecs.py", line 897, in open\n    file = builtins.open(filename, mode, buffering)\nFileNotFoundError: [Errno 2] No such file or directory: ''not_existing_file.txt'''
+      result:
+        description: >-
+          Information about the result of an execution of a Jupyter notebook. This is used only
+          when the status of the execution is SUCCEEDED.
+        type: object
+        additionalProperties:
+          type: object
+        example:
+          title: First Pass Yield
+          axis_labels:
+            - Time (s)
+            - '% Yield'
+          result_type: STANDARD
+          result:
+            - index:
+                - values
+                - percentages
+              columns:
+                - 0
+                - 1
+                - 2
+                - 3
+                - 4
+              data:
+                - - 40
+                  - 5
+                  - 3
+                  - 1
+                  - 1
+                - - 80
+                  - 90
+                  - 96
+                  - 98
+                  - 100
+      cachedResult:
+        description: >-
+          Whether or not the service is using a cached result instead of running a new execution
+        type: boolean
+        example: true
+      exportFileId:
+        description: >-
+          File ID of notebook report exported to the File Ingestion Service.
+        type: string
+        example: '5d1b72663629224d047d1c77'
+  CreateExecutionsPartialSuccessResponse:
+    title: Create Executions Partial Success Response
+    description: Create executions partial success response
+    type: object
+    required:
+      - executions
+      - failed
+      - error
+    properties:
+      executions:
+        description: Array of executions that were created
+        type: array
+        items:
+          $ref: '#/definitions/Execution'
+      failed:
+        description: Array of execution requests that failed
+        type: array
+        items:
+          $ref: '#/definitions/CreateExecution'
+      error:
+        $ref: '#/definitions/Error'
+  DeleteExecutionsPartialSuccessResponse:
+    title: Delete Executions Partial Success Response
+    description: Delete executions partial success response
+    type: object
+    required:
+      - ids
+      - failed
+      - error
+    properties:
+      ids:
+        description: Array of execution IDs that were successfully deleted
+        type: array
+        items:
+          type: string
+        example:
+          - '6d9cd574-2c35-4514-8b0e-04c45a7b2cc5'
+          - 'b64c45b0-cb9b-4cb9-9207-ff54ab76a25e'
+          - '35031757-d6ac-4ea9-b351-eba38ffffcfd'
+      failed:
+        description: Array of execution IDs that failed to delete
+        type: array
+        items:
+          type: string
+        example:
+          - '1bcfa300-732a-45a8-80a1-01546d5c4ac1'
+          - '293c0b80-6551-4e05-9ae3-e1e2fab8b39f'
+      error:
+        $ref: '#/definitions/Error'
+  CancelExecutionsPartialSuccessResponse:
+    title: Cancel Executions Partial Success Response
+    description: Cancel executions partial success response
+    type: object
+    required:
+      - ids
+      - failed
+      - error
+    properties:
+      ids:
+        description: Array of canceled execution IDs
+        type: array
+        items:
+          type: string
+        example:
+          - '6d9cd574-2c35-4514-8b0e-04c45a7b2cc5'
+          - 'b64c45b0-cb9b-4cb9-9207-ff54ab76a25e'
+          - '35031757-d6ac-4ea9-b351-eba38ffffcfd'
+      failed:
+        description: Array of execution IDs that failed to cancel
+        type: array
+        items:
+          type: string
+        example:
+          - '1bcfa300-732a-45a8-80a1-01546d5c4ac1'
+          - '293c0b80-6551-4e05-9ae3-e1e2fab8b39f'
+      error:
+        $ref: '#/definitions/Error'
+
+parameters:
+  notebookPath:
+    in: path
+    name: path
+    description: >-
+      Path of the Jupyter notebook. This is a relative path and uses '/' as the delimiter.
+    type: string
+    required: true
+    x-example: '_shared/reports/First Pass Yield.ipynb'
+  executionId:
+    in: path
+    name: id
+    description: The ID of the Execution job of a Jupyter notebook
+    type: string
+    required: true
+    x-example: '6d958d07-2d85-4655-90ba-8ff84a0482aa'
+
+responses:
+  Error:
+    description: Error definition object
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  Unauthorized:
+    description: Not authorized
+    headers:
+      WWW_Authenticate:
+        description: Information for how to authenticate
+        type: string
+
+paths:
+  /:
+    get:
+      operationId: RootEndpoint
+      x-ni-request-all-privileges: true
+      summary: API information
+      description: Returns information about API versions and available operations.
+      tags: [versioning]
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Version information
+            title: RootEndpointResponse
+            type: object
+            properties:
+              v1:
+                $ref: '#/definitions/V1Operations'
+              v2:
+                $ref: '#/definitions/V2Operations'
+              version:
+                description: Implementation version of the web service
+                type: string
+  /v1:
+    get:
+      tags: [versioning]
+      summary: API version 1 information
+      description: Returns available operations for version 1 of the API.
+      operationId: RootEndpointV1
+      x-ni-request-all-privileges: true
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/V1Operations'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+  /v2:
+    get:
+      tags: [versioning]
+      summary: API version 2 information
+      description: Returns available operations for version 2 of the API.
+      operationId: RootEndpointV2
+      x-ni-request-all-privileges: true
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/V2Operations'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+  /v2/notebooks/{path}:
+    parameters:
+      - $ref: '#/parameters/notebookPath'
+    get:
+      operationId: GetNotebook
+      x-ni-operation: queryNotebooks
+      x-ni-privilege: Read
+      x-ni-oldest-compatible-version: 1
+      summary: Get information about the specified Jupyter notebook
+      description: >-
+        Get information about the specified Jupyter notebook.
+      tags: [notebooks]
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Notebook'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/query-notebooks:
+    post:
+      operationId: QueryNotebooksV2
+      x-ni-operation: queryNotebooks
+      x-ni-privilege: Read
+      x-ni-request-variables: [REMOTE_USER]
+      summary: Query Jupyter notebooks
+      description: >-
+        Queries the Jupyter notebooks. Notebooks return in descending order of
+        'modifiedTime' if no sort order is specified.
+      tags: [notebooks]
+      parameters:
+        - in: body
+          name: queryNotebooks
+          description: Notebook query object
+          required: false
+          schema:
+            $ref: '#/definitions/NotebookAdvancedQuery'
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Jupyter notebook information
+            title: QueryNotebooksResponseV2
+            type: object
+            required:
+              - notebooks
+            properties:
+              notebooks:
+                description: Array of Jupyter notebooks
+                type: array
+                items:
+                  $ref: '#/definitions/Notebook'
+              totalCount:
+                description: Number of matching executions
+                type: integer
+                format: int64
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/notebooks/{path}/data:
+    parameters:
+      - $ref: '#/parameters/notebookPath'
+    get:
+      tags: [notebooks]
+      summary: Download a notebook file
+      description: >-
+        Downloads a notebook file in a single HTTP response. Use the inline parameter in the query
+        string to control the download behavior.
+      operationId: DownloadNotebook
+      x-ni-operation: downloadNotebook
+      x-ni-privilege: Read
+      x-ni-request-variables:
+        - REMOTE_USER
+        - REQUEST_METHOD
+      x-ni-oldest-compatible-version: 1
+      parameters:
+        - in: query
+          name: inline
+          description: >-
+            Whether to return the file data inline rather than as an attachment.
+            When this parameter is set to true, the file contents return
+            directly for the caller to handle. The Content-Disposition header
+            is set to 'inline' and the MIME type is unset.
+            When the the inline query parameter is not specified or is
+            false, the file contents are handled as an attachment. The
+            Content-Disposition header is set to 'attachment' and
+            the MIME type is set to 'application/json'.
+          type: boolean
+          default: false
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Notebook file data
+            type: file
+          examples:
+            application/octet-stream:
+              Notebook file data
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/executions/{id}:
+    parameters:
+      - $ref: '#/parameters/executionId'
+    get:
+      operationId: GetExecution
+      x-ni-operation: queryExecutions
+      x-ni-privilege: Read
+      x-ni-oldest-compatible-version: 1
+      summary: Get information on the specified execution of a Jupyter notebook
+      description: >-
+        Gets information on the specified execution of a Jupyter notebook.
+      tags: [executions]
+      responses:
+        200:
+          description: Execution information
+          schema:
+            $ref: '#/definitions/Execution'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      operationId: DeleteExecution
+      x-ni-operation: deleteExecutions
+      x-ni-privilege: Write
+      x-ni-oldest-compatible-version: 1
+      summary: Delete the specified execution of a Jupyter notebook
+      description: Deletes the execution of a Jupyter notebook specified by an execution ID.
+      tags: [executions]
+      responses:
+        204:
+          description: No content
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/delete-executions:
+    post:
+      operationId: DeleteExecutions
+      x-ni-operation: deleteExecutions
+      x-ni-privilege: Write
+      x-ni-oldest-compatible-version: 1
+      summary: Delete executions of Jupyter notebooks
+      description: >-
+        Deletes multiple executions in a single API call. The request body contains
+        an array of execution IDs to delete.
+      tags: [executions]
+      parameters:
+        - in: body
+          name: executions
+          description: Array of executions to delete.
+          required: true
+          schema:
+            description: Array of executions to delete.
+            title: DeleteExecutionsRequest
+            type: array
+            items:
+              description: The ID of an execution to delete.
+              type: string
+              example: '6d958d07-2d85-4655-90ba-8ff84a0482aa'
+            minItems: 1
+      responses:
+        204:
+          description: No content
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/DeleteExecutionsPartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/query-executions:
+    post:
+      operationId: QueryExecutionsV2
+      x-ni-operation: queryExecutions
+      x-ni-privilege: Read
+      summary: Query executions of Jupyter notebooks
+      description: >-
+        Queries the executions of Jupyter notebooks. If no sort order is specified,
+        executions return in descending order of 'queueTime'.
+      tags: [executions]
+      parameters:
+        - in: body
+          name: queryExecutions
+          description: Execution query object
+          required: false
+          schema:
+            $ref: '#/definitions/ExecutionAdvancedQuery'
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Queried execution information
+            title: QueryExecutionsResponseV2
+            type: object
+            required:
+              - executions
+            properties:
+              executions:
+                description: Array of executions
+                type: array
+                items:
+                  $ref: '#/definitions/Execution'
+              totalCount:
+                description: Number of matching executions
+                type: integer
+                format: int64
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/executions:
+    post:
+      operationId: CreateExecutions
+      x-ni-operation: createExecutions
+      x-ni-privilege: Read
+      x-ni-request-all-privileges: true
+      x-ni-request-variables: [REMOTE_USER]
+      x-ni-oldest-compatible-version: 1
+      summary: Create one or more executions of Jupyter notebooks
+      description: >-
+        Creates one or more executions of Jupyter notebooks.
+      tags: [executions]
+      parameters:
+        - in: body
+          name: createExecutions
+          description: Array of execution creation information
+          required: true
+          schema:
+            description: Array of execution creation information
+            title: CreateExecutionsRequest
+            type: array
+            items:
+              $ref: '#/definitions/CreateExecution'
+            minItems: 1
+      responses:
+        201:
+          description: Created
+          schema:
+            description: Array of executions that were created
+            title: CreateExecutionsResponse
+            type: array
+            items:
+              $ref: '#/definitions/Execution'
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/CreateExecutionsPartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/cancel-executions:
+    post:
+      operationId: CancelExecutions
+      x-ni-operation: cancelExecutions
+      x-ni-privilege: Write
+      x-ni-oldest-compatible-version: 1
+      summary: Cancel executions of Jupyter notebooks
+      description: >-
+        Cancels multiple executions in a single API call. The request body contains an array of
+        execution IDs to cancel.
+      tags: [executions]
+      parameters:
+        - in: body
+          name: executions
+          description: Array of executions to cancel
+          required: true
+          schema:
+            description: Array of executions to cancel
+            title: CancelExecutionsRequest
+            type: array
+            items:
+              description: ID of an execution to cancel
+              type: string
+              example: '6d958d07-2d85-4655-90ba-8ff84a0482aa'
+            minItems: 1
+      responses:
+        204:
+          description: No content
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/CancelExecutionsPartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/query-notebooks:
+    post:
+      operationId: QueryNotebooks
+      x-ni-operation: queryNotebooks
+      x-ni-privilege: Read
+      x-ni-request-variables: [REMOTE_USER]
+      summary: Query Jupyter notebooks
+      description: >-
+        Queries the Jupyter notebooks. If no Jupyter notebooks are specified, this request returns
+        all Jupyter notebooks under the user-specific directory with "reports" sub-directory as
+        well as all notebooks under the "_shared" directory with "reports" sub-directory. If you
+        specify a relative folder instead of a notebook path for a given array element, this
+        request queries all notebooks in the specified folder or in a sub-folder (i.e. a recursive
+        search). If you specify a notebook path or relative folder that begins with '/', this
+        request searches both the user-specific directory and '_shared' directory. Notebooks return
+        in descending order of 'modifiedTime'.
+      tags: [deprecated]
+      parameters:
+        - in: body
+          name: queryNotebooks
+          description: Notebook query object
+          required: false
+          schema:
+            $ref: '#/definitions/NotebookQueryObject'
+        - in: query
+          name: skip
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          type: integer
+          format: int32
+          default: -1
+          minimum: -1
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Jupyter notebook information
+            title: QueryNotebooksResponse
+            type: object
+            required:
+              - notebooks
+              - totalCount
+            properties:
+              notebooks:
+                description: Array of Jupyter notebooks
+                type: array
+                items:
+                  $ref: '#/definitions/Notebook'
+              totalCount:
+                description: Number of matching executions
+                type: integer
+                format: int64
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/query-executions:
+    post:
+      operationId: QueryExecutions
+      x-ni-operation: queryExecutions
+      x-ni-privilege: Read
+      summary: Query executions of Jupyter notebooks
+      description: >-
+        Queries the executions of Jupyter notebooks. If no execution IDs or notebook paths are
+        specified, this request returns all executions. Executions return in descending order of
+        'queueTime'.
+      tags: [deprecated]
+      parameters:
+        - in: body
+          name: queryExecutions
+          description: Execution query object
+          required: false
+          schema:
+            $ref: '#/definitions/ExecutionQueryObject'
+        - in: query
+          name: skip
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+        - in: query
+          name: take
+          type: integer
+          format: int32
+          default: -1
+          minimum: -1
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Queried execution information
+            title: QueryExecutionsResponse
+            type: object
+            required:
+              - executions
+              - totalCount
+            properties:
+              executions:
+                description: Array of executions
+                type: array
+                items:
+                  $ref: '#/definitions/Execution'
+              totalCount:
+                description: Number of matching executions
+                type: integer
+                format: int64
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'

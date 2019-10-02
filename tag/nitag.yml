@@ -1511,7 +1511,7 @@ definitions:
       timestamp:
         description: Timestamp associated with the current value
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-09-04T18:45:08Z'
       path:
         type: string
@@ -1553,7 +1553,7 @@ definitions:
       timestamp:
         description: Timestamp associated with the value
         type: string
-        format: iso-date-time
+        format: date-time
     example:
       value:
         type: DOUBLE
@@ -1748,7 +1748,7 @@ definitions:
       timestamp:
         description: Updated timestamp
         type: string
-        format: iso-date-time
+        format: date-time
       tag:
         $ref: '#/definitions/Tag'
       aggregates:
@@ -1782,7 +1782,7 @@ definitions:
       timestamp:
         description: Updated timestamp
         type: string
-        format: iso-date-time
+        format: date-time
       tag:
         $ref: '#/definitions/Tag'
       aggregates:

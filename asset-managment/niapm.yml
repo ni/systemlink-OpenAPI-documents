@@ -89,11 +89,11 @@ definitions:
       operations:
         description: >-
           Available operations in the v1 version of the API:
-          
+
           - readAssets: Read information related to assets.
-          
+
           - writeAssets: Write information related to assets.
-          
+
           - deleteAssets: Delete information related to assets.
 
           - readAssetUtilization: Read information related to asset utilization.
@@ -168,7 +168,7 @@ definitions:
           timestamp:
             description: ISO-8601 formatted timestamp specifying the creation date of the entry.
             type: string
-            format: iso-date-time
+            format: date-time
             example: '2018-05-07T18:58:05.219692Z'
   CalibrationStatus:
     title: Calibration Status
@@ -274,7 +274,7 @@ definitions:
       date:
         description: ISO-8601 formatted timestamp specifying the last date the asset was self-calibrated.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-07T18:58:05.219692Z'
   ExternalCalibrationBaseModel:
     title: Base External Calibration
@@ -298,7 +298,7 @@ definitions:
       date:
         description: ISO-8601 formatted timestamp specifying the last date the asset was externally calibrated.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-07T18:58:05.219692Z'
       recommendedInterval:
         description: The manufacturer's recommended calibration interval in months.
@@ -307,7 +307,7 @@ definitions:
       nextRecommendedDate:
         description: ISO-8601 formatted timestamp specifying the recommended date for the next external calibration.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-05-07T18:58:05.219692Z'
       comments:
         description: Calibration comments provided by an operator.
@@ -336,7 +336,7 @@ definitions:
       - vendorNumber
       - busType
     properties:
-      id: 
+      id:
         description: Unique identifier of the asset.
         type: string
         example: "29162;01B245D6;4243;0"
@@ -402,7 +402,7 @@ definitions:
       lastUpdatedTimestamp:
         description: ISO-8601 formatted timestamp specifying the last date that the asset has had a property update.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-07T18:58:05.219692Z'
       isNIAsset:
         description: Whether this asset is an NI asset (true) or a third-party asset (false).
@@ -506,8 +506,6 @@ definitions:
     title: Service policy
     description: An object containing the service policy.
     type: object
-    required:
-      - calibrationPolicy
     properties:
       calibrationPolicy:
         description: Calibration policy
@@ -517,8 +515,20 @@ definitions:
             description: The number of days for an asset to be considered as approaching calibration.
             type: integer
             example: 30
+      workingHoursPolicy:
+        description: An object that describes the start time and end time of a working day.
+        type: object
+        properties:
+          startTime:
+            description: A string formatted as an hour with minutes and seconds representing the start time of a working day.
+            type: string
+            example: "09:00:00"
+          endTime:
+            description: A string formatted as an hour with minutes and seconds representing the end time of a working day.
+            type: string
+            example: "17:00:00"
 parameters:
-  AssetAvailabilityGranularity:
+  TimespanGranularity:
     in: query
     name: granularity
     description: The possible granularities that can be used to obtain asset availability.
@@ -528,7 +538,7 @@ parameters:
       - NONE
       - WEEK
       - MONTH
-  AssetId: 
+  AssetId:
     in: path
     name: assetId
     description: The identifier of an asset.
@@ -573,20 +583,24 @@ parameters:
           example: ["29162;01B245D6;4243;0"]
         startDate:
           description: >-
-            A date time value which can be used to specify the beginning of a timespan. 
+            A date value which can be used to specify the beginning of a timespan. 
             
             This parameter is required to have the "ISO 8601" format in order to be considered valid. 
             
             If the parameter is not specified, the value will be set to the 1st day of the current month.
+            
+            The time component of the request is ignored.
           type: string
           example: '2018-05-01T00:00:00.519Z'
         endDate:
           description: >- 
-            A date time value which can be used to specify the end of a timespan.
+            A date value which can be used to specify the end of a timespan.
             
             This parameter is required to have the "ISO 8601" format in order to be considered valid. 
             
             If the parameter is not specified, the value will be set to the current date in UTC.
+            
+            The time component of the request is ignored.
           type: string
           example: '2018-05-20T00:00:00Z'
     required: true
@@ -637,9 +651,9 @@ parameters:
     name: updateMetadata
     description: >-
       The metadata to be updated on the asset. The method overrides any asset metadata with what is contained in the request.
-      
+
       - In order to ignore metadata properties update, leave the value off the request.
-      
+
       - In order to set the value to null, assign an empty array or an empty object to the request metadata object.
     required: true
     schema:
@@ -677,7 +691,7 @@ parameters:
           example: ["29162;01B245D6;4243;0"]
         responseFormat:
           $ref: '#/definitions/ResponseFormat'
-        destination: 
+        destination:
           $ref: '#/definitions/Destination'
         skip:
           description:
@@ -700,37 +714,37 @@ parameters:
             The filter criteria for assets. Consists of a string of queries composed using AND/OR operators.
             String values and date strings need to be enclosed in double quotes.
             Parenthesis can be used around filters to better define the order of operations.
-            
+
             Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
-            
+
 
             Operators:
 
             - Equals operator '='. Example: 'x = y'
-            
+
             - Not equal operator '!='. Example: 'x != y'
-            
+
             - Greater than operator '>'. Example: 'x > y'
-           
+
             - Greater than or equal operator '>='. Example: 'x >= y'
-            
+
             - Less than operator '<'. Example: 'x < y'
-            
+
             - Less than or equal operator '<='. Example: 'x <= y'
-            
+
             - Logical AND operator 'and'. Example: 'x and y'
-            
+
             - Logical OR operator 'or'. Example: 'x or y'
-            
+
             - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
 
             - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
 
-            
+
             Valid asset properties that can be used in the filter:
-          
+
             - AssetIdentifier: String representing the unique identifier of an asset.
-            
+
             - AssetClass: String enumeration representing the class of an asset. Possible values are: UNDEFINED, DISCOVERED, ASSET, DUT, FIXTURE.
 
             - SerialNumber: String representing the serial number of an asset.
@@ -797,7 +811,7 @@ parameters:
       properties:
         responseFormat:
           $ref: '#/definitions/ResponseFormat'
-        destination: 
+        destination:
           $ref: '#/definitions/Destination'
   ServicePolicyUpdateRequestBody:
     in: body
@@ -821,33 +835,33 @@ parameters:
             The filter criteria for asset utilization. Consists of a string of queries composed using AND/OR operators.
             String values and date strings need to be enclosed in double quotes.
             Parenthesis can be used around filters to better define the order of operations.
-            
+
             Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
-            
+
 
             Operators:
 
             - Equals operator '='. Example: 'x = y'
-            
+
             - Not equal operator '!='. Example: 'x != y'
-            
+
             - Greater than operator '>'. Example: 'x > y'
-            
+
             - Greater than or equal operator '>='. Example: 'x >= y'
-            
+
             - Less than operator '<'. Example: 'x < y'
-            
+
             - Less than or equal operator '<='. Example: 'x <= y'
-            
+
             - Logical AND operator 'and'. Example: 'x and y'
-            
+
             - Logical OR operator 'or'. Example: 'x or y'
-            
+
             - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
 
             - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
 
-            
+
             Valid asset utilization properties that can be used in the filter:
 
             - AssetIdentifier: String representing the unique identifier of an asset.
@@ -859,42 +873,42 @@ parameters:
             - User: : String representing the name of the operator who utilized the asset.
           type: string
           example: UtilizationCategory = "Test"
-        assetFilter: 
+        assetFilter:
           description: >-
               The filter criteria for assets. Consists of a string of queries composed using AND/OR operators.
               String values and date strings need to be enclosed in double quotes.
               Parenthesis can be used around filters to better define the order of operations.
-              
+
               Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
-              
+
 
               Operators:
 
               - Equals operator '='. Example: 'x = y'
-              
+
               - Not equal operator '!='. Example: 'x != y'
-              
+
               - Greater than operator '>'. Example: 'x > y'
-            
+
               - Greater than or equal operator '>='. Example: 'x >= y'
-              
+
               - Less than operator '<'. Example: 'x < y'
-              
+
               - Less than or equal operator '<='. Example: 'x <= y'
-              
+
               - Logical AND operator 'and'. Example: 'x and y'
-              
+
               - Logical OR operator 'or'. Example: 'x or y'
-              
+
               - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
 
               - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
 
-              
+
               Valid asset properties that can be used in the filter:
-            
+
               - AssetIdentifier: String representing the unique identifier of an asset.
-              
+
               - AssetClass: String enumeration representing the class of an asset. Possible values are: UNDEFINED, DISCOVERED, ASSET, DUT, FIXTURE.
 
               - SerialNumber: String representing the serial number of an asset.
@@ -959,19 +973,19 @@ parameters:
             properties:
               startDate:
                 description: >-
-                  A date time value which can be used to specify the beginning of a timespan. 
-                  
+                  A date time value which can be used to specify the beginning of a timespan.
+
                   This parameter is required to have the "ISO 8601" format in order to be considered valid.
                 type: string
-                format: iso-date-time
+                format: date-time
                 example: '2019-05-01T00:00:00.519Z'
               endDate:
-                description: >- 
+                description: >-
                   A date time value which can be used to specify the end of a timespan.
-                  
+
                   This parameter is required to have the "ISO 8601" format in order to be considered valid.
                 type: string
-                format: iso-date-time
+                format: date-time
                 example: '2019-05-20T00:00:00Z'
 responses:
   Error:
@@ -1059,8 +1073,8 @@ responses:
           type: integer
           example: 17
   AvailabilityInSystemResponse:
-    description: >- 
-      Returns asset availability information in the specified timespan split based on the specified timespan granularity. 
+    description: >-
+      Returns asset availability information in the specified timespan split based on the specified timespan granularity.
       The response contains a collection of systems that an asset has been present during the timespan, along with the percentage of time the asset was present in the system in each timespan.
     schema:
       title: Asset Availability
@@ -1069,7 +1083,7 @@ responses:
       items:
         type: object
         properties:
-          systemName: 
+          systemName:
             description: Hostname of the system in which the asset was located.
             type: string
             example: APM-PXI1
@@ -1133,59 +1147,55 @@ responses:
     description: Service policy response containing the service calibration policy with the number of days for an asset to be considered as approaching calibration.
     schema:
       $ref: '#/definitions/ServicePolicy'
-  AssetUtilizationResponse:
-    description: Asset Utilization response containing the collection of utilizations matching the provided filters, in a specific time interval. Besides a time interval, each element contains an asset identifier, an asset utilization category, and a percentage of time that the asset was utilized in the time interval.
+  UtilizationWithPercentageResponse:
+    description: Utilization response containing the collection of utilizations matching the provided filters, in a specific time interval. Besides a time interval, each element contains an asset identifier, a minion id, an utilization category, and a percentage of time that the asset was utilized in the time interval.
     schema:
-      title: Asset Utilization Response
-      description: Response for the asset utilization query containing the collection of utilizations. Besides a time interval, each element contains an asset identifier, an asset utilization category, and a percentage of time that the asset was utilized in the time interval.
+      title: Utilization with Percentage Response
+      description: Response for the utilization query containing the collection of utilizations. Besides a time interval, each element contains an asset identifier, a minion id, an utilization category, and a percentage of time that the asset was utilized in the time interval.
       type: array
       items:
           type: object
           required:
-            - startDate
-            - endDate
+            - startTimestamp
+            - endTimestamp
             - assetIdentifier
-            - minionIdentifier
-            - utilizationCategory
+            - minionId
+            - category
             - percentage
           properties:
-            startDate:
+            startTimestamp:
               description: >-
                 A date time value representing the beginning of an asset utilization interval.
-                
+
                 This parameter has the "ISO 8601" format in order to be considered valid.
               type: string
-              format: iso-date-time
+              format: date-time
               example: '2019-05-01T00:00:00.519Z'
-            endDate:
+            endTimestamp:
               description: >-
                 A date time value representing the end of an asset utilization interval.
-                
+
                 This parameter has the "ISO 8601" format in order to be considered valid.
               type: string
-              format: iso-date-time
+              format: date-time
               example: '2019-05-20T00:00:00Z'
-            assetIdentifier: 
+            assetIdentifier:
               description: String representing the unique identifier of an asset.
               type: string
               example: "29162;01B245D6;4243;0"
-            minionIdentifier:
+            minionId:
               description: Identifier of the minion where the asset is located.
               type: string
               example: NI_PXIe-8135_Embedded_Controller--MAC-00-80-2F-23-52-65
-            utilizationCategory: 
+            category:
               description: String representing the utilization task category.
               type: string
               example: Test
-            user:
-              description: String representing the name of the operator who utilized the asset.
-              type: string
-              example: Test Engineer1
-            percentage: 
+            percentage:
               description: Percentage of time that the asset was utilized in the specified time interval.
               type: number
               format: double
-              example: 7.38958 
+              example: 7.38958
 paths:
   /:
     get:
@@ -1331,7 +1341,7 @@ paths:
         200:
           $ref: '#/responses/AssetsResponse'
         400:
-          $ref: '#/responses/BadRequest' 
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -1352,7 +1362,7 @@ paths:
         200:
           $ref: '#/responses/AssetDetailsResponse'
         400:
-          $ref: '#/responses/BadRequest' 
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -1372,29 +1382,33 @@ paths:
         - in: query
           name: startDate
           description: >-
-            A date time value which can be used to specify the beginning of a timespan. 
+            A date value which can be used to specify the beginning of a timespan. 
             
             This parameter is required to have the "ISO 8601" format in order to be considered valid. 
             
             If the parameter is not specified, the value will be set to the 1st day of the current month.
+            
+            The time component of the request is ignored.
           type: string
           x-example: '2018-05-01T00:00:00.519Z'
         - in: query
           name: endDate
           description: >- 
-            A date time value which can be used to specify the end of a timespan.
+            A date value which can be used to specify the end of a timespan.
             
             This parameter is required to have the "ISO 8601" format in order to be considered valid. 
             
             If the parameter is not specified, the value will be set to the current date in UTC.
+            
+            The time component of the request is ignored.
           type: string
           x-example: '2018-05-20T00:00:00Z'
-        - $ref: '#/parameters/AssetAvailabilityGranularity'
+        - $ref: '#/parameters/TimespanGranularity'
       responses:
         200:
           $ref: '#/responses/AvailabilityInSystemResponse'
         400:
-          $ref: '#/responses/BadRequest' 
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -1586,7 +1600,7 @@ paths:
       parameters:
         - $ref: '#/parameters/DeleteAssetsRequestBody'
       responses:
-        200: 
+        200:
           $ref: '#/responses/PartialSuccess'
         400:
           $ref: '#/responses/BadRequest'
@@ -1600,7 +1614,7 @@ paths:
     post:
       tags: [utilization]
       summary: Query Asset Utilization
-      description: Retrieves asset utilization matching the provided filters. 
+      description: Retrieves asset utilization matching the provided filters.
       operationId: read-asset-utilization
       x-ni-operation: readAssetUtilization
       x-ni-priviledge: Read
@@ -1608,9 +1622,9 @@ paths:
         - $ref: '#/parameters/QueryAssetUtilizationRequest'
       responses:
         200:
-          $ref: '#/responses/AssetUtilizationResponse'
+          $ref: '#/responses/UtilizationWithPercentageResponse'
         400:
-          $ref: '#/responses/BadRequest' 
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
         404:

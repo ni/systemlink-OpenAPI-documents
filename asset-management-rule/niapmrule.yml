@@ -90,9 +90,9 @@ definitions:
       operations:
         description: >-
           Available operations in the v1 version of the API:
-          
+
           - getCalibrationRule: Obtain calibration rule information.
-          
+
           - updateCalibrationRule: Update calibration rule information.
         type: object
         properties:
@@ -183,7 +183,7 @@ definitions:
           lastUpdatedTimestamp:
             description: ISO-8601 formatted timestamp specifying the last date the rule was updated.
             type: string
-            format: iso-date-time
+            format: date-time
             example: '2018-05-07T18:58:05.219692Z'
   RuleStateUpdateModel:
     title: Rule State Update Model

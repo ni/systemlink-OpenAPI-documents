@@ -71,6 +71,16 @@ responses:
       properties:
         error:
           $ref: '#/definitions/Error'
+  
+  ServerNotActivated:
+    description: The server is not activated.
+    schema:
+      title: Server Not Activated Error Response
+      description: Server not activated response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
 
 definitions:
   CreateJobRequest:
@@ -94,7 +104,7 @@ definitions:
         example:
           - pkg.remove
           - pkg.install
-      arg: 
+      arg:
         description: An array of variable type element arrays, which are arguments to the function specified by the "fun" property. If at least one function requires arguments, an array must be provided for each function, even if it is empty. Keyword arguments may be provided as a parameter of type object with at least one property of type boolean ("__kwarg__") that evaluates to true.
         type: array
         items:
@@ -149,7 +159,7 @@ definitions:
         example:
           - pkg.remove
           - pkg.install
-      arg: 
+      arg:
         description: An array of arrays of variable type elements that are arguments to the function specified by the "fun" property. If at least one function requires arguments, an array must be provided for each function, even if it is empty. Keyword arguments may be provided as a parameter of type object with at least one property of type boolean, "__kwarg__", that is evaluated to true.
         type: array
         items:
@@ -383,7 +393,7 @@ definitions:
       lastUpdatedTimestamp:
         description: Last updated timestamp.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-02-11T13:32:06.030958Z'
       master:
         description: Master of the system.
@@ -433,7 +443,7 @@ definitions:
       - INQUEUE
       - INPROGRESS
     example: SUCCEEDED
-    description: > 
+    description: >
       The state of the job.
        * CANCELED: The job was canceled by the user.
        * FAILED: The job completed with failures. The job fails if at least one of the its functions executing fails.
@@ -456,17 +466,17 @@ definitions:
         example: VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5
       createdTimestamp:
         type: string
-        format: iso-date-time
+        format: date-time
         description: The date when the job was created.
         example: '2019-02-11T13:32:06.030958Z'
       lastUpdatedTimestamp:
         type: string
-        format: iso-date-time
+        format: date-time
         description: The date when the job was last updated.
         example: '2019-02-11T13:32:06.030958Z'
       dispatchedTimestamp:
         type: string
-        format: iso-date-time
+        format: date-time
         description: The date when the job was actually sent to the system.
         example: '2019-02-11T13:32:06.030958Z'
       state:
@@ -524,7 +534,7 @@ definitions:
               type: object
               example: 'Computer Description: test'
             description: An array of objects representing return values for each executed function.
-            example: 
+            example:
               - Computer Description: test
               - null
           retcode:
@@ -594,7 +604,7 @@ definitions:
       lastUpdatedTimestamp:
         description: Last updated timestamp.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-02-11T13:32:06.030958Z'
       data:
         description: The lists of SysAPI property-bags.
@@ -622,7 +632,7 @@ definitions:
       lastUpdatedTimestamp:
         description: Last updated timestamp.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-02-11T13:32:06.030958Z'
       data:
         description: This map is used for grains/packages/feeds. All these are heterogeneous (integers, booleans, lists, dictionaries, ...) collections containing open-ended properties and flags.
@@ -645,12 +655,12 @@ definitions:
       createdTimestamp:
         description: The time when the system was registered.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-02-19T11:42:25.078Z'
       lastUpdatedTimestamp:
         description: Last time when the system information updated.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-02-19T11:42:25.078Z'
       alias:
         description: The alias of the system.
@@ -663,7 +673,7 @@ definitions:
           lastUpdatedTimestamp:
             description: Last time when the system activation information updated.
             type: string
-            format: iso-date-time
+            format: date-time
             example: '2019-02-19T11:42:25.078Z'
           data:
             $ref: '#/definitions/ManagedSystemActivationData'
@@ -675,7 +685,7 @@ definitions:
           lastUpdatedTimestamp:
             description: Last time when the system connection information updated.
             type: string
-            format: iso-date-time
+            format: date-time
             example: '2019-02-19T11:42:25.078Z'
           data:
             type: object
@@ -699,7 +709,7 @@ definitions:
             os_family: Windows
             mem_total: 1023
             osversion: 6.1.7601
-            osrelease: 7        
+            osrelease: 7
       packages:
         description: Software packages installed on the system.
         $ref: '#/definitions/ManagedSystemDataPropertyMap'
@@ -769,7 +779,7 @@ definitions:
           lastUpdatedTimestamp:
             description: Last updated timestamp.
             type: string
-            format: iso-date-time
+            format: date-time
             example: '2019-02-19T11:42:25.078Z'
           data:
             description: A list of strings defining metadata information about a system.
@@ -785,7 +795,7 @@ definitions:
           lastUpdatedTimestamp:
             description: Last updated timestamp.
             type: string
-            format: iso-date-time
+            format: date-time
             example: '2019-02-19T11:42:25.078Z'
           data:
             description: A list of strings defining metadata information about a system.
@@ -801,7 +811,7 @@ definitions:
           lastUpdatedTimestamp:
             description: Last updated timestamp.
             type: string
-            format: iso-date-time
+            format: date-time
             example: '2019-02-19T11:42:25.078Z'
           data:
             description: An object defining key-value pairs metadata information about a system.
@@ -884,7 +894,7 @@ definitions:
       lastUpdatedTimestamp:
         description: The time when the group was alst updated.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-02-12T14:49:03.013000Z'
     required: [gid, name, lastUpdatedTimestamp]
 
@@ -972,7 +982,7 @@ definitions:
       - ACTIVATE_ACCEPT
     example: ACCEPT
     description: >
-      Action to be performed. 
+      Action to be performed.
         * ACCEPT: Accept the associated key.
         * REJECT: Reject the associated key.
         * DELETE: Delete the associated key.
@@ -1058,9 +1068,9 @@ definitions:
                 type: string
               example:
                 - http://download.ni.com/ni-linux-rt/feeds/SystemLink/18.5/x64/
-                - http://download.ni.com/ni-linux-rt/feeds/SystemLink/salt/18.5/x64/x64/           
+                - http://download.ni.com/ni-linux-rt/feeds/SystemLink/salt/18.5/x64/x64/
             osArchitectures:
-              type: array 
+              type: array
               description: An array of strings representing OS architectures supported by a system(s) in descending priority.
               items:
                 type: string
@@ -1136,7 +1146,7 @@ definitions:
       hardwareSupport:
         type: array
         description: When a package provides functionality for specific hardware product(s), it can list such products in this section
-        items: 
+        items:
           type: string
           example: NI cRIO-9035 (Sync)
       homepage:
@@ -1170,21 +1180,21 @@ definitions:
       priority:
         type: string
         description: The priority of the package.
-        example: "standard"        
+        example: "standard"
       provides:
         type: array
         description: An array containing information about other packages this package provides.
         items:
           type: string
           example: "ni-curl (= 17.0.0.49152-0+f0)"
-          description: One of the packages the containing package provides. This also contains information about the version of the package.      
+          description: One of the packages the containing package provides. This also contains information about the version of the package.
       recommends:
         type: array
         description: An array containing information about other packages this package recommends.
         items:
           type: string
           description: The name of a package this package recommends. This also contains information about the version of the package.
-          example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"        
+          example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"
       releaseNotes:
         type: string
         description: A page containing the release notes of the package.
@@ -1195,7 +1205,7 @@ definitions:
         items:
           type: string
           description: The name of a package this package replaces. This also contains information about the version of the package.
-          example: "b235b862-6a92-4a04-a8b2-6d71f777de67 (< 16.99.65535)"       
+          example: "b235b862-6a92-4a04-a8b2-6d71f777de67 (< 16.99.65535)"
       section:
         type: string
         description: The section of the package.
@@ -1219,7 +1229,7 @@ definitions:
         items:
           type: string
           description: The name of a package this package suggests. This also contains information about the version of the package.
-          example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"       
+          example: "ni-systemlink-client-2018.5-realtime-bin (>= 18.5.0)"
       tags:
         type: array
         description: An array containing tags for the package.
@@ -1227,7 +1237,7 @@ definitions:
           type: string
           description: The tag for the package.
           example: ".NET"
-      userVisible:
+      uservisible:
         type: boolean
         description: The installed packages with this attribute set to true are considered to be installed by a user, thus not installed to fulfill some dependency. This is needed input for the calculation of unneeded packages when removing a package.
         example: true
@@ -1303,23 +1313,23 @@ definitions:
           Available operations in the v1 version of the API:
 
           - getJobs: The ability to retrieve the jobs.
-          
+
           - getSystems: The ability to retrieve the systems information.
 
           - getGroups: The ability to retrieve the groups.
-    
+
           - manageSystems: The ability to register or unregister systems.
-          
+
           - createOrCancelJobs: The ability to create or cancel jobs.
-          
+
           - activateSystems: The ability to activate systems.
-          
+
           - updateSystemMetadata: The ability to update systems metadata.
-          
+
           - manageFeeds: The ability to configure feeds and retrieve the available packages.
-          
+
           - createOrUpdateGroups: The ability to create, update, or delete groups.
-          
+
         type: object
         properties:
           getJobs:
@@ -1339,11 +1349,11 @@ definitions:
           manageFeeds:
             $ref: '#/definitions/Operation'
           createOrUpdateGroups:
-            $ref: '#/definitions/Operation' 
+            $ref: '#/definitions/Operation'
 
-  QueryRequest:
+  QuerySystemsRequest:
     description: Request for querying resources. More info here -> https://github.com/StefH/System.Linq.Dynamic.Core/wiki/Dynamic-Expressions and https://stefh.github.io/System.Linq.Dynamic.Core/html/144078bd-d1ad-bece-4daa-7fdd3a7ed7dc.htm
-    title: Query Request
+    title: Query Systems Request
     properties:
       skip:
         description: The number of resources to skip.
@@ -1351,7 +1361,7 @@ definitions:
         format: int64
         default: 0
         minimum: 0
-        example: 100
+        example: 0
       take:
         description: The number of resources to return. The maximum value is 1000.
         type: integer
@@ -1362,6 +1372,116 @@ definitions:
       filter:
         type: string
         example: connected.data.state=="CONNECTED"
+        description: >-
+          The filter criteria for jobs or systems. Consists of a string of queries composed using AND/OR operators.
+          String values and date strings need to be enclosed in double quotes.
+          Parenthesis can be used around filters to better define the order of operations.
+
+          Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+
+
+          Operators:
+
+          - Equals operator '='. Example: 'x = y'
+
+          - Not equal operator '!='. Example: 'x != y'
+
+          - Greater than operator '>'. Example: 'x > y'
+
+          - Greater than or equal operator '>='. Example: 'x >= y'
+
+          - Less than operator '<'. Example: 'x < y'
+
+          - Less than or equal operator '<='. Example: 'x <= y'
+
+          - Logical AND operator 'and' or '&&'. Example: 'x and y'
+
+          - Logical OR operator 'or' or '||'. Example: 'x or y'
+
+          - Contains operator '.Contains()', used to check if a list contains an element. Example: 'x.Contains(y)'
+
+          - Not Contains operator '!.Contains()', used to check if a list does not contain an element. Example: '!x.Contains(y)'
+
+
+          Valid system properties that can be used in the filter:
+
+          - id : String representing the ID of the system.
+
+          - createdTimestamp: ISO-8601 formatted timestamp string specifying the date when the system was registered.
+
+          - lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system was updated.
+
+          - alias: String representing the alias of the system.
+
+          - activation.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system activation was updated.
+
+          - activation.data.activated: Boolean representing whether the system is activated or not.
+
+          - activation.data.licenseName: String representing the name of the license.
+
+          - activation.data.licenseVersion: String representing the license version.
+
+          - connected.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system connection was updated.
+
+          - connected.data.state: String representing the state of the system.
+
+          - grains.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system grains were updated.
+
+          - grains.data: Dictionary of string to object representing general information about the system. Example: grains.data.os == "Windows"
+
+          - packages.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system installed packages were updated.
+
+          - packages.data: Dictionary representing software packages installed on the system. Example: packages.data.ni-package-manager-upgrader.version: String representing the installed version of ni-package-manager-upgrader package.
+
+          - feeds.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system configured feeds were updated.
+
+          - feeds.data: Dictionary representing the feeds configured on the system.
+
+          - sysapi.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system sysapi data was updated.
+
+          - sysapi.data: Dictionary representing system API information of a system.
+
+          - groups.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system groups data was updated.
+
+          - groups.data: Array of strings representing the IDs of the groups the system is assigned to. Example: groups.data.Contains("id")
+
+          - keywords.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system keywords were updated.
+
+          - keywords.data: Array of strings representing the keywords of the system. Example: keywords.data.Contains("test")
+
+          - properties.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system properties were updated.
+
+          - properties.data: Dictionary of string to string representing metadata information about a system. Example: properties.data.owner == "admin"
+      projection:
+        type: string
+        example: 'new(id,grains,lastUpdatedTimestamp)'
+        description: Specifies the projection for resources. This field can be used if we don't want to receive the entire model but only certain properties of the model.
+      orderBy:
+        type: string
+        example: 'lastUpdatedTimestamp descending'
+        description: The order in which data returns.
+
+  QueryJobsRequest:
+    description: Request for querying jobs resources. More info here -> https://github.com/StefH/System.Linq.Dynamic.Core/wiki/Dynamic-Expressions and https://stefh.github.io/System.Linq.Dynamic.Core/html/144078bd-d1ad-bece-4daa-7fdd3a7ed7dc.htm
+    title: Query Jobs Request
+    properties:
+      skip:
+        description: The number of resources to skip.
+        type: integer
+        format: int64
+        default: 0
+        minimum: 0
+        example: 0
+      take:
+        description: The number of resources to return. The maximum value is 1000.
+        type: integer
+        format: int64
+        minimum: 0
+        maximum: 1000
+        example: 100
+      filter:
+        type: string
+        example: state=="SUCCEEDED"
         description: >-
           The filter criteria for jobs or systems. Consists of a string of queries composed using AND/OR operators.
           String values and date strings need to be enclosed in double quotes.
@@ -1424,60 +1544,10 @@ definitions:
 
           - result.success: An array of booleans representing success values for each executed function. Example:
             result.success.Contains(false)
-
-          Valid system properties that can be used in the filter:
-
-          - id : String representing the ID of the system.
-
-          - createdTimestamp: ISO-8601 formatted timestamp string specifying the date when the system was registered.
-
-          - lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system was updated.
-
-          - alias: String representing the alias of the system.
-
-          - activation.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system activation was updated.
-
-          - activation.data.activated: Boolean representing whether the system is activated or not.
-
-          - activation.data.licenseName: String representing the name of the license.
-
-          - activation.data.licenseVersion: String representing the license version.
-
-          - connected.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system connection was updated.
-
-          - connected.data.state: String representing the state of the system.
-
-          - grains.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system grains were updated.
-
-          - grains.data: Dictionary of string to object representing general information about the system. Example: grains.data.os == "Windows"
-
-          - packages.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system installed packages were updated.
-
-          - packages.data: Dictionary representing software packages installed on the system. Example: packages.data.ni-package-manager-upgrader.version: String representing the installed version of ni-package-manager-upgrader package.
-
-          - feeds.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system configured feeds were updated.
-
-          - feeds.data: Dictionary representing the feeds configured on the system.
-
-          - sysapi.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system sysapi data was updated.
-
-          - sysapi.data: Dictionary representing system API information of a system.
-
-          - groups.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system groups data was updated.
-
-          - groups.data: Array of strings representing the IDs of the groups the system is assigned to. Example: groups.data.Contains("id")
-
-          - keywords.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system keywords were updated.
-
-          - keywords.data: Array of strings representing the keywords of the system. Example: keywords.data.Contains("test")
-
-          - properties.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system properties were updated.
-
-          - properties.data: Dictionary of string to string representing metadata information about a system. Example: properties.data.owner == "admin"
       projection:
         type: string
-        example: 'new(id,grains,lastUpdatedTimestamp)'
-        description: Specifies the projection for resources. This field can be used if we don't want to receive the entire model but only certain properties of the model.  
+        example: 'new(id,jid,state,lastUpdatedTimestamp,config.fun as fun)'
+        description: Specifies the projection for resources. This field can be used if we don't want to receive the entire model but only certain properties of the model.
       orderBy:
         type: string
         example: 'lastUpdatedTimestamp descending'
@@ -1554,6 +1624,8 @@ paths:
       operationId: CreateJob
       x-ni-privilege: Write
       x-ni-operation: createOrCancelJobs
+      x-ni-request-timeout: 300000
+      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       tags: [jobs]
       summary: Create a job
       description: Create a job and returns the newly created job including the job ID.
@@ -1579,6 +1651,7 @@ paths:
       operationId: GetJobs
       x-ni-privilege: Read
       x-ni-operation: getJobs
+      x-ni-request-timeout: 120000
       tags: [jobs]
       summary: Get jobs
       description: Get jobs from the jobs cache.
@@ -1619,6 +1692,7 @@ paths:
       operationId: GetSystems
       x-ni-privilege: Read
       x-ni-operation: getSystems
+      x-ni-request-timeout: 120000
       tags: [systems]
       summary: Get systems information
       description: Get the systems information cached on the server.
@@ -1699,6 +1773,7 @@ paths:
       operationId: CancelJobs
       x-ni-privilege: Write
       x-ni-operation: createOrCancelJobs
+      x-ni-request-timeout: 120000
       tags: [jobs]
       summary: Cancel jobs
       description: Cancel jobs that are running on systems. This won't stop the jobs from executing on systems if the jobs have already been dispatched to the systems.
@@ -1729,6 +1804,7 @@ paths:
       operationId: ActivateSystems
       x-ni-privilege: Write
       x-ni-operation: activateSystems
+      x-ni-request-timeout: 120000
       tags: [systems]
       summary: Activate systems
       description: Activate managed systems.
@@ -1753,6 +1829,8 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/ServerNotActivated'
         default:
           $ref: '#/responses/Error'
   /v1/get-discovered-systems:
@@ -1857,6 +1935,7 @@ paths:
       operationId: GetPendingSystemsSummary
       x-ni-privilege: Read
       x-ni-operation: getSystems
+      x-ni-request-timeout: 120000
       tags: [systems]
       summary: Get pending systems summary
       description: Get the number of systems that are currently pending to be added to the master but have not yet been approved by the master.
@@ -1874,6 +1953,7 @@ paths:
       operationId: GetSystemsReport
       x-ni-privilege: Read
       x-ni-operation: getSystems
+      x-ni-request-timeout: 120000
       tags: [systems]
       summary: Get systems report
       description: Get a report containing software/hardware information about the requested systems.
@@ -2079,6 +2159,7 @@ paths:
     get:
       operationId: GetSystemsKeys
       x-ni-privilege: Read
+      x-ni-request-timeout: 120000
       tags: [systems]
       x-ni-operation: getSystems
       summary: Get systems keys
@@ -2177,7 +2258,7 @@ paths:
         200:
           description: OK.
           schema:
-            type: array 
+            type: array
             items:
               $ref: '#/definitions/PackageResponse'
         400:
@@ -2193,6 +2274,7 @@ paths:
       operationId: GetJobsByQuery
       x-ni-privilege: Read
       x-ni-operation: getJobs
+      x-ni-request-timeout: 120000
       tags: [jobs]
       summary: Get jobs by query
       description: Get jobs by query.
@@ -2201,21 +2283,15 @@ paths:
           name: Query
           description: Query for getting jobs data.
           required: true
-          x-example:
-            skip: 100
-            take: 100
-            filter: 'id == "VMware_Virtual_Platform--SN-VMware-56_4d_70_f1_81_06_04_3b-55_19_2a_87_f6_41_20_e5--MAC-00-0C-29-41-20-E5"'
-            projection: 'new(jid,id,lastUpdatedTimestamp,state,result)'
-            orderBy: 'lastUpdatedTimestamp descending'
           schema:
-            $ref: '#/definitions/QueryRequest'
+            $ref: '#/definitions/QueryJobsRequest'
       responses:
         200:
           description: OK.
           schema:
             $ref: '#/definitions/QueryResponse'
         401:
-          $ref: '#/responses/Unauthorized'          
+          $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
         default:
@@ -2225,6 +2301,7 @@ paths:
       operationId: GetSystemsByQuery
       x-ni-privilege: Read
       x-ni-operation: getSystems
+      x-ni-request-timeout: 120000
       tags: [systems]
       summary: Get systems by query.
       description: Get systems by query.
@@ -2233,21 +2310,15 @@ paths:
           name: Query
           description: Query for getting systems data.
           required: true
-          x-example:
-            skip: 10
-            take: 10
-            filter: 'connected.data.state == "CONNECTED" && grains.data.os == "Windows"'
-            projection: 'new(id,lastUpdatedTimestamp,connected,packages)'
-            orderBy: 'connected.data.state'
           schema:
-            $ref: '#/definitions/QueryRequest'
+            $ref: '#/definitions/QuerySystemsRequest'
       responses:
         200:
           description: OK.
           schema:
             $ref: '#/definitions/QueryResponse'
         401:
-          $ref: '#/responses/Unauthorized'          
+          $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
         default:

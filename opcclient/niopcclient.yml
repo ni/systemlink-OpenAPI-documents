@@ -129,7 +129,7 @@ paths:
         default:
           $ref: '#/responses/Error'
 
-  /v1/delete-server-certificates: 
+  /v1/delete-server-certificates:
     post:
       operationId: HandleHttpDeleteServerCertificates
       x-ni-privilege: Write
@@ -221,7 +221,7 @@ paths:
       x-ni-privilege: Write
       tags: [sessions]
       summary: Deletes existing OPC UA sessions
-      description: Deletes existing OPC UA sessions 
+      description: Deletes existing OPC UA sessions
       parameters:
         - in: body
           name: sessionIds
@@ -229,6 +229,7 @@ paths:
           schema:
             type: array
             items:
+              title: SessionIds
               type: object
               properties:
                 sessionId:
@@ -292,7 +293,7 @@ paths:
       x-ni-privilege: Read
       tags: [browse]
       summary: Gets child nodes of a node
-      description: Gets child nodes of the node specified by {path} 
+      description: Gets child nodes of the node specified by {path}
       parameters:
         - name: id
           in: path
@@ -371,7 +372,7 @@ paths:
               $ref: '#/definitions/MonitoredItemResponse'
         default:
             $ref: '#/responses/Error'
-    post: 
+    post:
       operationId: HandleHttpCreateMonitorsRequest
       x-ni-privilege: Write
       x-ni-request-timeout: 50000
@@ -885,7 +886,7 @@ definitions:
         displayname: "opc.opcuaserver.com-48010.Views.AirConditionerView.AirConditioner_1.Temperature"
         opcNodeId: "ns=3;s=AirConditioner_1.Temperature"
         direction: "Read"
-        opcSamplingInterval: 1000 
+        opcSamplingInterval: 1000
         opcQueueSize: 1000
 
   MonitoredItemResponse:
@@ -971,7 +972,7 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Error'
-    example:  
+    example:
         name: Skyline.OneOrMoreErrorsOccurred
         code: -251040
         message: One or more errors occurred. See the contained list for details of each error.

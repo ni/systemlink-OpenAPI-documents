@@ -147,7 +147,7 @@ definitions:
       timestamp:
         description: The ISO-8601 formatted timestamp when the historical value was written, in UTC.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-03-13T09:51:38Z'
       properties:
         description: Key-value pairs associated with the historical value after the fact. Tag
@@ -162,7 +162,7 @@ definitions:
           the expiration date is the ISO-8601 formatted timestamp at which the historical value will
           be deleted automatically.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2020-03-13T09:51:38Z'
   HttpHistoricalValueUpdate:
     description: An update for a single historical value.
@@ -185,7 +185,7 @@ definitions:
           value will be deleted automatically. Do not specify this value for tags that use
           count-based retention.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2020-03-13T09:51:38Z'
     required: [id]
   HttpUpdateValuesResponseBody:
@@ -218,14 +218,14 @@ definitions:
         description: Limits the returned historical values to those written at or after the given
           time in ISO-6801 format.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-09-04T18:45:08Z'
         default: '0001-01-01T00:00:00Z'
       endTime:
         description: Limits the returned historical values to those written at or before the given
           time in ISO-8601 format.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-09-04T18:45:08Z'
         default: '0001-01-01T00:00:00Z'
       skip:
@@ -277,7 +277,7 @@ definitions:
       timestamp:
         description: The ISO-8601 formatted timestamp that the historical value was written, in UTC.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2019-03-13T09:51:38Z'
       properties:
         description: Key-value pairs associated with the historical value after the fact. Tag properties
@@ -292,7 +292,7 @@ definitions:
           the expiration date is the ISO-8601 formatted timestamp at which the historical value will
           be deleted automatically.
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2020-03-13T09:51:38Z'
   TagHistorianValues:
     type: object
@@ -637,14 +637,14 @@ paths:
                 description: Limits the returned historical values to those written at or after at the
                   given time in ISO-6801 format.
                 type: string
-                format: iso-date-time
+                format: date-time
                 example: '2018-09-04T18:45:08Z'
                 default: '0001-01-01T00:00:00Z'
               endTime:
                 description: Limits the returned historical values to those written at or before the
                   given time in ISO-8601 format.
                 type: string
-                format: iso-date-time
+                format: date-time
                 example: '2018-09-04T18:45:08Z'
                 default: '9999-12-31T23:59:59Z'
               skip:
@@ -945,13 +945,13 @@ paths:
                       description: The ISO-8601 formatted timestamp indicating the start of the
                         range. Any historical values from this time until endTime will be deleted.
                       type: string
-                      format: iso-date-time
+                      format: date-time
                       example: '2019-03-13T09:51:38Z'
                     endTime:
                       description: The ISO-8601 formatted timestamp indicating the end of the range.
                         Any historical values from startTime to and including this time will be deleted.
                       type: string
-                      format: iso-date-time
+                      format: date-time
                       example: '2020-03-13T09:51:38Z'
             required: [ranges]
       responses:

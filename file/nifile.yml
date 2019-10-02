@@ -113,7 +113,7 @@ definitions:
       created:
         description: The date and time the file was created in the file service
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-15T18:54:27.519Z'
       id:
         description: The file's ID within the service group
@@ -127,6 +127,11 @@ definitions:
         example:
           Name: myfile.txt
           MyProperty: Value
+      metaDataRevision:
+        description: The file's properties revision number. When a file is uploaded, the revision number starts at 1. Every time metadata is updated, the revision number is incremented by 1. New in version 3 of the listFiles operation.
+        type: integer
+        format: int32
+        example: 1
       serviceGroup:
         description: The service group that owns the file
         type: string
@@ -200,7 +205,7 @@ definitions:
       value:
         description: The value of the field to search for
         type: string
-        format: iso-date-time
+        format: date-time
         example: '2018-05-14T00:00:00.000Z'
     required:
       - operation
@@ -580,7 +585,8 @@ paths:
       description: Deletes the file indicated by the resource ID.
       operationId: Delete
       x-ni-operation: deleteFiles
-      x-ni-privilege: ModifyFiles
+      x-ni-privilege: DeleteFiles
+      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       responses:
         204:
           description: No content
@@ -650,7 +656,7 @@ paths:
       operationId: UpdateMetadata
       x-ni-operation: updateMetadata
       x-ni-privilege: ModifyFiles
-      x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       parameters:
         - in: body
           name: metadata
@@ -667,6 +673,10 @@ paths:
                   replaced by the specified list or merged with the existing
                   list.
                 type: boolean
+              expectedRevision:
+                description: This is an optional value. When specified, this is an integer that should be set to match the last known revision number of the metadata. If it doesn't match at the time of execution, the update request will be rejected. This is used to ensure that changes to this file metadata are correctly using the previous state.
+                type: integer
+                format: int32
               properties:
                 description: The properties to set
                 type: object
@@ -693,8 +703,8 @@ paths:
         an array of file ids to delete.
       operationId: DeleteMultiple
       x-ni-operation: deleteFiles
-      x-ni-privilege: ModifyFiles
-      x-ni-request-variables: [REMOTE_USER]
+      x-ni-privilege: DeleteFiles
+      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       parameters:
         - in: body
           name: files
@@ -754,7 +764,7 @@ paths:
         - in: query
           name: take
           description: >-
-            How many files to return in the result, or 0 to use a default.  New in version 2 of this operation.
+            How many files to return in the result.  New in version 2 of this operation.
             The default value is defined by the service.
           type: integer
           format: int32
@@ -803,15 +813,19 @@ paths:
       operationId: Upload
       x-ni-operation: uploadFiles
       x-ni-privilege: UploadFiles
-      x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       consumes:
         - multipart/form-data
       parameters:
         - in: formData
           name: file
-          description: The file to upload. May be specified multiple times.
+          description: The file to upload.
           type: file
           required: true
+        - in: formData
+          name: metadata
+          description: JSON Dictionary with key/value pairs
+          type: string
       responses:
         201:
           description: OK
