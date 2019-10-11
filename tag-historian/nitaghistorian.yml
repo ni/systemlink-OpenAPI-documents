@@ -322,7 +322,7 @@ definitions:
         minimum: 0
         maximum: 1
         example: 1
-      error:
+      errors:
         description: This value is always null.
         type: object
         example: null
@@ -719,7 +719,7 @@ paths:
                 type: integer
                 minimum: 0
                 example: 1100
-              error:
+              errors:
                 $ref: '#/definitions/ErrorEntry'
               failed:
                 description: The paths of the tags that had errors.
