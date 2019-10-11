@@ -810,6 +810,99 @@ definitions:
         example: false
       responseFormat:
         $ref: '#/definitions/ResponseFormat'
+  ProductValuesQuery:
+    title: Product Values Query
+    type: object
+    required:
+    - field
+    properties:
+      field:
+        $ref: '#/definitions/ProductField'
+      filter:
+        description: >-
+          A Dynamic Linq query which specifies the products to consider when
+          getting values.
+        type: string
+        example: name != "cRIO-9030"
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
+      startsWith:
+        description: >-
+          Only return string values prefixed by this value (case sensitive).
+        type: string
+        example: cR
+  ResultValuesQuery:
+    title: Result Values Query
+    type: object
+    required:
+    - field
+    properties:
+      field:
+        $ref: '#/definitions/ResultField'
+      filter:
+        description: >-
+          A Dynamic Linq query which specifies the results to consider when
+          getting values.
+        type: string
+        example: programName != "MyProgram"
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
+      startsWith:
+        description: >-
+          Only return string values prefixed by this value (case sensitive).
+        type: string
+        example: op
+  StepValuesQuery:
+    title: Step Values Query
+    type: object
+    required:
+    - field
+    properties:
+      field:
+        $ref: '#/definitions/StepField'
+      filter:
+        description: >-
+          A Dynamic Linq query which specifies the steps to consider when
+          getting values.
+        type: string
+        example: stepType != "NumericLimitTest"
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
+      startsWith:
+        description: >-
+          Only return string values prefixed by this value (case sensitive).
+        type: string
+        example: op
   StepIdResultIdPair:
     title: Step Id / Result Id Pair
     type: object
@@ -1286,6 +1379,17 @@ responses:
             $ref: '#/definitions/StepIdResultIdPair'
         error:
           $ref: '#/definitions/Error'
+  ValuesResponse:
+    description: Values Response
+    schema:
+      description: Values Response
+      title: ValuesResponse
+      type: array
+      items:
+        type: string
+      example:
+      - operator1
+      - operator2
 paths:
   /:
     get:
@@ -1466,6 +1570,28 @@ paths:
       responses:
         204:
           description: The resource was deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/query-product-values:
+    post:
+      tags: [products]
+      summary: Queries values for a product field
+      description: Queries known values for a product field.
+      operationId: query-product-values-v2
+      x-ni-operation: queryProducts
+      x-ni-privilege: Read
+      parameters:
+        - in: body
+          name: postBody
+          description: Query parameters
+          required: true
+          schema:
+            $ref: '#/definitions/ProductValuesQuery'
+      responses:
+        200:
+          $ref: '#/responses/ValuesResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -1688,6 +1814,28 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+  /v2/query-result-values:
+    post:
+      tags: [results]
+      summary: Queries values for a result field
+      description: Queries known values for a result field.
+      operationId: query-result-values-v2
+      x-ni-operation: queryResults
+      x-ni-privilege: Read
+      parameters:
+        - in: body
+          name: postBody
+          description: Query parameters
+          required: true
+          schema:
+            $ref: '#/definitions/ResultValuesQuery'
+      responses:
+        200:
+          $ref: '#/responses/ValuesResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v2/update-results:
     post:
       tags: [results]
@@ -1892,6 +2040,28 @@ paths:
       responses:
         204:
           description: The resource was deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/query-step-values:
+    post:
+      tags: [results]
+      summary: Queries values for a step field
+      description: Queries known values for a step field.
+      operationId: query-step-values-v2
+      x-ni-operation: querySteps
+      x-ni-privilege: Read
+      parameters:
+        - in: body
+          name: postBody
+          description: Query parameters
+          required: true
+          schema:
+            $ref: '#/definitions/StepValuesQuery'
+      responses:
+        200:
+          $ref: '#/responses/ValuesResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
