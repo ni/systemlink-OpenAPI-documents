@@ -1578,7 +1578,9 @@ paths:
     post:
       tags: [products]
       summary: Queries values for a product field
-      description: Queries known values for a product field.
+      description: >-
+        Queries known values for an indexed, scalar product field. Supported
+        fields are `ID`, `PART_NUMBER`, `NAME`, `FAMILY`, and `UPDATED_AT`.
       operationId: query-product-values-v2
       x-ni-operation: queryProducts
       x-ni-privilege: Read
@@ -1818,7 +1820,11 @@ paths:
     post:
       tags: [results]
       summary: Queries values for a result field
-      description: Queries known values for a result field.
+      description: >-
+        Queries known values for an indexed, scalar result field. Supported
+        fields are `ID`, `STARTED_AT`, `UPDATED_AT`, `PROGRAM_NAME`,
+        `SYSTEM_ID`, `HOST_NAME`, `OPERATOR`, `SERIAL_NUMBER`, `PART_NUMBER`,
+        and `TOTAL_TIME_IN_SECONDS`.
       operationId: query-result-values-v2
       x-ni-operation: queryResults
       x-ni-privilege: Read
@@ -2046,9 +2052,13 @@ paths:
           $ref: '#/responses/Error'
   /v2/query-step-values:
     post:
-      tags: [results]
+      tags: [steps]
       summary: Queries values for a step field
-      description: Queries known values for a step field.
+      description: >-
+        Queries known values for an indexed, scalar step field. Supported
+        fields are `NAME`, `STEP_TYPE`, `STEP_ID`, `PARENT_ID`, `RESULT_ID`,
+        `PATH`, `TOTAL_TIME_IN_SECONDS`, `STARTED_AT`, `UPDATED_AT`, and
+        `DATA_MODEL`.
       operationId: query-step-values-v2
       x-ni-operation: querySteps
       x-ni-privilege: Read
