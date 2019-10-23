@@ -53,6 +53,24 @@ responses:
           type: array
           items:
             $ref: '#/definitions/TagWithValue'
+  QueryTagsWithValuesResponse:
+    description: List of tags, including their current and aggregate values
+    schema:
+      title: Query Tags With Values Response
+      type: object
+      properties:
+        continuationToken:
+          description: >-
+            Token to pass to a subsequent query to retrieve the next
+            page of tags
+          type: string
+          example: token
+        tagsWithValues:
+          description: List of tags with their current and aggregate values
+          type: array
+          items:
+            $ref: '#/definitions/TagWithValue'
+      required: [tagsWithValues]
   GetTagsResponse:
     description: List of tags, excluding current and aggregate values
     schema:
@@ -1372,6 +1390,29 @@ paths:
             items:
               $ref: '#/definitions/TimestampedTagValue'
           required: true
+  /v2/query-tags-with-values:
+    post:
+      tags:
+        - tags
+      summary: Query for tags
+      description: Returns tags with values satisfying the provided filtering criteria.
+      operationId: query-tags-with-values
+      responses:
+        200:
+          $ref: '#/responses/QueryTagsWithValuesResponse'
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+      parameters:
+        - in: body
+          name: tagQuery
+          description: Request body consisting of filtering criteria to apply when retrieving tags
+          schema:
+            $ref: '#/definitions/TagQuery'
+          required: true
 
 definitions:
   Error:
@@ -1543,6 +1584,85 @@ definitions:
         description: Mean value from the tag's aggregates
         type: number
         format: double
+  TagQuery:
+    type: object
+    title: Tag Query
+    properties:
+      filter:
+        type: string
+        description: >-
+          The filter criteria for tags. Consists of a string of queries composed using AND/OR operators.
+          String values and date strings need to be enclosed in double quotes.
+          Parenthesis can be used around filters to better define the order of operations.
+
+
+          Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+
+
+          Operators:
+
+          - Equals operator '='. Example: 'x = y'
+
+          - Not equal operator '!='. Example: 'x != y'
+
+          - Greater than operator '>'. Example: 'x > y'
+
+          - Greater than or equal operator '>='. Example: 'x >= y'
+
+          - Less than operator '<'. Example: 'x < y'
+
+          - Less than or equal operator '<='. Example: 'x <= y'
+
+          - Logical AND operator 'and' or '&&'. Example: 'x and y'
+
+          - Logical OR operator 'or' or '||'. Example: 'x or y'
+
+          - Contains operator '.Contains()', used to check if a list contains an element. Example: 'x.Contains(y)'
+
+          - Not Contains operator '!.Contains()', used to check if a list does not contain an element. Example: '!x.Contains(y)'
+
+
+          Valid tag properties that can be used in the filter:
+
+          - path : String representing the tag path. May include glob-style wildcards.
+
+          - type: Tag type. Example: INT
+
+          - keywords: Tag keywords. Example: keywords.Contains(x)
+
+          - properties: Tag properties. Example: properties['x'] = 'y'
+      orderBy:
+        description: >-
+          Which tag value property to order by; value and timestamp are from the current tag value.
+          When ordering by value, tags will be grouped by type, first numbers (INT, DOUBLE, U_INT64), then strings,
+          then booleans, then times. Null values will be at the end of the list regardless of type.
+        type: string
+        enum: [PATH, VALUE, TIMESTAMP]
+        default: PATH
+      descending:
+        description: Whether to return the tags in descending order
+        type: boolean
+        default: false
+      projection:
+        description: Specifies the fields to project along for tag metadata and values
+        type: string
+        default: ''
+      continuationToken:
+        description: >-
+          A token used for resuming a query at the next item in the matching tag set; to
+          obtain the next page of steps, pass the token to the service on a subsequent request
+        type: string
+      take:
+        description: Maximum number of tags to return
+        type: number
+        default: 100000
+    example:
+      filter: (path = "*.tag1") OR keywords.Contains("key1")
+      orderBy: TIMESTAMP
+      descending: true
+      projection: new(tag.path as path,current)
+      continuationToken: token
+      take: 20
   TimestampedTagValue:
     description: Current value of a tag
     type: object
