@@ -527,6 +527,22 @@ definitions:
             description: A string formatted as an hour with minutes and seconds representing the end time of a working day.
             type: string
             example: "17:00:00"
+  UtilizationHistoryField:
+    title: Asset Utilization History Field
+    description: An enumeration of all fields in an Asset Utilization History record.
+    type: string
+    enum:
+      - UTILIZATION_IDENTIFIER
+      - ASSET_IDENTIFIER
+      - MINION_ID
+      - CATEGORY
+      - TASK_NAME
+      - USER_NAME
+      - START_TIMESTAMP
+      - HEARTBEAT_TIMESTAMP
+      - END_TIMESTAMP
+    example:
+      START_TIMESTAMP
 parameters:
   TimespanGranularity:
     in: query
@@ -821,7 +837,7 @@ parameters:
       $ref: '#/definitions/ServicePolicy'
   QueryAssetUtilizationRequest:
     in: body
-    name: queryAssetUtilizationRequestBody
+    name: queryBody
     description: Request body consisting of filters for asset utilization, assets, and time intervals.
     schema:
       title: Query Asset Utilizations Request
@@ -863,8 +879,6 @@ parameters:
 
 
             Valid asset utilization properties that can be used in the filter:
-
-            - AssetIdentifier: String representing the unique identifier of an asset.
 
             - MinionId:  String representing the identifier of a minion in which an asset might be located in.
 
@@ -987,6 +1001,188 @@ parameters:
                 type: string
                 format: date-time
                 example: '2019-05-20T00:00:00Z'
+  QueryAssetUtilizationHistoryRequest:
+    in: body
+    name: queryBody
+    description: Request body consisting of filters for asset utilization and assets, with ordering and continuation token support.
+    schema:
+      title: Query Asset Utilization History Request
+      description: Object containing filters for asset utilization and assets. When continuation token is used, the orderBy parameter needs to be provided as well.
+      type: object
+      properties:
+        utilizationFilter:
+          description: >-
+            The filter criteria for asset utilization. Consists of a string of queries composed using AND/OR operators.
+            String values and date strings need to be enclosed in double quotes.
+            Parenthesis can be used around filters to better define the order of operations.
+
+            Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+
+            Operators:
+
+            - Equals operator '='. Example: 'x = y'
+
+            - Not equal operator '!='. Example: 'x != y'
+
+            - Greater than operator '>'. Example: 'x > y'
+
+            - Greater than or equal operator '>='. Example: 'x >= y'
+
+            - Less than operator '<'. Example: 'x < y'
+
+            - Less than or equal operator '<='. Example: 'x <= y'
+
+            - Logical AND operator 'and'. Example: 'x and y'
+
+            - Logical OR operator 'or'. Example: 'x or y'
+
+            - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
+
+            - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
+
+            Valid asset utilization properties that can be used in the filter:
+
+            - MinionId: String representing the identifier of a minion in which an asset might be located in.
+
+            - Category: String representing the utilization task category.
+
+            - UserName: String representing the name of the operator who utilized the asset.
+
+            - TaskName: String representing the name of the task.
+
+            - StartTimestamp:
+                description: >-
+                  A date time value which can be used to specify the start of an utilization.
+
+                  This parameter is required to have the "ISO 8601" format in order to be considered valid.
+                type: string
+                format: date-time
+                example: '2019-05-20T00:00:00Z'
+            - EndTimestamp:
+                description: >-
+                  A date time value which can be used to specify the end of an utilization.
+
+                  This parameter is required to have the "ISO 8601" format in order to be considered valid.
+                type: string
+                format: date-time
+                example: '2019-05-20T00:00:00Z'
+          type: string
+          example: Category = "Test"
+        assetFilter:
+          description: >-
+              The filter criteria for assets. Consists of a string of queries composed using AND/OR operators.
+              String values and date strings need to be enclosed in double quotes.
+              Parenthesis can be used around filters to better define the order of operations.
+
+              Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+
+
+              Operators:
+
+              - Equals operator '='. Example: 'x = y'
+
+              - Not equal operator '!='. Example: 'x != y'
+
+              - Greater than operator '>'. Example: 'x > y'
+
+              - Greater than or equal operator '>='. Example: 'x >= y'
+
+              - Less than operator '<'. Example: 'x < y'
+
+              - Less than or equal operator '<='. Example: 'x <= y'
+
+              - Logical AND operator 'and'. Example: 'x and y'
+
+              - Logical OR operator 'or'. Example: 'x or y'
+
+              - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
+
+              - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
+
+
+              Valid asset properties that can be used in the filter:
+
+              - AssetIdentifier: String representing the unique identifier of an asset.
+
+              - AssetClass: String enumeration representing the class of an asset. Possible values are: UNDEFINED, DISCOVERED, ASSET, DUT, FIXTURE.
+
+              - SerialNumber: String representing the serial number of an asset.
+
+              - ModelName: String representing the model name of an asset.
+
+              - ModelNumber: Unsigned integer representing the model number of an asset.
+
+              - VendorName: String representing the vendor name of an asset.
+
+              - VendorNumber: Unsigned integer representing the vendor number of an asset.
+
+              - AssetName: String representing the asset name.
+
+              - FirmwareVersion: String representing the firmware version of an asset.
+
+              - HardwareVersion: String representing the hardware version of an asset.
+
+              - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE.
+
+              - IsNIAsset: Boolean flag specifying whether the asset is an NI asset or a third-party asset.
+
+              - Keywords: Collection of string values representing asset metadata keywords. Example: 'Keywords=["keyword1", "keyword2"]'.
+
+              - Properties: Collection of key-value pairs, each key-value pair representing an asset metadata property. Example: 'Properties=["key1":"value1", "key2":"value2"]'.
+
+              - Location.MinionId: String representing the identifier of the minion in which the asset is located in.
+
+              - Location.SystemName: String representing the name of the system that the asset is located in.
+
+              - Location.SlotNumber: Unsigned integer representing the slot number the asset is located in.
+
+              - Location.AssetState.SystemConnection: String enumeration representing the connection state of the system the asset is currently located in. Possible values are: APPROVED, DISCONNECTED, CONNECTED_UPDATE_PENDING, CONNECTED_UPDATE_SUCCESSFUL, CONNECTED_UPDATE_FAILED, UNSUPPORTED, ACTIVATED.
+
+              - Location.AssetState.AssetPresence: String enumeration representing the present status of an asset in a system. Possible values are: INITIALIZING, UNKNOWN, NOT_PRESENT, PRESENT.
+
+              - SupportsSelfCalibration: Boolean flag specifying whether the asset supports self-calibration.
+
+              - SelfCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was self-calibrated. Example: "2018-05-20T00:00:00Z"
+
+              - SupportsExternalCalibration: Boolean flag specifying whether the asset supports external calibration.
+
+              - ExternalCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was externally-calibrated. Example: "2018-05-20T00:00:00Z"
+
+              - ExternalCalibration.NextRecommendedDate: ISO-8601 formatted timestamp string specifying the recommended date for the next external calibration. Example: "2018-05-20T00:00:00Z"
+
+              - ExternalCalibration.RecommendedInterval: Integer representing the manufacturer-recommended calibration interval, in months.
+
+              - ExternalCalibration.Comments: String representing any external calibration comments.
+
+              - ExternalCalibration.IsLimited: Boolean flag specifying whether the last external calibration was a limited calibration.
+
+              - ExternalCalibration.Operator.DisplayName: String representing the name of the operator which performed an external calibration on a third-party asset.
+
+          type: string
+          example: AssetName = "APMPXI1Slot3" and ExternalCalibration.NextRecommendedDate > "2018-05-01T00:00:00.519Z"
+        continuationToken:
+          description: >-
+            A token which allows the user to resume a query at the next item in
+            the matching asset utilization history set. When querying for asset utilization history, a token will
+            be returned if a query may be continued. To obtain the next page of
+            asset utilization history records, pass the token to the service on a subsequent request.
+
+          type: string
+          example: token
+        take:
+          description: The maximum number of asset utilization history records to return.
+          type: integer
+          format: int32
+          default: 1000
+          minimum: 0
+          example: 1000
+        orderBy:
+          $ref: '#/definitions/UtilizationHistoryField'
+        orderByDescending:
+          description: Whether to return the asset utilization history records in descending order.
+          type: boolean
+          default: false
+          example: false
 responses:
   Error:
     description: Error
@@ -1196,6 +1392,86 @@ responses:
               type: number
               format: double
               example: 7.38958
+  QueryUtilizationHistoryResponse:
+    description: Asset Utilization History response containing the collection of utilizations records matching the provided filters.
+    schema:
+      title: Asset Utilization History Response
+      description: Response for the asset utilization history query containing the collection of utilizations as well as a continuation token and a total count.
+      required:
+       - assetUtilizations
+      type: object
+      properties:
+        assetUtilizations:
+          description: Array of asset utilizations
+          type: array
+          items:
+              type: object
+              required:
+                - utilizationIdentifier
+                - assetIdentifier
+                - minionId
+                - category
+                - taskName
+                - userName
+                - startTimestamp
+              properties:
+                utilizationIdentifier:
+                  description: String representing the unique identifier of an asset utilization history record.
+                  type: string
+                  example: "2916201B245D642430"
+                assetIdentifier:
+                  description: String representing the unique identifier of an asset.
+                  type: string
+                  example: "29162;01B245D6;4243;0"
+                minionId:
+                  description: Identifier of the minion where the asset is located.
+                  type: string
+                  example: NI_PXIe-8135_Embedded_Controller--MAC-00-80-2F-23-52-65
+                category:
+                  description: String representing the utilization task category.
+                  type: string
+                  example: Test
+                taskName:
+                  description: String representing the name of the task.
+                  type: string
+                  example: DUTTestingRoutine
+                userName:
+                  description: String representing the name of the operator who utilized the asset.
+                  type: string
+                  example: johnDoe
+                startTimestamp:
+                  description: >-
+                    A date time value which can be used to specify the start of an utilization.
+
+                    This parameter has the "ISO 8601" format in order to be considered valid.
+                  type: string
+                  format: date-time
+                  example: '2019-05-01T00:00:00.519Z'
+                endTimestamp:
+                  description: >-
+                    A date time value which can be used to specify the end of an utilization.
+
+                    This parameter has the "ISO 8601" format in order to be considered valid.
+                  type: string
+                  format: date-time
+                  example: '2019-05-20T00:00:00Z'
+                heartbeatTimestamp:
+                  description: >-
+                    A date time value which can be used to specify the heartbeat of an utilization.
+
+                    This parameter has the "ISO 8601" format in order to be considered valid.
+                  type: string
+                  format: date-time
+                  example: '2019-05-20T00:00:00Z'
+        continuationToken:
+          description: >-
+            A token which allows the user to resume a query at the next item in
+            the matching asset utilization history set. When querying for asset utilization history, a token will
+            be returned if a query may be continued. To obtain the next page of
+            asset utilization history records, pass the token to the service on a subsequent request.
+
+          type: string
+          example: token
 paths:
   /:
     get:
@@ -1617,12 +1893,33 @@ paths:
       description: Retrieves asset utilization matching the provided filters.
       operationId: read-asset-utilization
       x-ni-operation: readAssetUtilization
-      x-ni-priviledge: Read
+      x-ni-privilege: Read
       parameters:
         - $ref: '#/parameters/QueryAssetUtilizationRequest'
       responses:
         200:
           $ref: '#/responses/UtilizationWithPercentageResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/query-asset-utilization-history:
+    post:
+      tags: [utilization]
+      summary: Query Asset Utilization Historical Data
+      description: Retrieves historical asset utilization data matching the provided filters. An empty request body queries all historical asset utilization data.
+      operationId: query-asset-utilizations
+      x-ni-operation: readAssetUtilization
+      x-ni-privilege: Read
+      parameters:
+        - $ref: '#/parameters/QueryAssetUtilizationHistoryRequest'
+      responses:
+        200:
+          $ref: '#/responses/QueryUtilizationHistoryResponse'
         400:
           $ref: '#/responses/BadRequest'
         401:
