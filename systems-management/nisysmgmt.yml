@@ -13,6 +13,10 @@ consumes: [application/json]
 produces: [application/json]
 
 securityDefinitions:
+  apiKeyAuth:
+    type: apiKey
+    name: x-ni-api-key
+    in: header
   basicAuth:
     type: basic
   cookieAuth:
