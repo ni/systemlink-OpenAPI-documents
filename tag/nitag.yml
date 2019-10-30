@@ -1593,7 +1593,7 @@ definitions:
         description: >-
           The filter criteria for tags. Consists of a string of queries composed using AND/OR operators.
           String values and date strings need to be enclosed in double quotes.
-          Parenthesis can be used around filters to better define the order of operations.
+          Parentheses can be used around filters to better define the order of operations.
 
 
           Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
@@ -1617,9 +1617,9 @@ definitions:
 
           - Logical OR operator 'or' or '||'. Example: 'x or y'
 
-          - Contains operator '.Contains()', used to check if a list contains an element. Example: 'x.Contains(y)'
+          - Contains operator '.Contains()', which is used to check if a list contains an element. Example: 'x.Contains(y)'
 
-          - Not Contains operator '!.Contains()', used to check if a list does not contain an element. Example: '!x.Contains(y)'
+          - Not Contains operator '!.Contains()', which is used to check if a list does not contain an element. Example: '!x.Contains(y)'
 
 
           Valid tag properties that can be used in the filter:
@@ -1633,18 +1633,18 @@ definitions:
           - properties: Tag properties. Example: properties['x'] = 'y'
       orderBy:
         description: >-
-          Which tag value property to order by; value and timestamp are from the current tag value.
+          The tag value property to order results by; value and timestamp are from the current tag value.
           When ordering by value, tags will be grouped by type, first numbers (INT, DOUBLE, U_INT64), then strings,
           then booleans, then times. Null values will be at the end of the list regardless of type.
         type: string
         enum: [PATH, VALUE, TIMESTAMP]
         default: PATH
       descending:
-        description: Whether to return the tags in descending order
+        description: A Boolean that determines whether to return the tags in descending order
         type: boolean
         default: false
       projection:
-        description: Specifies the fields to project along for tag metadata and values
+        description: The tag metadata and value fields to return
         type: string
         default: ''
       continuationToken:
