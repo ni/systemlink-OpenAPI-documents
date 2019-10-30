@@ -25,6 +25,7 @@ securityDefinitions:
     name: Cookie
 
 security:
+  - apiKeyAuth: []
   - basicAuth: []
   - cookieAuth: []
 
