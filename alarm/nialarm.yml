@@ -15,8 +15,13 @@ produces:
 securityDefinitions:
   basicAuth:
     type: basic
+  apiKeyAuth:
+    type: apiKey
+    name: x-ni-api-key
+    in: header
 security:
   - basicAuth: []
+  - apiKeyAuth: []
 x-ni-routing-key: Skyline.AlarmInstance
 definitions:
   Error:
