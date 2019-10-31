@@ -1001,6 +1001,7 @@ responses:
           description: Number of matching test results
           type: integer
           format: int64
+          example: 1
   StepsSuccessResponse:
     description: Test Steps Success Response
     schema:
@@ -1057,6 +1058,7 @@ responses:
           description: Number of matching test steps
           type: integer
           format: int64
+          example: 1
   StepsDeletePartialSuccessResponse:
     description: Delete Test Steps Partial Success Response
     schema:

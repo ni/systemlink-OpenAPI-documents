@@ -691,7 +691,7 @@ definitions:
     type: object
     properties:
       filter:
-        description: The query filter in Dynamic Linq
+        description: The result query filter in Dynamic Linq
         type: string
         example: (operator == "user1") || ((programName != "MyProgram") && (totalTimeInSeconds < @0))
       substitutions:
@@ -706,6 +706,22 @@ definitions:
           type: object
         example:
           - 2.5
+      productFilter:
+        description: The product query filter in Dynamic Linq
+        type: string
+        example: (name != "cRIO-9030") && (family == @0)
+      productSubstitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - cRIO
       orderBy:
         $ref: '#/definitions/ResultField'
       descending:
@@ -753,7 +769,7 @@ definitions:
     type: object
     properties:
       filter:
-        description: The query filter in Dynamic Linq
+        description: The step query filter in Dynamic Linq
         type: string
         example: (operator == "user1") || ((programName != "MyProgram") && (totalTimeInSeconds < @0))
       substitutions:
@@ -768,6 +784,25 @@ definitions:
           type: object
         example:
           - 2.5
+      resultFilter:
+        description: >-
+          The result query filter in Dynamic Linq.
+        type: string
+        example: (programName != "mySequence.seq") && (operator == @0)
+      resultSubstitutions:
+        description: >-
+          Makes substitutions in the query filter expression for results.
+          Substitutions for the query expression are indicated by non-negative
+          integers that are prefixed with the "at" symbol. Each substitution in
+          the given expression will be replaced by the element at the
+          corresponding index (zero-based) in this list. For example, "@0" in
+          the filter expression will be replaced with the element at the zeroth
+          index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - user1
       orderBy:
         $ref: '#/definitions/StepField'
       descending:
@@ -1203,6 +1238,7 @@ responses:
             This value is not present if returnCount is false.
           type: integer
           format: int64
+          example: 1
   ResultsSuccessResponse:
     description: Test Results Success Response
     schema:
@@ -1291,6 +1327,7 @@ responses:
             This value is not present if returnCount is false.
           type: integer
           format: int64
+          example: 1
   StepsSuccessResponse:
     description: Test Steps Success Response
     schema:
@@ -1358,6 +1395,7 @@ responses:
             This value is not present if returnCount is false.
           type: integer
           format: int64
+          example: 1
   StepsDeletePartialSuccessResponse:
     description: Delete Test Steps Partial Success Response
     schema:
@@ -1674,8 +1712,9 @@ paths:
       tags: [results]
       summary: Queries test results
       description: >-
-        Uses the Dynamic Linq query language to specify a filter and return
-        test results. An empty request body queries all test results.
+        Uses the Dynamic Linq query language to specify filters for results.
+        Both result and product filters can be specified and matching test
+        results are returned. An empty request body queries all test results.
       operationId: query-results-v2
       x-ni-operation: queryResults
       x-ni-privilege: Read
@@ -1908,8 +1947,9 @@ paths:
       tags: [steps]
       summary: Queries test steps
       description: >-
-        Uses the Dynamic Linq query language to specify a filter and return
-        test steps. An empty request body queries all test steps.
+        Uses the Dynamic Linq query language to specify filters for steps.
+        Both step and result filters can be specified and matching test
+        steps are returned. An empty request body queries all test steps.
       operationId: query-steps-v2
       x-ni-operation: querySteps
       x-ni-privilege: Read
@@ -2052,7 +2092,7 @@ paths:
           $ref: '#/responses/Error'
   /v2/query-step-values:
     post:
-      tags: [steps]
+      tags: [results]
       summary: Queries values for a step field
       description: >-
         Queries known values for an indexed, scalar step field. Supported
