@@ -640,10 +640,30 @@ definitions:
         format: date-time
         example: '2019-02-11T13:32:06.030958Z'
       data:
-        description: This map is used for grains/packages/feeds. All these are heterogeneous (integers, booleans, lists, dictionaries, ...) collections containing open-ended properties and flags.
+        description: This map is used for grains/feeds. All these are heterogeneous (integers, booleans, lists, dictionaries, ...) collections containing open-ended properties and flags.
         type: object
         additionalProperties:
           type: object
+        example:
+          key: value
+    required: [lastUpdatedTimestamp, data]
+
+  ManagedSystemPackagesData:
+    description: Property of a system composed by the last updated timestamp and a dictionary with the actual packages installed on the system.
+    type: object
+    properties:
+      lastUpdatedTimestamp:
+        description: Last updated timestamp.
+        type: string
+        format: date-time
+        example: '2019-02-11T13:32:06.030958Z'
+      data:
+        description: Installed packages. The key of the dictionary is the name of the package, and the value is a dictionary with open-ended properties and flags
+        type: object
+        additionalProperties:
+          type: object
+          additionalProperties:
+            type: object
         example:
           key: value
     required: [lastUpdatedTimestamp, data]
@@ -717,7 +737,7 @@ definitions:
             osrelease: 7
       packages:
         description: Software packages installed on the system.
-        $ref: '#/definitions/ManagedSystemDataPropertyMap'
+        $ref: '#/definitions/ManagedSystemPackagesData'
         example:
           lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
           data:
