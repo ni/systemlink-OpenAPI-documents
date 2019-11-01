@@ -2298,7 +2298,7 @@ paths:
       x-ni-request-timeout: 300000
       x-ni-operation: manageFeeds
       tags: [feeds]
-      summary: Get Available Packages
+      summary: Query packages
       description: Get available packages for a set of system configurations. If multiple system configurations are provided, only packages available to all applicable systems are returned. If OS architectures are provided, only the package with highest priority will be returned for packages of equal version.
       parameters:
         - in: body
@@ -2329,7 +2329,7 @@ paths:
       x-ni-operation: getJobs
       x-ni-request-timeout: 120000
       tags: [jobs]
-      summary: Get jobs by query
+      summary: Query jobs
       description: Get jobs by query.
       parameters:
         - in: body
@@ -2358,7 +2358,7 @@ paths:
       x-ni-operation: getSystems
       x-ni-request-timeout: 120000
       tags: [systems]
-      summary: Get systems by query.
+      summary: Query systems
       description: Get systems by query.
       parameters:
         - in: body
