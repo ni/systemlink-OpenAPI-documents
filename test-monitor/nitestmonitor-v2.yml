@@ -267,6 +267,33 @@ definitions:
       - HAS_CHILDREN
     example:
       STEP_TYPE
+  PathField:
+    title: Path Field
+    description: An enumeration of all fields in a Path.
+    type: string
+    enum:
+      - ID
+      - PROGRAM_NAME
+      - PART_NUMBER
+      - PATH
+      - PATH_NAMES
+      - INPUTS
+      - OUTPUTS
+      - MEASUREMENTS
+    example:
+      PROGRAM_NAME
+  ValueType:
+    title: Value Type
+    description: An enumeration of the possible types of variant values.
+    type: string
+    enum:
+      - UNKNOWN
+      - NULL
+      - BOOLEAN
+      - NUMBER
+      - STRING
+      - ARRAY
+      - OBJECT
   ResponseFormat:
     title: Response Format
     description: Enum indicating the expected response format (CSV or JSON). If unspecified, JSON is the default.
@@ -626,6 +653,71 @@ definitions:
         description: Determine test result status from the test step statuses
         type: boolean
         default: false
+  ValueSummaryObject:
+    title: Value Summary
+    type: object
+    properties:
+      type:
+        $ref: '#/definitions/ValueType'
+      min:
+        description: The minimum recorded value, if ValueType is "NUMBER."
+        type: number
+        example: 1.3
+      max:
+        description: The maximum recorded value, if ValueType is "NUMBER."
+        type: number
+        example: 2.6
+  PathResponseObject:
+    title: Path Response Object
+    type: object
+    properties:
+      id:
+        description: The unique ID of this path.
+        type: string
+        example: 507f191e810c19729de860ea
+      path:
+        description: >-
+          Identifies the steps that this path is representative of.
+        type: string
+        example: MainSequence Callback
+          
+          My Step Name
+      programName:
+        description: The program name for which this path is defined.
+        type: string
+        example: MyProgram.seq
+      partNumber:
+        description: The part number for which this path is defined.
+        type: string
+        example: 156502A-11L
+      pathNames:
+        description: >-
+          The list of all ancestor step names for any step which corresponds
+          to this path.
+        type: array
+        items:
+          type: string
+        example: ['MainSequence Callback', 'VoltageTest']
+      inputs:
+        description: >-
+          The set of inputs that steps which correspond to this path may take.
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/ValueSummaryObject'
+      outputs:
+        description: >-
+          The set of outputs that steps which correspond to this path may log.
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/ValueSummaryObject'
+      measurements:
+        description: >-
+          The set of measurements that steps which correspond to this path may take.
+        type: object
+        additionalProperties:
+          type: object
+        example:
+          myMeasurement: {}
   ProductsAdvancedQuery:
     title: Advanced Query Object for Products
     type: object
@@ -682,6 +774,66 @@ definitions:
       returnCount:
         description: >-
           Whether to return the total number of products which match the
+          provided filter, disregarding the take value.
+        type: boolean
+        default: false
+        example: false
+  PathsAdvancedQuery:
+    title: Advanced Query Object for Paths
+    type: object
+    properties:
+      filter:
+        description: The query filter in Dynamic Linq
+        type: string
+        example: programName == "MyTests.seq" || product == "cRIO-9030"
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
+      orderBy:
+        $ref: '#/definitions/PathField'
+      descending:
+        description: ->
+          Whether to return the paths in descending order.
+        type: boolean
+        default: false
+        example: false
+      projection:
+        description: >-
+          Specifies the path fields to project. When a field value is given here,
+          the corresponding field will be present in all returned paths, and all
+          unspecified fields will be excluded. If no projection is specified,
+          all path fields will be returned.
+        type: array
+        items:
+          $ref: '#/definitions/PathField'
+      take:
+        description: >-
+          The maximum number of paths to return.
+        type: integer
+        format: int32
+        default: 1000
+        minimum: 0
+        example: 1000
+      continuationToken:
+        description: >-
+          A token which allows the user to resume a query at the next item in
+          the matching path set. When querying for paths, a token will
+          be returned if a query may be continued. To obtain the next page of
+          paths, pass the token to the service on a subsequent request.
+        type: string
+        example: token
+      returnCount:
+        description: >-
+          Whether to return the total number of paths which match the
           provided filter, disregarding the take value.
         type: boolean
         default: false
@@ -1428,6 +1580,38 @@ responses:
       example:
       - operator1
       - operator2
+  PathsQueryResponse:
+    description: Paths Query Response
+    schema:
+      description: Paths Query Response
+      title: PathsQueryResponse
+      type: object
+      x-ni-sparse: true
+      required:
+        - paths
+      properties:
+        paths:
+          description: An array of path objects.
+          type: array
+          items:
+            $ref: '#/definitions/PathResponseObject'
+        continuationToken:
+          description: >-
+            A token which allows the user to resume this query at the next item
+            in the matching path set. In order to continue paginating a
+            query, pass this token to the service on a subsequent request. The
+            service will respond with a new continuation token. To paginate a
+            set of paths, continue sending requests with the newest
+            continuation token provided by the service, until this value is
+            null.
+          type: string
+          example: "token"
+        totalCount:
+          description: >-
+            The number of matching paths, if returnCount is true.
+            This value is not present if returnCount is false.
+          type: integer
+          format: int64
 paths:
   /:
     get:
@@ -2163,6 +2347,30 @@ paths:
           $ref: '#/responses/StepsDeletePartialSuccessResponse'
         204:
           description: The resources were deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/query-paths:
+    post:
+      tags: [paths]
+      summary: Queries paths
+      description: >-
+        Uses the Dynamic Linq query language to specify a filter and return
+        paths. An empty request body queries all paths.
+      operationId: query-paths-v2
+      x-ni-operation: queryPaths
+      x-ni-privilege: Read
+      parameters:
+        - in: body
+          name: postBody
+          description: Query filter
+          required: false
+          schema:
+            $ref: '#/definitions/PathsAdvancedQuery'
+      responses:
+        200:
+          $ref: '#/responses/PathsQueryResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
