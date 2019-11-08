@@ -165,6 +165,8 @@ definitions:
             $ref: '#/definitions/Operation'
           deleteManyProducts:
             $ref: '#/definitions/Operation'
+          queryPaths:
+            $ref: '#/definitions/Operation'
   StatusObject:
     title: Status Object
     description: Status object comprised of a type and display name
