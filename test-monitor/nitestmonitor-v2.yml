@@ -289,7 +289,7 @@ definitions:
     description: An enumeration of the possible types of variant values.
     type: string
     enum:
-      - UNKNOWN
+      - MIXED
       - NULL
       - BOOLEAN
       - NUMBER
