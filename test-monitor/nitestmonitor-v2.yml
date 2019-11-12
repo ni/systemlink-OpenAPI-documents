@@ -2353,6 +2353,68 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+  /v2/paths:
+    get:
+      tags: [paths]
+      summary: Gets paths
+      description: Gets a list of paths.
+      operationId: get-paths-v2
+      x-ni-operation: queryPaths
+      x-ni-privilege: Read
+      parameters:
+        - in: query
+          name: continuationToken
+          description: >-
+            A token which allows the user to resume a query at the next item in
+            the matching path set. When querying for paths, a token will
+            be returned if a query may be continued. To obtain the next page of
+            paths, pass the token to the service on a subsequent request.
+          type: string
+        - in: query
+          name: take
+          description: >-
+            The maximum number of paths to return.
+          type: integer
+          format: int32
+          default: 1000
+          minimum: -1
+        - in: query
+          name: returnCount
+          description: >-
+            Whether to return the total number of paths,
+            disregarding the take value.
+          type: boolean
+          default: false
+      responses:
+        200:
+          $ref: '#/responses/PathsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/paths/{pathId}:
+    get:
+      tags: [paths]
+      summary: Gets a path
+      description: Gets a single path.
+      operationId: get-path-v2
+      x-ni-operation: queryPaths
+      x-ni-privilege: Read
+      parameters:
+        - in: path
+          name: pathId
+          description: The ID of the path to get.
+          type: string
+          required: true
+      responses:
+        200:
+          description: Get Path Response
+          schema:
+            $ref: '#/definitions/PathResponseObject'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v2/query-paths:
     post:
       tags: [paths]
