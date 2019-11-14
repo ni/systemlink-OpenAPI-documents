@@ -1656,6 +1656,7 @@ definitions:
         description: Maximum number of tags to return
         type: number
         default: 100000
+        minimum: -1
     example:
       filter: (path = "*.tag1") OR keywords.Contains("key1")
       orderBy: TIMESTAMP
