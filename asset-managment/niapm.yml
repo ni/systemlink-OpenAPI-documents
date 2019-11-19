@@ -539,8 +539,6 @@ definitions:
       - TASK_NAME
       - USER_NAME
       - START_TIMESTAMP
-      - HEARTBEAT_TIMESTAMP
-      - END_TIMESTAMP
     example:
       START_TIMESTAMP
 parameters:
