@@ -114,15 +114,11 @@ definitions:
 
           - modifyHistoricalTagValues: The ability to modify properties of historical tag values
 
-          - deleteHistoricalTagValues: The ability to delete historical tag values
-
         type: object
         properties:
           queryHistoricalTagValues:
             $ref: '#/definitions/Operation'
           modifyHistoricalTagValues:
-            $ref: '#/definitions/Operation'
-          deleteHistoricalTagValues:
             $ref: '#/definitions/Operation'
   HttpHistoricalValue:
     type: object
@@ -803,56 +799,6 @@ paths:
       responses:
         200:
           description: OK
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-  /v2/tags/delete-values-by-range:
-    post:
-      tags: [history]
-      summary: Deletes a range of historical values
-      description: Deletes all historical values within a given time range for one or more tags.
-      operationId: DeleteHistoricalValuesByRange
-      x-ni-operation: deleteHistoricalTagValues
-      parameters:
-        - in: body
-          name: Request body
-          required: true
-          description: Contains the time ranges to delete.
-          schema:
-            description: Contains the time ranges to delete.
-            type: object
-            title: Tag Historian Delete Values By Range Request
-            properties:
-              ranges:
-                description: The time ranges to delete.
-                type: array
-                items:
-                  description: A time range of historical tag values to delete.
-                  type: object
-                  title: Historical Tag Query Range
-                  properties:
-                    path:
-                      description: The path of the tag whose historical values within the range will
-                        be deleted.
-                      type: string
-                      example: system1.tag1
-                    startTime:
-                      description: The ISO-8601 formatted timestamp indicating the start of the
-                        range. Any historical values from this time until endTime will be deleted.
-                      type: string
-                      format: date-time
-                      example: '2019-03-13T09:51:38Z'
-                    endTime:
-                      description: The ISO-8601 formatted timestamp indicating the end of the range.
-                        Any historical values from startTime to and including this time will be deleted.
-                      type: string
-                      format: date-time
-                      example: '2020-03-13T09:51:38Z'
-            required: [ranges]
-      responses:
-        204:
-          description: Success
         401:
           $ref: '#/responses/Unauthorized'
         default:
