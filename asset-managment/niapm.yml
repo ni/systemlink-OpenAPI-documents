@@ -197,7 +197,7 @@ definitions:
     enum:
       - SELF_CALIBRATION
       - EXTERNAL_CALIBRATION
-  AssetState:
+  AssetStateModel:
     title: Asset State
     description: The status of an asset and the system to which it is connected.
     type: object
@@ -206,7 +206,7 @@ definitions:
         $ref: '#/definitions/SystemConnectionState'
       assetPresence:
         $ref: '#/definitions/AssetPresenceStatus'
-  TemperatureSensor:
+  TemperatureSensorModel:
     title: Temperature Sensor
     description: The sensor name and temperature reading in Celsius.
     type: object
@@ -222,7 +222,7 @@ definitions:
         type: number
         format: double
         example: 25.8
-  AssetLocation:
+  AssetLocationModel:
     title: Asset Location
     description: Information about the asset and the system in which it resides.
     type: object
@@ -248,8 +248,8 @@ definitions:
         type: string
         example: APM-PXI1
       state:
-        $ref: '#/definitions/AssetState'
-  ExternalCalibrationOperator:
+        $ref: '#/definitions/AssetStateModel'
+  ExternalCalibrationOperatorModel:
     title: External Calibration Operator
     description: The information about the operator who performed the calibration.
     type: object
@@ -271,7 +271,7 @@ definitions:
           description: An array of temperature sensor information.
           type: array
           items:
-            $ref: '#/definitions/TemperatureSensor'
+            $ref: '#/definitions/TemperatureSensorModel'
       isLimited:
         description: Whether the last self-calibration of the asset was a limited calibration.
         type: boolean
@@ -295,7 +295,7 @@ definitions:
           description: An array of temperature sensor information.
           type: array
           items:
-            $ref: '#/definitions/TemperatureSensor'
+            $ref: '#/definitions/TemperatureSensorModel'
       isLimited:
         description: Whether the last external calibration of the asset was a limited calibration.
         type: boolean
@@ -327,7 +327,7 @@ definitions:
           entryType:
             $ref: '#/definitions/CalibrationMode'
           operator:
-            $ref: '#/definitions/ExternalCalibrationOperator'
+            $ref: '#/definitions/ExternalCalibrationOperatorModel'
   AssetModel:
     title: Asset Model
     description: An object describing an asset with all of its properties.
@@ -384,12 +384,12 @@ definitions:
         type: string
         example : vs-1234
       assetLocation:
-        $ref: '#/definitions/AssetLocation'
+        $ref: '#/definitions/AssetLocationModel'
       temperatureSensors:
         description: An array of temperature sensor information.
         type: array
         items:
-          $ref: '#/definitions/TemperatureSensor'
+          $ref: '#/definitions/TemperatureSensorModel'
       supportsSelfCalibration:
         description: Whether the asset supports self-calibration.
         type: boolean
@@ -507,7 +507,7 @@ definitions:
       - INLINE
       - DOWNLOAD
       - FILE_SERVICE
-  ServicePolicy:
+  ServicePolicyModel:
     title: Service policy
     description: An object containing the service policy.
     type: object
@@ -839,7 +839,7 @@ parameters:
     name: servicePolicyUpdateRequest
     description: The request to update properties of the current service policy.
     schema:
-      $ref: '#/definitions/ServicePolicy'
+      $ref: '#/definitions/ServicePolicyModel'
   QueryAssetUtilizationRequest:
     in: body
     name: queryBody
@@ -1347,7 +1347,7 @@ responses:
   ServicePolicyResponse:
     description: Service policy response containing the service calibration policy with the number of days for an asset to be considered as approaching calibration.
     schema:
-      $ref: '#/definitions/ServicePolicy'
+      $ref: '#/definitions/ServicePolicyModel'
   UtilizationWithPercentageResponse:
     description: Utilization response containing the collection of utilizations matching the provided filters, in a specific time interval. Besides a time interval, each element contains an asset identifier, a minion id, an utilization category, and a percentage of time that the asset was utilized in the time interval.
     schema:
