@@ -2278,7 +2278,7 @@ paths:
           $ref: '#/responses/Error'
   /v2/query-step-values:
     post:
-      tags: [results]
+      tags: [steps]
       summary: Queries values for a step field
       description: >-
         Queries known values for an indexed, scalar step field. Supported
