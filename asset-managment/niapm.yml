@@ -8,6 +8,7 @@ info:
     url: 'https://www.ni.com/systemlink'
     email: support@ni.com
 basePath: /niapm
+x-ni-privilege-application: 'niws.niasset'
 consumes:
   - application/json
 produces:
@@ -100,8 +101,6 @@ definitions:
           - writeAssets: Write information related to assets.
 
           - deleteAssets: Delete information related to assets.
-
-          - readAssetUtilization: Read information related to asset utilization.
         type: object
         properties:
           readAssets:
@@ -109,8 +108,6 @@ definitions:
           writeAssets:
             $ref: '#/definitions/Operation'
           deleteAssets:
-            $ref: '#/definitions/Operation'
-          readAssetUtilization:
             $ref: '#/definitions/Operation'
   BusType:
     title: Bus Type
@@ -552,7 +549,6 @@ parameters:
     name: granularity
     description: The possible granularities that can be used to obtain asset availability.
     type: string
-    default: WEEK
     enum:
       - NONE
       - WEEK
@@ -587,9 +583,10 @@ parameters:
     x-example: 0
   AssetAvailabilityComparison:
     in: body
-    name: assetIds
+    name: compareAvailability
     description: Request body consisting in a time interval and a list of assets to compute availability history for.
     schema:
+      title: Compare Asset Availability
       type: object
       required:
         - assetIds
@@ -1257,7 +1254,7 @@ responses:
   AssetSummaryResponse:
     description: Asset summary response containing the count of active assets, inactive assets and the total number of assets.
     schema:
-      title: Asset Summary
+      title: Asset Summary Response
       description: Asset summary response containing the total number of assets, the number of assets which are active (present in a connected system) and the number of assets which are not active.
       type: object
       properties:
@@ -1282,6 +1279,7 @@ responses:
       description: The response contains a collection of systems that an asset has been present during the timespan, along with the percentage of time the asset was present in the system in each timespan.
       type: array
       items:
+        title: Availability in System Model
         type: object
         properties:
           systemName:
@@ -1296,7 +1294,7 @@ responses:
   CalibratedAssetSummaryResponse:
     description: Response containing summary of assets supporting calibration. Contains the count of assets approaching recommended calibration due date, assets past recommended calibration due date and count of assets supporting (any type of) calibration.
     schema:
-      title: Calibrated Asset Summary
+      title: Calibrated Asset Summary Response
       description: Asset summary of the total number of assets supporting calibration, the number of assets approaching recommended calibration date and the number of assets past their recommended calibration date.
       type: object
       properties:
@@ -1355,6 +1353,7 @@ responses:
       description: Response for the utilization query containing the collection of utilizations. Besides a time interval, each element contains an asset identifier, a minion id, an utilization category, and a percentage of time that the asset was utilized in the time interval.
       type: array
       items:
+          title: Utilization with Percentage Model
           type: object
           required:
             - startTimestamp
@@ -1534,7 +1533,6 @@ paths:
             For example, a list of 100 asssets with a skip value of 50 and a take
             value of 25 will return entries 51 through 75.
           type: integer
-          default: 0
         - in: query
           name: take
           description:
@@ -1543,18 +1541,15 @@ paths:
             For example, a list of 100 assets with a skip value of 50 and a take
             value of 25 will return entries 51 through 75.
           type: integer
-          default: -1
           maximum: 1000
         - in: query
           name: calibratableOnly
           description: Whether to filter only assets which support calibration.
           type: boolean
-          default: false
         - in: query
           name: responseFormat
           description: The return type. Valid options are "JSON" and "CSV".
           type: string
-          default: JSON
           enum:
             - JSON
             - CSV
@@ -1566,7 +1561,6 @@ paths:
             "DOWNLOAD" returns the list of assets as the body of the response and indicates to the client that it should be downloaded as a file.
             "FILE_SERVICE" sends the list of assets to the file ingestion service and returns the ID of the file to the client in a JSON object.
           type: string
-          default: INLINE
           enum:
             - INLINE
             - DOWNLOAD
