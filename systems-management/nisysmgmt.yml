@@ -1673,10 +1673,10 @@ paths:
   /v1/jobs:
     post:
       operationId: CreateJob
+      x-ni-auth: true
       x-ni-privilege: Write
       x-ni-operation: createOrCancelJobs
       x-ni-request-timeout: 300000
-      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       tags: [jobs]
       summary: Create a job
       description: Create a job and returns the newly created job including the job ID.
@@ -1822,9 +1822,11 @@ paths:
   /v1/cancel-jobs:
     post:
       operationId: CancelJobs
+      x-ni-auth: true
       x-ni-privilege: Write
       x-ni-operation: createOrCancelJobs
       x-ni-request-timeout: 120000
+      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       tags: [jobs]
       summary: Cancel jobs
       description: Cancel jobs that are running on systems. This won't stop the jobs from executing on systems if the jobs have already been dispatched to the systems.
