@@ -662,11 +662,11 @@ definitions:
       type:
         $ref: '#/definitions/ValueType'
       min:
-        description: The minimum recorded value, if ValueType is "NUMBER."
+        description: The minimum recorded value, if `type` is "NUMBER."
         type: number
         example: 1.3
       max:
-        description: The maximum recorded value, if ValueType is "NUMBER."
+        description: The maximum recorded value, if `type` is "NUMBER."
         type: number
         example: 2.6
   PathResponseObject:
@@ -674,7 +674,9 @@ definitions:
     type: object
     properties:
       id:
-        description: The unique ID of this path.
+        description: >-
+          The unique ID of this path. Note that this value may change if
+          the collection is repaired.
         type: string
         example: 507f191e810c19729de860ea
       path:
@@ -763,7 +765,7 @@ definitions:
         type: integer
         format: int32
         default: 1000
-        minimum: 0
+        minimum: -1
         example: 1000
       continuationToken:
         description: >-
@@ -823,7 +825,7 @@ definitions:
         type: integer
         format: int32
         default: 1000
-        minimum: 0
+        minimum: -1
         example: 1000
       continuationToken:
         description: >-
@@ -899,7 +901,7 @@ definitions:
         type: integer
         format: int32
         default: 1000
-        minimum: 0
+        minimum: -1
         example: 1000
       continuationToken:
         description: >-
@@ -980,7 +982,7 @@ definitions:
         type: integer
         format: int32
         default: 1000
-        minimum: 0
+        minimum: -1
         example: 1000
       continuationToken:
         description: >-
@@ -1706,7 +1708,7 @@ paths:
             The maximum number of products to return.
           type: integer
           format: int32
-          default: -1
+          default: 1000
           minimum: -1
         - in: query
           name: returnCount
@@ -1944,7 +1946,7 @@ paths:
             The maximum number of results to return.
           type: integer
           format: int32
-          default: -1
+          default: 1000
           minimum: -1
         - in: query
           name: returnCount
@@ -2179,7 +2181,7 @@ paths:
             The maximum number of steps to return.
           type: integer
           format: int32
-          default: -1
+          default: 1000
           minimum: -1
         - in: query
           name: returnCount
