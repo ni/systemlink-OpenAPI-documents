@@ -388,8 +388,15 @@ definitions:
         example: false
   FeedBasicData:
     type: object
-    description: Contains the name and the description of a single feed.
+    description: |
+        Only one of the 'name' and 'feedName' properties is requested.
+        There are both 'name' and 'feedName' for backwards compatibility.
+        The 'feedName' parameter will be considered if both of them are provided.
     properties:
+      feedName:
+        type: string
+        description: Name of the feed.
+        example: My LabVIEW feed
       name:
         type: string
         description: Name of the feed.
@@ -421,7 +428,15 @@ definitions:
         $ref: '#/definitions/Platform'
   FeedDataWithURI:
     type: object
+    description: |
+        Only one of the 'name' and 'feedName' properties is requested.
+        There are both 'name' and 'feedName' for backwards compatibility.
+        The 'feedName' parameter will be considered if both of them are provided.
     properties:
+      feedName:
+        type: string
+        description: The name of this feed.
+        example: My LabVIEW feed
       name:
         type: string
         description: The name of the feed.
