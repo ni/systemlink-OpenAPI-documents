@@ -229,41 +229,14 @@ definitions:
         type: string
         description: The language the product supports.
         example: English
-  RepositoryInformation:
-    type: object
-    description: Contains information about one of the repositories where the packages of a product are located.
-    properties:
-      packageName:
-        type: string
-        description: The name of one of the packages.
-        example: ni-labview-nxg-2.0.0-2.1-released-critical
-      file:
-        type: string
-        description: |
-            The location of the file, including the file extension.
-            Depending on the selected platform, the following package extensions are available: .nipkg for windows feeds, .ipk and .deb for ni-linux-rt feeds.
-        example: "http://127.0.0.1/en/ni-labview-nxg-2.0.0-2.1-released-critical.nipkg"
-      md5Checksum:
-        description: The MD5 fingerprint of the file.
-        type: string
-        example: 233b2aa7d1c23cbef93874a7ecdce61a
-      repositoryPath:
-        type: string
-        description: The path to the repository where the package is found.
-        example: "http://download.ni.com/products/ni-labview-nxg-2.0.0/2.1/released-critical"
-      feedType:
-        type: string
-        enum: [RELEASED, RELEASED-CRITICAL]
-        description: The release type of the feed.
-        example: RELEASED
   SoftwareInformation:
     type: object
     description: Contains information about a piece of software that a store item contains.
     properties:
       storeItemId:
-        type: number
+        type: string
         description: The ID of this element.
-        example: 654
+        example: "654"
       productName:
         type: string
         description: The name of one the products contained in the software suite.
@@ -272,10 +245,10 @@ definitions:
         type: string
         description: A short description of the product.
         example: LabVIEW NXG enables engineers to quickly automate hardware, customize tests to project specifications, and easily view measurement results from anywhere.
-      updateDate:
+      downloadItemVersion:
         type: string
-        description: The last date this product was updated at.
-        example: '2018-01-23T14:33:29.000-06:00'
+        description: The item version number.
+        example: "2.1"
       packageName:
         type: string
         description: The name of the package to install.
@@ -284,23 +257,11 @@ definitions:
         type: string
         description: The version of the package to install.
         example: 5.3.1.49156-0+f4
-      architecture:
-        type: string
-        description: The architecture this product works on.
-        example: windows_x64
-      preSelect:
-        type: string
-        description: The designation of whether the product will be automatically set to install. Select "yes" to preselect the product.
-        example: "yes"
-      repositories:
+      feeds:
         type: array
-        description: An array containing information about where to locate the repositories and packages to install them.
+        description: The feeds where the suite contents are located at.
         items:
-          $ref: '#/definitions/RepositoryInformation'
-      downloadItemVersion:
-        type: string
-        description: The item version number.
-        example: "2.1"
+          $ref: '#/definitions/FeedNameAndUri'
   StoreItemInstaller:
     type: object
     properties:
@@ -858,12 +819,6 @@ definitions:
         example: "2016-11-02T22:26:33.668Z"
       metadata: 
         $ref: '#/definitions/PackageMetadata'
-      description: 
-        type: string
-        description: Description of the package.
-        example: Package Description.
-      platform:
-        $ref: '#/definitions/Platform'
   PackageResponse:
     description: Contains a single package.
     type: object
@@ -1803,12 +1758,12 @@ paths:
           default: ""
         - in: query
           name: pageSize
-          type: number
+          type: integer
           description: How many results should be returned in the response.
           default: 10
         - in: query
           name: pageNumber
-          type: number
+          type: integer
           description: The page of the response to return.
           default: 0
       responses:
