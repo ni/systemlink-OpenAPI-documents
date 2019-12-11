@@ -1613,7 +1613,6 @@ paths:
         - in: query
           name: shouldOverwrite
           type: boolean
-          required: true
           description: Determines if the existing packages with the same filename as the package to be added to the pool should be overwritten.
           default: false
         - in: body
