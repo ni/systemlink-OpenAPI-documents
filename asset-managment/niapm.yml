@@ -691,7 +691,7 @@ parameters:
   QueryAssetsRequest:
     in: body
     name: queryAssets
-    description: Request body consisting of filters to apply when retrieving assets.
+    description: Request body consisting of filters to apply when retrieving assets. Currently, the valid combinations of ResponseFormat and Destination are [JSON;INLINE], [CSV;DOWNLOAD], [CSV;FILE_SERVICE]
     schema:
       title: Query Assets Request
       description: Object containing filters to apply when retrieving assets.
