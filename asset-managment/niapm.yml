@@ -1842,8 +1842,8 @@ paths:
         200:
           description: Asset availability comparison response containing availability history for requested assets based on the requested timespan.
           schema:
-            title: Asset Comparison Response
-            description: Asset comparison response containing availability history for the requested assets. If availability history could not be resolved for some assets, the response contains error information on the assets which could not be resolved.
+            title: Asset Availability Comparison Response
+            description: Asset availability comparison response containing availability history for the requested assets. If availability history could not be resolved for some assets, the response contains error information on the assets which could not be resolved.
             type: object
             properties:
               availabilityComparisons:
