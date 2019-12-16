@@ -547,7 +547,7 @@ parameters:
   TimespanGranularity:
     in: query
     name: granularity
-    description: The possible granularities that can be used to obtain asset availability.
+    description: The possible granularities that can be used to obtain asset availability. WEEK is used when no granularity is specified.
     type: string
     enum:
       - NONE
@@ -590,6 +590,8 @@ parameters:
       type: object
       required:
         - assetIds
+        - startDate
+        - endDate
       properties:
         assetIds:
           description: Multiple asset identifiers for which to compare availability history.
@@ -603,8 +605,6 @@ parameters:
             
             This parameter is required to have the "ISO 8601" format in order to be considered valid. 
             
-            If the parameter is not specified, the value will be set to the 1st day of the current month.
-            
             The time component of the request is ignored.
           type: string
           example: '2018-05-01T00:00:00.519Z'
@@ -613,8 +613,6 @@ parameters:
             A date value which can be used to specify the end of a timespan.
             
             This parameter is required to have the "ISO 8601" format in order to be considered valid. 
-            
-            If the parameter is not specified, the value will be set to the current date in UTC.
             
             The time component of the request is ignored.
           type: string
@@ -1656,24 +1654,22 @@ paths:
         - $ref: '#/parameters/AssetId'
         - in: query
           name: startDate
+          required: true
           description: >-
             A date value which can be used to specify the beginning of a timespan. 
             
             This parameter is required to have the "ISO 8601" format in order to be considered valid. 
-            
-            If the parameter is not specified, the value will be set to the 1st day of the current month.
             
             The time component of the request is ignored.
           type: string
           x-example: '2018-05-01T00:00:00.519Z'
         - in: query
           name: endDate
+          required: true
           description: >- 
             A date value which can be used to specify the end of a timespan.
             
             This parameter is required to have the "ISO 8601" format in order to be considered valid. 
-            
-            If the parameter is not specified, the value will be set to the current date in UTC.
             
             The time component of the request is ignored.
           type: string
