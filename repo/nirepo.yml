@@ -96,7 +96,8 @@ definitions:
       created:
         description: The date when the job was created.
         type: string
-        example: "2019-01-30T15:09:52.391Z"
+        format: date-time
+        example: '2019-02-11T13:32:06.030958Z'
       resourceId:
         description: The ID of the feed or package which this job created or modified.
         type: string
@@ -165,7 +166,7 @@ definitions:
         $ref: '#/definitions/ErrorObject'
   Platform:
     type: string
-    enum: [WINDOWS, NI_LINUX_RT]
+    enum: [windows, ni_linux_rt]
     description: "Depending on the selected platform, the following package extensions are available: .nipkg for windows feeds, .ipk and .deb for ni-linux-rt feeds."
     example: windows
   PackageImportDescriptor:
@@ -317,6 +318,7 @@ definitions:
         enum:
           - ADD
           - UPGRADE
+        default: ADD
         example: UPGRADE
         description: The operation type.
       fromVersion:
@@ -528,19 +530,19 @@ definitions:
           $ref: '#/definitions/StoreItem'
       pageSize:
         description: The number of the records contained by one page. Maximum is 1000.
-        type: number
+        type: integer
         example: 100
       pageNumber:
         description: The number of the current page.
-        type: number
+        type: integer
         example: 5
       totalPages:
         description: The total number of pages.
-        type: number
+        type: integer
         example: 20
       totalItems:
         description: The total number of items.
-        type: number
+        type: integer
         example: 1975
   StoreItemResponse:
     type: object
@@ -615,10 +617,18 @@ definitions:
           type: string
           description: The ID of a package.
           example: "5c652e1f781e2b05cc4d589e"
+      packageSources:
+        type: array
+        description: IDs and/or external URIs of package sources
+        items:
+          description: The source of a package.
+          type: string
+          example: https://download.ni.com/support/nipkg/products/idne/idnet-ad/17.5/released
       lastUpdated:
         type: string
         description: The date this feed was last updated at.
-        example: "2019-01-28T14:37:55.043000Z"
+        format: date-time
+        example: '2019-02-11T13:32:06.030958Z'
       ready:
         type: boolean
         description: If the job that creates this feed is complete.
@@ -636,6 +646,12 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Feed'
+  FeedObject:
+    description: Contains a feed.
+    type: object
+    properties:
+      feed:
+        $ref: '#/definitions/Feed'
   JobID:
     description: An object containing the Job ID.
     type: object
@@ -707,7 +723,7 @@ definitions:
         description: The website of the maintainers for this package.
         example: "http://www.ni.com"
       installedSize:
-        type: number
+        type: integer
         description: The size of this package after install.
         example: 0
       maintainer:
@@ -722,7 +738,7 @@ definitions:
           type: string
           example: "ni-teststand-2017-tools (>= 17.0.0)"
       priority:
-        type: number
+        type: integer
         description: The priority of the package.
         example: 4
       provides:
@@ -755,7 +771,7 @@ definitions:
         description: The section of the package.
         example: Infrastructure
       size:
-        type: number
+        type: integer
         description: The size of the package in bytes.
         example: 750070
       source:
@@ -816,7 +832,8 @@ definitions:
       lastUpdated:
         type: string
         description: The date this package was last updated.
-        example: "2016-11-02T22:26:33.668Z"
+        format: date-time
+        example: '2019-02-11T13:32:06.030958Z'
       metadata: 
         $ref: '#/definitions/PackageMetadata'
   PackageResponse:
@@ -849,6 +866,7 @@ definitions:
     description: Points to the location of a package sources array.
     properties:
       packageSources:
+        description: IDs and/or external URIs of package sources
         type: array
         items:
           description: The source of a package.
@@ -1005,7 +1023,7 @@ paths:
         200:
           description: The request has succeeded.
           schema:
-            $ref: '#/definitions/Feed'
+            $ref: '#/definitions/FeedObject'
         401:
           $ref: '#/definitions/Unauthorized'
         default:
