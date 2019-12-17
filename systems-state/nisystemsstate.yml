@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  description: "Creates and manages states you can apply applied to managed systems."
+  description: "Creates and manages states you can apply to managed systems."
   version: "1"
   title: "SystemLink Systems State Manager"
   contact:
@@ -299,6 +299,10 @@ definitions:
         type: string
         format: date-time
         example: '2018-05-07T18:58:05.219692Z'
+      workspace:
+        type: string
+        description: The ID of the workspace. This property is available starting with version 3 of the getStates operation.
+        example: '5bc5e9092a4fa4c71cfa7197'
     required:
       - id
       - name
@@ -307,6 +311,7 @@ definitions:
       - architecture
       - createdTimestamp
       - lastUpdatedTimestamp
+      - workspace
 
   StateDescriptionListResponse:
     description: The response containing a list of state metadata.
@@ -330,6 +335,7 @@ definitions:
           architecture: x64
           createdTimestamp: '2018-05-07T18:58:05.219692Z'
           lastUpdatedTimestamp: '2018-05-07T18:58:05.219692Z'
+          workspace: '5bc5e9092a4fa4c71cfa7197'
         - id: '5bcde471fc13379595ce9b13'
           name: emacs
           description: Having Emacs installed on the windows system.
@@ -337,6 +343,7 @@ definitions:
           architecture: x86
           createdTimestamp: '2018-05-07T18:58:05.219692Z'
           lastUpdatedTimestamp: '2018-05-07T18:58:05.219692Z'
+          workspace: '5bc5e9092a4fa4c71cfa7198'
     required:
       - totalCount
       - states
@@ -366,6 +373,10 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Package'
+      workspace:
+        type: string
+        description: The ID of the workspace. This property is available starting with version 3 of the createOrUpdateStates operation.
+        example: '5bc5e9092a4fa4c71cfa7197'
     required:
       - name
       - distribution
@@ -401,6 +412,10 @@ definitions:
         type: string
         description: Description of the change operation.
         example: I've changed the state
+      workspace:
+        type: string
+        description: The ID of the workspace. This property is available starting with version 3 of the createOrUpdateStates operation.
+        example: '5bc5e9092a4fa4c71cfa7197'
 
   StateResponse:
     description: System state object.
@@ -449,6 +464,10 @@ definitions:
         type: boolean
         description: Whether the state contains extra operations in addition to feeds and packages.
         example: true
+      workspace:
+        type: string
+        description: The ID of the workspace. This property is available starting with version 3 of the getStates operation.
+        example: '5bc5e9092a4fa4c71cfa7197'
     required:
       - id
       - name
@@ -458,6 +477,7 @@ definitions:
       - createdTimestamp
       - lastUpdatedTimestamp
       - containsExtraOperations
+      - workspace
 
   StateVersion:
     description: A given version of a state.
@@ -550,11 +570,11 @@ paths:
   /:
     get:
       operationId: HandleGetVersionInfo
-      x-ni-request-all-privileges: true
+      x-ni-auth: true
       summary: API information
       tags: [versioning]
       security: []
-      description: Gets permissions and operations for the States Service.
+      description: Gets permissions and operations for the States Service. This API now includes organizational modeling, starting with version 3 of getStates and createOrUpdateStates operations. This route doesn't return granular permissions, but the operation is available if the current user has the corresponding access to at least one resource, regardless of the workspace. We recommend using the User Service API instead.
       responses:
         200:
           description: OK
@@ -573,9 +593,9 @@ paths:
   /{version}:
     get:
       operationId: RootEndpointWithVersion
-      x-ni-request-all-privileges: true
+      x-ni-auth: true
       summary: API version information
-      description: Returns available operations for a single version of the API.
+      description: Returns available operations for a single version of the API. This API now includes organizational modeling, starting with version 3 of getStates and createOrUpdateStates operations. This route doesn't return granular permissions, but the operation is available if the current user has the corresponding access to at least one resource, regardless of the workspace. We recommend using the User Service API instead.
       tags: [versioning]
       security: []
       parameters:
@@ -597,7 +617,7 @@ paths:
   /v1/states:
     get:
       operationId: GetStates
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getStates
       tags: [states]
       summary: Get all system states
@@ -626,7 +646,7 @@ paths:
           $ref: '#/responses/Error'
     post:
       operationId: CreateState
-      x-ni-privilege: nisystemsstate.Write
+      x-ni-auth: true
       x-ni-operation: createOrUpdateStates
       tags: [states]
       summary: Create a new system state
@@ -654,11 +674,11 @@ paths:
   /v1/states/{id}:
     get:
       operationId: GetState
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getStates
       tags: [states]
       summary:  Get system state
-      description: Returns the metadata, feeds, and packages from the state content. If the state contains only feed and package entries, the containsExtraOperations property of the response will be false. Otherwise, it will be true. You may use the export route to get all state content.
+      description: Returns the metadata, feeds, and packages from the state content. If the state contains only feed and package entries, the containsExtraOperations property of the response will be false. You may use the export route to get all state content.
       parameters:
         - name: id
           in: path
@@ -678,7 +698,7 @@ paths:
             $ref: '#/responses/Error'
     patch:
       operationId: UpdateState
-      x-ni-privilege: nisystemsstate.Write
+      x-ni-auth: true
       x-ni-operation: createOrUpdateStates
       consumes:
         - application/merge-patch+json
@@ -714,7 +734,7 @@ paths:
           $ref: '#/responses/Error'
     delete:
       operationId: DeleteState
-      x-ni-privilege: nisystemsstate.Write
+      x-ni-auth: true
       x-ni-operation: deleteStates
       tags: [states]
       summary: Delete state
@@ -737,7 +757,7 @@ paths:
   /v1/replace-state-content:
     post:
       operationId: ReplaceContent
-      x-ni-privilege: nisystemsstate.Write
+      x-ni-auth: true
       x-ni-operation: createOrUpdateStates
       tags: [states]
       summary: Replace the content of a state
@@ -775,7 +795,7 @@ paths:
   /v1/states/{id}/history:
     get:
       operationId: GetStateHistory
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getStates
       tags: [history]
       summary: Get state history
@@ -812,11 +832,11 @@ paths:
   /v1/states/{id}/history/{version}:
     get:
       operationId: GetStateVersion
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getStates
       tags: [history]
       summary: Get state by version
-      description: Returns the snapshot of a state at a specific version. Returns the metadata, feeds, and packages from the state content. If the state contains only feed and package entries, the containsExtraOperations property of the response will be false. Otherwise, it will be true. You may use the export route to get all state content.
+      description: Returns the snapshot of a state at a specific version. Returns the metadata, feeds, and packages from the state content. If the state contains only feed and package entries, the containsExtraOperations property of the response will be false. You may use the export route to get all state content.
       parameters:
         - name: id
           in: path
@@ -842,7 +862,7 @@ paths:
   /v1/export-state:
     post:
       operationId: ExportState
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getStates
       tags: [states]
       summary: Export a state
@@ -873,7 +893,7 @@ paths:
   /v1/import-state:
     post:
       operationId: ImportState
-      x-ni-privilege: nisystemsstate.Write
+      x-ni-auth: true
       x-ni-operation: createOrUpdateStates
       tags: [states]
       summary: Import a state
@@ -907,6 +927,9 @@ paths:
             - x64
             - x86
           required: true
+        - in: formData
+          name: workspace
+          type: string
       responses:
         201:
           description: Created
@@ -923,7 +946,7 @@ paths:
   /v1/export-state-from-system:
     post:
       operationId: ExportStateFromSystem
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getStates
       tags: [states]
       summary: Export the state of a system by providing its ID.
@@ -954,7 +977,7 @@ paths:
   /v1/delete-states:
     post:
       operationId: DeleteStates
-      x-ni-privilege: nisystemsstate.Write
+      x-ni-auth: true
       x-ni-operation: deleteStates
       tags: [states]
       summary: Delete states
@@ -984,7 +1007,7 @@ paths:
   /v1/revert-state-version:
     post:
       operationId: RevertStateToVersion
-      x-ni-privilege: nisystemsstate.Write
+      x-ni-auth: true
       x-ni-operation: createOrUpdateStates
       tags: [history]
       summary: Revert a state
