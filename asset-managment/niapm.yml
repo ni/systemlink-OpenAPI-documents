@@ -1885,7 +1885,7 @@ paths:
       summary: Query Asset Utilization
       description: Retrieves asset utilization matching the provided filters.
       operationId: read-asset-utilization
-      x-ni-operation: readAssetUtilization
+      x-ni-operation: readAssets
       x-ni-privilege: Read
       parameters:
         - $ref: '#/parameters/QueryAssetUtilizationRequest'
@@ -1906,7 +1906,7 @@ paths:
       summary: Query Asset Utilization Historical Data
       description: Retrieves historical asset utilization data matching the provided filters. An empty request body queries all historical asset utilization data.
       operationId: query-asset-utilizations
-      x-ni-operation: readAssetUtilization
+      x-ni-operation: readAssets
       x-ni-privilege: Read
       parameters:
         - $ref: '#/parameters/QueryAssetUtilizationHistoryRequest'
