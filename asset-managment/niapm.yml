@@ -1877,8 +1877,6 @@ paths:
           $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          $ref: '#/responses/NotFound'
         default:
           $ref: '#/responses/Error'
   /v1/query-asset-utilization:
