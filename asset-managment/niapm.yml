@@ -561,7 +561,7 @@ parameters:
     required: true
     x-example: "29162;01B245D6;4243;0"
   Skip:
-    in: path
+    in: query
     name: skip
     description:
       The number of resources to skip in the result when paging.
@@ -571,7 +571,7 @@ parameters:
     required: true
     x-example: 0
   Take:
-    in: path
+    in: query
     name: take
     description:
       How many resources to return in the result, or -1 to use a default
