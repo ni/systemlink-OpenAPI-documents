@@ -910,6 +910,12 @@ paths:
           description: Number of entries to include in the response list. Typically used in combination with the skip parameter to implement pagination.
           type: integer
           default: 100000
+        - in: query
+          name: workspace
+          description: Workspace to search for tags
+          type: string
+          required: false
+          x-example: "b71390c0-977b-4153-a939-487b0b7a1fa5"
       responses:
         200:
           $ref: '#/responses/GetTagsResponse'
@@ -981,11 +987,46 @@ paths:
           description: Number of entries to include in the response list. Typically used in combination with the skip parameter to implement pagination.
           type: integer
           default: 100000
-  /v2/tags-with-values/{path}:
+        - in: query
+          name: workspace
+          description: Workspace to search for tags
+          type: string
+          required: false
+          x-example: "b71390c0-977b-4153-a939-487b0b7a1fa5"
+  /v2/tags-with-values/{workspace}/{path}:
     get:
       tags:
         - tags
       description: Get a tag and its value
+      summary: Returns a tag and its current value
+      operationId: GetTagWithValueInWorkspace
+      parameters:
+        - in: path
+          name: workspace
+          type: string
+          required: true
+          x-example: "b71390c0-977b-4153-a939-487b0b7a1fa5"
+        - in: path
+          name: path
+          type: string
+          required: true
+          x-example: my-tag-1
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/TagWithValue'
+          description: Success
+        400:
+          description: Bad Request
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags-with-values/{path}:
+    get:
+      tags:
+        - tags
+      description: Get a tag and its value from the default workspace
       summary: Returns a tag and its current value
       operationId: GetTagWithValue
       parameters:
@@ -1075,13 +1116,41 @@ paths:
       tags:
         - tags
       summary: Get the aggregates and current value of a tag
-      description: Returns the current aggregate values for the tag at the path.
+      description: Returns the current aggregate values for the tag at the path from the default workspace.
       operationId: GetTagValues
       parameters:
         - in: path
           name: path
           type: string
           required: true
+          x-example: my-tag-1
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/TagCurrentAndAggregateValue'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{workspace}/{path}/values:
+    get:
+      tags:
+        - tags
+      summary: Get the aggregates and current value of a tag
+      description: Returns the current aggregate values for the tag at the path.
+      operationId: GetTagValuesInWorkspace
+      parameters:
+        - in: path
+          name: workspace
+          type: string
+          required: true
+          x-example: "b71390c0-977b-4153-a939-487b0b7a1fa5"
+        - in: path
+          name: path
+          type: string
+          required: true
+          x-example: my-tag-1
       responses:
         200:
           description: Success
@@ -1288,7 +1357,7 @@ paths:
       tags:
         - tag aggregates
       summary: Reset the aggregates of a tag
-      description: Resets aggregate values for a tag.
+      description: Resets aggregate values for a tag from the default workspace.
       operationId: ResetTagAggregates
       parameters:
         - in: path
@@ -1296,6 +1365,35 @@ paths:
           description: Tag path
           type: string
           required: true
+          x-example: my-tag-1
+      responses:
+        200:
+          description: Success
+        204:
+          description: No content (Sent only from SystemLink Server)
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/{workspace}/{path}/reset-aggregates:
+    post:
+      tags:
+        - tag aggregates
+      summary: Reset the aggregates of a tag
+      description: Resets aggregate values for a tag.
+      operationId: ResetTagAggregatesInWorkspace
+      parameters:
+        - in: path
+          name: workspace
+          type: string
+          required: true
+          x-example: "b71390c0-977b-4153-a939-487b0b7a1fa5"
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+          x-example: my-tag-1
       responses:
         200:
           description: Success
@@ -1413,6 +1511,87 @@ paths:
           schema:
             $ref: '#/definitions/TagQuery'
           required: true
+  /v2/tags/{workspace}/{path}:
+    put:
+      tags:
+        - tags
+      summary: Create or replace a tag in the given workspace
+      description: Replaces the tag at the location path specifies. If a tag does not exist where the path specifies, one is created.
+      operationId: CreateOrReplaceTagInWorkspace
+      parameters:
+        - in: path
+          name: workspace
+          description: Workspace
+          type: string
+          required: true
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+        - in: body
+          name: tag
+          description: Tag to create or replace. A complete resource representation must be sent (no partial updates).
+          schema:
+            $ref: '#/definitions/Tag'
+          required: true
+      responses:
+        201:
+          description: 'Created: Tag created successfully'
+        204:
+          description: 'No Content: Tag replaced successfully'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    get:
+      tags:
+        - tags
+      summary: Get a tag from the given workspace
+      description: Returns the metadata for a tag.
+      operationId: GetTagInWorkspace
+      parameters:
+        - in: path
+          name: workspace
+          description: Workspace
+          type: string
+          required: true
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Tag'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags:
+        - tags
+      summary: Delete a tag from the given workspace
+      description: Deletes a tag
+      operationId: DeleteTagInWorkspace
+      parameters:
+        - in: path
+          name: workspace
+          description: Workspace
+          type: string
+          required: true
+        - in: path
+          name: path
+          description: Tag path
+          type: string
+          required: true
+      responses:
+        204:
+          description: 'No content: Tag deleted successfully'
+        default:
+          $ref: '#/responses/Error'
 
 definitions:
   Error:
@@ -1502,6 +1681,12 @@ definitions:
       count:
         description: Count value from the tag's aggregates
         type: integer
+      workspace:
+        type: string
+    example:
+      path: foo
+      count: 1
+      workspace: "f0144202-52d5-4861-98fa-615ed4b2f751"
   TagPathWithCurrentAndAggregateValue:
     description: Tag path with its current value and aggregates
     type: object
@@ -1513,6 +1698,8 @@ definitions:
         $ref: '#/definitions/TimestampedTagValue'
       aggregates:
         $ref: '#/definitions/V2TagAggregates'
+      workspace:
+        type: string
     example:
       path: foo
       current:
@@ -1524,6 +1711,7 @@ definitions:
         max: "5.0"
         avg: 2.0
         count: 5
+      workspace: "f0144202-52d5-4861-98fa-615ed4b2f751"
   TagPathWithTimestampedValue:
     description: Tag path with timestamped value
     type: object
@@ -1534,6 +1722,16 @@ definitions:
         description: Tag path
       current:
         $ref: '#/definitions/TimestampedTagValue'
+      workspace:
+        type: string
+    example:
+      path: foo
+      current:
+        value:
+          type: DOUBLE
+          value: "3.14"
+        timestamp: '2018-09-04T18:45:08Z'
+      workspace: "f0144202-52d5-4861-98fa-615ed4b2f751"
   TagPathWithValue:
     description: Tag path with value
     type: object
@@ -1544,6 +1742,14 @@ definitions:
         description: Tag path
       current:
         $ref: '#/definitions/TagValue'
+      workspace:
+        type: string
+    example:
+      path: foo
+      current:
+        type: DOUBLE
+        value: "3.14"
+      workspace: "f0144202-52d5-4861-98fa-615ed4b2f751"
   TagPathWithTimestamp:
     type: object
     title: Tag Path with Timestamp
@@ -1556,6 +1762,12 @@ definitions:
         example: '2018-09-04T18:45:08Z'
       path:
         type: string
+      workspace:
+        type: string
+    example:
+      timestamp: '2018-09-04T18:45:08Z'
+      path: foo
+      workspace: "f0144202-52d5-4861-98fa-615ed4b2f751"
   TagPathWithMaxAggregate:
     type: object
     title: Tag Path With Max Aggregate
@@ -1565,6 +1777,12 @@ definitions:
       max:
         description: Maximum value from the tag's aggregates
         type: string
+      workspace:
+        type: string
+    example:
+      path: foo
+      max: "1"
+      workspace: "f0144202-52d5-4861-98fa-615ed4b2f751"
   TagPathWithMinAggregate:
     type: object
     title: Tag Path with Min Aggregate
@@ -1574,6 +1792,12 @@ definitions:
       min:
         description: Minimum value from the tag's aggregates
         type: string
+      workspace:
+        type: string
+    example:
+      path: foo
+      min: "1"
+      workspace: "f0144202-52d5-4861-98fa-615ed4b2f751"
   TagPathWithMeanAggregate:
     type: object
     title: Tag Path with Mean Aggregate
@@ -1584,6 +1808,12 @@ definitions:
         description: Mean value from the tag's aggregates
         type: number
         format: double
+      workspace:
+        type: string
+    example:
+      path: foo
+      avg: 1
+      workspace: "f0144202-52d5-4861-98fa-615ed4b2f751"
   TagQuery:
     type: object
     title: Tag Query
@@ -1631,13 +1861,15 @@ definitions:
           - keywords: Tag keywords. Example: keywords.Contains(x)
 
           - properties: Tag properties. Example: properties['x'] = 'y'
+
+          - workspace : The workspace of the tags. Example: 88974b87-07d4-4f84-b54f-48eec89b11ed
       orderBy:
         description: >-
           The tag value property to order results by; value and timestamp are from the current tag value.
           When ordering by value, tags will be grouped by type, first numbers (INT, DOUBLE, U_INT64), then strings,
           then booleans, then times. Null values will be at the end of the list regardless of type.
         type: string
-        enum: [PATH, VALUE, TIMESTAMP]
+        enum: [PATH, VALUE, TIMESTAMP, WORKSPACE]
         default: PATH
       descending:
         description: A Boolean that determines whether to return the tags in descending order
@@ -1767,6 +1999,8 @@ definitions:
           type: string
       collectAggregates:
         type: boolean
+      workspace:
+        type: string
     example:
       type: DOUBLE
       properties:
@@ -1775,6 +2009,7 @@ definitions:
       path: foo
       keywords: [fooKeyword, barKeyword]
       collectAggregates: true
+      workspace: "10e020d7-64df-45e9-b717-c537f374ca2f"
   TagUpdate:
     description: Object containing a tag's path, and one or more values to update the tag with at times you specify.
     type: object
@@ -1787,6 +2022,8 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/TimestampedTagValue'
+      workspace:
+        type: string
     example:
       path: foo
       updates:
@@ -1798,6 +2035,7 @@ definitions:
             type: DOUBLE
             value: "5.0"
           timestamp: '2018-09-04T18:45:08Z'
+      workspace: "bbcd6db8-10f6-4caf-af28-81157b741a5a"
   V1SubscriptionUpdate:
     description: Updates for a subscriptions
     type: object
@@ -1942,10 +2180,14 @@ definitions:
       alias:
         description: Name of the subscription
         type: string
+      workspace:
+        description: Workspace of the tags to subscribe to
+        type: string
     example:
       updatesOnly: true
       tags: [tag1, tag2, tag3]
       alias: foo
+      workspace: "3e884a30-5623-4403-932b-375a715ef065"
   SubscriptionIds:
     type: object
     properties:
@@ -1971,7 +2213,11 @@ definitions:
         default: 900
       id:
         type: string
+      workspace:
+        description: Workspace of the tags to select
+        type: string
     example:
       searchPaths: [tag1, tag2, tag3]
       inactivityTimeout: 1000
       id: 22520497-e85b-427f-980c-ca328fc72f75
+      workspace: "3e884a30-5623-4403-932b-375a715ef065"
