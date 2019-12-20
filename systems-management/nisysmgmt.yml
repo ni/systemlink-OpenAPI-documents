@@ -210,6 +210,13 @@ definitions:
         description: Whether to activate the systems or not.
         default: false
         example: true
+      workspaces:
+        description: List containing the corresponding workspace for each system credential information.
+        type: array
+        items:
+          type: string
+          description: The ID of the workspace.
+          example: '5bc5e9092a4fa4c71cfa7197'
     required: [systemsCredentials]
 
   SystemCredentials:
@@ -691,6 +698,10 @@ definitions:
         description: The alias of the system.
         type: string
         example: testVM
+      workspace:
+        type: string
+        description: The ID of the workspace.
+        example: '5bc5e9092a4fa4c71cfa7197'
       activation:
         description: Activation information.
         type: object
@@ -846,7 +857,7 @@ definitions:
             example:
               owner: admin
         required: [lastUpdatedTimestamp, data]
-    required: [id, createdTimestamp, lastUpdatedTimestamp, connected]
+    required: [id, createdTimestamp, lastUpdatedTimestamp, connected, workspace]
 
   ReportType:
     title: Report Type
@@ -1040,6 +1051,10 @@ definitions:
               type: string
               description: A string representing the public authorization key. If this field is specified, verification that the system ID is associated with this auth key will happen before the desired action is executed.
               example: -----BEGIN PUBLIC KEY-----↵MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFgEKiRwWBD/QSDHCpNQ↵Zml9q224YzIxG6reByDV16BNsQoH0lc2bT9LZ7o6xf6dTpQl7shIMc/abSAcl4/F↵VpKguH1yRmOG2Nhout/9wMP6kYBTlThzpop93rlxIo/I7nDkQDz07cMhNWYDvrut↵PVnjRg70xOCAzQRCHRy4GW3TLvfp2WAbCuoQ5oPHQLx+YBSRYDcgfo9jiW8vNzt4↵Bcg72c2PmHEJjGslzJeqcKdRjK0z4/VFgLYfMUBz4LCoy7DohU/uc9ZbHSlOy/BK↵1/S8O1vUyk8DEq+/kQumJWKh1Cl0SWcZGSDkdhQhoTiWqXGb1BBtU7vkxYgQoYjM↵rwIDAQAB↵-----END PUBLIC KEY-----
+            workspace:
+              type: string
+              description: The ID of the workspace.
+              example: '5bc5e9092a4fa4c71cfa7197'
           required: [id, action]
         required: [keyActions]
 
@@ -1068,6 +1083,10 @@ definitions:
         description: The new  alias of the system.
         type: string
         example: testVM
+      workspace:
+        type: string
+        description: The ID of the workspace.
+        example: '5bc5e9092a4fa4c71cfa7197'
 
   QueryAvailablePackagesRequest:
     title: Get Available Packages Request
@@ -1626,7 +1645,7 @@ paths:
   /:
     get:
       operationId: HandleGetVersionInfo
-      x-ni-request-all-privileges: true
+      x-ni-auth: true
       summary: API information
       tags: [versioning]
       security: []
@@ -1649,7 +1668,7 @@ paths:
   /{version}:
     get:
       operationId: RootEndpointWithVersion
-      x-ni-request-all-privileges: true
+      x-ni-auth: true
       summary: API version information
       description: Returns available operations for a single version of the API.
       tags: [versioning]
@@ -1674,9 +1693,9 @@ paths:
     post:
       operationId: CreateJob
       x-ni-auth: true
-      x-ni-privilege: Write
       x-ni-operation: createOrCancelJobs
       x-ni-request-timeout: 300000
+      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       tags: [jobs]
       summary: Create a job
       description: Create a job and returns the newly created job including the job ID.
@@ -1700,7 +1719,7 @@ paths:
           $ref: '#/responses/Error'
     get:
       operationId: GetJobs
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getJobs
       x-ni-request-timeout: 120000
       tags: [jobs]
@@ -1741,7 +1760,7 @@ paths:
   /v1/systems:
     get:
       operationId: GetSystems
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       x-ni-request-timeout: 120000
       tags: [systems]
@@ -1769,7 +1788,7 @@ paths:
   /v1/register-systems:
     post:
       operationId: RegisterSystems
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: manageSystems
       tags: [systems]
       summary: Register systems
@@ -1795,9 +1814,10 @@ paths:
   /v1/remove-systems:
     post:
       operationId: UnregisterSystems
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-request-timeout: 180000
       x-ni-operation: manageSystems
+      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       tags: [systems]
       summary: Unregister Systems
       description: Request to unregister systems.
@@ -1823,10 +1843,8 @@ paths:
     post:
       operationId: CancelJobs
       x-ni-auth: true
-      x-ni-privilege: Write
       x-ni-operation: createOrCancelJobs
       x-ni-request-timeout: 120000
-      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       tags: [jobs]
       summary: Cancel jobs
       description: Cancel jobs that are running on systems. This won't stop the jobs from executing on systems if the jobs have already been dispatched to the systems.
@@ -1855,7 +1873,7 @@ paths:
   /v1/activate-systems:
     post:
       operationId: ActivateSystems
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: activateSystems
       x-ni-request-timeout: 120000
       tags: [systems]
@@ -1889,7 +1907,7 @@ paths:
   /v1/get-discovered-systems:
     get:
       operationId: GetDiscoveredSystems
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       tags: [systems]
       summary: Get discovered systems
@@ -1908,7 +1926,7 @@ paths:
   /v1/get-systems-summary:
     get:
       operationId: GetSystemsSummary
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       tags: [systems]
       summary: Get systems summary
@@ -1925,7 +1943,7 @@ paths:
   /v1/get-jobs-summary:
     get:
       operationId: GetJobsSummary
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getJobs
       tags: [jobs]
       summary: Get jobs summary
@@ -1942,7 +1960,7 @@ paths:
   /v1/configure-feeds:
     post:
       operationId: ConfigureAndUpdateMultipleFeeds
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-request-timeout: 360000
       x-ni-operation: manageFeeds
       tags: [feeds]
@@ -1969,7 +1987,7 @@ paths:
   /v1/get-discovered-systems-summary:
     get:
       operationId: GetDiscoveredSystemsSummary
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       tags: [systems]
       summary: Get discovered systems summary
@@ -1986,7 +2004,7 @@ paths:
   /v1/get-pending-systems-summary:
     get:
       operationId: GetPendingSystemsSummary
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       x-ni-request-timeout: 120000
       tags: [systems]
@@ -2004,7 +2022,7 @@ paths:
   /v1/generate-systems-report:
     post:
       operationId: GetSystemsReport
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       x-ni-request-timeout: 120000
       tags: [systems]
@@ -2038,7 +2056,7 @@ paths:
   /v1/create-groups:
     post:
       operationId: CreateGroups
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: createOrUpdateGroups
       tags: [groups]
       summary: Create groups
@@ -2068,7 +2086,7 @@ paths:
   /v1/groups:
     get:
       operationId: GetGroups
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getGroups
       tags: [groups]
       summary: Get groups
@@ -2096,7 +2114,7 @@ paths:
   /v1/remove-groups:
     post:
       operationId: RemoveGroups
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: createOrUpdateGroups
       tags: [groups]
       summary: Remove groups
@@ -2127,7 +2145,7 @@ paths:
   /v1/add-systems-to-groups:
     post:
       operationId: AddSystemsToGroups
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: createOrUpdateGroups
       tags: [groups]
       summary: Add systems to groups
@@ -2155,7 +2173,7 @@ paths:
   /v1/remove-systems-from-groups:
     post:
       operationId: RemoveSystemsFromGroups
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: createOrUpdateGroups
       tags: [groups]
       summary: Remove systems from groups
@@ -2183,7 +2201,7 @@ paths:
   /v1/obtain-systems-info:
     post:
       operationId: GetSystemsInfo
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       tags: [systems]
       summary: Get systems info
@@ -2213,7 +2231,7 @@ paths:
   /v1/get-systems-keys:
     get:
       operationId: GetSystemsKeys
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-request-timeout: 120000
       tags: [systems]
       x-ni-operation: getSystems
@@ -2231,7 +2249,7 @@ paths:
   /v1/manage-systems-keys:
     post:
       operationId: ManageSystemsKeys
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-request-timeout: 300000
       x-ni-operation: manageSystems
       tags: [systems]
@@ -2260,7 +2278,7 @@ paths:
   /v1/systems/managed/{id}:
     patch:
       operationId: UpdateMetadata
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: updateSystemMetadata
       consumes:
         - application/merge-patch+json
@@ -2296,7 +2314,7 @@ paths:
   /v1/query-available-packages:
     post:
       operationId: GetAvailablePackagesByQuery
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-request-timeout: 300000
       x-ni-operation: manageFeeds
       tags: [feeds]
@@ -2327,7 +2345,7 @@ paths:
   /v1/query-jobs:
     post:
       operationId: GetJobsByQuery
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getJobs
       x-ni-request-timeout: 120000
       tags: [jobs]
@@ -2356,7 +2374,7 @@ paths:
   /v1/query-systems:
     post:
       operationId: GetSystemsByQuery
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       x-ni-request-timeout: 120000
       tags: [systems]
