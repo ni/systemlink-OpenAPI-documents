@@ -832,6 +832,7 @@ parameters:
   ServicePolicyUpdateRequestBody:
     in: body
     name: servicePolicyUpdateRequest
+    required: true
     description: The request to update properties of the current service policy.
     schema:
       $ref: '#/definitions/ServicePolicyModel'
