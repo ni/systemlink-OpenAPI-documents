@@ -504,6 +504,15 @@ definitions:
       - INLINE
       - DOWNLOAD
       - FILE_SERVICE
+  QueryHistoryRequestModel:
+    title: Query History Request Model
+    description: Object containing options for querying history.
+    type: object
+    properties:
+      responseFormat:
+        $ref: '#/definitions/ResponseFormat'
+      destination:
+        $ref: '#/definitions/Destination'
   ServicePolicyModel:
     title: Service policy
     description: An object containing the service policy.
@@ -821,14 +830,7 @@ parameters:
     name: queryHistory
     description: Request body consisting of options to be used for querying history for an asset.
     schema:
-      title: Query History Request Body
-      description: Object containing options for querying history.
-      type: object
-      properties:
-        responseFormat:
-          $ref: '#/definitions/ResponseFormat'
-        destination:
-          $ref: '#/definitions/Destination'
+      $ref: '#/definitions/QueryHistoryRequestModel'
   ServicePolicyUpdateRequestBody:
     in: body
     name: servicePolicyUpdateRequest
