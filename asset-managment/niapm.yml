@@ -732,6 +732,10 @@ parameters:
           type: integer
           default: -1
           maximum: 1000
+        calibratableOnly:
+          description: Whether to generate a report with calibrated asset specific columns.
+          type: boolean
+          default: false
         filter:
           description: >-
             The filter criteria for assets. Consists of a string of queries composed using AND/OR operators.
@@ -1607,7 +1611,7 @@ paths:
     post:
       tags: [assets]
       summary: Query assets
-      description: Returns the assets satisfying the provided filtering criteria. If the the caller requests a JSON inline response, the returned assets are filtered based on the filter string and the ids property is not taken into consideration. When the caller requests a CSV response, the filter is not taken into consideration, but the ids property can used to filter the assets from the response.
+      description: Returns the assets satisfying the provided filtering criteria. If the the caller requests a JSON inline response, the returned assets are filtered based on the filter string and the ids and calibratableOnly properties are not taken into consideration. When the caller requests a CSV response, the filter is not taken into consideration, but the ids and calibratableOnly properties are used to filter the assets from the response.
       operationId: query-assets
       x-ni-operation: readAssets
       x-ni-privilege: Read
@@ -1761,7 +1765,7 @@ paths:
     post:
       tags: [assets]
       summary: Queries asset calibration history
-      description: Computes the calibration history of an asset in CSV format. If the destination is download, the response will contain the calibration history file content. If the destination is file ingestion, the CSV file is sent to the file storing service and an object containing the file identifier is returned. Any other format and destination combinations are not supported yet.
+      description: Computes the calibration history of an asset in CSV format. If the destination is download, the response will contain the calibration history file content. If the destination is file ingestion service, the CSV file is sent to the file storing service and an object containing the file identifier is returned. Any other format and destination combinations are not supported yet.
       operationId: post-asset-query-calibration-history
       x-ni-operation: readAssets
       x-ni-priviledge: Read
@@ -1785,7 +1789,7 @@ paths:
     post:
       tags: [assets]
       summary: Queries asset location history
-      description: Computes the location history of an asset in CSV format. If the destination is download, the response will contain the location history file content. If the destination is file ingestion, the CSV file is sent to the file storing service and an object containing the file identifier is returned. Any other format and destination combinations are not supported yet.
+      description: Computes the location history of an asset in CSV format. If the destination is download, the response will contain the location history file content. If the destination is file ingestion service, the CSV file is sent to the file storing service and an object containing the file identifier is returned. Any other format and destination combinations are not supported yet.
       operationId: post-asset-query-location-history
       x-ni-operation: readAssets
       x-ni-priviledge: Read
