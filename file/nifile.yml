@@ -146,6 +146,10 @@ definitions:
         type: integer
         format: int64
         example: 7277
+      workspace:
+        description: The workspace the file belongs to
+        type: string
+        example: MyWorkspace
   ServiceGroup:
     type: object
     properties:
@@ -684,6 +688,9 @@ paths:
                   type: string
                 example:
                   key: value
+              workspace:
+                description: This is an optional value. When specified, the workspace of the metadata will be updated to the new value.
+                type: string
             required:
               - replaceExisting
               - properties

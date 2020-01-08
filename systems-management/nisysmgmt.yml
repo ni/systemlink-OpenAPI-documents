@@ -13,6 +13,10 @@ consumes: [application/json]
 produces: [application/json]
 
 securityDefinitions:
+  apiKeyAuth:
+    type: apiKey
+    name: x-ni-api-key
+    in: header
   basicAuth:
     type: basic
   cookieAuth:
@@ -21,6 +25,7 @@ securityDefinitions:
     name: Cookie
 
 security:
+  - apiKeyAuth: []
   - basicAuth: []
   - cookieAuth: []
 
@@ -635,10 +640,30 @@ definitions:
         format: date-time
         example: '2019-02-11T13:32:06.030958Z'
       data:
-        description: This map is used for grains/packages/feeds. All these are heterogeneous (integers, booleans, lists, dictionaries, ...) collections containing open-ended properties and flags.
+        description: This map is used for grains/feeds. All these are heterogeneous (integers, booleans, lists, dictionaries, ...) collections containing open-ended properties and flags.
         type: object
         additionalProperties:
           type: object
+        example:
+          key: value
+    required: [lastUpdatedTimestamp, data]
+
+  ManagedSystemPackagesData:
+    description: Property of a system composed by the last updated timestamp and a dictionary with the actual packages installed on the system.
+    type: object
+    properties:
+      lastUpdatedTimestamp:
+        description: Last updated timestamp.
+        type: string
+        format: date-time
+        example: '2019-02-11T13:32:06.030958Z'
+      data:
+        description: Installed packages. The key of the dictionary is the name of the package, and the value is a dictionary with open-ended properties and flags
+        type: object
+        additionalProperties:
+          type: object
+          additionalProperties:
+            type: object
         example:
           key: value
     required: [lastUpdatedTimestamp, data]
@@ -712,7 +737,7 @@ definitions:
             osrelease: 7
       packages:
         description: Software packages installed on the system.
-        $ref: '#/definitions/ManagedSystemDataPropertyMap'
+        $ref: '#/definitions/ManagedSystemPackagesData'
         example:
           lastUpdatedTimestamp: '2019-02-19T11:42:25.078Z'
           data:
@@ -1318,7 +1343,9 @@ definitions:
 
           - getGroups: The ability to retrieve the groups.
 
-          - manageSystems: The ability to register or unregister systems.
+          - manageSystems: The ability to manage keys and unregister systems.
+
+          - discoverSystems: The ability to discover and register systems.
 
           - createOrCancelJobs: The ability to create or cancel jobs.
 
@@ -1339,6 +1366,8 @@ definitions:
           getGroups:
             $ref: '#/definitions/Operation'
           manageSystems:
+            $ref: '#/definitions/Operation'
+          discoverSystems:
             $ref: '#/definitions/Operation'
           createOrCancelJobs:
             $ref: '#/definitions/Operation'
@@ -1553,7 +1582,7 @@ definitions:
         example: 'lastUpdatedTimestamp descending'
         description: The order in which data returns.
 
-  QueryResponse:
+  QueryJobsResponse:
     description: Response of a query request.
     title: Query Response
     properties:
@@ -1564,6 +1593,28 @@ definitions:
           type: object
         example:
           - jid: '20190211135234448026_28320'
+      count:
+        description: The total number of resources that matched the query.
+        type: integer
+        format: int64
+        example: 1
+    required: [data, count]
+
+  QuerySystemsResponse:
+    description: Response of a query systems request.
+    title: Query Systems response
+    properties:
+      data:
+        description: The data returned by query.
+        type: array
+        items:
+          type: object
+        example:
+          id: 'NI_PXIe-8880--SN-030A5D78--MAC-00-80-2F-21-C6-86'
+          grains:
+            data:
+              key: 'value'
+          lastUpdatedTimestamp: '2019-10-29T10:47:04.596+02:00'
       count:
         description: The total number of resources that matched the query.
         type: integer
@@ -1665,7 +1716,7 @@ paths:
           name: state
           description: A string defining the job state.
           type: string
-          x-example: Succeeded
+          x-example: SUCCEEDED
         - in: query
           name: fun
           description: A string defining the function executed by the job.
@@ -2063,6 +2114,8 @@ paths:
           $ref: '#/responses/PartialSuccess'
         204:
           description: No Content.
+        400:
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -2245,7 +2298,7 @@ paths:
       x-ni-request-timeout: 300000
       x-ni-operation: manageFeeds
       tags: [feeds]
-      summary: Get Available Packages
+      summary: Query packages
       description: Get available packages for a set of system configurations. If multiple system configurations are provided, only packages available to all applicable systems are returned. If OS architectures are provided, only the package with highest priority will be returned for packages of equal version.
       parameters:
         - in: body
@@ -2276,7 +2329,7 @@ paths:
       x-ni-operation: getJobs
       x-ni-request-timeout: 120000
       tags: [jobs]
-      summary: Get jobs by query
+      summary: Query jobs
       description: Get jobs by query.
       parameters:
         - in: body
@@ -2289,7 +2342,9 @@ paths:
         200:
           description: OK.
           schema:
-            $ref: '#/definitions/QueryResponse'
+            $ref: '#/definitions/QueryJobsResponse'
+        400:
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -2303,7 +2358,7 @@ paths:
       x-ni-operation: getSystems
       x-ni-request-timeout: 120000
       tags: [systems]
-      summary: Get systems by query.
+      summary: Query systems
       description: Get systems by query.
       parameters:
         - in: body
@@ -2316,7 +2371,9 @@ paths:
         200:
           description: OK.
           schema:
-            $ref: '#/definitions/QueryResponse'
+            $ref: '#/definitions/QuerySystemsResponse'
+        400:
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
         404:

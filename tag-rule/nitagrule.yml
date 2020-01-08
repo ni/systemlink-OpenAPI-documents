@@ -13,9 +13,14 @@ consumes:
 produces:
   - application/json
 securityDefinitions:
+  apiKeyAuth:
+    type: apiKey
+    name: x-ni-api-key
+    in: header        
   basicAuth:
     type: basic
 security:
+  - apiKeyAuth: []        
   - basicAuth: []
 x-ni-routing-key: Skyline.TagRuleEngine
 definitions:

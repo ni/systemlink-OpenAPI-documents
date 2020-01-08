@@ -165,6 +165,8 @@ definitions:
             $ref: '#/definitions/Operation'
           deleteManyProducts:
             $ref: '#/definitions/Operation'
+          queryPaths:
+            $ref: '#/definitions/Operation'
   StatusObject:
     title: Status Object
     description: Status object comprised of a type and display name
@@ -267,6 +269,33 @@ definitions:
       - HAS_CHILDREN
     example:
       STEP_TYPE
+  PathField:
+    title: Path Field
+    description: An enumeration of all fields in a Path.
+    type: string
+    enum:
+      - ID
+      - PROGRAM_NAME
+      - PART_NUMBER
+      - PATH
+      - PATH_NAMES
+      - INPUTS
+      - OUTPUTS
+      - MEASUREMENTS
+    example:
+      PROGRAM_NAME
+  ValueType:
+    title: Value Type
+    description: An enumeration of the possible types of variant values.
+    type: string
+    enum:
+      - MIXED
+      - NULL
+      - BOOLEAN
+      - NUMBER
+      - STRING
+      - ARRAY
+      - OBJECT
   ResponseFormat:
     title: Response Format
     description: Enum indicating the expected response format (CSV or JSON). If unspecified, JSON is the default.
@@ -626,6 +655,71 @@ definitions:
         description: Determine test result status from the test step statuses
         type: boolean
         default: false
+  ValueSummaryObject:
+    title: Value Summary
+    type: object
+    properties:
+      type:
+        $ref: '#/definitions/ValueType'
+      min:
+        description: The minimum recorded value, if ValueType is "NUMBER."
+        type: number
+        example: 1.3
+      max:
+        description: The maximum recorded value, if ValueType is "NUMBER."
+        type: number
+        example: 2.6
+  PathResponseObject:
+    title: Path Response Object
+    type: object
+    properties:
+      id:
+        description: The unique ID of this path.
+        type: string
+        example: 507f191e810c19729de860ea
+      path:
+        description: >-
+          Identifies the steps that this path is representative of.
+        type: string
+        example: MainSequence Callback
+          
+          My Step Name
+      programName:
+        description: The program name for which this path is defined.
+        type: string
+        example: MyProgram.seq
+      partNumber:
+        description: The part number for which this path is defined.
+        type: string
+        example: 156502A-11L
+      pathNames:
+        description: >-
+          The list of all ancestor step names for any step which corresponds
+          to this path.
+        type: array
+        items:
+          type: string
+        example: ['MainSequence Callback', 'VoltageTest']
+      inputs:
+        description: >-
+          The set of inputs that steps which correspond to this path may take.
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/ValueSummaryObject'
+      outputs:
+        description: >-
+          The set of outputs that steps which correspond to this path may log.
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/ValueSummaryObject'
+      measurements:
+        description: >-
+          The set of measurements that steps which correspond to this path may take.
+        type: object
+        additionalProperties:
+          type: object
+        example:
+          myMeasurement: {}
   ProductsAdvancedQuery:
     title: Advanced Query Object for Products
     type: object
@@ -686,12 +780,72 @@ definitions:
         type: boolean
         default: false
         example: false
+  PathsAdvancedQuery:
+    title: Advanced Query Object for Paths
+    type: object
+    properties:
+      filter:
+        description: The query filter in Dynamic Linq
+        type: string
+        example: programName == "MyTests.seq" || product == "cRIO-9030"
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
+      orderBy:
+        $ref: '#/definitions/PathField'
+      descending:
+        description: ->
+          Whether to return the paths in descending order.
+        type: boolean
+        default: false
+        example: false
+      projection:
+        description: >-
+          Specifies the path fields to project. When a field value is given here,
+          the corresponding field will be present in all returned paths, and all
+          unspecified fields will be excluded. If no projection is specified,
+          all path fields will be returned.
+        type: array
+        items:
+          $ref: '#/definitions/PathField'
+      take:
+        description: >-
+          The maximum number of paths to return.
+        type: integer
+        format: int32
+        default: 1000
+        minimum: 0
+        example: 1000
+      continuationToken:
+        description: >-
+          A token which allows the user to resume a query at the next item in
+          the matching path set. When querying for paths, a token will
+          be returned if a query may be continued. To obtain the next page of
+          paths, pass the token to the service on a subsequent request.
+        type: string
+        example: token
+      returnCount:
+        description: >-
+          Whether to return the total number of paths which match the
+          provided filter, disregarding the take value.
+        type: boolean
+        default: false
+        example: false
   ResultsAdvancedQuery:
     title: Advanced Query Object for Test Results
     type: object
     properties:
       filter:
-        description: The query filter in Dynamic Linq
+        description: The result query filter in Dynamic Linq
         type: string
         example: (operator == "user1") || ((programName != "MyProgram") && (totalTimeInSeconds < @0))
       substitutions:
@@ -706,6 +860,22 @@ definitions:
           type: object
         example:
           - 2.5
+      productFilter:
+        description: The product query filter in Dynamic Linq
+        type: string
+        example: (name != "cRIO-9030") && (family == @0)
+      productSubstitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - cRIO
       orderBy:
         $ref: '#/definitions/ResultField'
       descending:
@@ -753,7 +923,7 @@ definitions:
     type: object
     properties:
       filter:
-        description: The query filter in Dynamic Linq
+        description: The step query filter in Dynamic Linq
         type: string
         example: (operator == "user1") || ((programName != "MyProgram") && (totalTimeInSeconds < @0))
       substitutions:
@@ -768,6 +938,25 @@ definitions:
           type: object
         example:
           - 2.5
+      resultFilter:
+        description: >-
+          The result query filter in Dynamic Linq.
+        type: string
+        example: (programName != "mySequence.seq") && (operator == @0)
+      resultSubstitutions:
+        description: >-
+          Makes substitutions in the query filter expression for results.
+          Substitutions for the query expression are indicated by non-negative
+          integers that are prefixed with the "at" symbol. Each substitution in
+          the given expression will be replaced by the element at the
+          corresponding index (zero-based) in this list. For example, "@0" in
+          the filter expression will be replaced with the element at the zeroth
+          index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - user1
       orderBy:
         $ref: '#/definitions/StepField'
       descending:
@@ -810,6 +999,99 @@ definitions:
         example: false
       responseFormat:
         $ref: '#/definitions/ResponseFormat'
+  ProductValuesQuery:
+    title: Product Values Query
+    type: object
+    required:
+    - field
+    properties:
+      field:
+        $ref: '#/definitions/ProductField'
+      filter:
+        description: >-
+          A Dynamic Linq query which specifies the products to consider when
+          getting values.
+        type: string
+        example: name != "cRIO-9030"
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
+      startsWith:
+        description: >-
+          Only return string values prefixed by this value (case sensitive).
+        type: string
+        example: cR
+  ResultValuesQuery:
+    title: Result Values Query
+    type: object
+    required:
+    - field
+    properties:
+      field:
+        $ref: '#/definitions/ResultField'
+      filter:
+        description: >-
+          A Dynamic Linq query which specifies the results to consider when
+          getting values.
+        type: string
+        example: programName != "MyProgram"
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
+      startsWith:
+        description: >-
+          Only return string values prefixed by this value (case sensitive).
+        type: string
+        example: op
+  StepValuesQuery:
+    title: Step Values Query
+    type: object
+    required:
+    - field
+    properties:
+      field:
+        $ref: '#/definitions/StepField'
+      filter:
+        description: >-
+          A Dynamic Linq query which specifies the steps to consider when
+          getting values.
+        type: string
+        example: stepType != "NumericLimitTest"
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
+      startsWith:
+        description: >-
+          Only return string values prefixed by this value (case sensitive).
+        type: string
+        example: op
   StepIdResultIdPair:
     title: Step Id / Result Id Pair
     type: object
@@ -1110,6 +1392,7 @@ responses:
             This value is not present if returnCount is false.
           type: integer
           format: int64
+          example: 1
   ResultsSuccessResponse:
     description: Test Results Success Response
     schema:
@@ -1198,6 +1481,7 @@ responses:
             This value is not present if returnCount is false.
           type: integer
           format: int64
+          example: 1
   StepsSuccessResponse:
     description: Test Steps Success Response
     schema:
@@ -1265,6 +1549,7 @@ responses:
             This value is not present if returnCount is false.
           type: integer
           format: int64
+          example: 1
   StepsDeletePartialSuccessResponse:
     description: Delete Test Steps Partial Success Response
     schema:
@@ -1286,6 +1571,49 @@ responses:
             $ref: '#/definitions/StepIdResultIdPair'
         error:
           $ref: '#/definitions/Error'
+  ValuesResponse:
+    description: Values Response
+    schema:
+      description: Values Response
+      title: ValuesResponse
+      type: array
+      items:
+        type: string
+      example:
+      - operator1
+      - operator2
+  PathsQueryResponse:
+    description: Paths Query Response
+    schema:
+      description: Paths Query Response
+      title: PathsQueryResponse
+      type: object
+      x-ni-sparse: true
+      required:
+        - paths
+      properties:
+        paths:
+          description: An array of path objects.
+          type: array
+          items:
+            $ref: '#/definitions/PathResponseObject'
+        continuationToken:
+          description: >-
+            A token which allows the user to resume this query at the next item
+            in the matching path set. In order to continue paginating a
+            query, pass this token to the service on a subsequent request. The
+            service will respond with a new continuation token. To paginate a
+            set of paths, continue sending requests with the newest
+            continuation token provided by the service, until this value is
+            null.
+          type: string
+          example: "token"
+        totalCount:
+          description: >-
+            The number of matching paths, if returnCount is true.
+            This value is not present if returnCount is false.
+          type: integer
+          format: int64
 paths:
   /:
     get:
@@ -1470,6 +1798,30 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+  /v2/query-product-values:
+    post:
+      tags: [products]
+      summary: Queries values for a product field
+      description: >-
+        Queries known values for an indexed, scalar product field. Supported
+        fields are `ID`, `PART_NUMBER`, `NAME`, `FAMILY`, and `UPDATED_AT`.
+      operationId: query-product-values-v2
+      x-ni-operation: queryProducts
+      x-ni-privilege: Read
+      parameters:
+        - in: body
+          name: postBody
+          description: Query parameters
+          required: true
+          schema:
+            $ref: '#/definitions/ProductValuesQuery'
+      responses:
+        200:
+          $ref: '#/responses/ValuesResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v2/update-products:
     post:
       tags: [products]
@@ -1546,8 +1898,9 @@ paths:
       tags: [results]
       summary: Queries test results
       description: >-
-        Uses the Dynamic Linq query language to specify a filter and return
-        test results. An empty request body queries all test results.
+        Uses the Dynamic Linq query language to specify filters for results.
+        Both result and product filters can be specified and matching test
+        results are returned. An empty request body queries all test results.
       operationId: query-results-v2
       x-ni-operation: queryResults
       x-ni-privilege: Read
@@ -1688,6 +2041,32 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+  /v2/query-result-values:
+    post:
+      tags: [results]
+      summary: Queries values for a result field
+      description: >-
+        Queries known values for an indexed, scalar result field. Supported
+        fields are `ID`, `STARTED_AT`, `UPDATED_AT`, `PROGRAM_NAME`,
+        `SYSTEM_ID`, `HOST_NAME`, `OPERATOR`, `SERIAL_NUMBER`, `PART_NUMBER`,
+        and `TOTAL_TIME_IN_SECONDS`.
+      operationId: query-result-values-v2
+      x-ni-operation: queryResults
+      x-ni-privilege: Read
+      parameters:
+        - in: body
+          name: postBody
+          description: Query parameters
+          required: true
+          schema:
+            $ref: '#/definitions/ResultValuesQuery'
+      responses:
+        200:
+          $ref: '#/responses/ValuesResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v2/update-results:
     post:
       tags: [results]
@@ -1754,8 +2133,9 @@ paths:
       tags: [steps]
       summary: Queries test steps
       description: >-
-        Uses the Dynamic Linq query language to specify a filter and return
-        test steps. An empty request body queries all test steps.
+        Uses the Dynamic Linq query language to specify filters for steps.
+        Both step and result filters can be specified and matching test
+        steps are returned. An empty request body queries all test steps.
       operationId: query-steps-v2
       x-ni-operation: querySteps
       x-ni-privilege: Read
@@ -1896,6 +2276,32 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+  /v2/query-step-values:
+    post:
+      tags: [steps]
+      summary: Queries values for a step field
+      description: >-
+        Queries known values for an indexed, scalar step field. Supported
+        fields are `NAME`, `STEP_TYPE`, `STEP_ID`, `PARENT_ID`, `RESULT_ID`,
+        `PATH`, `TOTAL_TIME_IN_SECONDS`, `STARTED_AT`, `UPDATED_AT`, and
+        `DATA_MODEL`.
+      operationId: query-step-values-v2
+      x-ni-operation: querySteps
+      x-ni-privilege: Read
+      parameters:
+        - in: body
+          name: postBody
+          description: Query parameters
+          required: true
+          schema:
+            $ref: '#/definitions/StepValuesQuery'
+      responses:
+        200:
+          $ref: '#/responses/ValuesResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v2/update-steps:
     post:
       tags: [steps]
@@ -1943,6 +2349,92 @@ paths:
           $ref: '#/responses/StepsDeletePartialSuccessResponse'
         204:
           description: The resources were deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/paths:
+    get:
+      tags: [paths]
+      summary: Gets paths
+      description: Gets a list of paths.
+      operationId: get-paths-v2
+      x-ni-operation: queryPaths
+      x-ni-privilege: Read
+      parameters:
+        - in: query
+          name: continuationToken
+          description: >-
+            A token which allows the user to resume a query at the next item in
+            the matching path set. When querying for paths, a token will
+            be returned if a query may be continued. To obtain the next page of
+            paths, pass the token to the service on a subsequent request.
+          type: string
+        - in: query
+          name: take
+          description: >-
+            The maximum number of paths to return.
+          type: integer
+          format: int32
+          default: 1000
+          minimum: -1
+        - in: query
+          name: returnCount
+          description: >-
+            Whether to return the total number of paths,
+            disregarding the take value.
+          type: boolean
+          default: false
+      responses:
+        200:
+          $ref: '#/responses/PathsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/paths/{pathId}:
+    get:
+      tags: [paths]
+      summary: Gets a path
+      description: Gets a single path.
+      operationId: get-path-v2
+      x-ni-operation: queryPaths
+      x-ni-privilege: Read
+      parameters:
+        - in: path
+          name: pathId
+          description: The ID of the path to get.
+          type: string
+          required: true
+      responses:
+        200:
+          description: Get Path Response
+          schema:
+            $ref: '#/definitions/PathResponseObject'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/query-paths:
+    post:
+      tags: [paths]
+      summary: Queries paths
+      description: >-
+        Uses the Dynamic Linq query language to specify a filter and return
+        paths. An empty request body queries all paths.
+      operationId: query-paths-v2
+      x-ni-operation: queryPaths
+      x-ni-privilege: Read
+      parameters:
+        - in: body
+          name: postBody
+          description: Query filter
+          required: false
+          schema:
+            $ref: '#/definitions/PathsAdvancedQuery'
+      responses:
+        200:
+          $ref: '#/responses/PathsQueryResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
