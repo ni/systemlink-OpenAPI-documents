@@ -1256,9 +1256,7 @@ paths:
         200:
           description: The request has succeeded.
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/Package'
+            $ref: '#/definitions/Packages'
         401:
           $ref: '#/definitions/Unauthorized'
         default:
