@@ -29,7 +29,6 @@ security:
   - cookieAuth: []
   
 x-ni-routing-key: Skyline.Repository
-x-ni-privilege-application: nirepo
 
 definitions:
   JobError:
@@ -102,6 +101,12 @@ definitions:
         description: The ID of the feed or package which this job created or modified.
         type: string
         example: 58339eb8e0d6442db09f03f5
+      resourceIds:
+        type: array
+        items:
+          description: The ID of the feed or package which this job created or modified.
+          type: string
+          example: 58339eb8e0d6442db09f03f5
       returnType:
         description: The type of resource, such as a package or feed, that this job will return when completed.
         type: string
@@ -872,12 +877,16 @@ definitions:
           description: The source of a package.
           type: string
           example: https://nuget.org/api/v2/
-  UpdateDescriptorResponse:
-    description: An array of update descriptors.
-    type: array
-    items:
-      $ref: '#/definitions/UpdateDescriptor'
-
+  UpdateDescriptorsResponse:
+    type: object
+    description: Object containing an array of update descriptors.
+    properties:
+      updateDescriptors:
+        description: An array of update descriptors.
+        type: array
+        items:
+          $ref: '#/definitions/UpdateDescriptor'
+    
 responses:
   JobIdResponse:
     description: Response with a JobID in it. This is the usual result after executing a write operation.
@@ -908,7 +917,7 @@ paths:
           description: The request encountered an error.
         default:
           $ref: '#/definitions/Error'
-  /v1/files/{pathToFile}:
+  /v1/files:
     parameters:
       - in: path
         name: pathToFile
@@ -920,35 +929,12 @@ paths:
       operationId: DownloadFiles
       x-ni-privilege: Download
       x-ni-operation: getResource
+      x-ni-route-type: Static
+      x-ni-static-download: true
+      x-ni-static-alias: /files
       tags: [files]
       summary: Download files located in Package Repository
       description: Download files located in Package Repository.
-      produces:
-        - application/octet-stream
-      responses:
-        200:
-          description: The request has succeeded.
-          schema:
-            type: file
-        404:
-          description: File not found.
-        default:
-          $ref: '#/definitions/Error'
-  /v1/files/packages/{pathToPackage}:
-    parameters:
-      - in: path
-        name: pathToPackage
-        description: The path to the file to download.
-        type: string
-        required: true
-        x-example: "pathToPackage.extension"
-    get:
-      operationId: DownloadFilesFromPackages
-      x-ni-privilege: Download
-      x-ni-operation: getResource
-      tags: [files]
-      summary: Download files located in Package Repository in the packages folder
-      description: Download files located in Package Repository in the packages folder.
       produces:
         - application/octet-stream
       responses:
@@ -1752,7 +1738,7 @@ paths:
         200:
           description: The request has succeeded.
           schema:
-            $ref: '#/definitions/UpdateDescriptorResponse'
+            $ref: '#/definitions/UpdateDescriptorsResponse'
         401:
           $ref: '#/definitions/Unauthorized'
         default:
