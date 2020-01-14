@@ -244,7 +244,7 @@ definitions:
         description: Hostname of the system.
         type: string
         example: APM-PXI1
-      assetState:
+      state:
         $ref: '#/definitions/AssetStateModel'
   ExternalCalibrationOperatorModel:
     title: External Calibration Operator
@@ -262,7 +262,7 @@ definitions:
     description: Contains data from the last self-calibration.
     type: object
     required:
-        - calibrationDate
+        - date
     properties:
       temperatureSensors:
           description: An array of temperature sensor information.
@@ -273,7 +273,7 @@ definitions:
         description: Whether the last self-calibration of the asset was a limited calibration.
         type: boolean
         example: false
-      calibrationDate:
+      date:
         description: ISO-8601 formatted timestamp specifying the last date the asset was self-calibrated.
         type: string
         format: date-time
@@ -283,7 +283,7 @@ definitions:
     description: Data for an external calibration entry.
     type: object
     required:
-        - calibrationDate
+        - date
         - recommendedInterval
         - nextRecommendedDate
         - temperatureSensors
@@ -297,7 +297,7 @@ definitions:
         description: Whether the last external calibration of the asset was a limited calibration.
         type: boolean
         example: false
-      calibrationDate:
+      date:
         description: ISO-8601 formatted timestamp specifying the last date the asset was externally calibrated.
         type: string
         format: date-time
@@ -362,7 +362,7 @@ definitions:
         description: Vendor number of the asset.
         type: integer
         example: 4244
-      assetName:
+      name:
         description: Name of the asset.
         type: string
         example: PCISlot2
@@ -401,7 +401,7 @@ definitions:
         $ref: '#/definitions/ExternalCalibrationModel'
       calibrationStatus:
         $ref: '#/definitions/CalibrationStatus'
-      lastUpdatedDate:
+      lastUpdatedTimestamp:
         description: ISO-8601 formatted timestamp specifying the last date that the asset has had a property update.
         type: string
         format: date-time
@@ -577,7 +577,7 @@ parameters:
       For example, a list of 100 asssets with a skip value of 50 will return
       entries 51 through 100.
     type: integer
-    required: true
+    default: 0
     x-example: 0
   Take:
     in: query
@@ -588,8 +588,8 @@ parameters:
       For example, a list of 100 assets with a take value of 25 will return
       entries 1 through 25.
     type: integer
-    required: true
-    x-example: 0
+    default: -1
+    x-example: -1
   AssetAvailabilityComparison:
     in: body
     name: compareAvailability
