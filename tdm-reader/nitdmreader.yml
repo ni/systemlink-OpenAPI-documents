@@ -273,6 +273,8 @@ definitions:
       timeUtcOffsetHours:
         type: number
         description: Time zone offset applied to local time values
+      error:
+        $ref: '#/definitions/Error'
   QueryDataSpecifier:
     properties:
       channelSpecifications:
