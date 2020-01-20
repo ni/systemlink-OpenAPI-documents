@@ -1364,8 +1364,6 @@ responses:
             - startTimestamp
             - endTimestamp
             - assetIdentifier
-            - minionId
-            - category
             - percentage
           properties:
             startTimestamp:
