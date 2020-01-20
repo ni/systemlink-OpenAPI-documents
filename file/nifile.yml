@@ -27,6 +27,7 @@ security:
   - apiKeyAuth: []
   - basicAuth: []
   - cookieAuth: []
+
 x-ni-routing-key: Skyline.FileIngestion
 definitions:
   Link:
@@ -431,7 +432,7 @@ paths:
       tags: [versioning]
       summary: API information
       description: Returns information about API versions and available operations.
-      operationId: RootEndpoint
+      operationId: RootEndpoint      
       x-ni-request-all-privileges: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
@@ -477,11 +478,12 @@ paths:
   /v1/service-groups:
     get:
       tags: [service groups]
-      summary: List service groups
+      summary: List service groups      
       description: >-
         Returns an array of File service group names. Each service group is a
         distinct collection of files.
       operationId: ListServiceGroups
+      x-ni-auth: true
       x-ni-operation: listFiles
       x-ni-privilege: ViewMetadata
       x-ni-request-all-privileges: true
@@ -521,6 +523,7 @@ paths:
         The orderBy and orderByDescending fields can be used to manage sorting
         the list by metadata objects.
       operationId: ListAvailableFiles_GET
+      x-ni-auth: true
       x-ni-operation: listFiles
       x-ni-privilege: ViewMetadata
       x-ni-request-all-privileges: true
@@ -588,6 +591,7 @@ paths:
       summary: Delete file
       description: Deletes the file indicated by the resource ID.
       operationId: Delete
+      x-ni-auth: true
       x-ni-operation: deleteFiles
       x-ni-privilege: DeleteFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
@@ -610,6 +614,7 @@ paths:
 
         Use the inline parameter in the query string to control the download
         behavior.
+      x-ni-auth: true
       operationId: ReceiveFile
       x-ni-operation: downloadData
       x-ni-privilege: DownloadFiles
@@ -658,6 +663,7 @@ paths:
         Use the replaceExisting element to determine the replace or merge
         behavior.
       operationId: UpdateMetadata
+      x-ni-auth: true
       x-ni-operation: updateMetadata
       x-ni-privilege: ModifyFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
@@ -709,6 +715,7 @@ paths:
         Deletes multiple files in a single API call. The request body contains
         an array of file ids to delete.
       operationId: DeleteMultiple
+      x-ni-auth: true
       x-ni-operation: deleteFiles
       x-ni-privilege: DeleteFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
@@ -757,6 +764,7 @@ paths:
 
         - propertiesQuery: a JSON array of query objects with string values.
       operationId: QueryAvailableFiles
+      x-ni-auth: true
       x-ni-operation: listFiles
       x-ni-privilege: ViewMetadata
       x-ni-request-all-privileges: true
@@ -818,6 +826,7 @@ paths:
         Uploads a file using multipart/form-data headers to send the file
         payload in the HTTP body.
       operationId: Upload
+      x-ni-auth: true
       x-ni-operation: uploadFiles
       x-ni-privilege: UploadFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
