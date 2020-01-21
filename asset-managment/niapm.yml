@@ -552,6 +552,63 @@ definitions:
       - START_TIMESTAMP
     example:
       START_TIMESTAMP
+  AssetIdentificationModel:
+    title: Asset Identification
+    description: >-
+        Object containing properties which identify an asset.
+        An asset is uniquely identified by a combination of:
+            - busType
+            - modelName or modelNumber
+            - vendorName or vendorNumber
+            - serialNumber or minionId (part of the Location)
+    type: object
+    required: 
+    - busType
+    properties:
+      modelName:
+        description: Model name of the asset.
+        type: string
+        example: "NI PXIe-6368"
+      modelNumber:
+        description: Model number of the asset.
+        type: integer
+        example : 123
+      serialNumber:
+        description: Serial number of the asset.
+        type: string
+        example: "01BB877A"
+      vendorName:
+        description: Vendor name of the asset.
+        type: string
+        example: National Instruments
+      vendorNumber:
+        description: Vendor number of the asset.
+        type: integer
+        example: 4244
+      busType:
+        $ref: '#/definitions/BusType'
+  UtilizationIdentifiersWithTimestampModel:
+    title: Utilization Identifiers With Timestamp
+    description: Object containing a collection of utilization identifiers with a timestamp.
+    type: object
+    required:
+      - utilizationIdentifiers
+      - utilizationTimestamp
+    properties:
+      utilizationIdentifiers:
+        description: Array representing the unique identifier of an asset utilization history record.
+        type: array
+        items:
+          type: string
+          example: "2916201B245D642430"
+      utilizationTimestamp:
+        description: >-
+          A date time value which can be used to specify the end of an utilization.
+
+          This parameter must have the "ISO 8601" format in order to be considered valid.
+        type: string
+        format: date-time
+        example: '2019-05-01T00:00:00.519Z'
 parameters:
   TimespanGranularity:
     in: query
@@ -1190,6 +1247,66 @@ parameters:
           type: boolean
           default: false
           example: false
+  StartUtilizationRequest:
+    in: body
+    name: utilizationBody
+    description: Request body specifying utilization start information for multiple assets.
+    schema:
+      title: Start Utilization Request
+      description: Object containing utilization unique identifier, the asset identifiers of the utilized assets and the details of the utilization type, such as category, task name and utilization start timestamp.
+      type: object
+      required:
+        - utilizationIdentifier
+        - minionId
+        - assetIdentifiers
+        - utilizationCategory
+        - utilizationTimestamp
+      properties:
+        utilizationIdentifier:
+          description: String representing the unique identifier of an asset utilization history record.
+          type: string
+          example: "2916201B245D642430"
+        minionId:
+          description: Identifier of the minion where the utilized assets are located.
+          type: string
+          example: NI_PXIe-8135_Embedded_Controller--MAC-00-80-2F-23-52-65
+        assetIdentifiers:
+          description: Array of the identification information for the assets which are utilized.
+          type: array
+          items:
+            $ref: '#/definitions/AssetIdentificationModel'
+        utilizationCategory: 
+          description: String representing the utilization category.
+          type: string
+          example: Test
+        taskName:
+          description: String representing the name of the task.
+          type: string
+          example: DUTTestingRoutine
+        userName:
+          description: String representing the name of the operator who utilized the asset.
+          type: string
+          example: johnDoe
+        utilizationTimestamp:
+          description: >-
+            A date time value which can be used to specify the start of an utilization.
+
+            This parameter must have the "ISO 8601" format in order to be considered valid.
+          type: string
+          format: date-time
+          example: '2019-05-01T00:00:00.519Z'
+  EndUtilizationRequest:
+    in: body
+    name: utilizationBody
+    description: Request body consisting of data specifying the utilization end event for an asset.
+    schema:
+      $ref: '#/definitions/UtilizationIdentifiersWithTimestampModel'
+  HeartbeatUtilizationRequest:
+    in: body
+    name: utilizationBody
+    description: Request body consisting of data specifying the utilization heartbeat event for multiple ongoing utilizations.
+    schema:
+      $ref: '#/definitions/UtilizationIdentifiersWithTimestampModel'
 responses:
   Error:
     description: Error
@@ -1833,6 +1950,84 @@ paths:
           $ref: '#/responses/NotFound'
         default:
           $ref: '#/responses/Error'
+  /v1/assets/start-utilization:
+    post:
+      tags: [utilization]
+      summary: Stores assets utilization start
+      description: >- 
+          Stores information related to assets utilization start. The operation is succesful when utilization information can be stored for all asset identifiers provided in the request.
+          It will return a partial success when utilization information can be stored for only a subset of the asset identifiers provided in the request.
+          It will return a not found response when no stored assets matched the provided asset identifiers.
+      operationId: start-multiple-asset-utilization
+      x-ni-operation: createUtilization
+      x-ni-privilege: Create
+      parameters:
+        - $ref: '#/parameters/StartUtilizationRequest'
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        201:
+          description: Created
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/end-utilization:
+    post:
+      tags: [utilization]
+      summary: Stores assets utilization end
+      description: >-
+          Stores information related to assets utilization end. The operation is succesful and will return No Content when end utilization information can be stored for all utilization identifiers provided in the request.
+          It will return a partial success when end utilization information can be stored for only a subset of the utilization identifiers provided in the request.
+          It will return a not found response when no stored utilizations matched the provided utilization identifiers.
+      operationId: end-multiple-asset-utilization
+      x-ni-operation: updateUtilization
+      x-ni-privilege: Update
+      parameters:
+        - $ref: '#/parameters/EndUtilizationRequest'
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        204:
+          description: No Content
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/utilization-heartbeat:
+    post:
+      tags: [utilization]
+      summary: Stores asset utilization heartbeats
+      description: >-
+          Stores information related to ongoing asset utilizations. The operation is succesful and will return No Content when utilization heartbeat information can be stored for all utilization identifiers provided in the request.
+          It will return a partial success when utilization heartbeat information can be stored for only a subset of the utilization identifiers provided in the request.
+          It will return a not found response when no stored utilizations matched the provided utilization identifiers.
+      operationId: asset-utilization-multiple-heartbeats
+      x-ni-operation: updateUtilization
+      x-ni-privilege: Update
+      parameters:
+        - $ref: '#/parameters/HeartbeatUtilizationRequest'
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        204:
+          description: No Content
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'          
   /v1/compare-assets-availability:
     post:
       tags: [assets]
