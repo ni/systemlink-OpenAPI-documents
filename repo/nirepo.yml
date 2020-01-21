@@ -171,7 +171,7 @@ definitions:
         $ref: '#/definitions/ErrorObject'
   Platform:
     type: string
-    enum: [windows, ni_linux_rt]
+    enum: [WINDOWS, NI_LINUX_RT]
     description: "Depending on the selected platform, the following package extensions are available: .nipkg for windows feeds, .ipk and .deb for ni-linux-rt feeds."
     example: windows
   PackageImportDescriptor:
@@ -373,6 +373,10 @@ definitions:
         type: string
         description: A short description of the feed.
         example: Feed containing all the necessary packages for configuring LabVIEW 2015
+      workspace:
+        type: string
+        description: The workspace's id where the feed belongs to
+        example: 3651818c-9b31-4d25-8b35-0afc4e305f2d
   FeedData:
     type: object
     description: |
@@ -394,6 +398,10 @@ definitions:
         example: Feed containing all the necessary packages for configuring LabVIEW 2015
       platform:
         $ref: '#/definitions/Platform'
+      workspace:
+        type: string
+        description: The workspace's id where the feed belongs to
+        example: 3651818c-9b31-4d25-8b35-0afc4e305f2d
   FeedDataWithURI:
     type: object
     description: |
@@ -415,6 +423,10 @@ definitions:
         example: Feed containing all the necessary packages for configuring LabVIEW 2015
       platform:
         $ref: '#/definitions/Platform'
+      workspace:
+        type: string
+        description: The workspace's id where the feed belongs to
+        example: 3651818c-9b31-4d25-8b35-0afc4e305f2d
       uri:
         type: string
         description: 'The path of the feed to replicate. Appending /Packages to the URI should yield the "Packages" file of the feed.'
@@ -494,6 +506,10 @@ definitions:
         type: string
         description: If "split" is false, the description of the feed which will be created. If "split" is true, this field is ignored.
         example: Feed containing all the necessary packages for configuring LabVIEW 2015
+      workspace:
+        type: string
+        description: The workspace's id where the feed belongs to
+        example: 3651818c-9b31-4d25-8b35-0afc4e305f2d
   StoreItem:
     type: object
     properties:
@@ -615,6 +631,10 @@ definitions:
         example: Feed that contains all the necessary packages for configuring LabVIEW 2015
       platform:
         $ref: '#/definitions/Platform'
+      workspace:
+        type: string
+        description: The workspace's id where the feed belongs to
+        example: 3651818c-9b31-4d25-8b35-0afc4e305f2d
       packageReferences:
         type: array
         description: An array containing the IDs of the packages in this feed.
@@ -901,7 +921,7 @@ paths:
   /v1/ping:
     get:
       operationId: Ping
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: ping
       tags: [ping]
       summary: Ping the service
@@ -927,7 +947,7 @@ paths:
         x-example: "filePath"
     get:
       operationId: DownloadFiles
-      x-ni-privilege: Download
+      x-ni-auth: true
       x-ni-operation: getResource
       x-ni-route-type: Static
       x-ni-static-download: true
@@ -949,7 +969,7 @@ paths:
   /v1/feeds:
     get:
       operationId: ListFeeds
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getFeeds
       tags: [feeds]
       summary: List all feeds
@@ -971,7 +991,7 @@ paths:
           $ref: '#/definitions/Error'
     post:
       operationId: CreateFeed
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: createFeed
       tags: [feeds]
       summary: Create a feed
@@ -1000,7 +1020,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     get:
       operationId: GetFeed
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getFeeds
       tags: [feeds]
       summary: Get feed
@@ -1016,7 +1036,7 @@ paths:
           $ref: '#/definitions/Error'
     delete:
       operationId: DeleteFeed
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: deleteFeeds
       tags: [feeds]
       summary: Remove a feed
@@ -1044,7 +1064,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     post:
       operationId: CloneFeed
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: cloneFeed
       tags: [feeds]
       summary: Clone a feed
@@ -1073,7 +1093,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     get:
       operationId: ListFeedPackages
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getPackages
       tags: [feeds, packages]
       summary: Get all packages in a feed
@@ -1101,7 +1121,7 @@ paths:
   /v1/replicate-feed:
     post:
       operationId: ReplicateFeed
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: replicateFeed
       tags: [feeds]
       summary: Replicate a feed
@@ -1140,7 +1160,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     post:
       operationId: ImportPackages
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: importPackages
       tags: [feeds, packages]
       summary: Import packages into a feed
@@ -1179,7 +1199,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     post:
       operationId: ImportFeedsAlternative
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: importFeeds
       tags: [feeds]
       summary: Import feeds into an existing feed
@@ -1217,7 +1237,7 @@ paths:
   /v1/packages:
     get:
       operationId: ListPackages
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getPackages
       tags: [packages]
       summary: Get all packages
@@ -1257,7 +1277,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     get:
       operationId: GetPackage
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getPackages
       tags: [packages]
       summary: Get package details
@@ -1277,7 +1297,7 @@ paths:
           $ref: '#/definitions/Error'
     delete:
       operationId: DeletePackage
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: deletePackage
       tags: [packages]
       summary: Remove a package
@@ -1298,7 +1318,7 @@ paths:
   /v1/upload-packages:
     post:
       operationId: UploadPackage
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: uploadPackage
       tags: [packages]
       summary: Upload packages to the pool
@@ -1344,7 +1364,7 @@ paths:
   /v1/get-package-import-descriptors:
     post:
       operationId: ObtainPackageImportDescriptorsFromFeedUri
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getPackageImportDescriptors
       tags: [packages]
       summary: Returns the package import descriptors from the specified feed URI
@@ -1375,11 +1395,11 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     put:
       operationId: UpdateFeed
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: getFeedMetadata
       tags: [feeds]
-      summary: Update a feed's name and/or description
-      description: Asynchronously updates a feed's name and/or description. Returns the ID of a resource which can be queried to determine the status of the operation.
+      summary: Update a feed's name and/or description and/or workspace
+      description: Asynchronously updates a feed's name and/or description and/or workspace. Returns the ID of a resource which can be queried to determine the status of the operation.
       parameters:
         - in: body
           name: updateData
@@ -1404,7 +1424,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     post:
       operationId: AddPackageReferences
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: addPackageReferences
       tags: [feeds, packages]
       summary: Add package references to feed
@@ -1434,7 +1454,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     post:
       operationId: RemovePackageReferences
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: removePackageReferences
       tags: [feeds, packages]
       summary: Remove package references
@@ -1469,7 +1489,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     post:
       operationId: ImportFeeds
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: importFeeds
       tags: [feeds]
       summary: Import feeds into an existing feed
@@ -1514,7 +1534,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     post:
       operationId: CheckForUpdates
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: checkForUpdates
       tags: [feeds]
       summary: Check for updates to a feed
@@ -1544,7 +1564,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     post:
       operationId: ApplyUpdates
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: applyUpdates
       tags: [feeds]
       summary: Apply updates
@@ -1584,7 +1604,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     post:
       operationId: CleanFeed
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: cleanFeed
       tags: [feeds]
       summary: Clean a feed
@@ -1606,7 +1626,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     post:
       operationId: ImportStoreItems
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: importStoreItems
       tags: [feeds, store]
       summary: Import store items
@@ -1633,7 +1653,7 @@ paths:
   /v1/jobs:
     get:
       operationId: ListJobs
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: listJobs
       tags: [jobs]
       summary: List all jobs
@@ -1678,7 +1698,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     get:
       operationId: GetJob
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getJobs
       tags: [jobs]
       summary: Get job details
@@ -1707,7 +1727,7 @@ paths:
   /v1/can-write:
     get:
       operationId: CheckWritePermission
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: canWrite
       tags: [misc]
       summary: Check if the logged user can write
@@ -1729,7 +1749,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     get:
       operationId: GetUpdateDescriptors
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getUpdateDescriptors
       tags: [updates]
       summary: Retrieve updates for a feed
@@ -1746,7 +1766,7 @@ paths:
   /v1/store/items:
     get:
       operationId: QueryStoreItems
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getStoreItems
       tags: [store]
       summary: Query store items
@@ -1786,7 +1806,7 @@ paths:
         x-example: "5c5d49f2781e2b2cd045267b"
     get:
       operationId: GetStoreItem
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getStoreItems
       tags: [store]
       summary: Get a store item
@@ -1803,7 +1823,7 @@ paths:
   /v1/replicate-store-item:
     post:
       operationId: ReplicateStoreItem
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: replicateStoreItem
       tags: [store]
       summary: Replicate a store item
