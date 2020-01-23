@@ -946,11 +946,11 @@ parameters:
 
             - MinionId:  String representing the identifier of a minion in which an asset might be located in.
 
-            - UtilizationCategory: String representing the utilization task category.
+            - Category: String representing the utilization task category.
 
-            - User: : String representing the name of the operator who utilized the asset.
+            - UserName: : String representing the name of the operator who utilized the asset.
           type: string
-          example: UtilizationCategory = "Test"
+          example: Category = "Test"
         assetFilter:
           description: >-
               The filter criteria for assets. Consists of a string of queries composed using AND/OR operators.
