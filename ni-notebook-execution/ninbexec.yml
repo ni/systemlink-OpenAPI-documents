@@ -108,14 +108,14 @@ definitions:
   CreateExecutionOperation:
     title: Create Executions Operation
     description: Create Executions array object including export formats
-    allOf: 
+    allOf:
       - $ref: '#/definitions/Operation'
       - type: object
-        properties: 
-          exportFormats: 
-            description: List of export formats 
+        properties:
+          exportFormats:
+            description: List of export formats
             type: array
-            items: 
+            items:
               $ref: '#/definitions/NotebookExportFormat'
         example:
           exportFormats: [PDF, HTML]
@@ -389,7 +389,7 @@ definitions:
       filter:
         description: The query filter in Dynamic Linq
         type: string
-        example: (metadata.key1 == "value1") || ((parameters.key2 != "value2") && (updatedAt >= "2002-12-25T01:01:01.1234567Z"))
+        example: (metadata["key1"] == "value1") || ((parameters["key2"] != "value2") && (updatedAt >= "2002-12-25T01:01:01.1234567Z"))
       orderBy:
         $ref: '#/definitions/NotebookSortField'
       descending:
@@ -706,7 +706,7 @@ definitions:
       filter:
         description: The query filter in Dynamic Linq
         type: string
-        example: ((status == "SUCCEEDED") && (result.key1 == "value1")) || ((status == "FAILED") && (completedAt >= "2002-12-25T01:01:01.1234567Z"))
+        example: ((status == "SUCCEEDED") && (result["key1"] == "value1")) || ((status == "FAILED") && (completedAt >= "2002-12-25T01:01:01.1234567Z"))
       orderBy:
         $ref: '#/definitions/ExecutionSortField'
       descending:
