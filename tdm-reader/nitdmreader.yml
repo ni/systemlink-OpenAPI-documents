@@ -218,19 +218,17 @@ definitions:
         description: >-
           ISO-8601 formatted timestamp indicating the starting point for x data
         type: string
-        format: date-time
         example: '2018-05-09T15:07:42.527921Z'
       xmaxStringData:
         description: >-
           ISO-8601 formatted timestamp indicating the ending point for x data
         type: string
-        format: date-time
         example: '2018-05-09T15:07:42.527921Z'
       sort:
         type: string
         default: null
         description: Specify how to sort values before returning them.
-        example: -y0,x
+        example: '-y0,x'
       useWaveformProperties:
         type: boolean
         description: Look for specific properties in a channel that define the start and increment x values to use for each channel.
