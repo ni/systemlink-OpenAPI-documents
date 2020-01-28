@@ -608,6 +608,24 @@ definitions:
         type: string
         format: date-time
         example: '2019-05-01T00:00:00.519Z'
+  Skip:
+    description:
+      The number of resources to skip in the result when paging.
+      For example, a list of 100 resources with a skip value of 50 will return
+      entries 51 through 100.
+    type: integer
+    default: 0
+    x-example: 0
+  Take:
+    description:
+      How many resources to return in the result, or -1 to use a default
+      defined by the service. The maximum value for Take is 1000.
+      For example, a list of 100 resources with a take value of 25 will return
+      entries 1 through 25.
+    type: integer
+    default: -1
+    x-example: -1
+    maximum: 1000
 parameters:
   TimespanGranularity:
     in: query
@@ -630,7 +648,7 @@ parameters:
     name: skip
     description:
       The number of resources to skip in the result when paging.
-      For example, a list of 100 asssets with a skip value of 50 will return
+      For example, a list of 100 resources with a skip value of 50 will return
       entries 51 through 100.
     type: integer
     default: 0
@@ -640,12 +658,13 @@ parameters:
     name: take
     description:
       How many resources to return in the result, or -1 to use a default
-      defined by the service.
-      For example, a list of 100 assets with a take value of 25 will return
+      defined by the service. The maximum value for Take is 1000.
+      For example, a list of 100 resources with a take value of 25 will return
       entries 1 through 25.
     type: integer
     default: -1
     x-example: -1
+    maximum: 1000
   AssetAvailabilityComparison:
     in: body
     name: compareAvailability
@@ -773,21 +792,9 @@ parameters:
         destination:
           $ref: '#/definitions/Destination'
         skip:
-          description:
-            How many assets to skip in the result when paging.
-            For example, a list of 100 asssets with a skip value of 50 will return
-            entries 51 through 100.
-          type: integer
-          default: 0
+          $ref: '#/definitions/Skip'
         take:
-          description:
-            How many assets to return in the result, or -1 to use a default
-            defined by the service.
-            For example, a list of 100 assets with a take value of 25 will return
-            entries 1 through 25.
-          type: integer
-          default: -1
-          maximum: 1000
+          $ref: '#/definitions/Take'
         calibratableOnly:
           description: Whether to generate a report with calibrated asset specific columns.
           type: boolean
@@ -1676,22 +1683,8 @@ paths:
       x-ni-operation: readAssets
       x-ni-privilege: Read
       parameters:
-        - in: query
-          name: skip
-          description:
-            How many files to skip in the result when paging.
-            For example, a list of 100 asssets with a skip value of 50 and a take
-            value of 25 will return entries 51 through 75.
-          type: integer
-        - in: query
-          name: take
-          description:
-            How many assets to return in the result, or -1 to use a default
-            defined by the service.
-            For example, a list of 100 assets with a skip value of 50 and a take
-            value of 25 will return entries 51 through 75.
-          type: integer
-          maximum: 1000
+        - $ref: '#/parameters/Skip'
+        - $ref: '#/parameters/Take'
         - in: query
           name: calibratableOnly
           description: Whether to filter only assets which support calibration.
