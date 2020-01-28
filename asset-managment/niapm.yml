@@ -1838,6 +1838,7 @@ paths:
       operationId: post-asset-calibration-history
       x-ni-operation: writeAssets
       x-ni-priviledge: Write
+      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       parameters:
         - $ref: '#/parameters/AssetId'
         - $ref: '#/parameters/ExternalCalibrationRequestBody'
