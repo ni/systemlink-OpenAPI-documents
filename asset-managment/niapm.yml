@@ -65,13 +65,12 @@ definitions:
         One or more errors occurred. See the contained list for details of each
         error.
       args: []
-      ## TODO: populate with valid error code
       innerErrors:
-        - name: AssetPerformanceManagement.AssetNotFound
-          code: -253401
+        - name: AssetPerformanceManagement.NonExistingAssetWithIdentifier
+          code: -253426
           resourceType: AssetEntry
           resourceId: 29162;01B245D6;4243;0
-          message: 'The asset with identifier 29162;01B245D6;4243;0 was not found.'
+          message: 'No asset found with the specified identifier: 29162;01B245D6;4243;0.'
           args: [29162;01B245D6;4243;0]
   Operation:
     description: An operation provided by the API.
@@ -1335,6 +1334,14 @@ responses:
       properties:
         error:
           $ref: '#/definitions/Error'
+      example:
+        error:
+          name: AssetPerformanceManagement.NonExistingAssetWithIdentifier
+          code: -253426
+          message: >-
+            No asset found with the specified identifier: 29162;01B245D6;4243;0.
+          args: [29162;01B245D6;4243;0]
+          innerErrors: []
   PartialSuccess:
     description: Partial Success is returned in the case when only a part of the request body information was processed successfully.
     schema:
