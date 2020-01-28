@@ -698,7 +698,7 @@ parameters:
           type: array
           items:
             type: string
-          example: [1234;4567;8456]
+          example: ["29162;01B245D6;4243;0"]
   DeleteCalibrationsRequestBody:
     in: body
     name: deleteCalibrationsRequestBody
@@ -1399,6 +1399,29 @@ responses:
           description: Total number of managed assets.
           type: integer
           example: 17
+  DeleteAssetsResponse:
+    description: Delete Assets Response containing the ids of the assets which were deleted, the ids of the assets which failed to be deleted and any errors encountered.
+    schema:
+      title: Delete Assets Response
+      description: Delete Assets Response containing the ids of the assets which were deleted, the ids of the assets which failed to be deleted and any errors encountered.
+      type: object
+      required:
+        - ids
+      properties:
+        ids:
+          description: Array of asset identifiers which were deleted
+          type: array
+          items:
+            type: string
+            example: "29162;01B245D6;4243;0"
+        failed:
+          description: Array of asset identifiers that failed to delete
+          type: array
+          items:
+            type: string
+            example: "29162;01B245D6;4243;0"
+        error:
+          $ref: '#/definitions/Error'
   AvailabilityInSystemResponse:
     description: >-
       Returns asset availability information in the specified timespan split based on the specified timespan granularity.
@@ -2080,7 +2103,7 @@ paths:
         - $ref: '#/parameters/DeleteAssetsRequestBody'
       responses:
         200:
-          $ref: '#/responses/PartialSuccess'
+          $ref: '#/responses/DeleteAssetsResponse'
         400:
           $ref: '#/responses/BadRequest'
         401:
