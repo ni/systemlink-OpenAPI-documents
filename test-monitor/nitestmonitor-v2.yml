@@ -348,7 +348,7 @@ definitions:
       id:
         description: ID of the product
         type: string
-        example: 0365cee9-0e5d-4802-b0f6-9fedb8f08800
+        example: 5e30931793cac80468509487
       partNumber:
         description: The part number of the product
         type: string
@@ -388,7 +388,7 @@ definitions:
         type: array
         items:
           type: string
-        example: [5ccb19ce5aa0a3348872c3e3]
+        example: [5e30934193cac8046851acb2]
   ProductUpdateRequestObject:
     title: Product Update Request
     type: object
@@ -396,7 +396,7 @@ definitions:
       id:
         description: ID of the product to update
         type: string
-        example: 0365cee9-0e5d-4802-b0f6-9fedb8f08800
+        example: 5e30931793cac80468509487
       name:
         description: The name of the product
         type: string
@@ -425,7 +425,7 @@ definitions:
         type: array
         items:
           type: string
-        example: [5ccb19ce5aa0a3348872c3e3]
+        example: [5e30934193cac8046851acb2]
   TestResultRequestObject:
     title: Test Result Request
     type: object
@@ -476,7 +476,7 @@ definitions:
         type: array
         items:
           type: string
-        example: [df1b63da-4fd8-4466-b721-5a28de036f56]
+        example: [5e30934193cac8046851acb2]
       startedAt:
         description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
@@ -513,11 +513,11 @@ definitions:
       id:
         description: Id of the test result
         type: string
-        example: df1b63da-4fd8-4466-b721-5a28de036f56
+        example: 5e30938d93cac80468534720
       systemId:
         description: Id of the system
         type: string
-        example: 9c75f1b5-5882-490e-a2e2-1c14123d68b2
+        example: 5e30931993cac8046850a996
       hostName:
         description: Host name of the system
         type: string
@@ -577,7 +577,7 @@ definitions:
       id:
         description: Test result id to update
         type: string
-        example: df1b63da-4fd8-4466-b721-5a28de036f56
+        example: 5e30938d93cac80468534720
       programName:
         description: Program name
         type: string
@@ -624,7 +624,7 @@ definitions:
         type: array
         items:
           type: string
-        example: [df1b63da-4fd8-4466-b721-5a28de036f56]
+        example: [5e30934193cac8046851acb2]
       startedAt:
         description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
@@ -1103,10 +1103,10 @@ definitions:
     properties:
       stepId:
         type: string
-        example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+        example: 5e30934193cac8046851acb4
       resultId:
         type: string
-        example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+        example: 5e30938d93cac80468534720
   StepDataObject:
     title: Step Data
     description: Data returned by the test step
@@ -1156,7 +1156,7 @@ definitions:
       resultId:
         description: Result id
         type: string
-        example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+        example: 5e30938d93cac80468534720
       children:
         description: Nested child steps
         type: array
@@ -1238,7 +1238,7 @@ definitions:
       resultId:
         description: Result id
         type: string
-        example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+        example: 5e30938d93cac80468534720
       path:
         description: Step path
         type: string
@@ -1885,7 +1885,7 @@ paths:
                 type: array
                 items:
                   type: string
-                  example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+                  example: 5e30931793cac80468509487
       responses:
         200:
           $ref: '#/responses/DeleteProductsResponse'
@@ -2116,7 +2116,7 @@ paths:
                 type: array
                 items:
                   type: string
-                  example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+                  example: 5e30938d93cac80468534720
               deleteSteps:
                 description: Indicates whether to delete the test steps associated with the test result
                 type: boolean
