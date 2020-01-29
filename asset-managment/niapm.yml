@@ -615,6 +615,7 @@ definitions:
       entries 51 through 100.
     type: integer
     default: 0
+    example: 0
     x-example: 0
   Take:
     description:
@@ -624,6 +625,7 @@ definitions:
       entries 1 through 25.
     type: integer
     default: -1
+    example: -1
     x-example: -1
     maximum: 1000
 parameters:
@@ -891,7 +893,7 @@ parameters:
 
             - ExternalCalibration.Operator.DisplayName: String representing the name of the operator which performed an external calibration on a third-party asset.
           type: string
-          example: AssetName = "APMPXI1Slot3" and ExternalCalibration.NextRecommendedDate > "2018-05-01T00:00:00.519Z"
+          example: IsSystemController = true
   QueryHistoryRequestBody:
     in: body
     name: queryHistory
@@ -1032,8 +1034,10 @@ parameters:
               - SupportsSelfCalibration: Boolean flag specifying whether the asset supports self-calibration.
 
               - SelfCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was self-calibrated. Example: "2018-05-20T00:00:00Z"
-
+              
               - SupportsExternalCalibration: Boolean flag specifying whether the asset supports external calibration.
+              
+              - CalibrationStatus: String enumeration representing the calibration status of an asset. Possible values are: OK, APPROACHING_RECOMMENDED_DUE_DATE, PAST_RECOMMENDED_DUE_DATE.
 
               - ExternalCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was externally-calibrated. Example: "2018-05-20T00:00:00Z"
 
@@ -1047,7 +1051,7 @@ parameters:
 
               - ExternalCalibration.Operator.DisplayName: String representing the name of the operator which performed an external calibration on a third-party asset.
           type: string
-          example: AssetName = "APMPXI1Slot3" and ExternalCalibration.NextRecommendedDate > "2018-05-01T00:00:00.519Z"
+          example: IsSystemController = true
         utilizationIntervals:
           description: Multiple time intervals for which to retrieve asset utilization.
           type: array
@@ -1215,6 +1219,8 @@ parameters:
               - SelfCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was self-calibrated. Example: "2018-05-20T00:00:00Z"
 
               - SupportsExternalCalibration: Boolean flag specifying whether the asset supports external calibration.
+              
+              - CalibrationStatus: String enumeration representing the calibration status of an asset. Possible values are: OK, APPROACHING_RECOMMENDED_DUE_DATE, PAST_RECOMMENDED_DUE_DATE.
 
               - ExternalCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was externally-calibrated. Example: "2018-05-20T00:00:00Z"
 
@@ -1227,9 +1233,8 @@ parameters:
               - ExternalCalibration.IsLimited: Boolean flag specifying whether the last external calibration was a limited calibration.
 
               - ExternalCalibration.Operator.DisplayName: String representing the name of the operator which performed an external calibration on a third-party asset.
-
           type: string
-          example: AssetName = "APMPXI1Slot3" and ExternalCalibration.NextRecommendedDate > "2018-05-01T00:00:00.519Z"
+          example: IsSystemController = true
         continuationToken:
           description: >-
             A token which allows the user to resume a query at the next item in
