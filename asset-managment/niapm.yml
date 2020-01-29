@@ -494,9 +494,9 @@ definitions:
     title: Request Destination
     description:
       The destination of the request.
-      "INLINE" (default) returns the list of assets as the body of the response.
-      "DOWNLOAD" returns the list of assets as the body of the response and indicates to the client that it should be downloaded as a file.
-      "FILE_SERVICE" sends the list of assets to the file ingestion service and returns the ID of the file to the client in a JSON object.
+      "INLINE" (default) returns the list of resources as the body of the response.
+      "DOWNLOAD" returns the list of resources as the body of the response and indicates to the client that it should be downloaded as a file.
+      "FILE_SERVICE" sends the list of resources to the file ingestion service and returns the ID of the file to the client in a JSON object.
     type: string
     default: INLINE
     enum:
@@ -512,6 +512,9 @@ definitions:
         $ref: '#/definitions/ResponseFormat'
       destination:
         $ref: '#/definitions/Destination'
+    example:
+      responseFormat: CSV
+      destination: DOWNLOAD
   ServicePolicyModel:
     title: Service policy
     description: An object containing the service policy.
