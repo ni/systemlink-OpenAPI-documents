@@ -1488,6 +1488,29 @@ responses:
           description: The total number of calibration history entries for the requested asset.
           type: integer
           example: 1
+  DeleteCalibrationsPartialSuccessResponse:
+    description: Delete Calibrations Partial Success Response
+    schema:
+      description: Delete Calibrations Partial Success Response
+      title: DeleteCalibrationsPartialSuccessResponse
+      type: object
+      required:
+        - calibrationIds
+      properties:
+        calibrationIds:
+          description: Array of calibration entry identifiers that were deleted
+          type: array
+          items:
+            type: string
+            example: "5c4f0834174ae321b8a95a03"
+        failed:
+          description: Array of calibration entry identifiers that failed to delete
+          type: array
+          items:
+            type: string
+            example: "5c4f0834174ae321b8a95a03"
+        error:
+          $ref: '#/definitions/Error'
   SendToFileIngestionOrDownloadResponse:
     description: Response for the query operation that consists either in the file information for when the result was sent to the file ingestion service or the report file content for download. In the latter case, the name of the file is provided in the header of the resonse with key='Filename'.
     schema:
@@ -1889,7 +1912,7 @@ paths:
         - $ref: '#/parameters/DeleteCalibrationsRequestBody'
       responses:
         200:
-          $ref: '#/responses/PartialSuccess'
+          $ref: '#/responses/DeleteCalibrationsPartialSuccessResponse'
         204:
           description: No Content
         400:
