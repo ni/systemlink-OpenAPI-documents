@@ -842,6 +842,13 @@ paths:
           name: metadata
           description: JSON Dictionary with key/value pairs
           type: string
+        - in: formData
+          name: id
+          description: >-
+            Optional field that allows the client to specify the ID of the file
+            once it is uploaded. An ID is expected to be a 24-digit hex string,
+            which is unique among all files.
+          type: string
       responses:
         201:
           description: OK
