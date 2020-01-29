@@ -1802,8 +1802,6 @@ paths:
       responses:
         200:
           $ref: '#/responses/AssetDetailsResponse'
-        400:
-          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
         404:
