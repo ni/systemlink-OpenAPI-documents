@@ -780,10 +780,10 @@ parameters:
   QueryAssetsRequest:
     in: body
     name: queryAssets
-    description: Request body consisting of filters to apply when retrieving assets. Currently, the valid combinations of ResponseFormat and Destination are [JSON;INLINE], [CSV;DOWNLOAD], [CSV;FILE_SERVICE]
+    description: Request body consisting of filters to apply when retrieving assets. Currently, the valid combinations of ResponseFormat and Destination are [JSON;INLINE], [CSV;DOWNLOAD], [CSV;FILE_SERVICE].
     schema:
       title: Query Assets Request
-      description: Object containing filters to apply when retrieving assets.
+      description: Object containing filters to apply when retrieving assets. If no assets match the filter and the destination is "DOWNLOAD" or "FILE_SERVICE", an empty report will be generated.
       type: object
       properties:
         ids:
@@ -801,7 +801,15 @@ parameters:
         take:
           $ref: '#/definitions/Take'
         calibratableOnly:
-          description: Whether to generate a report with calibrated asset specific columns.
+          description: >-
+            Whether to generate a report with calibrated asset specific columns.
+
+            When the destination is "DOWNLOAD or "FILE_SERVICE" this property is used as follows:
+
+            - It determines the type of the report. When true, the file will be a calibration report. If this is false, the file will be an asset report. 
+            
+            - If asset ids are in the request, this property will not be used for filtering. If no asset ids are in the request, setting this property to true will generate a report only for the calibrated assets.
+          
           type: boolean
           default: false
         filter:
