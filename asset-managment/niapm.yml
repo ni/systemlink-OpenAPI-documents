@@ -602,7 +602,7 @@ definitions:
           example: "2916201B245D642430"
       utilizationTimestamp:
         description: >-
-          A date time value which can be used to specify the end of an utilization.
+          A date time value which can be used to specify the end of an asset utilization.
 
           This parameter must have the "ISO 8601" format in order to be considered valid.
         type: string
@@ -2030,8 +2030,8 @@ paths:
           It will return a partial success when end utilization information can be stored for only a subset of the utilization identifiers provided in the request.
           It will return a not found response when no stored utilizations matched the provided utilization identifiers.
       operationId: end-multiple-asset-utilization
-      x-ni-operation: updateUtilization
-      x-ni-privilege: Update
+      x-ni-operation: writeAssets
+      x-ni-privilege: Write
       parameters:
         - $ref: '#/parameters/EndUtilizationRequest'
       responses:
@@ -2056,8 +2056,8 @@ paths:
           It will return a partial success when utilization heartbeat information can be stored for only a subset of the utilization identifiers provided in the request.
           It will return a not found response when no stored utilizations matched the provided utilization identifiers.
       operationId: asset-utilization-multiple-heartbeats
-      x-ni-operation: updateUtilization
-      x-ni-privilege: Update
+      x-ni-operation: writeAssets
+      x-ni-privilege: Write
       parameters:
         - $ref: '#/parameters/HeartbeatUtilizationRequest'
       responses:
