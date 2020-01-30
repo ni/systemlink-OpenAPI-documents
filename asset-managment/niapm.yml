@@ -25,7 +25,7 @@ securityDefinitions:
     in: header
     name: Cookie
 security:
-  - apiKeyAuth: []        
+  - apiKeyAuth: []
   - basicAuth: []
   - cookieAuth: []
 x-ni-routing-key: Skyline.AssetPerformanceManagement
@@ -129,8 +129,18 @@ definitions:
       - ACCESSORY
       - CAN
       - SWITCH_BLOCK_DEVICE
-  SystemConnectionState:
-    title: System Connection State
+  AssetType:
+    title: Asset Type
+    description: All supported asset types.
+    type: string
+    default: GENERIC
+    enum:
+      - GENERIC
+      - DEVICE_UNDER_TEST
+      - FIXTURE
+      - SYSTEM
+  SystemConnectionStatus:
+    title: System Connection Status
     description: Whether or not the minion is connected to the server and has updated the server with its data.
     type: string
     enum:
@@ -145,21 +155,22 @@ definitions:
     title: Asset Presence Status
     description: The status of an asset's presence in a system.
     type: string
+    default: NOT_PRESENT
     enum:
       - INITIALIZING
       - UNKNOWN
       - NOT_PRESENT
       - PRESENT
   CalibrationHistoryModel:
+    title: Calibration History
+    description: The calibration history for an asset.
     allOf:
       - $ref: '#/definitions/ExternalCalibrationModel'
-      - title: Calibration History
-      - description: The calibration history for an asset.
       - type: object
-      - required:
+        required:
         - id
         - calibrationType
-      - properties:
+        properties:
           id:
             description: The calibration entry identifier.
             type: string
@@ -193,15 +204,24 @@ definitions:
     enum:
       - SELF_CALIBRATION
       - EXTERNAL_CALIBRATION
-  AssetStateModel:
-    title: Asset State
-    description: The status of an asset and the system to which it is connected.
+  AssetPresenceModel:
+    title: Asset Presence Model
+    description: The presence of an asset. Wraps the AssetPresenceStatus into an object.
     type: object
+    required:
+      - assetPresence
     properties:
-      systemConnection:
-        $ref: '#/definitions/SystemConnectionState'
       assetPresence:
         $ref: '#/definitions/AssetPresenceStatus'
+  AssetPresenceWithSystemConnectionModel:
+    title: Asset Presence With System Connection Model
+    description: The presence of an asset and the connection of the system in which it resides.
+    allOf:
+      - $ref: '#/definitions/AssetPresenceModel'
+      - type: object
+        properties:
+          systemConnection:
+            $ref: '#/definitions/SystemConnectionStatus'
   TemperatureSensorModel:
     title: Temperature Sensor
     description: The sensor name and temperature reading in Celsius.
@@ -218,10 +238,12 @@ definitions:
         type: number
         format: double
         example: 25.8
-  AssetLocationModel:
-    title: Asset Location
-    description: Information about the asset and the system in which it resides.
+  BaseAssetLocationModel:
+    title: Base Asset Location Model
+    description: Basic information about the asset and the system in which it resides. Base class for other models.
     type: object
+    required:
+      - minionId
     properties:
       minionId:
         description: Identifier of the minion where the asset is located.
@@ -239,12 +261,28 @@ definitions:
         description: The number of the slot in which the asset is located.
         type: integer
         example: 2
-      systemName:
-        description: Hostname of the system.
-        type: string
-        example: APM-PXI1
-      state:
-        $ref: '#/definitions/AssetStateModel'
+  AssetLocationWithPresenceModel:
+    title: Asset Location With Presence Model
+    description: Information about the asset location and presence. Used in create or update operations.
+    allOf:
+      - $ref: '#/definitions/BaseAssetLocationModel'
+      - type: object
+        properties:
+          state:
+            $ref: '#/definitions/AssetPresenceModel'
+  AssetLocationModel:
+    title: Asset Location Model
+    description: Information about the asset location, presence and the connection status of the system in which it resides.
+    allOf:
+      - $ref: '#/definitions/BaseAssetLocationModel'
+      - type: object
+        properties:
+          systemName:
+            description: Hostname of the system.
+            type: string
+            example: APM-PXI1
+          state:
+            $ref: '#/definitions/AssetPresenceWithSystemConnectionModel'
   ExternalCalibrationOperatorModel:
     title: External Calibration Operator
     description: The information about the operator who performed the calibration.
@@ -253,9 +291,11 @@ definitions:
       displayName:
         description: Display name of logged in user.
         type: string
+        example: John Doe
       userId:
         description: Identifier of the logged in user.
         type: string
+        example: johnDoe2020
   SelfCalibrationModel:
     title: Self-Calibration
     description: Contains data from the last self-calibration.
@@ -313,119 +353,135 @@ definitions:
       comments:
         description: Calibration comments provided by an operator.
         type: string
+        example: This is a comment.
   ExternalCalibrationModel:
+    title: External Calibration
+    description: Data from the last external calibration.
     allOf:
       - $ref: '#/definitions/ExternalCalibrationBaseModel'
-      - title: External Calibration
-      - description: Data from the last external calibration
       - type: object
-      - properties:
+        properties:
           entryType:
             $ref: '#/definitions/CalibrationMode'
           operator:
             $ref: '#/definitions/ExternalCalibrationOperatorModel'
+  BaseAssetModel:
+    title: Base Asset Model
+    description: An object describing basic properties of an asset. Base class for other models.
+    allOf:
+      - $ref: '#/definitions/AssetIdentificationModel'
+      - type: object
+        properties:
+          name:
+            description: Name of the asset.
+            type: string
+            example: PCISlot2
+          assetType:
+            $ref: '#/definitions/AssetType'
+          firmwareVersion:
+            description: Firmware version of the asset.
+            type: string
+            example: A1
+          hardwareVersion:
+            description: Hardware version of the asset.
+            type: string
+            example: 12A
+          visaResourceName:
+            description: VISA resource name of the asset.
+            type: string
+            example : vs-1234
+          temperatureSensors:
+            description: An array of temperature sensor information.
+            type: array
+            items:
+              $ref: '#/definitions/TemperatureSensorModel'
+          supportsSelfCalibration:
+            description: Whether the asset supports self-calibration.
+            type: boolean
+            example: true
+          supportsExternalCalibration:
+            description: Whether the asset supports external calibration.
+            type: boolean
+            example: true
+          selfCalibration:
+            $ref: '#/definitions/SelfCalibrationModel'
+          externalCalibration:
+            $ref: '#/definitions/ExternalCalibrationModel'
+          isNIAsset:
+            description: Whether this asset is an NI asset (true) or a third-party asset (false).
+            type: boolean
+            example: true
+  AssetCreateModel:
+    title: Asset Create Model
+    description: >-
+          An object describing the properties for creating an asset.
+          
+          
+          Unique Asset Identification is required to create an asset. See AssetIdentificationModel for details.
+    allOf:
+      - $ref: '#/definitions/BaseAssetModel'
+      - type: object
+        required:
+          - name
+          - location
+        properties:
+          location:
+            $ref: '#/definitions/AssetLocationWithPresenceModel'
+  AssetUpdateModel:
+    title: Asset Update Model
+    description: >-
+          An object describing the properties for updating an asset.
+          
+          
+          Unique Asset Identification is required to create an asset. If the id property is not specified, a set of properties are required to identify an asset. See AssetIdentificationModel for details.
+          If the id is specified on the model, the following properties will be ignored: busType, modelName, modelNumber, vendorName, vendorNumber and serialNumber.
+    allOf:
+      - $ref: '#/definitions/BaseAssetModel'
+      - type: object
+        properties:
+          id:
+            description: Unique identifier of the asset.
+            type: string
+            example: "29162;01B245D6;4243;0"
+          location:
+            $ref: '#/definitions/AssetLocationWithPresenceModel'
   AssetModel:
     title: Asset Model
     description: An object describing an asset with all of its properties.
-    type: object
-    required:
-      - id
-      - modelName
-      - modelNumber
-      - serialNumber
-      - vendorName
-      - vendorNumber
-      - busType
-    properties:
-      id:
-        description: Unique identifier of the asset.
-        type: string
-        example: "29162;01B245D6;4243;0"
-      serialNumber:
-        description: Serial number of the asset.
-        type: string
-        example: "01BB877A"
-      modelName:
-        description: Model name of the asset.
-        type: string
-        example: "NI PXIe-6368"
-      modelNumber:
-        description: Model number of the asset.
-        type: integer
-        example : 123
-      vendorName:
-        description: Vendor name of the asset.
-        type: string
-        example: National Instruments
-      vendorNumber:
-        description: Vendor number of the asset.
-        type: integer
-        example: 4244
-      name:
-        description: Name of the asset.
-        type: string
-        example: PCISlot2
-      firmwareVersion:
-        description: Firmware version of the asset.
-        type: string
-        example: A1
-      hardwareVersion:
-        description: Hardware version of the asset.
-        type: string
-        example: 12A
-      busType:
-        $ref: '#/definitions/BusType'
-      visaResourceName:
-        description: VISA resource name of the asset.
-        type: string
-        example : vs-1234
-      location:
-        $ref: '#/definitions/AssetLocationModel'
-      temperatureSensors:
-        description: An array of temperature sensor information.
-        type: array
-        items:
-          $ref: '#/definitions/TemperatureSensorModel'
-      supportsSelfCalibration:
-        description: Whether the asset supports self-calibration.
-        type: boolean
-        example: true
-      supportsExternalCalibration:
-        description: Whether the asset supports external calibration.
-        type: boolean
-        example: true
-      selfCalibration:
-        $ref: '#/definitions/SelfCalibrationModel'
-      externalCalibration:
-        $ref: '#/definitions/ExternalCalibrationModel'
-      calibrationStatus:
-        $ref: '#/definitions/CalibrationStatus'
-      lastUpdatedTimestamp:
-        description: ISO-8601 formatted timestamp specifying the last date that the asset has had a property update.
-        type: string
-        format: date-time
-        example: '2018-05-07T18:58:05.219692Z'
-      isNIAsset:
-        description: Whether this asset is an NI asset (true) or a third-party asset (false).
-        type: boolean
-        example: true
-      isSystemController:
-        description: Whether this asset represents a System Controller.
-        type: boolean
-        example: true
-      properties:
-        description: Key-value-pair metadata associated with an asset.
-        type: object
-        additionalProperties:
-          type: string
-        example:
-          Key1: Value1
-      keywords:
-        description: Words or phrases associated with an asset.
-        type: array
-        items:
-          type: string
-          example: Keyword1
+    allOf:
+      - $ref: '#/definitions/BaseAssetModel'
+      - type: object
+        properties:
+          id:
+            description: Unique identifier of the asset.
+            type: string
+            example: "29162;01B245D6;4243;0"
+          location:
+            $ref: '#/definitions/AssetLocationModel'
+          calibrationStatus:
+            $ref: '#/definitions/CalibrationStatus'
+          isSystemController:
+            description: Whether this asset represents a System Controller.
+            type: boolean
+            example: true
+          properties:
+            description: Key-value-pair metadata associated with an asset.
+            type: object
+            additionalProperties:
+              type: string
+            example:
+              Key1: Value1
+          keywords:
+            description: Words or phrases associated with an asset.
+            type: array
+            items:
+              type: string
+              example: Keyword1
+          lastUpdatedTimestamp:
+            description: ISO-8601 formatted timestamp specifying the last date that the asset has had a property update.
+            type: string
+            format: date-time
+            example: '2018-05-07T18:58:05.219692Z'
   AssetWithAvailabilityHistoryModel:
     title: Asset With Availability History
     description: Information about the availability, or connection, history of an asset, which also contains information about each system in which the asset was present.
@@ -723,6 +779,36 @@ parameters:
           items:
             type: string
           example: ["29162;01B245D6;4243;0"]
+  CreateAssetsRequestBody:
+    in: body
+    name: createAssets
+    description: Request body containing an array of assets that should be created.
+    required: true
+    schema:
+      title: Create Assets Request
+      description: Request body containing an array of assets that should be created.
+      type: object
+      properties:
+        assets:
+          description: Multiple assets that should be created.
+          type: array
+          items:
+            $ref: '#/definitions/AssetCreateModel'
+  UpdateAssetsRequestBody:
+    in: body
+    name: updateAssets
+    description: Request body containing an array of assets to update.
+    required: true
+    schema:
+      title: Update Assets Request
+      description: Request body containing an array of assets to update.
+      type: object
+      properties:
+        assets:
+          description: Multiple assets that should be updated.
+          type: array
+          items:
+            $ref: '#/definitions/AssetUpdateModel'
   DeleteCalibrationsRequestBody:
     in: body
     name: deleteCalibrationsRequestBody
@@ -1407,11 +1493,11 @@ responses:
     description: Asset summary response containing the count of active assets, inactive assets and the total number of assets.
     schema:
       title: Asset Summary Response
-      description: Asset summary response containing the total number of assets, the number of assets which are active (present in a connected system) and the number of assets which are not active.
+      description: Asset summary response containing the total number of assets, the number of assets which are active, i.e. present in a connected system, and the number of assets which are not active.
       type: object
       properties:
         active:
-          description: Number of assets which are active (present in a connected system).
+          description: Number of assets which are active, i.e. present in a connected system.
           type: integer
           example: 12
         notActive:
@@ -1527,6 +1613,25 @@ responses:
             example: "5c4f0834174ae321b8a95a03"
         error:
           $ref: '#/definitions/Error'
+  CreateAssetsPartialSuccessResponse:
+    description: Create Assets Partial Success Response
+    schema:
+      title: CreateAssetsPartialSuccessResponse
+      description: Create Assets Partial Success Response
+      type: object
+      properties:
+        assets:
+          description: Array of created assets
+          type: array
+          items:
+            $ref: '#/definitions/AssetModel'
+        failed:
+          description: Array of assets create requests that failed
+          type: array
+          items:
+            $ref: '#/definitions/AssetCreateModel'
+        error:
+          $ref: '#/definitions/Error'
   SendToFileIngestionOrDownloadResponse:
     description: Response for the query operation that consists either in the file information for when the result was sent to the file ingestion service or the report file content for download. In the latter case, the name of the file is provided in the header of the resonse with key='Filename'.
     schema:
@@ -1544,6 +1649,25 @@ responses:
     description: Service policy response containing the service calibration policy with the number of days for an asset to be considered as approaching calibration.
     schema:
       $ref: '#/definitions/ServicePolicyModel'
+  UpdateAssetsPartialSuccessResponse:
+    description: Update Assets Partial Success Response
+    schema:
+      title: UpdateAssetsPartialSuccessResponse
+      description: Update Assets Partial Success Response
+      type: object
+      properties:
+        assets:
+          description: Array of updated assets
+          type: array
+          items:
+            $ref: '#/definitions/AssetModel'
+        failed:
+          description: Array of assets update requests that failed
+          type: array
+          items:
+            $ref: '#/definitions/AssetUpdateModel'
+        error:
+          $ref: '#/definitions/Error'
   UtilizationWithPercentageResponse:
     description: Utilization response containing the collection of utilizations matching the provided filters, in a specific time interval. Besides a time interval, each element contains an asset identifier, a minion id, an utilization category, and a percentage of time that the asset was utilized in the time interval.
     schema:
@@ -1754,14 +1878,86 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+    post:
+      tags: [assets]
+      summary: Creates assets
+      description: >-
+        Creates new assets with the provided information. 
+        
+        
+        If an asset with the provided identification does not exist on the server, a new asset is created. If an asset with the provided identification already exists on the server, no create or update operation will be performed for the respective identification and the final response will contain an error message describing the actual reason.
+        
+        
+        If the selfCalibration property is set, the supportsSelfCalibration property is automatically set to true by the service no matter if it is specified as false. The same is true for the externalCalibration and supportsExternalCalibration properties.
+      operationId: create-assets
+      x-ni-operation: writeAssets
+      x-ni-privilege: Write
+      parameters:
+        - $ref: '#/parameters/CreateAssetsRequestBody'
+      responses:
+        200:
+          $ref: '#/responses/CreateAssetsPartialSuccessResponse'
+        201:
+          description: Created
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/update-assets:
+    post:
+      tags: [assets]
+      summary: Updates multiple assets
+      description: >-
+        Updates multiple assets. If an asset with the provided identification does not exist, that asset is not created and an error is returned instead.
+        Any property that is not set or set to null is ignored.
+
+        The properties that cannot be updated are:
+
+        - busType
+
+        - modelName
+
+        - modelNumber
+
+        - vendorName
+
+        - vendorNumber
+
+        - serialNumber
+
+        - id
+
+
+        If the selfCalibration property is set, the supportsSelfCalibration property is automatically set to true by the service, no matter if it is specified as false. The same is true for the externalCalibration and supportsExternalCalibration properties.
+
+
+        Updating the assetPresence property to NOT_PRESENT succeeds only if it is updated with the same minionId, parent and slotNumber. Updating it to PRESENT always succeeds.
+      operationId: update-assets
+      x-ni-operation: writeAssets
+      x-ni-privilege: Write
+      parameters:
+        - $ref: '#/parameters/UpdateAssetsRequestBody'
+      responses:
+        200:
+          $ref: '#/responses/UpdateAssetsPartialSuccessResponse'
+        204:
+          description: No Content
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v1/asset-summary:
     get:
       tags: [assets]
       summary: Gets a summary of assets
-      description: Gets asset summary response containing the total number of assets, the number of assets which are active (present in a connected system) and the number of assets which are not active.
+      description: Gets asset summary response containing the total number of assets, the number of assets which are active, i.e. present in a connected system, and the number of assets which are not active.
       operationId: get-asset-summary
       x-ni-operation: readAssets
-      x-ni-priviledge: Read
+      x-ni-privilege: Read
       responses:
           200:
             $ref: '#/responses/AssetSummaryResponse'
@@ -1776,7 +1972,7 @@ paths:
       description: Gets asset summary of the total number of assets supporting calibration, the number of assets approaching calibration date and the number of assets past their calibration date
       operationId: get-calibratable-asset-summary
       x-ni-operation: readAssets
-      x-ni-priviledge: Read
+      x-ni-privilege: Read
       responses:
           200:
             $ref: '#/responses/CalibratedAssetSummaryResponse'
@@ -1812,7 +2008,7 @@ paths:
       description: Gets the asset which has the given identifier.
       operationId: get-asset-with-identifier
       x-ni-operation: readAssets
-      x-ni-priviledge: Read
+      x-ni-privilege: Read
       parameters:
         - $ref: '#/parameters/AssetId'
       responses:
@@ -1831,7 +2027,7 @@ paths:
       description: Returns availability information for an asset in the specified timespan and split based on the specified time granularity.
       operationId: get-asset-availability-history
       x-ni-operation: readAssets
-      x-ni-priviledge: Read
+      x-ni-privilege: Read
       parameters:
         - $ref: '#/parameters/AssetId'
         - in: query
@@ -1875,7 +2071,7 @@ paths:
       description: Returns the calibration history of the asset which has the given identifier.
       operationId: get-asset-calibration-history
       x-ni-operation: readAssets
-      x-ni-priviledge: Read
+      x-ni-privilege: Read
       parameters:
         - $ref: '#/parameters/AssetId'
         - $ref: '#/parameters/Skip'
@@ -1897,7 +2093,7 @@ paths:
       description: Creates a new calibration history entry for a third-party asset.
       operationId: post-asset-calibration-history
       x-ni-operation: writeAssets
-      x-ni-priviledge: Write
+      x-ni-privilege: Write
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       parameters:
         - $ref: '#/parameters/AssetId'
@@ -1920,7 +2116,7 @@ paths:
       description: Deletes multiple calibration history entries for an asset.
       operationId: post-delete-asset-calibration-history
       x-ni-operation: deleteAssets
-      x-ni-priviledge: Write
+      x-ni-privilege: Write
       parameters:
         - $ref: '#/parameters/AssetId'
         - $ref: '#/parameters/DeleteCalibrationsRequestBody'
@@ -1944,7 +2140,7 @@ paths:
       description: Computes the calibration history of an asset in CSV format. If the destination is download, the response will contain the calibration history file content. If the destination is file ingestion service, the CSV file is sent to the file storing service and an object containing the file identifier is returned. Any other format and destination combinations are not supported yet.
       operationId: post-asset-query-calibration-history
       x-ni-operation: readAssets
-      x-ni-priviledge: Read
+      x-ni-privilege: Read
       parameters:
         - $ref: '#/parameters/AssetId'
         - $ref: '#/parameters/QueryHistoryRequestBody'
@@ -1968,7 +2164,7 @@ paths:
       description: Computes the location history of an asset in CSV format. If the destination is download, the response will contain the location history file content. If the destination is file ingestion service, the CSV file is sent to the file storing service and an object containing the file identifier is returned. Any other format and destination combinations are not supported yet.
       operationId: post-asset-query-location-history
       x-ni-operation: readAssets
-      x-ni-priviledge: Read
+      x-ni-privilege: Read
       parameters:
         - $ref: '#/parameters/AssetId'
         - $ref: '#/parameters/QueryHistoryRequestBody'
@@ -1992,7 +2188,7 @@ paths:
       description: Performs a request to update the metadata information of an asset.
       operationId: update-asset-metadata
       x-ni-operation: writeAssets
-      x-ni-priviledge: Write
+      x-ni-privilege: Write
       consumes:
         - application/merge-patch+json
       parameters:
@@ -2088,7 +2284,7 @@ paths:
         404:
           $ref: '#/responses/NotFound'
         default:
-          $ref: '#/responses/Error'          
+          $ref: '#/responses/Error'
   /v1/compare-assets-availability:
     post:
       tags: [assets]
@@ -2096,7 +2292,7 @@ paths:
       description: Gets availability history for multiple assets based on a specified timespan.
       operationId: compare-asset-availability
       x-ni-operation: readAssets
-      x-ni-priviledge: Read
+      x-ni-privilege: Read
       parameters:
         - $ref: '#/parameters/AssetAvailabilityComparison'
       responses:
@@ -2128,7 +2324,7 @@ paths:
       description: Deletes all persisted data for the assets with the provided identifiers. This includes asset properties and all related historical information.
       operationId: delete-assets
       x-ni-operation: deleteAssets
-      x-ni-priviledge: Write
+      x-ni-privilege: Write
       parameters:
         - $ref: '#/parameters/DeleteAssetsRequestBody'
       responses:
@@ -2189,7 +2385,7 @@ paths:
       description: Retrieves the service policy.
       operationId: get-policy
       x-ni-operation: readAssets
-      x-ni-priviledge: Read
+      x-ni-privilege: Read
       responses:
         200:
           $ref: '#/responses/ServicePolicyResponse'
@@ -2203,7 +2399,7 @@ paths:
       description: Performs a request to update the service policy.
       operationId: update-policy
       x-ni-operation: writeAssets
-      x-ni-priviledge: Write
+      x-ni-privilege: Write
       consumes:
         - application/merge-patch+json
       parameters:
