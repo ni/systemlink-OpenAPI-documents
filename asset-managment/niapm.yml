@@ -482,6 +482,24 @@ definitions:
             type: string
             format: date-time
             example: '2018-05-07T18:58:05.219692Z'
+  AssetMetadata:
+    title: Asset Metadata
+    description: Information about asset metadata
+    type: object
+    properties:
+      keywords:
+        description: Words or phrases associated with an asset.
+        type: array
+        items:
+          type: string
+          example: Keyword1
+      properties:
+        description: Key-value-pair metadata associated with an asset.
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          Key1: Value1
   AssetWithAvailabilityHistoryModel:
     title: Asset With Availability History
     description: Information about the availability, or connection, history of an asset, which also contains information about each system in which the asset was present.
@@ -877,7 +895,7 @@ parameters:
           type: array
           items:
             type: string
-          example: ["29162;01B245D6;4243;0"]
+          example: []
         responseFormat:
           $ref: '#/definitions/ResponseFormat'
         destination:
@@ -1160,18 +1178,22 @@ parameters:
                 description: >-
                   A date time value which can be used to specify the beginning of a timespan.
 
-                  This parameter is required to have the "ISO 8601" format in order to be considered valid.
+                  This parameter is required to have the "ISO 8601" format in order to be considered valid. 
+            
+                  The time component of the request is ignored.
                 type: string
                 format: date-time
-                example: '2019-05-01T00:00:00.519Z'
+                example: '2019-05-01T00:00:00.000Z'
               endDate:
                 description: >-
                   A date time value which can be used to specify the end of a timespan.
 
                   This parameter is required to have the "ISO 8601" format in order to be considered valid.
+            
+                  The time component of the request is ignored.
                 type: string
                 format: date-time
-                example: '2019-05-20T00:00:00Z'
+                example: '2019-05-20T00:00:000Z'
   QueryAssetUtilizationHistoryRequest:
     in: body
     name: queryBody
@@ -1528,7 +1550,7 @@ responses:
           type: array
           items:
             type: string
-            example: "29162;01B245D6;4243;0"
+            example: "13562;01B245D6;4243;0"
         error:
           $ref: '#/definitions/Error'
   AvailabilityInSystemResponse:
@@ -1668,6 +1690,44 @@ responses:
             $ref: '#/definitions/AssetUpdateModel'
         error:
           $ref: '#/definitions/Error'
+  UpdateAssetMetadataPartialSuccessResponse:
+    description: Update Asset Metadata Partial Success Response
+    schema:
+      description: Update Asset Metadata Partial Success Response
+      title: UpdateAssetMetadataPartialSuccessResponse
+      type: object
+      required:
+        - succeeded
+      properties:
+        succeeded:
+          $ref: '#/definitions/AssetMetadata'
+        failed:
+          $ref: '#/definitions/AssetMetadata'
+        error:
+          $ref: '#/definitions/Error'
+      example:
+        succeeded:
+          keywords: [ Keyword1 ]
+          properties:
+            Key1: Value1
+        failed:
+          keywords: [ BadKeyword1 ]
+          properties:
+            BadKey1: BadValue1
+        error:
+          name: Skyline.OneOrMoreErrorsOccurred
+          code: -251040
+          message: >-
+            One or more errors occurred. See the contained list for details of each
+            error.
+          args: []
+          innerErrors:
+            - name: AssetPerformanceManagement.InvalidKeywordInUpdateMetadataRequest
+              code: -253435
+              resourceType: Asset
+              resourceId: BadKeyword1
+              message: 'Invalid keyword value: BadKeyword1.'
+              args: [BadKeyword1]
   UtilizationWithPercentageResponse:
     description: Utilization response containing the collection of utilizations matching the provided filters, in a specific time interval. Besides a time interval, each element contains an asset identifier, a minion id, an utilization category, and a percentage of time that the asset was utilized in the time interval.
     schema:
@@ -1841,7 +1901,11 @@ paths:
     get:
       tags: [assets]
       summary: Gets assets
-      description: Gets a list of assets. Calibrated assets can be obtained by setting calibratableOnly=true. To obtain a report of the assets, reponseFormat=csv&destination=download should be sent as query parameters.
+      description: >-
+        Gets a list of assets. Calibrated assets can be obtained by setting calibratableOnly=true. To obtain a report of the assets, reponseFormat=csv&destination=download should be sent as query parameters.
+
+
+        Currently, the valid combinations of ResponseFormat and Destination are [JSON;INLINE], [CSV;DOWNLOAD], [CSV;FILE_SERVICE].
       operationId: get-assets
       x-ni-operation: readAssets
       x-ni-privilege: Read
@@ -2040,7 +2104,7 @@ paths:
             
             The time component of the request is ignored.
           type: string
-          x-example: '2018-05-01T00:00:00.519Z'
+          x-example: '2018-05-01T00:00:00.000Z'
         - in: query
           name: endDate
           required: true
@@ -2196,7 +2260,7 @@ paths:
         - $ref: '#/parameters/UpdateMetadata'
       responses:
         200:
-          $ref: '#/responses/PartialSuccess'
+          $ref: '#/responses/UpdateAssetMetadataPartialSuccessResponse'
         204:
           description: No Content
         400:
