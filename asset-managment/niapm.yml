@@ -2099,8 +2099,6 @@ paths:
           $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          $ref: '#/responses/NotFound'
         default:
           $ref: '#/responses/Error'
   /v1/assets/{assetId}:
@@ -2405,14 +2403,18 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/AssetWithAvailabilityHistoryModel'
+              failed:
+                description: Array of asset identifiers for which obtaining availability failed
+                type: array
+                items:
+                  type: string
+                  example: [ "13562;01B245D6;4243;0" ]
               error:
                 $ref: '#/definitions/Error'
         400:
           $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          $ref: '#/responses/NotFound'
         default:
           $ref: '#/responses/Error'
   /v1/delete-assets:
@@ -2451,8 +2453,6 @@ paths:
           $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          $ref: '#/responses/NotFound'
         default:
           $ref: '#/responses/Error'
   /v1/query-asset-utilization-history:
@@ -2472,8 +2472,6 @@ paths:
           $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          $ref: '#/responses/NotFound'
         default:
           $ref: '#/responses/Error'
   /v1/policy:
