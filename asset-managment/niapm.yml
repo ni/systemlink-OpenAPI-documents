@@ -1871,6 +1871,29 @@ responses:
 
           type: string
           example: token
+  UpdateUtilizationPartialSuccessResponse:
+    description: Update utilization partial success response. The update operation can be either a heartbeat update or a utilization end.
+    schema:
+      description: Update utilization partial success response.
+      title: UpdateUtilizationPartialSuccessResponse
+      type: object
+      required:
+        - updatedUtilizationIds
+      properties:
+        updatedUtilizationIds:
+          description: Array of utilization identifiers for the entries that were updated.
+          type: array
+          items:
+            type: string
+            example: "5c4f0834174ae321b8a95a03"
+        failed:
+          description: Array of utilization identifiers for the entries that failed to update.
+          type: array
+          items:
+            type: string
+            example: "5c4f0834174ae321b8a95a04"
+        error:
+          $ref: '#/definitions/Error'
 paths:
   /:
     get:
@@ -2327,15 +2350,13 @@ paths:
         - $ref: '#/parameters/EndUtilizationRequest'
       responses:
         200:
-          $ref: '#/responses/PartialSuccess'
+          $ref: '#/responses/UpdateUtilizationPartialSuccessResponse'
         204:
           description: No Content
         400:
           $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          $ref: '#/responses/NotFound'
         default:
           $ref: '#/responses/Error'
   /v1/assets/utilization-heartbeat:
@@ -2353,15 +2374,13 @@ paths:
         - $ref: '#/parameters/HeartbeatUtilizationRequest'
       responses:
         200:
-          $ref: '#/responses/PartialSuccess'
+          $ref: '#/responses/UpdateUtilizationPartialSuccessResponse'
         204:
           description: No Content
         400:
           $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          $ref: '#/responses/NotFound'
         default:
           $ref: '#/responses/Error'
   /v1/compare-assets-availability:
