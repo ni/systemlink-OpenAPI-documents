@@ -365,6 +365,17 @@ definitions:
             $ref: '#/definitions/CalibrationMode'
           operator:
             $ref: '#/definitions/ExternalCalibrationOperatorModel'
+  ExternalCalibrationWithChecksumModel:
+    title: External Calibration
+    description: Data from the last external calibration including checksum.
+    allOf:
+      - $ref: '#/definitions/ExternalCalibrationModel'
+      - type: object
+        properties:
+          checksum:
+            description: Checksum for the external calibration.
+            type: string
+            example: 7d9f4953655d48a6a5fd68e9dfd41345
   BaseAssetModel:
     title: Base Asset Model
     description: An object describing basic properties of an asset. Base class for other models.
@@ -405,8 +416,6 @@ definitions:
             example: true
           selfCalibration:
             $ref: '#/definitions/SelfCalibrationModel'
-          externalCalibration:
-            $ref: '#/definitions/ExternalCalibrationModel'
           isNIAsset:
             description: Whether this asset is an NI asset (true) or a third-party asset (false).
             type: boolean
@@ -427,6 +436,8 @@ definitions:
         properties:
           location:
             $ref: '#/definitions/AssetLocationWithPresenceModel'
+          externalCalibration:
+            $ref: '#/definitions/ExternalCalibrationWithChecksumModel'
   AssetUpdateModel:
     title: Asset Update Model
     description: >-
@@ -445,6 +456,8 @@ definitions:
             example: "29162;01B245D6;4243;0"
           location:
             $ref: '#/definitions/AssetLocationWithPresenceModel'
+          externalCalibration:
+            $ref: '#/definitions/ExternalCalibrationWithChecksumModel'
   AssetModel:
     title: Asset Model
     description: An object describing an asset with all of its properties.
@@ -464,6 +477,8 @@ definitions:
             description: Whether this asset represents a System Controller.
             type: boolean
             example: true
+          externalCalibration:
+            $ref: '#/definitions/ExternalCalibrationModel'
           properties:
             description: Key-value-pair metadata associated with an asset.
             type: object
