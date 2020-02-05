@@ -967,8 +967,6 @@ parameters:
 
             - AssetIdentifier: String representing the unique identifier of an asset.
 
-            - AssetClass: String enumeration representing the class of an asset. Possible values are: UNDEFINED, DISCOVERED, ASSET, DUT, FIXTURE.
-
             - SerialNumber: String representing the serial number of an asset.
 
             - ModelName: String representing the model name of an asset.
@@ -1124,8 +1122,6 @@ parameters:
               Valid asset properties that can be used in the filter:
 
               - AssetIdentifier: String representing the unique identifier of an asset.
-
-              - AssetClass: String enumeration representing the class of an asset. Possible values are: UNDEFINED, DISCOVERED, ASSET, DUT, FIXTURE.
 
               - SerialNumber: String representing the serial number of an asset.
 
@@ -1311,8 +1307,6 @@ parameters:
               Valid asset properties that can be used in the filter:
 
               - AssetIdentifier: String representing the unique identifier of an asset.
-
-              - AssetClass: String enumeration representing the class of an asset. Possible values are: UNDEFINED, DISCOVERED, ASSET, DUT, FIXTURE.
 
               - SerialNumber: String representing the serial number of an asset.
 
