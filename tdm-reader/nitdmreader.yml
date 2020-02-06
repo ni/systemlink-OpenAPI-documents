@@ -251,8 +251,6 @@ definitions:
         example: Channel 1
     required: 
       - fileId
-      - groupName
-      - channelName
   ChannelSpecifications:
     description: Array of x-y channel groups.  The x channel of each grouping is optional.
     properties:
