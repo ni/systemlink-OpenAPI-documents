@@ -233,7 +233,29 @@ definitions:
         type: boolean
         description: Look for specific properties in a channel that define the start and increment x values to use for each channel.
         default: false
-
+      groupBy:
+        type: string
+        description: List of channels to group by.
+        default: null
+        example: 'y0,x'
+      groupStride:
+        type: integer
+        description: Number of samples per group.
+        default: null
+        format: int32
+        example: 100
+      groupChannels:
+        type: array
+        items:
+          $ref: '#/definitions/OneChannelSpecifier'
+        default: null
+        description: Channels to use only to group. Values from these channels are not returned.
+      maxGroupsToReturn:
+        type: integer
+        default: null
+        format: int32
+        description: Maximum number of groups to return when grouping.
+        example: 100
   OneChannelSpecifier:
     description: Specification for a channel of data
     properties:
