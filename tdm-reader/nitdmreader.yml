@@ -228,7 +228,13 @@ definitions:
         type: string
         default: null
         description: Specify how to sort values before returning them.
-        example: '-y0,x'
+        example: '-y0,x,s0'
+      sortChannels:
+        type: array
+        items:
+          $ref: '#/definitions/OneChannelSpecifier'
+        default: null
+        description: Channels to use only to sort. Values from these channels are not returned.
       useWaveformProperties:
         type: boolean
         description: Look for specific properties in a channel that define the start and increment x values to use for each channel.
