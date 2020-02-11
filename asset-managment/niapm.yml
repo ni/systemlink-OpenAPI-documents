@@ -2325,8 +2325,6 @@ paths:
       responses:
         200:
           $ref: '#/responses/StartUtilizationPartialSuccessResponse'
-        201:
-          description: Created
         400:
           $ref: '#/responses/BadRequest'
         401:
