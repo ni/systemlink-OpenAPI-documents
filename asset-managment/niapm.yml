@@ -133,7 +133,6 @@ definitions:
     title: Asset Type
     description: All supported asset types.
     type: string
-    default: GENERIC
     enum:
       - GENERIC
       - DEVICE_UNDER_TEST
@@ -453,7 +452,7 @@ definitions:
           id:
             description: Unique identifier of the asset.
             type: string
-            example: "29162;01B245D6;4243;0"
+            example: "123;01BB877A;4244;0"
           location:
             $ref: '#/definitions/AssetLocationWithPresenceModel'
           externalCalibration:
@@ -653,8 +652,6 @@ definitions:
             - vendorName or vendorNumber
             - serialNumber or minionId (part of the Location)
     type: object
-    required: 
-    - busType
     properties:
       modelName:
         description: Model name of the asset.
