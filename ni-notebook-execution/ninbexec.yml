@@ -1032,6 +1032,7 @@ paths:
       - $ref: '#/parameters/notebookPath'
     get:
       operationId: GetNotebook
+      x-ni-auth: true
       x-ni-operation: queryNotebooks
       x-ni-privilege: Read
       x-ni-oldest-compatible-version: 1
@@ -1051,6 +1052,7 @@ paths:
   /v2/query-notebooks:
     post:
       operationId: QueryNotebooksV2
+      x-ni-auth: true
       x-ni-operation: queryNotebooks
       x-ni-privilege: Read
       x-ni-request-variables: [REMOTE_USER]
@@ -1099,6 +1101,7 @@ paths:
         Downloads a notebook file in a single HTTP response. Use the inline parameter in the query
         string to control the download behavior.
       operationId: DownloadNotebook
+      x-ni-auth: true
       x-ni-operation: downloadNotebook
       x-ni-privilege: Read
       x-ni-request-variables:
@@ -1137,6 +1140,7 @@ paths:
       - $ref: '#/parameters/executionId'
     get:
       operationId: GetExecution
+      x-ni-auth: true
       x-ni-operation: queryExecutions
       x-ni-privilege: Read
       x-ni-oldest-compatible-version: 1
@@ -1171,6 +1175,7 @@ paths:
   /v2/delete-executions:
     post:
       operationId: DeleteExecutions
+      x-ni-auth: true
       x-ni-operation: deleteExecutions
       x-ni-privilege: Write
       x-ni-oldest-compatible-version: 1
@@ -1207,6 +1212,7 @@ paths:
   /v2/query-executions:
     post:
       operationId: QueryExecutionsV2
+      x-ni-auth: true
       x-ni-operation: queryExecutions
       x-ni-privilege: Read
       summary: Query executions of Jupyter notebooks
@@ -1247,6 +1253,7 @@ paths:
   /v2/executions:
     post:
       operationId: CreateExecutions
+      x-ni-auth: true
       x-ni-operation: createExecutions
       x-ni-privilege: Read
       x-ni-request-all-privileges: true
@@ -1288,6 +1295,7 @@ paths:
   /v2/cancel-executions:
     post:
       operationId: CancelExecutions
+      x-ni-auth: true
       x-ni-operation: cancelExecutions
       x-ni-privilege: Write
       x-ni-oldest-compatible-version: 1
@@ -1324,6 +1332,7 @@ paths:
   /v1/query-notebooks:
     post:
       operationId: QueryNotebooks
+      x-ni-auth: true
       x-ni-operation: queryNotebooks
       x-ni-privilege: Read
       x-ni-request-variables: [REMOTE_USER]
@@ -1384,6 +1393,7 @@ paths:
   /v1/query-executions:
     post:
       operationId: QueryExecutions
+      x-ni-auth: true
       x-ni-operation: queryExecutions
       x-ni-privilege: Read
       summary: Query executions of Jupyter notebooks
