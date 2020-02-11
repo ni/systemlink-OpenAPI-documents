@@ -258,7 +258,7 @@ definitions:
     properties:
       x:
         $ref: '#/definitions/OneChannelData'
-      y:
+      'y':
         type: array
         description: Array of y channels
         items:
