@@ -2343,8 +2343,6 @@ paths:
       responses:
         200:
           $ref: '#/responses/UpdateUtilizationPartialSuccessResponse'
-        204:
-          description: No Content
         400:
           $ref: '#/responses/BadRequest'
         401:
@@ -2367,8 +2365,6 @@ paths:
       responses:
         200:
           $ref: '#/responses/UpdateUtilizationPartialSuccessResponse'
-        204:
-          description: No Content
         400:
           $ref: '#/responses/BadRequest'
         401:
