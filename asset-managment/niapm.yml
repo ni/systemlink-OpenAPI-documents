@@ -2002,8 +2002,6 @@ paths:
       responses:
         200:
           $ref: '#/responses/CreateAssetsPartialSuccessResponse'
-        201:
-          description: Created
         400:
           $ref: '#/responses/BadRequest'
         401:
@@ -2047,8 +2045,6 @@ paths:
       responses:
         200:
           $ref: '#/responses/UpdateAssetsPartialSuccessResponse'
-        204:
-          description: No Content
         400:
           $ref: '#/responses/BadRequest'
         401:
