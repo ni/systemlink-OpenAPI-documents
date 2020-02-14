@@ -503,6 +503,7 @@ paths:
       description: 'Gets all group names, channel names, channel information, and properties at all levels. This does not return channel data.'
       operationId: getAllFileInfo
       x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
       produces:
         - application/json
       parameters:
@@ -527,6 +528,7 @@ paths:
       description: 'Gets all group names, channel names, channel information, and properties at all levels. This does not return channel data.'
       operationId: getMultipleFileInfo
       x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
       produces:
         - application/json
       parameters:
@@ -552,6 +554,7 @@ paths:
       description: 'Gets all channel names, channel information, and properties for the channel. This does not return channel data.'
       operationId: queryChannels
       x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
       produces:
         - application/json
       parameters:
@@ -577,6 +580,7 @@ paths:
       description: Lists all group names in the file.
       operationId: getChannelPropertiesCount
       x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
       produces:
         - application/json
       parameters:
@@ -616,6 +620,7 @@ paths:
       description:  Lists all channel names for a group in a specific file.
       operationId: getChannels
       x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
       produces:
         - application/json
       parameters:
@@ -660,6 +665,7 @@ paths:
       description: Queries files based on channel and window specifications and returns channel data that matches the query. The channel specifications select channels by group and channel relationships. Window specifications determine a bounding box of minimum and maximum x and y values, as well as specify the type of decimation performed on data within the window.
       operationId: queryData
       x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
       produces:
         - application/json
       parameters:
@@ -685,6 +691,7 @@ paths:
       description: Queries files based on channel specifications and returns unique channel data values. The channel specifications select channels by group and channel relationships. The maximum number of unique values to return is determined by MaxNumberOfUniqueValues. If there are more unique values, then the first MaxNumberOfUniqueValues + 1 values are returned.
       operationId: queryUniqueValues
       x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
       produces:
         - application/json
       parameters:
@@ -710,6 +717,7 @@ paths:
       description: Creates a channel based on values from other channels.
       operationId: createCalculatedResult
       x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
       produces:
         - application/json
       parameters:
