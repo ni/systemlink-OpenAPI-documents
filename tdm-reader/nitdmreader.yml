@@ -262,6 +262,18 @@ definitions:
         format: int32
         description: Maximum number of groups to return when grouping.
         example: 100
+      groupItemIndexStart:
+        type: integer
+        default: null
+        format: int32
+        description: Index of first item in each group to return.
+        example: 100
+      groupItemMaxCount:
+        type: integer
+        default: null
+        format: int32
+        description: Maximum number of items to return per group.
+        example: 100
   OneChannelSpecifier:
     description: Specification for a channel of data
     properties:
