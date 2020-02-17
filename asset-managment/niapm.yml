@@ -181,6 +181,22 @@ definitions:
             type: string
             format: date-time
             example: '2018-05-07T18:58:05.219692Z'
+        example:
+          temperatureSensors: [
+            { name: 'Sensor0' , reading: 25.7 }
+          ]
+          isLimited: false
+          date: '2018-05-07T18:58:05.000Z'
+          recommendedInterval: 12
+          nextRecommendedDate: '2019-05-07T18:58:05.000Z'
+          comments: 'This is a comment.'
+          entryType: MANUAL
+          operator:
+            displayName: John Doe
+            userId: johnDoe2020
+          id: 5c4f0834174ae321b8a95a03
+          calibrationType: EXTERNAL_CALIBRATION
+          timestamp: '2018-05-07T18:58:05.219692Z'
   CalibrationStatus:
     title: Calibration Status
     description: The calibration category the asset belongs to based on the next due calibration date.
@@ -353,6 +369,15 @@ definitions:
         description: Calibration comments provided by an operator.
         type: string
         example: This is a comment.
+    example:
+      temperatureSensors: [
+        { name: 'Sensor0' , reading: 25.7 }
+      ]
+      isLimited: false
+      date: '2018-05-07T18:58:05.000Z'
+      recommendedInterval: 12
+      nextRecommendedDate: '2019-05-07T18:58:05.000Z'
+      comments: 'This is a comment.'
   ExternalCalibrationModel:
     title: External Calibration
     description: Data from the last external calibration.
@@ -364,6 +389,19 @@ definitions:
             $ref: '#/definitions/CalibrationMode'
           operator:
             $ref: '#/definitions/ExternalCalibrationOperatorModel'
+        example:
+          temperatureSensors: [
+            { name: 'Sensor0' , reading: 25.7 }
+          ]
+          isLimited: false
+          date: '2018-05-07T18:58:05.000Z'
+          recommendedInterval: 12
+          nextRecommendedDate: '2019-05-07T18:58:05.000Z'
+          comments: 'This is a comment.'
+          entryType: MANUAL
+          operator:
+            displayName: John Doe
+            userId: johnDoe2020
   ExternalCalibrationWithChecksumModel:
     title: External Calibration
     description: Data from the last external calibration including checksum.
@@ -375,6 +413,20 @@ definitions:
             description: Checksum for the external calibration.
             type: string
             example: 7d9f4953655d48a6a5fd68e9dfd41345
+        example:
+          temperatureSensors: [
+            { name: 'Sensor0' , reading: 25.7 }
+          ]
+          isLimited: false
+          date: '2018-05-07T18:58:05.000Z'
+          recommendedInterval: 12
+          nextRecommendedDate: '2019-05-07T18:58:05.000Z'
+          comments: 'This is a comment.'
+          entryType: MANUAL
+          operator:
+            displayName: John Doe
+            userId: johnDoe2020
+          checksum: 7d9f4953655d48a6a5fd68e9dfd41345
   BaseAssetModel:
     title: Base Asset Model
     description: An object describing basic properties of an asset. Base class for other models.
