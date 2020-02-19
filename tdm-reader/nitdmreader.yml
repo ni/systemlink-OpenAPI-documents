@@ -274,6 +274,11 @@ definitions:
         format: int32
         description: Maximum number of items to return per group.
         example: 100
+      ignoreXForDecimation:
+        type: boolean
+        default: null
+        description: If true, x is not used in decimation. Instead, indices are returend for x.
+        example: true
   OneChannelSpecifier:
     description: Specification for a channel of data
     properties:
