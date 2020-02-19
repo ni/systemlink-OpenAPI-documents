@@ -2065,7 +2065,15 @@ paths:
       tags: [assets]
       summary: Updates multiple assets
       description: >-
-        Updates multiple assets. If an asset with the provided identification does not exist, that asset is not created and an error is returned instead.
+        Updates multiple assets. To identify the assets that need to be updated, the following properties must be provided:
+
+        - id
+
+        OR
+
+        - asset identification properties. See AssetIdentificationModel for details.
+        
+        If an asset with the provided identification does not exist, that asset is not created and an error is returned instead.
         Any property that is not set or set to null is ignored.
 
         The properties that cannot be updated are:
