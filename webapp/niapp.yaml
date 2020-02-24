@@ -36,8 +36,8 @@ paths:
     put:
       tags:
         - metadata
-      summary: Update existing webapp metadata
-      description: Update webapp metadata by Id
+      summary: Update webapp metadata by Id
+      description: Update existing webapp metadata
       operationId: update-webapp
       parameters:
         - $ref: '#/parameters/WebAppId'
@@ -54,8 +54,8 @@ paths:
     delete:
       tags:
         - metadata
-      summary: ''
-      description: Delete webapp by id
+      summary: Delete webapp by Id
+      description: Delete existing webapp metadata and content
       operationId: delete-webapp
       parameters:
         - $ref: '#/parameters/WebAppId'
@@ -70,8 +70,8 @@ paths:
     get:
       tags:
         - metadata
-      summary: Lists the webapps
-      description: Lists the webapps
+      summary: List the webapps
+      description: List the webapps
       operationId: list-webapps
       parameters:
         - in: query
@@ -88,16 +88,16 @@ paths:
           - WebVI
         - in: query
           name: userId
-          description: Filters the webapps by the user id of the owner
+          description: Filters the webapps by the user Id of the owner
           type: string
         - in: query
           name: workspace
-          description: Filters the webapps by workspace id
+          description: Filters the webapps by workspace Id
           type: string
         - in: query
           name: continuationToken
           description: The continuation token can be used to paginate through the webapp list results. Provide a token to continue a previous listing.
-          type: integer
+          type: string
         - in: query
           name: take
           description: How many webapps to return in the result
@@ -145,8 +145,8 @@ paths:
     get:
       tags:
         - metadata
-      summary: List the emails the user has shared webapps with
-      description: List the emails the user has shared webapps with
+      summary: List the emails with which the user has shared webapps
+      description: List the emails with which the user has shared webapps
       operationId: list-shared-emails
       responses:
         200:
@@ -173,7 +173,7 @@ paths:
       tags:
         - content
       summary: Upload content for an existing webapp
-      description: Upload content an existing webapp
+      description: Upload content for an existing webapp
       operationId: update-content
       parameters:
         - $ref: '#/parameters/WebAppId'
@@ -197,7 +197,7 @@ paths:
       tags:
         - content
       summary: Get webapp content by path
-      description: Get webapp content at path. For webapps with multiple files (e.g. WebVIs)
+      description: Get the webapp content at a path. This applies to webapps with multiple files, such as WebVIs.
       operationId: get-content
       parameters:
         - $ref: '#/parameters/WebAppId'
@@ -223,7 +223,7 @@ paths:
           type: string
           required: true
           name: sourceId
-          description: The id of the source webapp to get copy content from
+          description: The Id of the source webapp to get copy content from
       responses:
         200:
           description: Success
@@ -367,7 +367,7 @@ definitions:
     properties:
       id :
         type: string
-        description: The webapp id
+        description: The webapp Id
         example: "asdsad-17a6-45323-b64b-65325287372d"
       type:
         type: string
@@ -400,10 +400,12 @@ definitions:
         description: List of policy Ids associated with the webapp, which give it access to the user's resources"
       created:
         type: string
+        format: date-time
         description: The created timestamp (iso8601 format)
         example: "2019-12-02T15:31:45.379Z"
       updated:
         type: string
+        format: date-time
         description: The last updated timestamp (iso8601 format)
         example: "2019-12-02T15:31:45.379Z"
       properties:
