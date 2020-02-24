@@ -530,6 +530,10 @@ definitions:
             example: true
           externalCalibration:
             $ref: '#/definitions/ExternalCalibrationModel'
+          workspace:
+            type: string
+            description: The ID of the workspace.
+            example: '5bc5e9092a4fa4c71cfa7197'
           properties:
             description: Key-value-pair metadata associated with an asset.
             type: object
