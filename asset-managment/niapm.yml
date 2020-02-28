@@ -1960,7 +1960,7 @@ paths:
       summary: API information
       description: Returns information about API versions and available operations.
       operationId: RootEndpoint
-      x-ni-request-all-privileges: true
+      x-ni-auth: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -1985,7 +1985,7 @@ paths:
       summary: API version information
       description: Returns available operations for a single version of the API.
       operationId: RootEndpointWithVersion
-      x-ni-request-all-privileges: true
+      x-ni-auth: true
       security: []
       responses:
         200:
@@ -2005,7 +2005,7 @@ paths:
         Currently, the valid combinations of ResponseFormat and Destination are [JSON;INLINE], [CSV;DOWNLOAD], [CSV;FILE_SERVICE].
       operationId: get-assets
       x-ni-operation: readAssets
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/Skip'
         - $ref: '#/parameters/Take'
@@ -2052,7 +2052,7 @@ paths:
         If the selfCalibration property is set, the supportsSelfCalibration property is automatically set to true by the service no matter if it is specified as false. The same is true for the externalCalibration and supportsExternalCalibration properties.
       operationId: create-assets
       x-ni-operation: writeAssets
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/CreateAssetsRequestBody'
       responses:
@@ -2103,7 +2103,7 @@ paths:
         Updating the assetPresence property to NOT_PRESENT succeeds only if it is updated with the same minionId, parent and slotNumber. Updating it to PRESENT always succeeds.
       operationId: update-assets
       x-ni-operation: writeAssets
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/UpdateAssetsRequestBody'
       responses:
@@ -2122,7 +2122,7 @@ paths:
       description: Gets asset summary response containing the total number of assets, the number of assets which are active, i.e. present in a connected system, and the number of assets which are not active.
       operationId: get-asset-summary
       x-ni-operation: readAssets
-      x-ni-privilege: Read
+      x-ni-auth: true
       responses:
           200:
             $ref: '#/responses/AssetSummaryResponse'
@@ -2137,7 +2137,7 @@ paths:
       description: Gets asset summary of the total number of assets supporting calibration, the number of assets approaching calibration date and the number of assets past their calibration date
       operationId: get-calibratable-asset-summary
       x-ni-operation: readAssets
-      x-ni-privilege: Read
+      x-ni-auth: true
       responses:
           200:
             $ref: '#/responses/CalibratedAssetSummaryResponse'
@@ -2152,7 +2152,7 @@ paths:
       description: Returns the assets satisfying the provided filtering criteria. If the the caller requests a JSON inline response, the returned assets are filtered based on the filter string and the ids and calibratableOnly properties are not taken into consideration. When the caller requests a CSV response, the filter is not taken into consideration, but the ids and calibratableOnly properties are used to filter the assets from the response.
       operationId: query-assets
       x-ni-operation: readAssets
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/QueryAssetsRequest'
       responses:
@@ -2171,7 +2171,7 @@ paths:
       description: Gets the asset which has the given identifier.
       operationId: get-asset-with-identifier
       x-ni-operation: readAssets
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/AssetId'
       responses:
@@ -2190,7 +2190,7 @@ paths:
       description: Returns availability information for an asset in the specified timespan and split based on the specified time granularity.
       operationId: get-asset-availability-history
       x-ni-operation: readAssets
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/AssetId'
         - in: query
@@ -2234,7 +2234,7 @@ paths:
       description: Returns the calibration history of the asset which has the given identifier.
       operationId: get-asset-calibration-history
       x-ni-operation: readAssets
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/AssetId'
         - $ref: '#/parameters/Skip'
@@ -2256,7 +2256,7 @@ paths:
       description: Creates a new calibration history entry for a third-party asset.
       operationId: post-asset-calibration-history
       x-ni-operation: writeAssets
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       parameters:
         - $ref: '#/parameters/AssetId'
@@ -2279,7 +2279,7 @@ paths:
       description: Deletes multiple calibration history entries for an asset.
       operationId: post-delete-asset-calibration-history
       x-ni-operation: deleteAssets
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/AssetId'
         - $ref: '#/parameters/DeleteCalibrationsRequestBody'
@@ -2303,7 +2303,7 @@ paths:
       description: Computes the calibration history of an asset in CSV format. If the destination is download, the response will contain the calibration history file content. If the destination is file ingestion service, the CSV file is sent to the file storing service and an object containing the file identifier is returned. Any other format and destination combinations are not supported yet.
       operationId: post-asset-query-calibration-history
       x-ni-operation: readAssets
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/AssetId'
         - $ref: '#/parameters/QueryHistoryRequestBody'
@@ -2327,7 +2327,7 @@ paths:
       description: Computes the location history of an asset in CSV format. If the destination is download, the response will contain the location history file content. If the destination is file ingestion service, the CSV file is sent to the file storing service and an object containing the file identifier is returned. Any other format and destination combinations are not supported yet.
       operationId: post-asset-query-location-history
       x-ni-operation: readAssets
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/AssetId'
         - $ref: '#/parameters/QueryHistoryRequestBody'
@@ -2351,7 +2351,7 @@ paths:
       description: Performs a request to update the metadata information of an asset.
       operationId: update-asset-metadata
       x-ni-operation: writeAssets
-      x-ni-privilege: Write
+      x-ni-auth: true
       consumes:
         - application/merge-patch+json
       parameters:
@@ -2379,7 +2379,7 @@ paths:
           It will return a partial success when storing the utilization start information failed for one or more assets.
       operationId: start-multiple-asset-utilization
       x-ni-operation: createUtilization
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/StartUtilizationRequest'
       responses:
@@ -2401,7 +2401,7 @@ paths:
           It will return a not found response when no stored utilizations matched the provided utilization identifiers.
       operationId: end-multiple-asset-utilization
       x-ni-operation: writeAssets
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/EndUtilizationRequest'
       responses:
@@ -2423,7 +2423,7 @@ paths:
           It will return a not found response when no stored utilizations matched the provided utilization identifiers.
       operationId: asset-utilization-multiple-heartbeats
       x-ni-operation: writeAssets
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/HeartbeatUtilizationRequest'
       responses:
@@ -2442,7 +2442,7 @@ paths:
       description: Gets availability history for multiple assets based on a specified timespan.
       operationId: compare-asset-availability
       x-ni-operation: readAssets
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/AssetAvailabilityComparison'
       responses:
@@ -2478,7 +2478,7 @@ paths:
       description: Deletes all persisted data for the assets with the provided identifiers. This includes asset properties and all related historical information.
       operationId: delete-assets
       x-ni-operation: deleteAssets
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/DeleteAssetsRequestBody'
       responses:
@@ -2497,7 +2497,7 @@ paths:
       description: Retrieves asset utilization matching the provided filters.
       operationId: read-asset-utilization
       x-ni-operation: readAssets
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/QueryAssetUtilizationRequest'
       responses:
@@ -2516,7 +2516,7 @@ paths:
       description: Retrieves historical asset utilization data matching the provided filters. An empty request body queries all historical asset utilization data.
       operationId: query-asset-utilizations
       x-ni-operation: readAssets
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/QueryAssetUtilizationHistoryRequest'
       responses:
@@ -2535,7 +2535,7 @@ paths:
       description: Retrieves the service policy.
       operationId: get-policy
       x-ni-operation: readAssets
-      x-ni-privilege: Read
+      x-ni-auth: true
       responses:
         200:
           $ref: '#/responses/ServicePolicyResponse'
@@ -2549,7 +2549,7 @@ paths:
       description: Performs a request to update the service policy.
       operationId: update-policy
       x-ni-operation: writeAssets
-      x-ni-privilege: Write
+      x-ni-auth: true
       consumes:
         - application/merge-patch+json
       parameters:
