@@ -171,7 +171,7 @@ definitions:
         $ref: '#/definitions/ErrorObject'
   Platform:
     type: string
-    enum: [WINDOWS, NI_LINUX_RT]
+    enum: [windows, ni-linux-rt]
     description: "Depending on the selected platform, the following package extensions are available: .nipkg for windows feeds, .ipk and .deb for ni-linux-rt feeds."
     example: windows
   PackageImportDescriptor:
