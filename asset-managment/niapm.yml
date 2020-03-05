@@ -24,7 +24,7 @@ securityDefinitions:
     in: header
     name: Cookie
 security:
-  - apiKeyAuth: []        
+  - apiKeyAuth: []
   - basicAuth: []
   - cookieAuth: []
 x-ni-routing-key: Skyline.AssetPerformanceManagement
