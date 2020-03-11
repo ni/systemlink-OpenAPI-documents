@@ -1085,7 +1085,6 @@ paths:
       summary: API version 1 information
       description: Returns available operations for version 1 of the API.
       operationId: root-endpoint-v1
-      x-ni-request-all-privileges: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -1105,7 +1104,7 @@ paths:
       description: Uses input criteria to filter and return test results. An empty request body queries all test results.
       operationId: query-results
       x-ni-operation: queryResults
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody
@@ -1139,7 +1138,7 @@ paths:
       description: Gets a list of test results.
       operationId: get-results
       x-ni-operation: getResults
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: query
           name: skip
@@ -1166,7 +1165,7 @@ paths:
       description: Updates existing test results by merging or replacing values.
       operationId: update-results
       x-ni-operation: updateResults
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -1205,7 +1204,7 @@ paths:
       description: Creates new test results from the supplied models. The server automatically generates the result ids. The server will populate the start time if one is not provided.
       operationId: create-results
       x-ni-operation: createResults
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -1239,7 +1238,7 @@ paths:
       description: Deletes the test result with the specified id. The request succeeds for result ids that do not exist.
       operationId: DeleteResult
       x-ni-operation: deleteResult
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: path
           name: resultId
@@ -1265,7 +1264,7 @@ paths:
       description: Deletes multiple test results in a single request.
       operationId: delete-results
       x-ni-operation: deleteResults
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -1304,7 +1303,7 @@ paths:
       description: Uses input criteria to filter and return test steps. An empty request body queries all test steps.
       operationId: query-steps
       x-ni-operation: querySteps
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody
@@ -1338,7 +1337,7 @@ paths:
       description: Gets a list of test steps.
       operationId: get-steps
       x-ni-operation: getSteps
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: query
           name: skip
@@ -1365,7 +1364,7 @@ paths:
       description: Updates existing test steps by replacing values for the specified fields.
       operationId: update-steps
       x-ni-operation: updateSteps
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -1391,7 +1390,7 @@ paths:
       description: Creates new test steps from the supplied models. The result associated with the step must exist prior to step creation. The server automatically generates step ids if not supplied.
       operationId: create-steps
       x-ni-operation: createSteps
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -1420,7 +1419,7 @@ paths:
       description: Deletes the test step with the specified id. The request succeeds for step ids that do not exist.
       operationId: DeleteStep
       x-ni-operation: deleteStep
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: path
           name: resultId
@@ -1451,7 +1450,7 @@ paths:
       description: Deletes multiple test steps in a single request.
       operationId: delete-steps
       x-ni-operation: deleteSteps
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -1479,7 +1478,6 @@ paths:
       summary: Pings the test monitor service
       description: Deprecated. Pings the test monitor service to ensure that it is online.
       operationId: ping
-      x-ni-privilege: Read
       deprecated: true
       responses:
         204:

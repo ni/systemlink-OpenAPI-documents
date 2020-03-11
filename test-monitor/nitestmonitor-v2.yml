@@ -244,6 +244,7 @@ definitions:
       - PROPERTIES
       - FILE_IDS
       - STATUS_TYPE_SUMMARY
+      - WORKSPACE
     example:
       PROGRAM_NAME
   StepField:
@@ -267,6 +268,7 @@ definitions:
       - DATA_MODEL
       - DATA
       - HAS_CHILDREN
+      - WORKSPACE
     example:
       STEP_TYPE
   PathField:
@@ -488,6 +490,10 @@ definitions:
         format: double
         default: 0
         example: 29.9
+      workspace:
+        description: The workspace the test result belongs to
+        type: string
+        example: MyWorkspace
   TestResultResponseObject:
     title: Test Result Response
     type: object
@@ -568,6 +574,10 @@ definitions:
           format: int32
         example:
           FAILED: 5
+      workspace:
+        description: The workspace the test result belongs to
+        type: string
+        example: MyWorkspace
   TestResultUpdateRequestObject:
     title: Test Result Update
     type: object
@@ -636,6 +646,10 @@ definitions:
         format: double
         default: 0
         example: 29.9
+      workspace:
+        description: The workspace the test step belongs to
+        type: string
+        example: MyWorkspace
   UpdateTestResultsRequest:
     title: Update Test Results Request
     type: object
@@ -1200,6 +1214,10 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/NamedValueObject'
+      workspace:
+        description: The workspace the step belongs to
+        type: string
+        example: MyWorkspace
   TestStepCreateOrUpdateRequestObject:
     title: Test Step Create or Update Request
     type: object
@@ -1290,6 +1308,10 @@ definitions:
           that this step object is a leaf node.
         type: boolean
         example: false
+      workspace:
+        description: The workspace the test step belongs to
+        type: string
+        example: MyWorkspace
 responses:
   Error:
     description: Error
@@ -1623,7 +1645,6 @@ paths:
       summary: API information
       description: Returns information about API versions and available operations.
       operationId: root-endpoint
-      x-ni-request-all-privileges: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -1648,7 +1669,6 @@ paths:
       summary: API version 2 information
       description: Returns available operations for version 2 of the API.
       operationId: root-endpoint-v2
-      x-ni-request-all-privileges: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -1670,7 +1690,7 @@ paths:
         product. An empty request body queries all products.
       operationId: query-products-v2
       x-ni-operation: queryProducts
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody
@@ -1692,7 +1712,7 @@ paths:
       description: Gets a list of products.
       operationId: get-products-v2
       x-ni-operation: getProducts
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: query
           name: continuationToken
@@ -1730,7 +1750,7 @@ paths:
       description: Creates new products from the supplied models. The server automatically generates the product ids.
       operationId: create-products-v2
       x-ni-operation: createProducts
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -1764,7 +1784,7 @@ paths:
       description: Gets a single product.
       operationId: get-product-v2
       x-ni-operation: getProducts
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: path
           name: productId
@@ -1786,7 +1806,7 @@ paths:
       description: Deletes the product with the specified id. The request succeeds for products that do not exist.
       operationId: delete-product-v2
       x-ni-operation: deleteProduct
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: path
           name: productId
@@ -1809,7 +1829,7 @@ paths:
         fields are `ID`, `PART_NUMBER`, `NAME`, `FAMILY`, and `UPDATED_AT`.
       operationId: query-product-values-v2
       x-ni-operation: queryProducts
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody
@@ -1831,7 +1851,7 @@ paths:
       description: Updates existing products by merging or replacing values.
       operationId: update-products-v2
       x-ni-operation: updateProducts
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -1867,7 +1887,7 @@ paths:
       description: Deletes multiple products in a single request.
       operationId: delete-products-v2
       x-ni-operation: deleteProducts
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -1905,7 +1925,7 @@ paths:
         results are returned. An empty request body queries all test results.
       operationId: query-results-v2
       x-ni-operation: queryResults
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody
@@ -1930,7 +1950,7 @@ paths:
       description: Gets a list of test results.
       operationId: get-results-v2
       x-ni-operation: getResults
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: query
           name: continuationToken
@@ -1968,7 +1988,7 @@ paths:
       description: Creates new test results from the supplied models. The server automatically generates the result ids. The server will populate the start time if one is not provided.
       operationId: create-results-v2
       x-ni-operation: createResults
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -2002,7 +2022,7 @@ paths:
       description: Gets a single test result.
       operationId: get-result-v2
       x-ni-operation: getResults
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: path
           name: resultId
@@ -2024,7 +2044,7 @@ paths:
       description: Deletes the test result with the specified id. The request succeeds for result ids that do not exist.
       operationId: delete-result-v2
       x-ni-operation: deleteResult
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: path
           name: resultId
@@ -2051,10 +2071,10 @@ paths:
         Queries known values for an indexed, scalar result field. Supported
         fields are `ID`, `STARTED_AT`, `UPDATED_AT`, `PROGRAM_NAME`,
         `SYSTEM_ID`, `HOST_NAME`, `OPERATOR`, `SERIAL_NUMBER`, `PART_NUMBER`,
-        and `TOTAL_TIME_IN_SECONDS`.
+        `TOTAL_TIME_IN_SECONDS`, and `WORKSPACE`.
       operationId: query-result-values-v2
       x-ni-operation: queryResults
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody
@@ -2076,7 +2096,7 @@ paths:
       description: Updates existing test results by merging or replacing values.
       operationId: update-results-v2
       x-ni-operation: updateResults
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -2098,7 +2118,7 @@ paths:
       description: Deletes multiple test results in a single request.
       operationId: delete-results-v2
       x-ni-operation: deleteResults
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -2140,7 +2160,7 @@ paths:
         steps are returned. An empty request body queries all test steps.
       operationId: query-steps-v2
       x-ni-operation: querySteps
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody
@@ -2165,7 +2185,7 @@ paths:
       description: Gets a list of test steps.
       operationId: get-steps-v2
       x-ni-operation: getSteps
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: query
           name: continuationToken
@@ -2203,7 +2223,7 @@ paths:
       description: Creates new test steps from the supplied models. The result associated with the step must exist prior to step creation. The server automatically generates step ids if not supplied.
       operationId: create-steps-v2
       x-ni-operation: createSteps
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -2227,7 +2247,7 @@ paths:
       description: Gets a single test step.
       operationId: get-step-v2
       x-ni-operation: getSteps
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: path
           name: resultId
@@ -2254,7 +2274,7 @@ paths:
       description: Deletes the test step with the specified id. The request succeeds for step ids that do not exist.
       operationId: delete-step-v2
       x-ni-operation: deleteStep
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: path
           name: resultId
@@ -2285,11 +2305,11 @@ paths:
       description: >-
         Queries known values for an indexed, scalar step field. Supported
         fields are `NAME`, `STEP_TYPE`, `STEP_ID`, `PARENT_ID`, `RESULT_ID`,
-        `PATH`, `TOTAL_TIME_IN_SECONDS`, `STARTED_AT`, `UPDATED_AT`, and
-        `DATA_MODEL`.
+        `PATH`, `TOTAL_TIME_IN_SECONDS`, `STARTED_AT`, `UPDATED_AT`,
+        `DATA_MODEL`, and `WORKSPACE`.
       operationId: query-step-values-v2
       x-ni-operation: querySteps
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody
@@ -2311,7 +2331,7 @@ paths:
       description: Updates existing steps by merging or replacing values.
       operationId: update-steps-v2
       x-ni-operation: updateSteps
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -2333,7 +2353,7 @@ paths:
       description: Deletes multiple test steps in a single request.
       operationId: delete-steps-v2
       x-ni-operation: deleteSteps
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -2362,7 +2382,7 @@ paths:
       description: Gets a list of paths.
       operationId: get-paths-v2
       x-ni-operation: queryPaths
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: query
           name: continuationToken
@@ -2401,7 +2421,7 @@ paths:
       description: Gets a single path.
       operationId: get-path-v2
       x-ni-operation: queryPaths
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: path
           name: pathId
@@ -2426,7 +2446,7 @@ paths:
         paths. An empty request body queries all paths.
       operationId: query-paths-v2
       x-ni-operation: queryPaths
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody
