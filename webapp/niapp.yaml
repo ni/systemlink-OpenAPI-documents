@@ -112,8 +112,8 @@ paths:
     post:
       tags:
         - metadata
-      summary: Creates a new webapp
-      description: Creates a new webapp
+      summary: Create a new webapp
+      description: Create a new webapp
       operationId: create-webapp
       parameters:
         - $ref: '#/parameters/CreateWebAppRequest'
@@ -214,8 +214,8 @@ paths:
     post:
       tags:
         - content
-      summary: Duplicates webapp content
-      description: Duplicates webapp content
+      summary: Duplicate webapp content
+      description: Duplicate webapp content
       operationId: duplicate-content
       parameters:
         - $ref: '#/parameters/WebAppId'
