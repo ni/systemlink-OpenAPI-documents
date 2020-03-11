@@ -958,9 +958,6 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/ExportStateFromSystemRequest'
-      produces:
-        - text/x-yaml
-        - application/json
       responses:
         200:
           description: OK
@@ -968,8 +965,8 @@ paths:
             description: The file data
             type: file
           examples:
-            application/octet-stream:
-              File data
+            text/x-yaml:
+              State file data
         401:
           $ref: '#/responses/Unauthorized'
         default:

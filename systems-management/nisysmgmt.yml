@@ -2035,9 +2035,6 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/SystemsReportRequest'
-      produces:
-        - text/csv
-        - application/json
       responses:
         200:
           description: OK.
@@ -2045,8 +2042,8 @@ paths:
             description: The file data
             type: file
           examples:
-            application/octet-stream:
-              File data
+            text/csv:
+              Systems report file data
         400:
           $ref: '#/responses/BadRequest'
         401:
