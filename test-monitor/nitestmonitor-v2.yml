@@ -803,7 +803,7 @@ definitions:
       filter:
         description: The query filter in Dynamic Linq
         type: string
-        example: programName == "MyTests.seq" || product == "cRIO-9030"
+        example: programName == "MyTests.seq" || partNumber == "cRIO-9030"
       substitutions:
         description: >-
           Makes substitutions in the query filter expression. Substitutions for the query expression
@@ -1377,11 +1377,14 @@ responses:
           type: array
           items:
             type: string
+          example:
+            - 5e30931793cac80468509487
         failed:
           description: Array of product ids that failed to delete
           type: array
           items:
             type: string
+          example: []
         error:
           $ref: '#/definitions/Error'
   ProductsQueryResponse:
