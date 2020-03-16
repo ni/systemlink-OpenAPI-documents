@@ -1,0 +1,418 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: SystemLink WebApp Service
+basePath: /niapp/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  ApiKeyAuth:
+    type: apiKey
+    name: x-ni-api-key
+    in: header
+security:
+  - ApiKeyAuth: []
+schemes:
+  - https
+paths:
+  '/webapps/{id}':
+    get:
+      tags:
+        - metadata
+      summary: Get webapp metadata by Id
+      description: Get webapp metadata by Id
+      operationId: get-webapp
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+      responses:
+        200:
+          $ref: '#/responses/GetWebAppResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+    put:
+      tags:
+        - metadata
+      summary: Update webapp metadata by Id
+      description: Update existing webapp metadata
+      operationId: update-webapp
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+        - $ref: '#/parameters/UpdateWebAppRequest'
+      responses:
+        200:
+          $ref: '#/responses/UpdateWebAppResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+    delete:
+      tags:
+        - metadata
+      summary: Delete webapp by Id
+      description: Delete existing webapp metadata and content
+      operationId: delete-webapp
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+  '/webapps':
+    get:
+      tags:
+        - metadata
+      summary: List the webapps
+      description: List the webapps
+      operationId: list-webapps
+      parameters:
+        - in: query
+          name: name
+          description: Filters the webapps by name
+          type: string
+        - in: query
+          name: type
+          description: Filters the webapps by type
+          type: string
+          enum:
+          - Dashboard
+          - DashboardTemplate
+          - WebVI
+        - in: query
+          name: userId
+          description: Filters the webapps by the user Id of the owner
+          type: string
+        - in: query
+          name: workspace
+          description: Filters the webapps by workspace Id
+          type: string
+        - in: query
+          name: continuationToken
+          description: The continuation token can be used to paginate through the webapp list results. Provide a token to continue a previous listing.
+          type: string
+        - in: query
+          name: take
+          description: How many webapps to return in the result
+          type: integer
+          default: 100
+          maximum: 1000
+      responses:
+        200:
+          $ref: '#/responses/ListWebAppsResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+    post:
+      tags:
+        - metadata
+      summary: Create a new webapp
+      description: Create a new webapp
+      operationId: create-webapp
+      parameters:
+        - $ref: '#/parameters/CreateWebAppRequest'
+      responses:
+        200:
+          $ref: '#/responses/CreateWebAppResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+  '/webapps/{id}/sharing':
+    put:
+      tags:
+        - metadata
+      summary: Update sharing settings of the webapp
+      description: Update sharing settings of the webapp
+      operationId: update-webapp-sharing
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+        - $ref: '#/parameters/UpdateWebAppSharingRequest'
+      responses:
+        200:
+          $ref: '#/responses/UpdateWebAppSharingResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+  '/webapps/shared-emails':
+    get:
+      tags:
+        - metadata
+      summary: List the emails with which the user has shared webapps
+      description: List the emails with which the user has shared webapps
+      operationId: list-shared-emails
+      responses:
+        200:
+          $ref: '#/responses/SharedEmailsResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+  '/webapps/{id}/content':
+    get:
+      tags:
+        - content
+      summary: Get webapp content
+      description: Get the content of a webapp. ContentType varies from JSON for dashboards and templates or redirect to main HTML for WebVIs
+      operationId: get-content-index
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+      responses:
+        200:
+          description: The webapp's content. JSON for Dashboards, HTML for WebVIs
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+    put:
+      tags:
+        - content
+      summary: Upload content for an existing webapp
+      description: Upload content for an existing webapp
+      operationId: update-content
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+        - in: body
+          required: true
+          name: content
+          description: The webapp content to upload
+          schema:
+            $ref: '#/definitions/WebAppContent'
+      responses:
+        200:
+          description: Success
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+  '/api/webapps/{id}/content/{path}':
+    get:
+      tags:
+        - content
+      summary: Get webapp content by path
+      description: Get the webapp content at a path. This applies to webapps with multiple files, such as WebVIs.
+      operationId: get-content
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+        - $ref: '#/parameters/WebAppContentPath'
+      responses:
+        200:
+          $ref: '#/definitions/WebAppContent'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+
+  '/webapps/{id}/duplicate/{sourceId}':
+    post:
+      tags:
+        - content
+      summary: Duplicate webapp content
+      description: Duplicate webapp content
+      operationId: duplicate-content
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+        - in: path
+          type: string
+          required: true
+          name: sourceId
+          description: The Id of the source webapp to get copy content from
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+
+parameters:
+  WebAppId:
+    in: path
+    name: id
+    description: The webapp identifier
+    type: string
+    required: true
+  WebAppContentPath:
+    in: path
+    name: path
+    description: Path to webapp content
+    type: string
+    required: true
+  CreateWebAppRequest:
+    in: body
+    name: CreateWebAppRequest
+    description: Create WebApp Request
+    schema:
+      type: object
+      title: Create WebApp Request
+      properties:
+        name:
+          type: string
+          description: The webapp's name
+        policyIds:
+          type: array
+          items:
+            type: string
+            example: "asdsad-17a6-45323-b64b-65325287372d"
+          description: List of policy Ids associated with the webapp, which give it access to the user's resources"
+        properties:
+          type: object
+          description: A map of key value properties associated with the webapp
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+  UpdateWebAppRequest:
+    in: body
+    name: UpdateWebAppRequest
+    description: Update WebApp Request
+    schema:
+      type: object
+      title: Update WebApp Request
+      properties:
+        name:
+          type: string
+          description: The webapp's name
+        policyIds:
+          type: array
+          items:
+            type: string
+            example: "asdsad-17a6-45323-b64b-65325287372d"
+          description: List of policy Ids associated with the webapp, which give it access to the user's resources"
+        properties:
+          type: object
+          description: A map of key value properties associated with the webapp
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+  UpdateWebAppSharingRequest:
+    in: body
+    name: UpdateWebAppSharingRequest
+    description: Update WebApp Sharing Request
+    schema:
+      type: object
+      title: Update WebApp Sharing Request
+      properties:
+        shared:
+          type: string
+          enum:
+            - private
+            - direct
+            - public
+          description: The webapp's sharing option
+        sharedEmails:
+          type: array
+          items:
+            type: string
+          description: List of emails of users to share the webapp with. Applies when "shared" option is "direct"
+
+responses:
+  Unauthorized:
+    description: API Key is missing or invalid
+  NotFound:
+    description: The resource was not found.
+  ValidationError:
+    description: Invalid input data
+  GetWebAppResponse:
+    description: Get WebApp Response
+    schema:
+      $ref: '#/definitions/WebApp'
+  CreateWebAppResponse:
+    description: Create WebApp Response
+    schema:
+      $ref: '#/definitions/WebApp'
+  UpdateWebAppResponse:
+    description: Update WebApp Response
+    schema:
+      $ref: '#/definitions/WebApp'
+  UpdateWebAppSharingResponse:
+    description: Update WebApp Sharing Response
+    schema:
+      $ref: '#/definitions/WebApp'
+  ListWebAppsResponse:
+    description: List WebApps Response
+    schema:
+      title: List WebApps Response
+      type: object
+      properties:
+        webapps:
+          description: List of webapps
+          type: array
+          items:
+            $ref: '#/definitions/WebApp'
+        continuationToken:
+          description: The continuation token can be used to paginate through the webapp list results. Provide this token in the next list webapps call.
+          type: string
+  SharedEmailsResponse:
+    description: Shared Emails Response
+    schema:
+      title: Shared Emails Response
+      type: array
+      items:
+        type: string
+        example: john.doe@email.com
+
+definitions:
+  WebApp:
+    type: object
+    title: WebApp Metadata
+    properties:
+      id :
+        type: string
+        description: The webapp Id
+        example: "asdsad-17a6-45323-b64b-65325287372d"
+      type:
+        type: string
+        enum:
+          - Dashboard
+          - DashboardTemplate
+          - WebVI
+        description: The webapp type
+      name:
+        type: string
+        description: The webapp name
+      shared:
+        type: string
+        enum:
+          - private
+          - direct
+          - public
+        description: The webapp's sharing option
+      sharedEmails:
+        type: array
+        items:
+          type: string
+          example: john.doe@ni.com
+        description: List of emails of users to share the webapp with. Applies when "shared" option is "direct"
+      policyIds:
+        type: array
+        items:
+          type: string
+          example: "asdsad-17a6-45323-b64b-65325287372d"
+        description: List of policy Ids associated with the webapp, which give it access to the user's resources"
+      created:
+        type: string
+        format: date-time
+        description: The created timestamp (iso8601 format)
+        example: "2019-12-02T15:31:45.379Z"
+      updated:
+        type: string
+        format: date-time
+        description: The last updated timestamp (iso8601 format)
+        example: "2019-12-02T15:31:45.379Z"
+      properties:
+        type: object
+        description: A map of key value properties associated with the webapp
+  WebAppContent:
+    type: string
+    format: binary
+    title: WebApp Content
+    description: The webapp binary content. Depending on the webapp's type it can be a dashboard, template or *.nipkg file exported from LabVIEW NXG
