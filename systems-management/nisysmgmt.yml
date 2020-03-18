@@ -1087,7 +1087,38 @@ definitions:
         type: string
         description: The ID of the workspace.
         example: '5bc5e9092a4fa4c71cfa7197'
+        
+  UpdateSystemsRequest:
+    description: List of systems and metadata to be updated.
+    title: Update Systems Request
+    type: object
+    properties:
+      SystemsUpdateInformation:
+        description: The list of system ids and changes.
+        type: array
+        items:
+          description: System ids and changes that need to be applied to the systems.
+          title: SystemUpdateInformation
+          type: object
+          properties:
+            systemId:
+              type: string
+              description: The system id.
+              example: 'VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F9'
+            systemMetadata:
+              $ref: '#/definitions/SystemMetadata'
 
+  SystemMetadata:
+    description: System metadata to be updated.
+    title: SystemMetadata
+    x-ni-sparse: true
+    type: object
+    properties:
+      workspace:
+        type: string
+        description: The ID of the workspace.
+        example: '5bc5e9092a4fa4c71cfa7197'
+      
   QueryAvailablePackagesRequest:
     title: Get Available Packages Request
     description: Request to get the available packages from the feeds specified in the request.
@@ -2306,6 +2337,30 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/update-systems:
+    post:
+      operationId: UpdateSystemsMetadata
+      x-ni-auth: true
+      x-ni-operation: updateSystemMetadata
+      tags: [systems]
+      summary: Update systems metadata
+      description: Update metadata for a list of systems.
+      parameters:
+        - in: body
+          name: UpdateSystemsRequest
+          required: true
+          description: The new metadata associated with a list of systems.
+          schema:
+            $ref: '#/definitions/UpdateSystemsRequest'
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
   /v1/query-available-packages:
