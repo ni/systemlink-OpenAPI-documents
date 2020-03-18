@@ -100,13 +100,16 @@ paths:
           type: string
         - in: query
           name: take
-          description: How many webapps to return in the result
+          description: The maximum number of webapps to return
           type: integer
           default: 100
+          minimum: 0
           maximum: 1000
       responses:
         200:
           $ref: '#/responses/ListWebAppsResponse'
+        400:
+          $ref: '#/responses/ValidationError'
         401:
           $ref: '#/responses/Unauthorized'
     post:
@@ -120,6 +123,29 @@ paths:
       responses:
         200:
           $ref: '#/responses/CreateWebAppResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+  '/webapps/query-webapps':
+    post:
+      tags:
+        - metadata
+      summary: Query the webapps
+      description: >-
+        Use the Dynamic Linq query language to specify filters for webapps.
+        An empty request body queries all webapps.
+      operationId: query-webapps
+      parameters:
+        - in: body
+          name: postBody
+          description: Query filter
+          required: false
+          schema:
+            $ref: '#/definitions/WebAppsAdvancedQuery'
+      responses:
+        200:
+          $ref: '#/responses/ListWebAppsResponse'
+        400:
+          $ref: '#/responses/ValidationError'
         401:
           $ref: '#/responses/Unauthorized'
   '/webapps/{id}/sharing':
@@ -416,3 +442,21 @@ definitions:
     format: binary
     title: WebApp Content
     description: The webapp binary content. Depending on the webapp's type it can be a dashboard, template or *.nipkg file exported from LabVIEW NXG
+  WebAppsAdvancedQuery:
+    type: object
+    title: Advanced Query Object for WebApps
+    properties:
+      filter:
+        description: The webapp query filter in Dynamic Linq
+        type: string
+        example: name.Contains("myWebApp") || type == "WebVI"
+      take:
+        description: The maximum number of webapps to return
+        type: integer
+        default: 100
+        minimum: 0
+        maximum: 1000
+        example: 10
+      continuationToken:
+        description: The continuation token can be used to paginate through the webapp query results. Provide this token in the next query webapps call.
+        type: string
