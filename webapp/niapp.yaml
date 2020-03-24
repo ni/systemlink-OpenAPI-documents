@@ -218,7 +218,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
-  '/api/webapps/{id}/content/{path}':
+  '/webapps/{id}/content/{path}':
     get:
       tags:
         - content
@@ -377,6 +377,7 @@ responses:
         continuationToken:
           description: The continuation token can be used to paginate through the webapp list results. Provide this token in the next list webapps call.
           type: string
+          example: token
   SharedEmailsResponse:
     description: Shared Emails Response
     schema:
@@ -507,3 +508,4 @@ definitions:
       continuationToken:
         description: The continuation token can be used to paginate through the webapp query results. Provide this token in the next query webapps call.
         type: string
+        example: token
