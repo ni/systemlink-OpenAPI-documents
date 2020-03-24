@@ -125,7 +125,7 @@ paths:
           $ref: '#/responses/CreateWebAppResponse'
         401:
           $ref: '#/responses/Unauthorized'
-  '/webapps/query-webapps':
+  '/webapps/query':
     post:
       tags:
         - metadata
@@ -133,7 +133,7 @@ paths:
       description: >-
         Use the Dynamic Linq query language to specify filters for webapps.
         An empty request body queries all webapps.
-      operationId: query-webapps
+      operationId: query
       parameters:
         - in: body
           name: postBody
@@ -447,7 +447,54 @@ definitions:
     title: Advanced Query Object for WebApps
     properties:
       filter:
-        description: The webapp query filter in Dynamic Linq
+        description: >-
+            The filter criteria for webapps, consisting of a string of queries composed using AND/OR operators.
+            String values need to be enclosed in double quotes.
+            Parenthesis can be used within the filter to better define the order of operations.
+
+
+            Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+
+            Operators:
+
+            - Equals operator '='. Example: 'x = y'
+
+            - Not equal operator '!='. Example: 'x != y'
+
+            - Greater than operator '>'. Example: 'x > y'
+
+            - Greater than or equal operator '>='. Example: 'x >= y'
+
+            - Less than operator '<'. Example: 'x < y'
+
+            - Less than or equal operator '<='. Example: 'x <= y'
+
+            - Logical AND operator 'and'. Example: 'x and y'
+
+            - Logical OR operator 'or'. Example: 'x or y'
+
+            - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
+
+            - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
+
+            - String null or empty 'string.IsNullOrEmpty()', used to check whether a string is null or empty. Example: 'string.IsNullOrEmpty(x)'
+
+            - String is not null or empty '!string.IsNullOrEmpty()', used to check whether a string is not null or empty. Example: '!string.IsNullOrEmpty(x)'
+
+
+            Valid webapp properties that can be used in the filter:
+
+            - id
+
+            - name
+
+            - properties
+
+            - shared
+
+            - type
+
+            - workspace
         type: string
         example: name.Contains("myWebApp") || type == "WebVI"
       take:
