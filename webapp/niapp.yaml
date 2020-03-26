@@ -100,13 +100,16 @@ paths:
           type: string
         - in: query
           name: take
-          description: How many webapps to return in the result
+          description: The maximum number of webapps to return
           type: integer
           default: 100
+          minimum: 0
           maximum: 1000
       responses:
         200:
           $ref: '#/responses/ListWebAppsResponse'
+        400:
+          $ref: '#/responses/ValidationError'
         401:
           $ref: '#/responses/Unauthorized'
     post:
@@ -120,6 +123,29 @@ paths:
       responses:
         200:
           $ref: '#/responses/CreateWebAppResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+  '/webapps/query':
+    post:
+      tags:
+        - metadata
+      summary: Query the webapps
+      description: >-
+        Use the Dynamic Linq query language to specify filters for webapps.
+        An empty request body queries all webapps.
+      operationId: query
+      parameters:
+        - in: body
+          name: postBody
+          description: Query filter
+          required: false
+          schema:
+            $ref: '#/definitions/WebAppsAdvancedQuery'
+      responses:
+        200:
+          $ref: '#/responses/ListWebAppsResponse'
+        400:
+          $ref: '#/responses/ValidationError'
         401:
           $ref: '#/responses/Unauthorized'
   '/webapps/{id}/sharing':
@@ -192,7 +218,7 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
-  '/api/webapps/{id}/content/{path}':
+  '/webapps/{id}/content/{path}':
     get:
       tags:
         - content
@@ -351,6 +377,7 @@ responses:
         continuationToken:
           description: The continuation token can be used to paginate through the webapp list results. Provide this token in the next list webapps call.
           type: string
+          example: token
   SharedEmailsResponse:
     description: Shared Emails Response
     schema:
@@ -416,3 +443,69 @@ definitions:
     format: binary
     title: WebApp Content
     description: The webapp binary content. Depending on the webapp's type it can be a dashboard, template or *.nipkg file exported from LabVIEW NXG
+  WebAppsAdvancedQuery:
+    type: object
+    title: Advanced Query Object for WebApps
+    properties:
+      filter:
+        description: >-
+            The filter criteria for webapps, consisting of a string of queries composed using AND/OR operators.
+            String values need to be enclosed in double quotes.
+            Parenthesis can be used within the filter to better define the order of operations.
+
+
+            Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+
+            Operators:
+
+            - Equals operator '='. Example: 'x = y'
+
+            - Not equal operator '!='. Example: 'x != y'
+
+            - Greater than operator '>'. Example: 'x > y'
+
+            - Greater than or equal operator '>='. Example: 'x >= y'
+
+            - Less than operator '<'. Example: 'x < y'
+
+            - Less than or equal operator '<='. Example: 'x <= y'
+
+            - Logical AND operator 'and'. Example: 'x and y'
+
+            - Logical OR operator 'or'. Example: 'x or y'
+
+            - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
+
+            - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
+
+            - String null or empty 'string.IsNullOrEmpty()', used to check whether a string is null or empty. Example: 'string.IsNullOrEmpty(x)'
+
+            - String is not null or empty '!string.IsNullOrEmpty()', used to check whether a string is not null or empty. Example: '!string.IsNullOrEmpty(x)'
+
+
+            Valid webapp properties that can be used in the filter:
+
+            - id
+
+            - name
+
+            - properties
+
+            - shared
+
+            - type
+
+            - workspace
+        type: string
+        example: name.Contains("myWebApp") || type == "WebVI"
+      take:
+        description: The maximum number of webapps to return
+        type: integer
+        default: 100
+        minimum: 0
+        maximum: 1000
+        example: 10
+      continuationToken:
+        description: The continuation token can be used to paginate through the webapp query results. Provide this token in the next query webapps call.
+        type: string
+        example: token
