@@ -33,6 +33,8 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
     put:
       tags:
         - metadata
@@ -51,6 +53,8 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
     delete:
       tags:
         - metadata
@@ -66,6 +70,8 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
   '/webapps':
     get:
       tags:
@@ -112,6 +118,8 @@ paths:
           $ref: '#/responses/ValidationError'
         401:
           $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
     post:
       tags:
         - metadata
@@ -125,6 +133,8 @@ paths:
           $ref: '#/responses/CreateWebAppResponse'
         401:
           $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   '/webapps/query':
     post:
       tags:
@@ -148,6 +158,8 @@ paths:
           $ref: '#/responses/ValidationError'
         401:
           $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   '/webapps/{id}/sharing':
     put:
       tags:
@@ -167,6 +179,8 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
   '/webapps/shared-emails':
     get:
       tags:
@@ -179,6 +193,8 @@ paths:
           $ref: '#/responses/SharedEmailsResponse'
         401:
           $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   '/webapps/{id}/content':
     get:
       tags:
@@ -195,6 +211,8 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
     put:
       tags:
         - content
@@ -218,6 +236,8 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
   '/webapps/{id}/content/{path}':
     get:
       tags:
@@ -235,7 +255,32 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
 
+  '/webapps/duplicate/{sourceId}':
+    post:
+      tags:
+        - content
+      summary: Duplicate webapp
+      description: Duplicate a webapp by creating new webapp metadata with the specified name and duplicating existing content into the new webapp.
+      operationId: duplicate-webapp
+      parameters:
+        - in: path
+          type: string
+          required: true
+          name: sourceId
+          description: The Id of the source webapp to copy content from
+        - $ref: '#/parameters/DuplicateWebAppRequest'
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
   '/webapps/{id}/duplicate/{sourceId}':
     post:
       tags:
@@ -249,7 +294,7 @@ paths:
           type: string
           required: true
           name: sourceId
-          description: The Id of the source webapp to get copy content from
+          description: The Id of the source webapp to copy content from
       responses:
         200:
           description: Success
@@ -257,6 +302,8 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
 
 parameters:
   WebAppId:
@@ -339,8 +386,29 @@ parameters:
           items:
             type: string
           description: List of emails of users to share the webapp with. Applies when "shared" option is "direct"
+  DuplicateWebAppRequest:
+    in: body
+    name: DuplicateWebAppRequest
+    description: Duplicate WebApp Request
+    schema:
+      type: object
+      title: Duplicate WebApp Request
+      properties:
+        name:
+          type: string
+          description: The name of the new webapp created during the duplication
+          example: My webapp name
 
 responses:
+  Error:
+    description: Error
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
   Unauthorized:
     description: API Key is missing or invalid
   NotFound:
@@ -509,3 +577,26 @@ definitions:
         description: The continuation token can be used to paginate through the webapp query results. Provide this token in the next query webapps call.
         type: string
         example: token
+  Error:
+    description: Contains error information
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+      message:
+        description: Complete error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+    example:
+      name: DocumentManager.NotFound
+      code: -252520
+      message: The specified document was not found.
+      args: []
