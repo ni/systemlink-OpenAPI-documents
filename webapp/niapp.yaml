@@ -274,7 +274,7 @@ paths:
         - $ref: '#/parameters/DuplicateWebAppRequest'
       responses:
         200:
-          description: Success
+          $ref: '#/responses/CreateWebAppResponse'
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -398,6 +398,10 @@ parameters:
           type: string
           description: The name of the new webapp created during the duplication
           example: My webapp name
+        workspace:
+          type: string
+          description: The workspace in which to create the new webapp. If no workspace is specified, the new webapp will be put in the default workspace.
+          example: 0c80cf49-54e9-4e92-b117-3bfa574caa84
 
 responses:
   Error:
@@ -542,9 +546,9 @@ definitions:
 
             - Logical OR operator 'or'. Example: 'x or y'
 
-            - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
+            - Starts with operator '.StartsWith()', used to check whether a string starts with another string. Example: 'x.StartsWith(y)'
 
-            - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
+            - Does not start with operator '!.StartsWith()', used to check whether a string does not start with another string. Example: '!x.StartsWith(y)'
 
             - String null or empty 'string.IsNullOrEmpty()', used to check whether a string is null or empty. Example: 'string.IsNullOrEmpty(x)'
 
@@ -557,7 +561,7 @@ definitions:
 
             - name
 
-            - properties
+            - properties.embedLocation
 
             - shared
 
@@ -565,7 +569,7 @@ definitions:
 
             - workspace
         type: string
-        example: name.Contains("myWebApp") || type == "WebVI"
+        example: name.StartsWith("myWebApp") || type == "WebVI"
       take:
         description: The maximum number of webapps to return
         type: integer
