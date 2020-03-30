@@ -1,0 +1,882 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: SystemLink User Service
+basePath: /niuser/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  ApiKeyAuth:
+    type: apiKey
+    name: x-ni-api-key
+    in: header
+security:
+  - ApiKeyAuth: []
+schemes:
+  - https
+paths:
+  '/orgs/{name}':
+    get:
+      tags:
+        - orgs
+      summary: 'Get organization'
+      operationId: get-org
+      description: Returns the organization with the given name
+      parameters:
+        - in: path
+          required: true
+          name: name
+          description: The org name, e.g. 'SystemLink Server'
+          type: string
+      responses:
+        200:
+          $ref: '#/responses/GetOrgResponse'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+
+  '/users/query':
+    post:
+      tags:
+        - users
+      summary: Query the users
+      description: >-
+        Use the Dynamic Linq query language to specify filters for users.
+        An empty request body queries all users.
+      operationId: query-users
+      parameters:
+        - $ref: '#/parameters/QueryUsersRequest'
+      responses:
+        200:
+          $ref: '#/responses/QueryUsersResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+
+  '/users':
+    post:
+      tags:
+        - users
+      summary: Creates a new user
+      description: Create a user
+      operationId: create-user
+      parameters:
+        - $ref: '#/parameters/CreateUserRequest'
+      responses:
+        200:
+          $ref: '#/responses/CreateUserResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+
+  '/users/{id}':
+    get:
+      tags:
+        - users
+      summary: 'Get user'
+      operationId: get-user
+      description: Lookup a user by user id
+      parameters:
+        - in: path
+          required: true
+          name: id
+          description: The user id
+          type: string
+      responses:
+        200:
+          $ref: '#/responses/GetUserResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+    put:
+      tags:
+        - users
+      summary: 'Update user'
+      operationId: update-user
+      description: Update the user record
+      parameters:
+        - $ref: '#/parameters/UserId'
+        - $ref: '#/parameters/UpdateUserRequest'
+      responses:
+        200:
+          $ref: '#/responses/UpdateUserResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags:
+        - users
+      summary: 'Delete user'
+      description: Delete a user by user id
+      operationId: delete-user
+      parameters:
+        - type: string
+          required: true
+          name: id
+          in: path
+          description: The user id
+      responses:
+        201:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+
+  '/workspaces':
+    get:
+      tags:
+        - workspaces
+      summary: List workspaces
+      description: List the workspaces of an organization
+      operationId: get-workspaces
+      responses:
+        200:
+          $ref: '#/responses/GetWorkspacesResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+    post:
+      tags:
+        - workspaces
+      summary: Creates a new workspace
+      description: Create a workspace
+      operationId: create-workspace
+      parameters:
+        - $ref: '#/parameters/CreateWorkspaceRequest'
+      responses:
+        200:
+          $ref: '#/responses/CreateWorkspaceResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+
+  '/workspaces/{id}':
+    put:
+      tags:
+        - workspaces
+      summary: 'Update workspace'
+      operationId: update-workspace
+      description: Update the workspace
+      parameters:
+        - $ref: '#/parameters/WorkspaceId'
+        - $ref: '#/parameters/UpdateWorkspaceRequest'
+      responses:
+        200:
+          $ref: '#/responses/UpdateWorkspaceResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+
+  '/auth-mappings':
+    get:
+      tags:
+        - auth-mappings
+      summary: List auth-mappings
+      description: List the auth-mappings of an organization
+      operationId: get-auth-mappings
+      parameters:
+        - in: query
+          name: workspace
+          description: Filters the auth mappings by workspace
+          type: string
+        - in: query
+          name: skip
+          description: How many auth mappings to skip in the result when paging.
+          type: integer
+        - in: query
+          name: take
+          description: How many auth mappings to return in the result
+          type: integer
+          default: 50
+          maximum: 100
+      responses:
+        200:
+          $ref: '#/responses/GetAuthMappingsResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    post:
+      tags:
+        - auth-mappings
+      summary: Creates a new auth-mapping
+      description: Create a auth-mapping
+      operationId: create-auth-mapping
+      parameters:
+        - $ref: '#/parameters/CreateAuthMappingRequest'
+      responses:
+        200:
+          $ref: '#/responses/CreateAuthMappingResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+
+  '/auth-mappings/{id}':
+    put:
+      tags:
+        - auth-mappings
+      summary: 'Update auth-mapping'
+      operationId: update-auth-mapping
+      description: Update the auth-mapping
+      parameters:
+        - $ref: '#/parameters/AuthMappingId'
+        - $ref: '#/parameters/UpdateAuthMappingRequest'
+      responses:
+        200:
+          $ref: '#/responses/UpdateAuthMappingResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags:
+        - auth-mappings
+      summary: Deletes an auth-mapping
+      description: Deletes the auth-mapping with the given Id
+      operationId: delete-auth-mapping
+      parameters:
+        - $ref: '#/parameters/AuthMappingId'
+      responses:
+        201:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+
+  '/websocket':
+    get:
+      tags:
+        - web socket
+      summary: Open a WebSocket session
+      description: Opens a persistent connection to the web server that allows two-way communication using
+                   a JSON protocol. After you open a connection, you can subscribe to workspace creation notifications.
+                   Refer to the *Models* section to access the schema for these actions.
+      operationId: OpenWebSocketSession
+      parameters:
+        - in: header
+          name: Upgrade
+          type: string
+          required: true
+          x-example: websocket
+        - in: header
+          name: Connection
+          type: string
+          required: true
+          x-example: Upgrade
+        - in: header
+          name: Sec-WebSocket-Version
+          description: Protocol version of the WebSocket connection.
+          type: string
+          required: true
+          x-example: 13
+        - in: header
+          name: Sec-WebSocket-Key
+          description: Randomly selected sixteen-byte base64-encoded string. Used to confirm a
+            valid WebSocket handshake. Must be selected randomly for each new connection.
+          type: string
+          required: true
+          x-example: dGhlIHNhbXBsZSBub25jZQ==
+      responses:
+        101:
+          description: Switching Protocols
+          headers:
+            Sec-WebSocket-Accept:
+              description: Used in the WebSocket opening handshake. Set to a value derived from the
+                Sec-WebSocket-Key header.
+              type: string
+        401:
+          $ref: '#/responses/Unauthorized'
+        426:
+          description: Upgrade Required
+        default:
+          $ref: '#/responses/Error'
+
+parameters:
+  UserId:
+    in: path
+    name: id
+    description: The identifier of a user
+    type: string
+    required: true
+  WorkspaceId:
+    in: path
+    name: id
+    description: The identifier of a workspace
+    type: string
+    required: true
+  AuthMappingId:
+    in: path
+    name: id
+    description: The identifier of an auth mapping
+    type: string
+    required: true
+
+  QueryUsersRequest:
+    in: body
+    name: queryUsersRequest
+    description: Request to query for users
+    schema:
+      title: Query Users Request
+      description: Filters to query for users
+      type: object
+      properties:
+        filter:
+          description: >-
+              The filter criteria for users, consisting of a string of queries composed using AND/OR operators.
+              String values need to be enclosed in double quotes.
+              Parenthesis can be used within the filter to better define the order of operations.
+              Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+              Operators:
+              - Equals operator '='. Example: 'x = y'
+              - Not equal operator '!='. Example: 'x != y'
+              - Greater than operator '>'. Example: 'x > y'
+              - Greater than or equal operator '>='. Example: 'x >= y'
+              - Less than operator '<'. Example: 'x < y'
+              - Less than or equal operator '<='. Example: 'x <= y'
+              - Logical AND operator 'and'. Example: 'x and y'
+              - Logical OR operator 'or'. Example: 'x or y'
+              - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
+              - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
+              - String null or empty 'string.IsNullOrEmpty()', used to check whether a string is null or empty. Example: 'string.IsNullOrEmpty(x)'
+              - String is not null or empty '!string.IsNullOrEmpty()', used to check whether a string is not null or empty. Example: '!string.IsNullOrEmpty(x)'
+              Valid user properties that can be used in the filter:
+              - id
+              - firstName
+              - lastName
+              - email
+              - niuaId
+              - login
+              - status
+          type: string
+          example: firstName.Contains("John") && status == "active"
+        take:
+          description: The maximum number of users to return
+          type: integer
+          default: 100
+          minimum: 0
+          maximum: 1000
+          example: 10
+        sortby:
+          description: The field name for sorting the results
+          type: string
+          enum: [firstName, lastName, email, niuaId, login, status]
+        order:
+          description: Sort by ascending or descending order
+          type: string
+          enum: [ascending, descending]
+        continuationToken:
+          description: The continuation token can be used to paginate through the user query results. Provide this token in the next query users call.
+          type: string
+          example: token
+  CreateUserRequest:
+    in: body
+    name: createUserRequest
+    description: Request to create a new user
+    schema:
+      title: Create User Request
+      description: Creates a new user in the callers' organization
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: First name filter
+        lastName:
+          type: string
+          description: Last name filter
+        email:
+          type: string
+          description: Email filter
+        niuaId:
+          type: string
+          description: niua Id filter
+        acceptedToS:
+          type: boolean
+          description: Filter for users which accepted or not accepted the terms of services
+        policies:
+          type: array
+          items:
+            type: string
+          description: A list of policy ids. Defines the permissions of the user in the organization.
+        keywords:
+          type: array
+          items:
+            type: string
+          description: A list of keywords associated with the user
+        properties:
+          type: object
+          description: A map of key value properties
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+  UpdateUserRequest:
+    in: body
+    name: updateUserRequest
+    description: Request to update an existing user
+    schema:
+      title: Update User Request
+      description: Updates an existing user
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: First name filter
+        lastName:
+          type: string
+          description: Last name filter
+        email:
+          type: string
+          description: Email filter
+        acceptedToS:
+          type: boolean
+          description: Filter for users which accepted or not accepted the terms of services
+        policies:
+          type: array
+          items:
+            type: string
+          description: A list of policy ids. Defines the permissions of the user in the organization.
+        keywords:
+          type: array
+          items:
+            type: string
+          description: A list of keywords associated with the user
+        properties:
+          type: object
+          description: A map of key value properties
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+
+  CreateWorkspaceRequest:
+    in: body
+    name: createWorkspaceRequest
+    description: Request to create a new workspace
+    schema:
+      title: Create Workspace Request
+      description: Creates a new workspace
+      type: object
+      properties:
+        name:
+          type: string
+          description: The workspace name, must be unique in the organization
+  UpdateWorkspaceRequest:
+    in: body
+    name: updateWorkspaceRequest
+    description: Request to update an existing workspace
+    schema:
+      title: Update Workspace Request
+      description: Updates an existing workspace
+      type: object
+      properties:
+        name:
+          type: string
+          description: The workspace name, must be unique in the organization
+        enabled:
+          type: boolean
+          description: Whether the workspace is enabled or disabled. If a workspace is disabled, requests to create new resources in this workspace will fail but queries still return the resources in this workspace.
+
+  CreateAuthMappingRequest:
+    in: body
+    name: createAuthMappingRequest
+    description: Request to create a new auth mapping
+    schema:
+      title: Create Auth Mapping Request
+      description: Creates a new auth mapping
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [user, windows-group, windows-user, ldap-group, ldap-attribute, ldap-user]
+          description: The Auth Mapping type
+        policyId:
+          type: string
+          description: The policy id this mapping references.
+        policyTemplateId:
+          type: string
+          description: The policy template id this mapping references.
+        workspace:
+          type: string
+          description: The workspace id.
+        selector:
+          type: object
+          description: The selector
+          properties:
+            key:
+              type: string
+              description: The Auth Mapping selector key
+            value:
+              type: string
+              description: The Auth Mapping selector value
+
+  UpdateAuthMappingRequest:
+    in: body
+    name: updateAuthMappingRequest
+    description: Request to update an existing auth mapping
+    schema:
+      title: Update Auth Mapping Request
+      description: Updates an existing auth mapping
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [user, windows-group, windows-user, ldap-group, ldap-attribute, ldap-user]
+          description: The Auth Mapping type
+        policyId:
+          type: string
+          description: The policy id this mapping references.
+        policyTemplateId:
+          type: string
+          description: The policy template id this mapping references.
+        selector:
+          type: object
+          description: The selector
+          properties:
+            key:
+              type: string
+              description: The Auth Mapping selector key
+            value:
+              type: string
+              description: The Auth Mapping selector value
+
+responses:
+  Unauthorized:
+    description: API Key is missing or invalid
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+  ValidationError:
+    description: Invalid input data
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+  NotFound:
+    description: The resource was not found.
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+  Error:
+    description: Error Response
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+  GetOrgResponse:
+    description: Auth Response
+    schema:
+      $ref: '#/definitions/Org'
+
+  QueryUsersResponse:
+    description: Query Users Response
+    schema:
+      title: Query Users Response
+      type: object
+      properties:
+        continuationToken:
+          description: The continuation token can be used to paginate through the user list results. Provide this token in the next list users call.
+          type: string
+          example: token
+        users:
+          description: List of users
+          type: array
+          items:
+            $ref: '#/definitions/User'
+  CreateUserResponse:
+    description: Create User Response
+    schema:
+      $ref: '#/definitions/User'
+  GetUserResponse:
+    description: Get User Response
+    schema:
+      $ref: '#/definitions/User'
+  UpdateUserResponse:
+    description: Update User Response
+    schema:
+      $ref: '#/definitions/User'
+
+  GetWorkspacesResponse:
+    description: Get Workspaces Response
+    schema:
+      title: Get Workspaces Response
+      type: object
+      properties:
+        workspaces:
+          description: List of workspaces
+          type: array
+          items:
+            $ref: '#/definitions/Workspace'
+  CreateWorkspaceResponse:
+    description: Create Workspaces Response
+    schema:
+      $ref: '#/definitions/Workspace'
+  UpdateWorkspaceResponse:
+    description: Update Workspaces Response
+    schema:
+      $ref: '#/definitions/Workspace'
+
+  GetAuthMappingsResponse:
+    description: Get Auth Mappings Response
+    schema:
+      title: Get Auth Mappings Response
+      type: object
+      properties:
+        authMappings:
+          description: List of auth mappings
+          type: array
+          items:
+            $ref: '#/definitions/AuthMapping'
+  CreateAuthMappingResponse:
+    description: Create Auth Mapping Response
+    schema:
+      $ref: '#/definitions/AuthMapping'
+  UpdateAuthMappingResponse:
+    description: Update Auth Mapping Response
+    schema:
+      $ref: '#/definitions/AuthMapping'
+definitions:
+  User:
+    type: object
+    title: User
+    description: The user details
+    properties:
+      id:
+        type: string
+        description: The unique id
+      firstName:
+        type: string
+        description: The first name
+      lastName:
+        type: string
+        description: The last name
+      email:
+        type: string
+        description: The email
+      niuaId:
+        type: string
+        description: The external id (niuaId, SID, login name)
+      acceptedToS:
+        type: boolean
+        description: Whether the user accepted the terms of service
+      properties:
+        type: object
+        description: A map of key value properties associated with the user
+      keywords:
+        type: array
+        items:
+          type: string
+        description: A list of keywords associated with the user
+      created:
+        type: string
+        format: date-time
+        description: The created timestamp
+        example: "2019-12-02T15:31:45.379Z"
+      updated:
+        type: string
+        format: date-time
+        description: The last updated timestamp
+        example: "2019-12-02T15:31:45.379Z"
+      orgId:
+        type: string
+        description: The id of the organization
+      policies:
+        type: array
+        items:
+          type: string
+        description: A list of policy ids
+      status:
+        type: string
+        enum: [pending, active]
+        description: The status of the users' registration
+  Org:
+    type: object
+    title: Org
+    description: Organization the user belongs to
+    properties:
+      id:
+        type: string
+        description: The unique id
+      name:
+        type: string
+        description: The name of the organization
+      owner:
+        $ref: '#/definitions/User'
+      workspaces:
+        description: The list of workspaces in the organization
+        type: array
+        items:
+          $ref: '#/definitions/Workspace'
+  Workspace:
+    type: object
+    title: Workspace
+    description: Information about the workspace
+    properties:
+      id:
+        type: string
+        description: The unique id
+      name:
+        type: string
+        description: The workspace name
+      enabled:
+        type: boolean
+        description: Whether the workspace is enabled or not
+      default:
+        type: boolean
+        description: Whether the workspace is the default. The default workspace is used when callers omit a workspace id
+  AuthMapping:
+    type: object
+    title: Auth Mapping
+    description: Information about the auth mapping
+    properties:
+      id:
+        type: string
+        description: The unique id
+      type:
+        type: string
+        description: The auth mapping type
+      policyId:
+        type: string
+        description: The policy id this mapping references.
+      policyTemplateId:
+        type: string
+        description: The policy template id this mapping references.
+      workspace:
+        type: string
+        description: The workspace id.
+      selector:
+        type: object
+        description: The selector
+        properties:
+          key:
+            type: string
+            description: The Auth Mapping selector key
+          value:
+            type: string
+            description: The Auth Mapping selector value
+  Error:
+    description: Contains error information
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+        format: int32
+      resourceType:
+        description: Type of resource associated with the error
+        type: string
+      resourceId:
+        description: Identifier of the resource associated with the error
+        type: string
+      message:
+        description: Complete error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+      innerErrors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+    example:
+      name: Auth.ServerError
+      code: -12345
+      message: There has been an error with your request
+      args: []
+      innerErrors: []
+
+  WebSocketAsyncWorkspacesSubscribeRequest:
+    title: Web Socket Workspaces Subscribe Request
+    description: A web socket message sent by the client to subscribe to notifications when workspaces are created
+    type: object
+    required:
+      - action
+    properties:
+      action:
+        description: The action to perform. Must be set to "UserAsyncWorkspacesSubscribeRequest".
+        type: string
+        enum: ['UserAsyncWorkspacesSubscribeRequest']
+        example: UserAsyncWorkspacesSubscribeRequest
+
+  WebSocketAsyncWorkspacesSubscribeResponse:
+    title: Web Socket Workspaces Subscribe Response
+    description: A web socket message sent by the server to confirm a *WebSocketAsyncWorkspacesSubscribeRequest*.
+    type: object
+    properties:
+      action:
+        description: The action performed. Must be set to "UserAsyncWorkspacesSubscribeResponse".
+        type: string
+        enum: ['UserAsyncWorkspacesSubscribeResponse']
+        example: UserAsyncWorkspacesSubscribeResponse
+
+  WebSocketWorkspaceCreatedMessage:
+    title: Web Socket Workspace Created Message
+    description: A web socket message sent by the server when a new workspace is created.
+    type: object
+    properties:
+      action:
+        description: The action performed. Must be set to "UserWorkspacesCreatedRoutedMessage".
+        type: string
+        enum: ['UserWorkspacesCreatedRoutedMessage']
+        example: UserWorkspacesCreatedRoutedMessage
+      workspace:
+        $ref: '#/definitions/Workspace'
