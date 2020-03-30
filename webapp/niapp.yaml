@@ -258,7 +258,7 @@ paths:
         default:
           $ref: '#/responses/Error'
 
-  '/webapps/duplicate/{sourceId}':
+  '/webapps/{sourceId}/duplicate':
     post:
       tags:
         - content
