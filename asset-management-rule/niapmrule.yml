@@ -190,6 +190,10 @@ definitions:
             type: string
             format: date-time
             example: '2018-05-07T18:58:05.219692Z'
+          workspace:
+            type: string
+            description: The ID of the workspace.
+            example: '5bc5e9092a4fa4c71cfa7197'
   RuleStateUpdateModel:
     title: Rule State Update Model
     description: The collection of rule identifiers and the enable/disable state to apply on them.
