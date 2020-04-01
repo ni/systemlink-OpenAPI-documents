@@ -296,7 +296,7 @@ paths:
       summary: API information
       description: Returns information about API versions and available operations.
       operationId: RootEndpoint
-      x-ni-request-all-privileges: true
+      x-ni-auth: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -326,7 +326,7 @@ paths:
       summary: API version information
       description: Returns available operations for a single version of the API.
       operationId: RootEndpointWithVersion
-      x-ni-request-all-privileges: true
+      x-ni-auth: true
       security: []
       responses:
         200:
@@ -344,7 +344,7 @@ paths:
       description: Gets a list containing all rules specific to calibration.
       operationId: get-calibration-rules
       x-ni-operation: getCalibrationRule
-      x-ni-privilege: assetrule.Read
+      x-ni-auth: true
       responses:
         200:
           $ref: '#/responses/CalibrationRulesResponse'
@@ -361,7 +361,7 @@ paths:
       description: Gets the calibration rule with the specified identifier.
       operationId: get-calibration-rule-by-id
       x-ni-operation: getCalibrationRule
-      x-ni-privilege: assetrule.Read
+      x-ni-auth: true
       responses:
         200:
           $ref: '#/responses/CalibrationRuleResponse'
@@ -379,7 +379,7 @@ paths:
       description: Replaces a specific calibration rule with the given one.
       operationId: put-calibration-rule
       x-ni-operation: updateCalibrationRule
-      x-ni-privilege: assetrule.Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: CalibrationRulePutRequestModel
@@ -405,7 +405,7 @@ paths:
       description: Sets specific calibration rules state by enabling or disabling them.
       operationId: set-calibration-rules-state
       x-ni-operation: updateCalibrationRule
-      x-ni-privilege: assetrule.Write
+      x-ni-auth: true
       parameters:
         - $ref: '#/parameters/SetRulesState'
       responses:
