@@ -382,6 +382,14 @@ definitions:
         $ref: '#/definitions/ChannelSpecifications'
     required:
       - channelSpecifications
+  CreateCalculatedResultSpecifier:
+    properties:
+      channelSpecifications:
+        $ref: '#/definitions/ChannelSpecifications'
+      workspace:
+        type: string
+    required:
+      - channelSpecifications
   ReturnedUniqueValues:
     properties:
       uniqueValues:
@@ -507,6 +515,7 @@ paths:
       summary: Gets file, group, and channel information
       description: 'Gets all group names, channel names, channel information, and properties at all levels. This does not return channel data.'
       operationId: getAllFileInfo
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       x-ni-request-timeout: 60000
       produces:
@@ -532,6 +541,7 @@ paths:
       summary: Gets file, group, and channel information
       description: 'Gets all group names, channel names, channel information, and properties at all levels. This does not return channel data.'
       operationId: getMultipleFileInfo
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       x-ni-request-timeout: 60000
       produces:
@@ -558,6 +568,7 @@ paths:
       summary: Gets channel information
       description: 'Gets all channel names, channel information, and properties for the channel. This does not return channel data.'
       operationId: queryChannels
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       x-ni-request-timeout: 60000
       produces:
@@ -584,6 +595,7 @@ paths:
       summary: Lists all groups in the file
       description: Lists all group names in the file.
       operationId: getChannelPropertiesCount
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       x-ni-request-timeout: 60000
       produces:
@@ -624,6 +636,7 @@ paths:
       summary: Lists all channels in the group
       description:  Lists all channel names for a group in a specific file.
       operationId: getChannels
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       x-ni-request-timeout: 60000
       produces:
@@ -669,6 +682,7 @@ paths:
       summary: Returns data from channels.
       description: Queries files based on channel and window specifications and returns channel data that matches the query. The channel specifications select channels by group and channel relationships. Window specifications determine a bounding box of minimum and maximum x and y values, as well as specify the type of decimation performed on data within the window.
       operationId: queryData
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       x-ni-request-timeout: 60000
       produces:
@@ -695,6 +709,7 @@ paths:
       summary: Returns unique data from channels.
       description: Queries files based on channel specifications and returns unique channel data values. The channel specifications select channels by group and channel relationships. The maximum number of unique values to return is determined by MaxNumberOfUniqueValues. If there are more unique values, then the first MaxNumberOfUniqueValues + 1 values are returned.
       operationId: queryUniqueValues
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       x-ni-request-timeout: 60000
       produces:
@@ -721,6 +736,7 @@ paths:
       summary: Returns a calculated result channel.
       description: Creates a channel based on values from other channels.
       operationId: createCalculatedResult
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       x-ni-request-timeout: 60000
       produces:
@@ -731,7 +747,7 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/QueryDataSpecifier'
+            $ref: '#/definitions/CreateCalculatedResultSpecifier'
       responses:
         200:
           description: OK
