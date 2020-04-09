@@ -592,6 +592,71 @@ definitions:
       - assetName
       - assetIdentifier
       - availabilityHistory
+  AvailabilityTimeInterval:
+    title: Availability Time Interval
+    description: Time interval containing a start and an end date.
+    type: object
+    properties:
+      startDate:
+        description: >-
+          A date value which can be used to specify the beginning of a timespan. 
+          
+          This parameter is required to have the "ISO 8601" format in order to be considered valid. 
+          
+          The time component of the request is ignored.
+        type: string
+        format: date-time
+        example: '2018-05-01T00:00:00Z'
+      endDate:
+        description: >- 
+          A date value which can be used to specify the end of a timespan.
+          
+          This parameter is required to have the "ISO 8601" format in order to be considered valid. 
+          
+          The time component of the request is ignored.
+        type: string
+        format: date-time
+        example: '2018-05-20T00:00:00Z'
+    required:
+      - startDate
+      - endDate
+  AssetWithAvailabilityInIntervalModel:
+    title: Asset With Availability In Interval
+    description: Information about the availability, or connection history, of an asset. This includes the name of each system in which the asset was present during an interval of time you specify.
+    type: object
+    properties:
+      assetName:
+        description: The asset name for which the availability was computed.
+        type: string
+        example: PCI-Slot2
+      assetIdentifier:
+        description: The identifier of the asset for which the availability was computed.
+        type: string
+        example: 29162;01B245D6;4243;0
+      interval:
+        $ref: '#/definitions/AvailabilityTimeInterval'
+      availabilityInSystems:
+        description: List containing the availability percentage of an asset for each system it was present in during a given time interval.
+        type: array
+        items:
+          $ref: '#/definitions/AssetAvailabilityInSystemModel'
+  AssetAvailabilityInSystemModel:
+    title: Asset Availability In System Model
+    description: Contains the availability percentage and the name of the system an asset was present in during an interval.
+    type: object
+    properties:
+      systemName:
+        description: Name of the system to which the availability data corresponds.
+        type: string
+        example: 'PXI1'
+      availabilityPercentage:
+        description: The percentage of time in which the asset was available in the system.
+        type: number
+        format: double
+        example: 7.38958
+    required:
+      - systemName
+      - availabilityPercentage
   OverallAvailabilityInSystemModel:
     title: Overall Availability In System
     description: Availability information for an asset in a single system for the specified timespan.
@@ -849,6 +914,28 @@ parameters:
           type: string
           example: '2018-05-20T00:00:00Z'
     required: true
+  QueryAssetsAvailabilityRequestBody:
+    in: body
+    name: queryAssetsAvailability
+    description: Request body containing a list of asset identifiers and a list of time intervals.
+    schema:
+      title: Query Assets Availability Request Body
+      type: object
+      required:
+        - ids
+        - intervals
+      properties:
+        ids:
+          description: Multiple asset identifiers for which the availability data is retrieved.
+          type: array
+          items:
+            type: string
+          example: ["29162;01B245D6;4243;0", "29162;01B245D6;4243;1"]
+        intervals:
+          description: Time intervals for which the availability data is retrieved.
+          type: array
+          items:
+            $ref: '#/definitions/AvailabilityTimeInterval'
   DeleteAssetsRequestBody:
     in: body
     name: deleteAssets
@@ -2459,6 +2546,42 @@ paths:
                   $ref: '#/definitions/AssetWithAvailabilityHistoryModel'
               failed:
                 description: Array of asset identifiers for which obtaining availability failed
+                type: array
+                items:
+                  type: string
+                  example: [ "13562;01B245D6;4243;0" ]
+              error:
+                $ref: '#/definitions/Error'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/history/query-assets-availability:
+    post:
+      tags: [assets]
+      summary: Gets availability history for multiple assets.
+      description: Gets availability history for multiple assets based on the specified timespans.
+      operationId: query-assets-availability
+      x-ni-operation: readAssets
+      x-ni-auth: true
+      parameters:
+        - $ref: '#/parameters/QueryAssetsAvailabilityRequestBody'
+      responses:
+        200:
+          description: Query assets availability response containing information about the availability of the assets specified by their ids during the given time intervals.
+          schema:
+            title: Query Assets Availability Response
+            description: Query assets availability response containing availability history for the requested assets. If availability history could not be resolved for some assets, the response contains error information on the assets which could not be resolved.
+            type: object
+            properties:
+              availabilityData:
+                type: array
+                items:
+                  $ref: '#/definitions/AssetWithAvailabilityInIntervalModel'
+              failed:
+                description: Array of asset identifiers for which obtaining availability failed.
                 type: array
                 items:
                   type: string
