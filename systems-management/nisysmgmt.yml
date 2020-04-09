@@ -1534,7 +1534,13 @@ definitions:
       projection:
         type: string
         example: 'new(id,grains,lastUpdatedTimestamp)'
-        description: Specifies the projection for resources. This field can be used if we don't want to receive the entire model but only certain properties of the model.
+        description: >-
+            Specifies the projection for resources. Use this field to receive specific properties of the model.
+
+            Examples:
+                - 'new(id,connected)'
+                - 'new(id,alias,grains.data.host as host)'
+                - 'new(id,lastUpdatedTimestamp,properties.data.location as location)'
       orderBy:
         type: string
         example: 'lastUpdatedTimestamp descending'
@@ -1626,7 +1632,13 @@ definitions:
       projection:
         type: string
         example: 'new(id,jid,state,lastUpdatedTimestamp,config.fun as fun)'
-        description: Specifies the projection for resources. This field can be used if we don't want to receive the entire model but only certain properties of the model.
+        description: >-
+            Specifies the projection for resources. Use this field to receive specific properties of the model.
+
+            Examples:
+                - 'new(id,jid,state)'
+                - 'new(id,jid,config.user as user)'
+                - 'new(id,jid,state,lastUpdatedTimestamp,metadata.queued as queued)'
       orderBy:
         type: string
         example: 'lastUpdatedTimestamp descending'
