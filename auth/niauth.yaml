@@ -1,0 +1,1075 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: SystemLink Auth Service
+basePath: /niauth/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  ApiKeyAuth:
+    type: apiKey
+    name: x-ni-api-key
+    in: header
+security:
+  - ApiKeyAuth: []
+schemes:
+  - https
+paths:
+  /auth:
+    get:
+      tags:
+        - auth
+      summary: Authenticates API Keys
+      description: Authenticates the given x-ni-api-key and returns information about the caller
+      operationId: auth
+      responses:
+        200:
+          $ref: '#/responses/AuthResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+
+  /session-keys:
+    post:
+      tags:
+        - keys
+      summary: Creates temporary API Keys
+      description: Create a temporary session key which is valid for 1 hour. The caller needs a whitelisted API key to issue session keys.
+      operationId: create-session-key
+      parameters:
+        - $ref: '#/parameters/CreateSessionKeyRequest'
+      responses:
+        200:
+          $ref: '#/responses/CreateSessionKeyResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+
+  /keys:
+    get:
+      tags:
+        - keys
+      summary: Lists all API Keys
+      description: Returns the list of permanent api keys
+      operationId: get-keys
+      parameters:
+        - in: query
+          name: name
+          description: Filters the keys by name
+          type: string
+        - in: query
+          name: skip
+          description: How many keys to skip in the result when paging.
+          type: integer
+        - in: query
+          name: take
+          description: How many keys to return in the result
+          type: integer
+          default: 50
+          maximum: 100
+        - in: query
+          name: sortby
+          description: The field name for sorting the results
+          type: string
+          enum: [name, created, updated]
+        - in: query
+          name: order
+          description: Sort by ascending or descending order
+          type: string
+          enum: [ascending, descending]
+      responses:
+        200:
+          $ref: '#/responses/GetKeysResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    post:
+      tags:
+        - keys
+      summary: Creates a new API Key
+      description: Create a permanent API Key
+      operationId: create-key
+      parameters:
+        - $ref: '#/parameters/CreateKeyRequest'
+      responses:
+        200:
+          $ref: '#/responses/CreateKeyResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /keys/{id}:
+    get:
+      tags:
+        - keys
+      summary: Gets an API Key by the given Id
+      description: Returns the API Key for the given Id
+      operationId: get-key
+      parameters:
+        - $ref: '#/parameters/KeyId'
+      responses:
+        200:
+          $ref: '#/responses/GetKeyResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+    put:
+      tags:
+        - keys
+      summary: Updates an API Key
+      description: Updates the API Key with the given Id
+      operationId: update-key
+      parameters:
+        - $ref: '#/parameters/KeyId'
+        - $ref: '#/parameters/UpdateKeyRequest'
+      responses:
+        200:
+          $ref: '#/responses/UpdateKeyResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags:
+        - keys
+      summary: Deletes an API Key
+      description: Deletes the API Key with the given Id
+      operationId: delete-key
+      parameters:
+        - $ref: '#/parameters/KeyId'
+      responses:
+        201:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+
+  /policies:
+    get:
+      tags:
+        - policies
+      summary: Lists all policies
+      description: Returns the list of policies
+      operationId: get-policies
+      parameters:
+        - in: query
+          name: name
+          description: Filters the policies by name
+          type: string
+        - in: query
+          name: type
+          description: Filters the policies by type. Can be a comma-separated list of types.
+          type: string
+        - in: query
+          name: id
+          description: Filters the policies by id. Can be a comma-separated list of ids.
+          type: string
+        - in: query
+          name: skip
+          description: How many policies to skip in the result when paging.
+          type: integer
+        - in: query
+          name: take
+          description: How many policies to return in the result
+          type: integer
+          default: 50
+          maximum: 100
+        - in: query
+          name: sortby
+          description: The field name for sorting the results
+          type: string
+          enum: [name, created, updated]
+        - in: query
+          name: order
+          description: Sort by ascending or descending order
+          type: string
+          enum: [ascending, descending]
+      responses:
+        200:
+          $ref: '#/responses/GetPoliciesResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    post:
+      tags:
+        - policies
+      summary: Creates a new policy
+      description: Creates a new policy
+      operationId: create-policy
+      parameters:
+        - $ref: '#/parameters/CreatePolicyRequest'
+      responses:
+        200:
+          $ref: '#/responses/CreatePolicyResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /policies/{id}:
+    get:
+      tags:
+        - policies
+      summary: Gets a policy by the given Id
+      description: Returns the policy for the given Id
+      operationId: get-policy
+      parameters:
+        - $ref: '#/parameters/PolicyId'
+      responses:
+        200:
+          $ref: '#/responses/GetPolicyResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+    put:
+      tags:
+        - policies
+      summary: Updates a policy
+      description: Updates the policy with the given Id
+      operationId: update-policy
+      parameters:
+        - $ref: '#/parameters/PolicyId'
+        - $ref: '#/parameters/UpdatePolicyRequest'
+      responses:
+        200:
+          $ref: '#/responses/UpdatePolicyResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags:
+        - policies
+      summary: Deletes a policy
+      description: Deletes the policy with the given Id
+      operationId: delete-policy
+      parameters:
+        - $ref: '#/parameters/PolicyId'
+      responses:
+        201:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+
+  /policy-templates:
+    get:
+      tags:
+        - policy-templates
+      summary: Lists all policy-templates
+      description: Returns the list of policy-templates
+      operationId: get-policy-templates
+      parameters:
+        - in: query
+          name: name
+          description: Filters the policy-templates by name
+          type: string
+        - in: query
+          name: type
+          description: Filters the policy-templates by type. Can be a comma-separated list of types.
+          type: string
+        - in: query
+          name: id
+          description: Filters the policy-templates by id. Can be a comma-separated list of ids.
+          type: string
+        - in: query
+          name: skip
+          description: How many policy-templates to skip in the result when paging.
+          type: integer
+        - in: query
+          name: take
+          description: How many policy-templates to return in the result
+          type: integer
+          default: 50
+          maximum: 100
+        - in: query
+          name: sortby
+          description: The field name for sorting the results
+          type: string
+          enum: [name, created, updated]
+        - in: query
+          name: order
+          description: Sort by ascending or descending order
+          type: string
+          enum: [ascending, descending]
+      responses:
+        200:
+          $ref: '#/responses/GetPolicyTemplatesResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    post:
+      tags:
+        - policy-templates
+      summary: Creates a new policy-template
+      description: Creates a new policy-template
+      operationId: create-policy-template
+      parameters:
+        - $ref: '#/parameters/CreatePolicyTemplateRequest'
+      responses:
+        200:
+          $ref: '#/responses/CreatePolicyTemplateResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /policy-templates/{id}:
+    get:
+      tags:
+        - policy-templates
+      summary: Gets a policy-template by the given Id
+      description: Returns the policy-template for the given Id
+      operationId: get-policy-template
+      parameters:
+        - $ref: '#/parameters/PolicyTemplateId'
+      responses:
+        200:
+          $ref: '#/responses/GetPolicyTemplateResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+    put:
+      tags:
+        - policy-templates
+      summary: Updates a policy-template
+      description: Updates the policy-template with the given Id
+      operationId: update-policy-template
+      parameters:
+        - $ref: '#/parameters/PolicyTemplateId'
+        - $ref: '#/parameters/UpdatePolicyTemplateRequest'
+      responses:
+        200:
+          $ref: '#/responses/UpdatePolicyTemplateResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags:
+        - policy-templates
+      summary: Deletes a policy-template
+      description: Deletes the policy-template with the given Id
+      operationId: delete-policy-template
+      parameters:
+        - $ref: '#/parameters/PolicyTemplateId'
+      responses:
+        201:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+
+definitions:
+  PolicyTemplate:
+    type: object
+    title: Policy Template
+    description: A policy template defines what a user or device is allowed to do but is not bound to a workspace. When the template is referenced by a policy, the connection between the actions and the workspace is created.
+    properties:
+      id:
+        type: string
+        description: The unique id
+      name:
+        type: string
+        description: The policy template's name
+      type:
+        type: string
+        description: The type of the policy template
+      userId:
+        type: string
+        description: The user id
+      created:
+        type: string
+        format: date-time
+        description: The created timestamp
+        example: "2019-12-02T15:31:45.379Z"
+      updated:
+        type: string
+        format: date-time
+        description: The last updated timestamp
+        example: "2019-12-02T15:31:45.379Z"
+      deleted:
+        type: boolean
+        description: Whether the policy is deleted or not
+      properties:
+        type: object
+        description: A map of key value properties
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      statements:
+        type: array
+        items:
+          $ref: '#/definitions/Statement'
+        description: A list of statements defining the actions the user can perform on a resource
+  Statement:
+    type: object
+    title: Statement
+    description: A statement defines what a user or device is allowed to do
+    properties:
+      actions:
+        type: array
+        items:
+          type: string
+        description: A list of actions the user is allowed to perform
+      resource:
+        type: array
+        items:
+          type: string
+        description: A list of resources the user is allowed to access
+      workspace:
+        type: string
+        description: The workspace the user is allowed to access
+      type:
+        type: string
+        description: The type of the resources these actions apply
+      description:
+        type: string
+        description: A description for this statement
+  Policy:
+    type: object
+    title: Policy
+    description: A policy defines what a user or device is allowed to do
+    properties:
+      id:
+        type: string
+        description: The unique id
+      name:
+        type: string
+        description: The policies's name
+      type:
+        type: string
+        description: The type of the policy
+      userId:
+        type: string
+        description: The user id
+      created:
+        type: string
+        format: date-time
+        description: The created timestamp
+        example: "2019-12-02T15:31:45.379Z"
+      updated:
+        type: string
+        format: date-time
+        description: The last updated timestamp
+        example: "2019-12-02T15:31:45.379Z"
+      deleted:
+        type: boolean
+        description: Whether the policy is deleted or not
+      properties:
+        type: object
+        description: A map of key value properties
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      statements:
+        type: array
+        items:
+          $ref: '#/definitions/Statement'
+        description: A list of statements defining the actions the user can perform on a resource in a workspace
+      templateId:
+        type: string
+        description: The id of the policy template. Only set if the policy has been created based on a template and does not contain inline statements.
+      workspace:
+        type: string
+        description: The workspace the policy template applies to. Only set if the policy has been created based on a template and does not contain inline statements.
+  Key:
+    type: object
+    title: API Key
+    description: The API Key can be used to authenticate a user or device
+    properties:
+      id:
+        type: string
+        description: The unique id
+      name:
+        type: string
+        description: The key's name
+      userId:
+        type: string
+        description: The user id
+      created:
+        type: string
+        format: date-time
+        description: The created timestamp
+        example: "2019-12-02T15:31:45.379Z"
+      updated:
+        type: string
+        format: date-time
+        description: The last updated timestamp
+        example: "2019-12-02T15:31:45.379Z"
+      expiry:
+        type: string
+        format: date-time
+        description: The time when the key expires (epoch in milliseconds)
+        example: "2019-12-02T15:31:45.379Z"
+      deleted:
+        type: boolean
+        description: Whether the key is deleted or not
+      defaultWorkspace:
+        type: string
+        description: This field overrides the default workspace when authenticating.
+      properties:
+        type: object
+        description: A map of key value properties
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      policies:
+        type: array
+        items:
+          $ref: '#/definitions/Policy'
+        description: A list of policy definitions including statements and permissions
+  User:
+    type: object
+    title: User
+    description: The user details
+    properties:
+      id:
+        type: string
+        description: The unique id
+      firstName:
+        type: string
+        description: The first name
+      lastName:
+        type: string
+        description: The last name
+      email:
+        type: string
+        description: The email
+      niuaId:
+        type: string
+        description: The external id (niuaId, SID, login name)
+      acceptedToS:
+        type: boolean
+        description: Whether the user accepted the terms of service
+      properties:
+        type: object
+        description: A map of key value properties
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      keywords:
+        type: array
+        items:
+          type: string
+        description: A list of keywords associated with the user
+      created:
+        type: string
+        format: date-time
+        description: The created timestamp
+        example: "2019-12-02T15:31:45.379Z"
+      updated:
+        type: string
+        format: date-time
+        description: The last updated timestamp
+        example: "2019-12-02T15:31:45.379Z"
+      orgId:
+        type: string
+        description: The id of the organization
+      policies:
+        type: array
+        items:
+          $ref: '#/definitions/Policy'
+        description: A list of policy definitions including statements and permissions
+      status:
+        type: string
+        enum: [pending, active]
+        description: The status of the users' registration
+  Org:
+    type: object
+    title: Org
+    description: Organization the user belongs to
+    properties:
+      id:
+        type: string
+        description: The unique id
+      name:
+        type: string
+        description: The name of the organization
+      ownerId:
+        type: string
+        description: The userId of the organization owner
+  Workspace:
+    type: object
+    title: Workspace
+    description: Information about the workspace
+    properties:
+      id:
+        type: string
+        description: The unique id
+      name:
+        type: string
+        description: The workspace name
+      enabled:
+        type: boolean
+        description: Whether the workspace is enabled or not
+      default:
+        type: boolean
+        description: Whether the workspace is the default. The default workspace is used when callers omit a workspace id
+  Error:
+    description: Contains error information
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+        format: int32
+      resourceType:
+        description: Type of resource associated with the error
+        type: string
+      resourceId:
+        description: Identifier of the resource associated with the error
+        type: string
+      message:
+        description: Complete error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+      innerErrors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+    example:
+      name: Auth.ServerError
+      code: -12345
+      message: There has been an error with your request
+      args: []
+      innerErrors: []
+
+parameters:
+  KeyId:
+    in: path
+    name: id
+    description: The identifier of an API Key.
+    type: string
+    required: true
+  PolicyId:
+    in: path
+    name: id
+    description: The identifier of a policy.
+    type: string
+    required: true
+  PolicyTemplateId:
+    in: path
+    name: id
+    description: The identifier of a policy template.
+    type: string
+    required: true
+  CreateSessionKeyRequest:
+    in: body
+    name: createSessionKey
+    description: The request to create session keys
+    schema:
+      title: Create Session Key Request
+      description: Parameters for creating temporary session keys
+      type: object
+      properties:
+        orgId:
+          type: string
+          description: The org id
+        userId:
+          type: string
+          description: The user id
+        policies:
+          type: array
+          items:
+            $ref: '#/definitions/Policy'
+          description: A list of policy definitions including statements and permissions
+        policyIds:
+          type: array
+          items:
+            type: string
+          description: A list of policy ids to reference existing policies
+        defaultWorkspace:
+          type: string
+          description: This field overrides the default workspace when authenticating.
+        durationSeconds:
+          type: integer
+          minimum: 1
+          maximum: 86400
+          description: The time in seconds how long the temporary key is valid
+        properties:
+          type: object
+          description: A map of key value properties
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+
+  CreateKeyRequest:
+    in: body
+    name: createKey
+    description: The request to create an API Key
+    schema:
+      title: Create Key Request
+      description: Parameters for creating API Keys
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name
+        policyIds:
+          type: array
+          items:
+            type: string
+          description: A list of policy ids to reference existing policies
+        defaultWorkspace:
+          type: string
+          description: This field overrides the default workspace when authenticating.
+        properties:
+          type: object
+          description: A map of key value properties
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+  UpdateKeyRequest:
+    in: body
+    name: updateKey
+    description: The request to update an existing API Key
+    schema:
+      title: Update Key Request
+      description: Parameters for updating API Keys
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name
+        policyIds:
+          type: array
+          items:
+            type: string
+          description: A list of policy ids to reference existing policies
+        defaultWorkspace:
+          type: string
+          description: This field overrides the default workspace when authenticating.
+        properties:
+          type: object
+          description: A map of key value properties
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+        enabled:
+          type: boolean
+          description: Whether the key is enabled or not
+
+  CreatePolicyRequest:
+    in: body
+    name: createPolicy
+    description: The request to create a policy
+    schema:
+      title: Create Policy Request
+      description: Parameters for creating policies
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name
+        type:
+          type: string
+          enum: [default, internal, custom, role]
+          description: The policy type
+        statements:
+          type: array
+          items:
+            $ref: '#/definitions/Statement'
+          description: A list of statements which define the actions a user or device is allowed to perform
+        properties:
+          type: object
+          description: A map of key value properties
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+  UpdatePolicyRequest:
+    in: body
+    name: updatePolicy
+    description: The request to update an existing policy
+    schema:
+      title: Update Policy Request
+      description: Parameters for updating policies
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name
+        type:
+          type: string
+          enum: [default, internal, custom, role]
+          description: The policy type
+        statements:
+          type: array
+          items:
+            $ref: '#/definitions/Statement'
+          description: A list of statements which define the actions a user or device is allowed to perform
+        properties:
+          type: object
+          description: A map of key value properties
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+
+  CreatePolicyTemplateRequest:
+    in: body
+    name: createPolicyTemplate
+    description: The request to create a policy template
+    schema:
+      title: Create Policy Template Request
+      description: Parameters for creating policies
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name
+        type:
+          type: string
+          enum: [user, service]
+          description: The policy template type
+        statements:
+          type: array
+          items:
+            $ref: '#/definitions/Statement'
+          description: A list of statements which define the actions a user or device is allowed to perform
+        properties:
+          type: object
+          description: A map of key value properties
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+  UpdatePolicyTemplateRequest:
+    in: body
+    name: updatePolicyTemplate
+    description: The request to update an existing policy
+    schema:
+      title: Update Policy Template Request
+      description: Parameters for updating policy templates
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name
+        type:
+          type: string
+          enum: [user, service]
+          description: The policy template type
+        statements:
+          type: array
+          items:
+            $ref: '#/definitions/Statement'
+          description: A list of statements which define the actions a user or device is allowed to perform
+        properties:
+          type: object
+          description: A map of key value properties
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+
+responses:
+  Unauthorized:
+    description: API Key is missing or invalid
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+  ValidationError:
+    description: Invalid input data
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+  NotFound:
+    description: The resource was not found.
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+  Error:
+    description: Error Response
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
+  AuthResponse:
+    description: Auth Response
+    schema:
+      type: object
+      title: Auth Response
+      properties:
+        user:
+          $ref: '#/definitions/User'
+        org:
+          $ref: '#/definitions/Org'
+        workspaces:
+          type: array
+          items:
+            $ref: '#/definitions/Workspace'
+        policies:
+          type: array
+          items:
+            $ref: '#/definitions/Policy'
+        properties:
+          type: object
+          description: A map of key value properties
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+
+  CreateSessionKeyResponse:
+    description: Create Session Key Response
+    schema:
+      $ref: '#/definitions/Key'
+
+  GetKeysResponse:
+    description: Get Keys Response
+    schema:
+      title: Get Keys Response
+      type: object
+      properties:
+        totalCount:
+          description: Total number of keys which match a given query
+          type: integer
+        keys:
+          description: List of keys
+          type: array
+          items:
+            $ref: '#/definitions/Key'
+  CreateKeyResponse:
+    description: Create Key Response
+    schema:
+      $ref: '#/definitions/Key'
+  GetKeyResponse:
+    description: Get Key Response
+    schema:
+      $ref: '#/definitions/Key'
+  UpdateKeyResponse:
+    description: Update Key Response
+    schema:
+      $ref: '#/definitions/Key'
+
+  GetPoliciesResponse:
+    description: Get Policies Response
+    schema:
+      title: Get Policies Response
+      type: object
+      properties:
+        totalCount:
+          description: Total number of policies which match a given query
+          type: integer
+        policies:
+          description: List of policies
+          type: array
+          items:
+            $ref: '#/definitions/Policy'
+  CreatePolicyResponse:
+    description: Create Policy Response
+    schema:
+      $ref: '#/definitions/Policy'
+  GetPolicyResponse:
+    description: Get Policy Response
+    schema:
+      $ref: '#/definitions/Policy'
+  UpdatePolicyResponse:
+    description: Update Policy Response
+    schema:
+      $ref: '#/definitions/Policy'
+
+  GetPolicyTemplatesResponse:
+    description: Get Policy Templates Response
+    schema:
+      title: Get Policy Templates Response
+      type: object
+      properties:
+        totalCount:
+          description: Total number of policy templates which match a given query
+          type: integer
+        policyTemplates:
+          description: List of policy templates
+          type: array
+          items:
+            $ref: '#/definitions/PolicyTemplate'
+  CreatePolicyTemplateResponse:
+    description: Create Policy Template Response
+    schema:
+      $ref: '#/definitions/PolicyTemplate'
+  GetPolicyTemplateResponse:
+    description: Get Policy Template Response
+    schema:
+      $ref: '#/definitions/PolicyTemplate'
+  UpdatePolicyTemplateResponse:
+    description: Update Policy Template Response
+    schema:
+      $ref: '#/definitions/PolicyTemplate'
