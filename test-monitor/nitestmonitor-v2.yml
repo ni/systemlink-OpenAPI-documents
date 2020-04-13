@@ -493,7 +493,7 @@ definitions:
       workspace:
         description: The workspace the test result belongs to
         type: string
-        example: MyWorkspace
+        example: f94b178e-288c-4101-afb1-833992413aa7
   TestResultResponseObject:
     title: Test Result Response
     type: object
@@ -577,7 +577,7 @@ definitions:
       workspace:
         description: The workspace the test result belongs to
         type: string
-        example: MyWorkspace
+        example: f94b178e-288c-4101-afb1-833992413aa7
   TestResultUpdateRequestObject:
     title: Test Result Update
     type: object
@@ -647,9 +647,9 @@ definitions:
         default: 0
         example: 29.9
       workspace:
-        description: The workspace the test step belongs to
+        description: The workspace the test result belongs to
         type: string
-        example: MyWorkspace
+        example: f94b178e-288c-4101-afb1-833992413aa7
   UpdateTestResultsRequest:
     title: Update Test Results Request
     type: object
@@ -1214,10 +1214,6 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/NamedValueObject'
-      workspace:
-        description: The workspace the step belongs to
-        type: string
-        example: MyWorkspace
   TestStepCreateOrUpdateRequestObject:
     title: Test Step Create or Update Request
     type: object
@@ -1311,7 +1307,7 @@ definitions:
       workspace:
         description: The workspace the test step belongs to
         type: string
-        example: MyWorkspace
+        example: f94b178e-288c-4101-afb1-833992413aa7
 responses:
   Error:
     description: Error
