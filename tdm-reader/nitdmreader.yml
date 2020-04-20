@@ -386,7 +386,7 @@ definitions:
     properties:
       channelSpecifications:
         $ref: '#/definitions/ChannelSpecifications'
-      workspace:
+      workspaceId:
         type: string
     required:
       - channelSpecifications
