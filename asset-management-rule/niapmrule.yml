@@ -227,6 +227,13 @@ parameters:
     required: true
     schema:
       $ref: '#/definitions/RuleStateUpdateModel'
+  Workspaces:
+    in: query
+    name: workspaces
+    description: A string representing the collection of workspace IDs separated by comma used to filter the rules.
+    required: false
+    type: string
+    x-example: '5bc5e9092a4fa4c71cfa7197,3a83d3fc174ae3491890f7ae'
 responses:
   BadRequest:
     description: The server was unable to process the request because of invalid syntax.
@@ -349,6 +356,8 @@ paths:
       operationId: get-calibration-rules
       x-ni-operation: getCalibrationRule
       x-ni-auth: true
+      parameters:
+        - $ref: '#/parameters/Workspaces'
       responses:
         200:
           $ref: '#/responses/CalibrationRulesResponse'
