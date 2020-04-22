@@ -921,7 +921,6 @@ paths:
   /v1/ping:
     get:
       operationId: Ping
-      x-ni-auth: true
       x-ni-operation: ping
       tags: [ping]
       summary: Ping the service
@@ -947,7 +946,6 @@ paths:
         x-example: "filePath"
     get:
       operationId: DownloadFiles
-      x-ni-auth: true
       x-ni-operation: getResource
       x-ni-route-type: Static
       x-ni-static-download: true
