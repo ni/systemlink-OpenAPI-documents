@@ -404,6 +404,34 @@ paths:
           $ref: '#/responses/Error'
 
 definitions:
+  AuthStatement:
+    type: object
+    title: Auth Statement
+    description: A statement defines what a user or device is allowed to do
+    properties:
+      actions:
+        type: array
+        items:
+          type: string
+        description: A list of actions the user is allowed to perform
+      resource:
+        type: array
+        items:
+          type: string
+        description: A list of resources the user is allowed to access
+      workspace:
+        type: string
+        description: The workspace the user is allowed to access
+  AuthPolicy:
+    type: object
+    title: Auth Policy
+    description: A policy defines what a user or device is allowed to do
+    properties:
+      statements:
+        type: array
+        items:
+          $ref: '#/definitions/AuthStatement'
+        description: A list of statements defining the actions the user can perform on a resource in a workspace
   PolicyTemplate:
     type: object
     title: Policy Template
@@ -464,9 +492,6 @@ definitions:
       workspace:
         type: string
         description: The workspace the user is allowed to access
-      type:
-        type: string
-        description: The type of the resources these actions apply
       description:
         type: string
         description: A description for this statement
@@ -616,8 +641,8 @@ definitions:
       policies:
         type: array
         items:
-          $ref: '#/definitions/Policy'
-        description: A list of policy definitions including statements and permissions
+          type: string
+        description: A list of policy ids to reference existing policies
       status:
         type: string
         enum: [pending, active]
@@ -979,7 +1004,7 @@ responses:
         policies:
           type: array
           items:
-            $ref: '#/definitions/Policy'
+            $ref: '#/definitions/AuthPolicy'
         properties:
           type: object
           description: A map of key value properties
