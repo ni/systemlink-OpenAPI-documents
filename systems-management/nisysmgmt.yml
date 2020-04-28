@@ -250,6 +250,8 @@ definitions:
         description: The ID of the registration request.
         type: string
         example: '068530b9-b059-4c0e-9820-9e9cc4e0832c'
+      error:
+        $ref: '#/definitions/Error'
     required: [requestId]
 
   UnregisterSystemsRequest:
