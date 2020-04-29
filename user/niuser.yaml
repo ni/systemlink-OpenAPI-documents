@@ -133,7 +133,7 @@ paths:
           in: path
           description: The user id
       responses:
-        201:
+        204:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
@@ -271,7 +271,7 @@ paths:
       parameters:
         - $ref: '#/parameters/AuthMappingId'
       responses:
-        201:
+        204:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'

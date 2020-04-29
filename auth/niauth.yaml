@@ -154,7 +154,7 @@ paths:
       parameters:
         - $ref: '#/parameters/KeyId'
       responses:
-        201:
+        204:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
@@ -274,7 +274,7 @@ paths:
       parameters:
         - $ref: '#/parameters/PolicyId'
       responses:
-        201:
+        204:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
@@ -394,7 +394,7 @@ paths:
       parameters:
         - $ref: '#/parameters/PolicyTemplateId'
       responses:
-        201:
+        204:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
