@@ -572,6 +572,9 @@ definitions:
         format: date-time
         description: The time when the key expires (epoch in milliseconds)
         example: "2019-12-02T15:31:45.379Z"
+      enabled:
+        type: boolean
+        description: Whether the key is enabled or not
       deleted:
         type: boolean
         description: Whether the key is deleted or not
