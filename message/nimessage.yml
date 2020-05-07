@@ -30,6 +30,17 @@ responses:
       WWW_Authenticate:
         description: Information for how to authenticate (sent only from SystemLink Server).
         type: string
+
+  ValidationError:
+    description: Invalid input data
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+
   Error:
     description: Error
     schema:
@@ -47,6 +58,21 @@ parameters:
     description: Unique session ID
     type: string
     required: true
+  CreateSessionRequest:
+    in: body
+    name: createSessionRequest
+    description: Request to create a new session
+    schema:
+      title: Create Session Request
+      description: Creates a message session with the server to send and receive messages.
+      type: object
+      properties:
+        workspace:
+          type: string
+          description: The ID of the workspace used by this session.
+          example: 8472777d-8e2f-4c42-bceb-7901ede23085
+      example:
+        workspace: 8472777d-8e2f-4c42-bceb-7901ede23085
 
 paths:
   /v1/sessions:
@@ -56,11 +82,15 @@ paths:
       summary: Create a session
       description: Creates a message session with the server to send and receive messages.
       operationId: CreateSession
+      parameters:
+        - $ref: '#/parameters/CreateSessionRequest'
       responses:
         200:
           schema:
             $ref: '#/definitions/SessionToken'
           description: Success
+        400:
+          $ref: '#/responses/ValidationError'
         401:
           $ref: '#/responses/Unauthorized'
         403:
@@ -228,13 +258,19 @@ paths:
   /v1/websocket:
     get:
       tags:
-        - webSocket (SystemLink Server only)
+        - webSocket
       summary: Open a WebSocket session
       description: Opens a persistent connection to the web server that allows two-way communication using a JSON
                    protocol. After you open a connection, you can publish messages and subscribe or unsubscribe to topics.
-                   Refer to the *Models* section to access the schema for these actions. SystemLink Cloud does not support WebSocket connections.
+                   Refer to the *Models* section to access the schema for these actions.
       operationId: OpenWebSocketSession
       parameters:
+        - in: query
+          name: workspace
+          description: The ID of the workspace used by this session.
+          type: string
+          required: false
+          x-example: c04c612b-0ba8-4c8e-a8af-a7f314c44715
         - in: header
           name: Upgrade
           type: string
@@ -264,6 +300,12 @@ paths:
             Sec-WebSocket-Accept:
               description: Used in the WebSocket opening handshake. Set to a value derived from the Sec-WebSocket-Key header.
               type: string
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          description: Reached the maximum number of sessions
         426:
           description: Upgrade Required
 
