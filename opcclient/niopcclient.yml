@@ -33,7 +33,6 @@ paths:
   /:
     get:
       operationId: HandleGetVersionInfo
-      x-ni-request-all-privileges: true
       summary: Gets API information
       tags: [versioning]
       description: Returns permissions and operations for the OpcClientService
@@ -62,7 +61,6 @@ paths:
         required: true
     get:
       operationId: RootEndpointWithVersion
-      x-ni-request-all-privileges: true
       summary: API version information
       description: Returns available operations for a single version of the API.
       tags: [versioning]
