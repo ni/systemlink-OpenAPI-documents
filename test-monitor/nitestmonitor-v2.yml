@@ -1141,9 +1141,16 @@ definitions:
           example:
             key1: value1
         example:
-          - key1: value1
-            key2: value2
-          - key1: value3
+          - name: Voltage
+            status: Passed
+            measurement: "3.725"
+            lowLimit: "3.65"
+            highLimit: "3.8"
+            nominalValue: "3.7"
+            units: volt
+            comparisonType: GELE
+          - nitmParameterType: ADDITIONAL_RESULTS
+            additionalProp: myValue
   TestStepsDeleteRequest:
     title: Test Steps Delete Request
     type: object
