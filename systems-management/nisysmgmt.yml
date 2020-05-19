@@ -193,6 +193,8 @@ definitions:
           timeout: 600
           refresh_minion_cache:
             grains: true
+      error:
+        $ref: '#/definitions/Error'
     required: [jid, tgt, fun]
 
   RegisterSystemsRequest:
