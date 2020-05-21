@@ -838,6 +838,31 @@ definitions:
     example: -1
     x-example: -1
     maximum: 1000
+  UtilizationTimeIntervalModel:
+    title:  Utilization Time Interval
+    description: Time interval for which to retrieve asset/system utilization.
+    type: object
+    properties:
+        startDate:
+            description: >-
+                A date time value which can be used to specify the beginning of a timespan.
+
+                This parameter is required to have the "ISO 8601" format in order to be considered valid. 
+            
+                The time component of the request is ignored.
+            type: string
+            format: date-time
+            example: '2019-05-01T00:00:00.000Z'
+        endDate:
+            description: >-
+                A date time value which can be used to specify the end of a timespan.
+
+                This parameter is required to have the "ISO 8601" format in order to be considered valid.
+            
+                The time component of the request is ignored.
+            type: string
+            format: date-time
+            example: '2019-05-20T00:00:000Z' 
 parameters:
   TimespanGranularity:
     in: query
@@ -1317,34 +1342,160 @@ parameters:
 
               - ExternalCalibration.Operator.DisplayName: String representing the name of the operator which performed an external calibration on a third-party asset.
           type: string
-          example: IsSystemController = true
+          example: IsNIAsset = true
         utilizationIntervals:
           description: Multiple time intervals for which to retrieve asset utilization.
           type: array
           items:
-            title: Utilization Time Interval
-            type: object
-            properties:
-              startDate:
-                description: >-
-                  A date time value which can be used to specify the beginning of a timespan.
+            $ref: '#/definitions/UtilizationTimeIntervalModel'
+  QuerySystemUtilizationRequest:
+    in: body
+    name: queryBody
+    description: Request body consisting of filters for asset utilization, assets, and time intervals.
+    schema:
+      title: Query System Utilizations Request
+      description: Object containing filters for asset utilization, assets, and time intervals.
+      type: object
+      required:
+        - utilizationIntervals
+      properties:
+        utilizationFilter:
+          description: >-
+            The filter criteria for asset utilization. Consists of a string of queries composed using AND/OR operators.
+            String values and date strings need to be enclosed in double quotes.
+            Parenthesis can be used around filters to better define the order of operations.
 
-                  This parameter is required to have the "ISO 8601" format in order to be considered valid. 
-            
-                  The time component of the request is ignored.
-                type: string
-                format: date-time
-                example: '2019-05-01T00:00:00.000Z'
-              endDate:
-                description: >-
-                  A date time value which can be used to specify the end of a timespan.
+            Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
 
-                  This parameter is required to have the "ISO 8601" format in order to be considered valid.
-            
-                  The time component of the request is ignored.
-                type: string
-                format: date-time
-                example: '2019-05-20T00:00:000Z'
+
+            Operators:
+
+            - Equals operator '='. Example: 'x = y'
+
+            - Not equal operator '!='. Example: 'x != y'
+
+            - Greater than operator '>'. Example: 'x > y'
+
+            - Greater than or equal operator '>='. Example: 'x >= y'
+
+            - Less than operator '<'. Example: 'x < y'
+
+            - Less than or equal operator '<='. Example: 'x <= y'
+
+            - Logical AND operator 'and'. Example: 'x and y'
+
+            - Logical OR operator 'or'. Example: 'x or y'
+
+            - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
+
+            - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
+
+
+            Valid asset utilization properties that can be used in the filter:
+
+            - MinionId:  String representing the identifier of a minion in which an asset might be located in.
+
+            - Category: String representing the utilization task category.
+
+            - UserName: : String representing the name of the operator who utilized the asset.
+          type: string
+          example: Category = "Test"
+        assetFilter:
+          description: >-
+              The filter criteria for assets. Consists of a string of queries composed using AND/OR operators.
+              String values and date strings need to be enclosed in double quotes.
+              Parenthesis can be used around filters to better define the order of operations.
+
+              Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+
+
+              Operators:
+
+              - Equals operator '='. Example: 'x = y'
+
+              - Not equal operator '!='. Example: 'x != y'
+
+              - Greater than operator '>'. Example: 'x > y'
+
+              - Greater than or equal operator '>='. Example: 'x >= y'
+
+              - Less than operator '<'. Example: 'x < y'
+
+              - Less than or equal operator '<='. Example: 'x <= y'
+
+              - Logical AND operator 'and'. Example: 'x and y'
+
+              - Logical OR operator 'or'. Example: 'x or y'
+
+              - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
+
+              - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
+
+
+              Valid asset properties that can be used in the filter:
+
+              - AssetIdentifier: String representing the unique identifier of an asset.
+
+              - SerialNumber: String representing the serial number of an asset.
+
+              - ModelName: String representing the model name of an asset.
+
+              - ModelNumber: Unsigned integer representing the model number of an asset.
+
+              - VendorName: String representing the vendor name of an asset.
+
+              - VendorNumber: Unsigned integer representing the vendor number of an asset.
+
+              - AssetName: String representing the asset name.
+
+              - FirmwareVersion: String representing the firmware version of an asset.
+
+              - HardwareVersion: String representing the hardware version of an asset.
+
+              - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE.
+
+              - IsNIAsset: Boolean flag specifying whether the asset is an NI asset or a third-party asset.
+
+              - Keywords: Collection of string values representing asset metadata keywords. Example: 'Keywords=["keyword1", "keyword2"]'.
+
+              - Properties: Collection of key-value pairs, each key-value pair representing an asset metadata property. Example: 'Properties=["key1":"value1", "key2":"value2"]'.
+
+              - Location.MinionId: String representing the identifier of the minion in which the asset is located in.
+
+              - Location.SystemName: String representing the name of the system that the asset is located in.
+
+              - Location.SlotNumber: Unsigned integer representing the slot number the asset is located in.
+
+              - Location.AssetState.SystemConnection: String enumeration representing the connection state of the system the asset is currently located in. Possible values are: APPROVED, DISCONNECTED, CONNECTED_UPDATE_PENDING, CONNECTED_UPDATE_SUCCESSFUL, CONNECTED_UPDATE_FAILED, UNSUPPORTED, ACTIVATED.
+
+              - Location.AssetState.AssetPresence: String enumeration representing the present status of an asset in a system. Possible values are: INITIALIZING, UNKNOWN, NOT_PRESENT, PRESENT.
+
+              - SupportsSelfCalibration: Boolean flag specifying whether the asset supports self-calibration.
+
+              - SelfCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was self-calibrated. Example: "2018-05-20T00:00:00Z"
+              
+              - SupportsExternalCalibration: Boolean flag specifying whether the asset supports external calibration.
+              
+              - CalibrationStatus: String enumeration representing the calibration status of an asset. Possible values are: OK, APPROACHING_RECOMMENDED_DUE_DATE, PAST_RECOMMENDED_DUE_DATE.
+
+              - ExternalCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was externally-calibrated. Example: "2018-05-20T00:00:00Z"
+
+              - ExternalCalibration.NextRecommendedDate: ISO-8601 formatted timestamp string specifying the recommended date for the next external calibration. Example: "2018-05-20T00:00:00Z"
+
+              - ExternalCalibration.RecommendedInterval: Integer representing the manufacturer-recommended calibration interval, in months.
+
+              - ExternalCalibration.Comments: String representing any external calibration comments.
+
+              - ExternalCalibration.IsLimited: Boolean flag specifying whether the last external calibration was a limited calibration.
+
+              - ExternalCalibration.Operator.DisplayName: String representing the name of the operator which performed an external calibration on a third-party asset.
+          type: string
+          example: IsNIAsset = true
+        utilizationIntervals:
+          description: Multiple time intervals for which to retrieve system utilization.
+          type: array
+          items:
+            $ref: '#/definitions/UtilizationTimeIntervalModel'
   QueryAssetUtilizationHistoryRequest:
     in: body
     name: queryBody
@@ -1916,6 +2067,54 @@ responses:
               type: number
               format: double
               example: 7.38958
+  SystemUtilizationWithPercentageResponse:
+    description: Utilization response containing the collection of utilizations matching the provided filters, in a specific time interval. Besides a time interval, each element contains an asset identifier, a minion id, an utilization category, and a percentage of time that the system was utilized in the time interval.
+    schema:
+      title: System Utilization with Percentage Response
+      description: Response for the utilization query containing the collection of utilizations. Besides a time interval, each element contains an asset identifier, a minion id, an utilization category, and a percentage of time that the system was utilized in the time interval.
+      type: array
+      items:
+          title: System Utilization with Percentage Model
+          type: object
+          required:
+            - startTimestamp
+            - endTimestamp
+            - minionId
+            - percentage
+          properties:
+            startTimestamp:
+              description: >-
+                A date time value representing the beginning of a system utilization interval.
+
+                This parameter has the "ISO 8601" format in order to be considered valid.
+              type: string
+              format: date-time
+              example: '2019-05-01T00:00:00.519Z'
+            endTimestamp:
+              description: >-
+                A date time value representing the end of a system utilization interval.
+
+                This parameter has the "ISO 8601" format in order to be considered valid.
+              type: string
+              format: date-time
+              example: '2019-05-20T00:00:00Z'
+            assetIdentifier:
+              description: String representing the unique identifier of an asset.
+              type: string
+              example: "29162;01B245D6;4243;0"
+            minionId:
+              description: String representing the unique identifier of a system.
+              type: string
+              example: NI_PXIe-8135_Embedded_Controller--MAC-00-80-2F-23-52-65
+            category:
+              description: String representing the utilization task category.
+              type: string
+              example: Test
+            percentage:
+              description: Percentage of time that the system was utilized in the specified time interval.
+              type: number
+              format: double
+              example: 7.38958
   QueryUtilizationHistoryResponse:
     description: Asset Utilization History response containing the collection of utilizations records matching the provided filters.
     schema:
@@ -2091,7 +2290,6 @@ paths:
 
         Currently, the valid combinations of ResponseFormat and Destination are [JSON;INLINE], [CSV;DOWNLOAD], [CSV;FILE_SERVICE].
       operationId: get-assets
-      x-ni-operation: readAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/Skip'
@@ -2138,7 +2336,6 @@ paths:
         
         If the selfCalibration property is set, the supportsSelfCalibration property is automatically set to true by the service no matter if it is specified as false. The same is true for the externalCalibration and supportsExternalCalibration properties.
       operationId: create-assets
-      x-ni-operation: writeAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/CreateAssetsRequestBody'
@@ -2189,7 +2386,6 @@ paths:
 
         Updating the assetPresence property to NOT_PRESENT succeeds only if it is updated with the same minionId, parent and slotNumber. Updating it to PRESENT always succeeds.
       operationId: update-assets
-      x-ni-operation: writeAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/UpdateAssetsRequestBody'
@@ -2208,7 +2404,6 @@ paths:
       summary: Gets a summary of assets
       description: Gets asset summary response containing the total number of assets, the number of assets which are active, i.e. present in a connected system, and the number of assets which are not active.
       operationId: get-asset-summary
-      x-ni-operation: readAssets
       x-ni-auth: true
       responses:
           200:
@@ -2223,7 +2418,6 @@ paths:
       summary: Gets a summary of assets supporting calibration
       description: Gets asset summary of the total number of assets supporting calibration, the number of assets approaching calibration date and the number of assets past their calibration date
       operationId: get-calibratable-asset-summary
-      x-ni-operation: readAssets
       x-ni-auth: true
       responses:
           200:
@@ -2238,7 +2432,6 @@ paths:
       summary: Query assets
       description: Returns the assets satisfying the provided filtering criteria. If the the caller requests a JSON inline response, the returned assets are filtered based on the filter string and the ids and calibratableOnly properties are not taken into consideration. When the caller requests a CSV response, the filter is not taken into consideration, but the ids and calibratableOnly properties are used to filter the assets from the response.
       operationId: query-assets
-      x-ni-operation: readAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/QueryAssetsRequest'
@@ -2257,7 +2450,6 @@ paths:
       summary: Gets asset with identifier
       description: Gets the asset which has the given identifier.
       operationId: get-asset-with-identifier
-      x-ni-operation: readAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/AssetId'
@@ -2276,7 +2468,6 @@ paths:
       summary: Retrieves asset availability history
       description: Returns availability information for an asset in the specified timespan and split based on the specified time granularity.
       operationId: get-asset-availability-history
-      x-ni-operation: readAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/AssetId'
@@ -2320,7 +2511,6 @@ paths:
       summary: Retrieves asset calibration history
       description: Returns the calibration history of the asset which has the given identifier.
       operationId: get-asset-calibration-history
-      x-ni-operation: readAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/AssetId'
@@ -2342,7 +2532,6 @@ paths:
       summary: Creates a new calibration history entry for an asset
       description: Creates a new calibration history entry for a third-party asset.
       operationId: post-asset-calibration-history
-      x-ni-operation: writeAssets
       x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       parameters:
@@ -2365,7 +2554,6 @@ paths:
       summary: Deletes calibration history entries
       description: Deletes multiple calibration history entries for an asset.
       operationId: post-delete-asset-calibration-history
-      x-ni-operation: deleteAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/AssetId'
@@ -2389,7 +2577,6 @@ paths:
       summary: Queries asset calibration history
       description: Computes the calibration history of an asset in CSV format. If the destination is download, the response will contain the calibration history file content. If the destination is file ingestion service, the CSV file is sent to the file storing service and an object containing the file identifier is returned. Any other format and destination combinations are not supported yet.
       operationId: post-asset-query-calibration-history
-      x-ni-operation: readAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/AssetId'
@@ -2413,7 +2600,6 @@ paths:
       summary: Queries asset location history
       description: Computes the location history of an asset in CSV format. If the destination is download, the response will contain the location history file content. If the destination is file ingestion service, the CSV file is sent to the file storing service and an object containing the file identifier is returned. Any other format and destination combinations are not supported yet.
       operationId: post-asset-query-location-history
-      x-ni-operation: readAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/AssetId'
@@ -2437,7 +2623,6 @@ paths:
       summary: Updates asset metadata
       description: Performs a request to update the metadata information of an asset.
       operationId: update-asset-metadata
-      x-ni-operation: writeAssets
       x-ni-auth: true
       consumes:
         - application/merge-patch+json
@@ -2465,7 +2650,6 @@ paths:
           Stores information related to assets utilization start. The operation is succesful when utilization information can be stored for all asset identifiers provided in the request.
           It will return a partial success when storing the utilization start information failed for one or more assets.
       operationId: start-multiple-asset-utilization
-      x-ni-operation: createUtilization
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/StartUtilizationRequest'
@@ -2487,7 +2671,6 @@ paths:
           It will return a partial success when end utilization information can be stored for only a subset of the utilization identifiers provided in the request.
           It will return a not found response when no stored utilizations matched the provided utilization identifiers.
       operationId: end-multiple-asset-utilization
-      x-ni-operation: writeAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/EndUtilizationRequest'
@@ -2509,7 +2692,6 @@ paths:
           It will return a partial success when utilization heartbeat information can be stored for only a subset of the utilization identifiers provided in the request.
           It will return a not found response when no stored utilizations matched the provided utilization identifiers.
       operationId: asset-utilization-multiple-heartbeats
-      x-ni-operation: writeAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/HeartbeatUtilizationRequest'
@@ -2528,7 +2710,6 @@ paths:
       summary: Gets availability history for multiple assets.
       description: Gets availability history for multiple assets based on a specified timespan.
       operationId: compare-asset-availability
-      x-ni-operation: readAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/AssetAvailabilityComparison'
@@ -2564,7 +2745,6 @@ paths:
       summary: Gets availability history for multiple assets.
       description: Gets availability history for multiple assets based on the specified timespans.
       operationId: query-assets-availability
-      x-ni-operation: readAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/QueryAssetsAvailabilityRequestBody'
@@ -2600,7 +2780,6 @@ paths:
       summary: Deletes assets and all information associated with assets.
       description: Deletes all persisted data for the assets with the provided identifiers. This includes asset properties and all related historical information.
       operationId: delete-assets
-      x-ni-operation: deleteAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/DeleteAssetsRequestBody'
@@ -2619,7 +2798,6 @@ paths:
       summary: Query Asset Utilization
       description: Retrieves asset utilization matching the provided filters.
       operationId: read-asset-utilization
-      x-ni-operation: readAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/QueryAssetUtilizationRequest'
@@ -2632,13 +2810,30 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+  /v1/query-system-utilization:
+    post:
+      tags: [utilization]
+      summary: Query System Utilization
+      description: Retrieves system utilization matching the provided filters.
+      operationId: read-system-utilization
+      x-ni-auth: true
+      parameters:
+        - $ref: '#/parameters/QuerySystemUtilizationRequest'
+      responses:
+        200:
+          $ref: '#/responses/SystemUtilizationWithPercentageResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v1/query-asset-utilization-history:
     post:
       tags: [utilization]
       summary: Query Asset Utilization Historical Data
       description: Retrieves historical asset utilization data matching the provided filters. An empty request body queries all historical asset utilization data.
       operationId: query-asset-utilizations
-      x-ni-operation: readAssets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/QueryAssetUtilizationHistoryRequest'
@@ -2657,7 +2852,6 @@ paths:
       summary: Retrieves the service policy
       description: Retrieves the service policy.
       operationId: get-policy
-      x-ni-operation: readAssets
       x-ni-auth: true
       responses:
         200:
@@ -2671,7 +2865,6 @@ paths:
       summary: Updates the service policy
       description: Performs a request to update the service policy.
       operationId: update-policy
-      x-ni-operation: writeAssets
       x-ni-auth: true
       consumes:
         - application/merge-patch+json
