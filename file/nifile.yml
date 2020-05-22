@@ -485,7 +485,6 @@ paths:
       operationId: ListServiceGroups
       x-ni-auth: true
       x-ni-operation: listFiles
-      x-ni-privilege: ViewMetadata
       x-ni-request-all-privileges: true
       responses:
         200:
@@ -525,7 +524,6 @@ paths:
       operationId: ListAvailableFiles_GET
       x-ni-auth: true
       x-ni-operation: listFiles
-      x-ni-privilege: ViewMetadata
       x-ni-request-all-privileges: true
       parameters:
         - in: query
@@ -593,7 +591,6 @@ paths:
       operationId: Delete
       x-ni-auth: true
       x-ni-operation: deleteFiles
-      x-ni-privilege: DeleteFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       responses:
         204:
@@ -617,7 +614,6 @@ paths:
       x-ni-auth: true
       operationId: ReceiveFile
       x-ni-operation: downloadData
-      x-ni-privilege: DownloadFiles
       x-ni-request-variables:
         - REQUEST_METHOD
       parameters:
@@ -665,7 +661,6 @@ paths:
       operationId: UpdateMetadata
       x-ni-auth: true
       x-ni-operation: updateMetadata
-      x-ni-privilege: ModifyFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       parameters:
         - in: body
@@ -717,7 +712,6 @@ paths:
       operationId: DeleteMultiple
       x-ni-auth: true
       x-ni-operation: deleteFiles
-      x-ni-privilege: DeleteFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       parameters:
         - in: body
@@ -766,7 +760,6 @@ paths:
       operationId: QueryAvailableFiles
       x-ni-auth: true
       x-ni-operation: listFiles
-      x-ni-privilege: ViewMetadata
       x-ni-request-all-privileges: true
       parameters:
         - in: query
@@ -828,7 +821,6 @@ paths:
       operationId: Upload
       x-ni-auth: true
       x-ni-operation: uploadFiles
-      x-ni-privilege: UploadFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       consumes:
         - multipart/form-data
