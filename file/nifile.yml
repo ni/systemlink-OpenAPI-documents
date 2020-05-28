@@ -433,7 +433,6 @@ paths:
       summary: API information
       description: Returns information about API versions and available operations.
       operationId: RootEndpoint      
-      x-ni-request-all-privileges: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -462,7 +461,6 @@ paths:
       summary: API version information
       description: Returns available operations for a single version of the API.
       operationId: RootEndpointWithVersion
-      x-ni-request-all-privileges: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -485,7 +483,6 @@ paths:
       operationId: ListServiceGroups
       x-ni-auth: true
       x-ni-operation: listFiles
-      x-ni-request-all-privileges: true
       responses:
         200:
           description: OK
@@ -524,7 +521,6 @@ paths:
       operationId: ListAvailableFiles_GET
       x-ni-auth: true
       x-ni-operation: listFiles
-      x-ni-request-all-privileges: true
       parameters:
         - in: query
           name: skip
@@ -760,7 +756,6 @@ paths:
       operationId: QueryAvailableFiles
       x-ni-auth: true
       x-ni-operation: listFiles
-      x-ni-request-all-privileges: true
       parameters:
         - in: query
           name: skip
