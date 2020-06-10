@@ -2134,8 +2134,6 @@ responses:
                 - assetIdentifier
                 - minionId
                 - category
-                - taskName
-                - userName
                 - startTimestamp
               properties:
                 utilizationIdentifier:
