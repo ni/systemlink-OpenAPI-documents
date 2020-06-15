@@ -1692,7 +1692,6 @@ paths:
   /:
     get:
       operationId: HandleGetVersionInfo
-      x-ni-auth: true
       summary: API information
       tags: [versioning]
       security: []
@@ -1715,7 +1714,6 @@ paths:
   /{version}:
     get:
       operationId: RootEndpointWithVersion
-      x-ni-auth: true
       summary: API version information
       description: Returns available operations for a single version of the API.
       tags: [versioning]
