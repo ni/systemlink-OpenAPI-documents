@@ -69,10 +69,6 @@ definitions:
         description: The ID of the privilege
         type: string
         example: "12314121"
-      dependsOnService:
-        description: Specifies the logical dependency of this privilege. Usually, this is a backend service
-        type: string
-        example: "AssetPerformanceManagement"
       show:
         description: Specifies whether this privilege is user visible
         type: boolean
