@@ -2098,10 +2098,6 @@ responses:
               type: string
               format: date-time
               example: '2019-05-20T00:00:00Z'
-            assetIdentifier:
-              description: String representing the unique identifier of an asset.
-              type: string
-              example: "29162;01B245D6;4243;0"
             minionId:
               description: String representing the unique identifier of a system.
               type: string
