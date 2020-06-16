@@ -59,8 +59,8 @@ definitions:
         items:
           $ref: '#/definitions/Error'
     example:
-      name: Skyline.OneOrMoreErrorsOccurred
-      code: -251040
+      name: TestMonitorErrorCodes.OneOrMoreErrorsOccurred
+      code: -252921
       message: >-
         One or more errors occurred. See the contained list for details of each
         error.
