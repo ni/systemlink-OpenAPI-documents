@@ -571,7 +571,6 @@ paths:
   /:
     get:
       operationId: RootEndpoint
-      x-ni-request-all-privileges: true
       summary: API information
       description: Returns information about API versions and available operations.
       tags: [versioning]
@@ -598,7 +597,6 @@ paths:
         required: true
     get:
       operationId: RootEndpointWithVersion
-      x-ni-request-all-privileges: true
       summary: API version information
       description: Returns available operations for a single version of the API
       tags: [versioning]
@@ -616,7 +614,7 @@ paths:
     get:
       operationId: GetUserDataItems
       x-ni-operation: queryUserDataItems
-      x-ni-request-all-privileges: true
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       summary: Get All User Data Items
       description: >-
@@ -696,7 +694,7 @@ paths:
     post:
       operationId: CreateOrUpdateUserDataItems
       x-ni-operation: createOrUpdateUserDataItems
-      x-ni-request-all-privileges: true
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       summary: Create or update one or more user data items
       description: >-
@@ -737,7 +735,7 @@ paths:
     get:
       operationId: GetUserDataItem
       x-ni-operation: queryUserDataItems
-      x-ni-request-all-privileges: true
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       summary: Get information about the specified user data item
       description: >-
@@ -755,7 +753,7 @@ paths:
     delete:
       operationId: DeleteUserDataItem
       x-ni-operation: deleteUserDataItems
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       summary: Delete the specified user data item
       description: Deletes the specified user data item.
@@ -771,7 +769,7 @@ paths:
     post:
       operationId: QueryUserDataItems
       x-ni-operation: queryUserDataItems
-      x-ni-request-all-privileges: true
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       summary: Query User Data Items
       description: Queries the user data items.
@@ -830,8 +828,7 @@ paths:
     post:
       operationId: UpdateUserDataItems
       x-ni-operation: createOrUpdateUserDataItems
-      x-ni-privilege: Write
-      x-ni-request-all-privileges: true
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       summary: Update one or more user data items
       description: >-
@@ -864,8 +861,7 @@ paths:
     post:
       operationId: DeleteUserDataItems
       x-ni-operation: deleteUserDataItems
-      x-ni-privilege: Write
-      x-ni-request-all-privileges: true
+      x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       summary: Delete user data items
       description: >-
