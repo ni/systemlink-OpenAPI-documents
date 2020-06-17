@@ -2240,7 +2240,6 @@ paths:
       summary: API information
       description: Returns information about API versions and available operations.
       operationId: RootEndpoint
-      x-ni-auth: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -2265,7 +2264,6 @@ paths:
       summary: API version information
       description: Returns available operations for a single version of the API.
       operationId: RootEndpointWithVersion
-      x-ni-auth: true
       security: []
       responses:
         200:
