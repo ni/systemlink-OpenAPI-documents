@@ -712,6 +712,11 @@ definitions:
       - INLINE
       - DOWNLOAD
       - FILE_SERVICE
+  FileIngestionWorkspace:
+    title: File Ingestion Workspace
+    description: The ID of the workspace to put the file into, if the destination is "FILE_SERVICE".
+    type: string
+    example: '5bc5e9092a4fa4c71cfa7197'
   QueryHistoryRequestModel:
     title: Query History Request Model
     description: Object containing options for querying history.
@@ -721,6 +726,8 @@ definitions:
         $ref: '#/definitions/ResponseFormat'
       destination:
         $ref: '#/definitions/Destination'
+      fileIngestionWorkspace:
+        $ref: '#/definitions/FileIngestionWorkspace'
     example:
       responseFormat: CSV
       destination: DOWNLOAD
@@ -1080,6 +1087,8 @@ parameters:
           $ref: '#/definitions/ResponseFormat'
         destination:
           $ref: '#/definitions/Destination'
+        fileIngestionWorkspace:
+          $ref: '#/definitions/FileIngestionWorkspace'
         skip:
           $ref: '#/definitions/Skip'
         take:
@@ -2309,6 +2318,11 @@ paths:
             - INLINE
             - DOWNLOAD
             - FILE_SERVICE
+        - in: query
+          name: fileIngestionWorkspace
+          description: The ID of the workspace to put the file into, if the destination is "FILE_SERVICE".
+          type: string
+          x-example: '5bc5e9092a4fa4c71cfa7197'
       responses:
         200:
           $ref: '#/responses/AssetsResponse'
