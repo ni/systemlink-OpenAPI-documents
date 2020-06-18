@@ -42,11 +42,33 @@ definitions:
         type: array
         items:
           type: string
+      resourceType:
+        description: Type of resource associated with the error.
+          This field is only present for entries in *innerErrors*.
+        type: string
+        enum: [tagRule]
+      resourceId:
+        description: Identifier of the resource associated with the error.
+          This field is only present for entries in *innerErrors*.
+        type: string
+      innerErrors:
+        description: Array of individual errors when a request results in multiple errors.
+          This field is only present when *name* is 'Skyline.OneOrMoreErrorsOccurred'.
+        type: array
+        items:
+          $ref: '#/definitions/Error'
     example:
-      name: TagRuleEngine.RuleNotFound
-      code: -253103
-      message: A rule with ID '5c2cf7e0e0d64403b486fcb4' was not found.
+      name: Skyline.OneOrMoreErrorsOccurred
+      code: -251041
+      message: One or more errors occurred. See the contained list for details of each error.
       args: []
+      innerErrors:
+        - name: TagRuleEngine.RuleNotFound
+          code: -253103
+          message: A rule with ID '5c2cf7e0e0d64403b486fcb4' was not found.
+          resourceType: tagRule
+          resourceId: 5c2cf7e0e0d64403b486fcb4
+          args: [5c2cf7e0e0d64403b486fcb4]
   Operation:
     description: Operation provided by the API
     type: object
@@ -162,7 +184,7 @@ definitions:
       key1: value1
   RuleCommonFields:
     title: Rule Common Fields
-    description: A single-sourced definition of available fields in both an udpate request and the rule type
+    description: A single-sourced definition of available fields in both an update request and the rule type
       itself.
     properties:
       searchPath:
@@ -170,6 +192,11 @@ definitions:
           a single tag's path, or a string containing wildcard characters which can match multiple tags.
         type: string
         example: '*.System.Health.DiskUsePercentage'
+      workspace:
+        description: The ID of the workspace to which this rule belongs. Added in version 2 of the
+          readRules operation.
+        type: string
+        example: 3d411024-9db8-42d1-8ab8-6cee0e6cd841
       tagDataType:
         $ref: '#/definitions/TagDataType'
       conditions:
@@ -241,7 +268,6 @@ paths:
       summary: API information
       description: Returns information about API versions and available operations.
       operationId: RootEndpoint
-      x-ni-request-all-privileges: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -271,7 +297,6 @@ paths:
       summary: API version information
       description: Returns available operations for a single version of the API.
       operationId: RootEndpointWithVersion
-      x-ni-request-all-privileges: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -308,6 +333,12 @@ paths:
                   a single tag's path, or a string containing wildcard characters which can match multiple tags.
                 type: string
                 example: '*.System.Health.DiskUsePercentage'
+              workspace:
+                description: The ID of the workspace in which to create or update the rule. When not specified,
+                  the default workspace is used based on the requesting user. Added in version 2 of the
+                  writeRules operation.
+                type: string
+                example: 3d411024-9db8-42d1-8ab8-6cee0e6cd841
               tagDataType:
                 $ref: '#/definitions/TagDataType'
               conditions:
@@ -439,8 +470,34 @@ paths:
                   type: string
                 example: [5c40ec55e0d6441168b4c543, 5c40ec55e0d6441168b4c543]
       responses:
+        200:
+            description: Partial Success - Indicates the request to delete was processed successfully,
+              but one or more rules failed to delete. The included *error* object will contain
+              an entry in the *innerErrors* array for each failed rule.
+            schema:
+              type: object
+              title: DeleteRulesPartialSuccess
+              properties:
+                deleted:
+                  description: The *ruleId*s of the rules that were successfully deleted.
+                  type: array
+                  items:
+                    type: string
+                  example:
+                    - 5c33c212e0d6444320d9a9f4
+                failed:
+                  description: The *ruleId*s of the rules that were not deleted.
+                    See *error* for why each rule failed to delete. Reasons include the
+                    rule could not be found or the caller is not authorized to delete the rule.
+                  type: array
+                  items:
+                    type: string
+                  example:
+                    - 5c2cf7e0e0d64403b486fcb4
+                error:
+                  $ref: '#/definitions/Error'
         204:
-          description: No Content
+          description: Success - Indicated all requested rules were deleted successfully.
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -493,6 +550,8 @@ paths:
                 items:
                   type: string
                 example: [5c40ec55e0d6441168b4c541]
+              error:
+                $ref: '#/definitions/Error'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -551,6 +610,14 @@ paths:
                 example:
                   - keyword1
                   - keyword2
+              workspaces:
+                type: array
+                description: Workspace query. The service will return rules whose *workspace* field is one of
+                  the specified workspaces. Added in version 2 of the readRules operation.
+                items:
+                  type: string
+                example:
+                  - '*'    
               skip:
                 description: Number of entries to skip in the response list. Typically used in combination
                   with the take parameter to implement pagination.
@@ -578,6 +645,64 @@ paths:
                 description: The total number of rules which matched the filter criteria.
                 type: integer
                 example: 1
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/duplicate-rules:
+    post:
+      tags: [rules]
+      summary: Duplicate rules
+      description: Duplicates multiple rules into a given workspace
+      operationId: DuplicateRules
+      x-ni-operation: writeRules
+      parameters:
+        - in: body
+          name: Request body
+          required: true
+          schema:
+            title: DuplicateRequestBody
+            type: object
+            required:
+              - ids
+              - workspace
+            properties:
+              ids:
+                description: The IDs of the rules which should be duplicated.
+                type: array
+                items:
+                  type: string
+                example: [5c40ec55e0d6441168b4c543, 5c40ec55e0d6441168b4c543]
+              workspace:
+                description: The ID of the workspace in which to duplicate the specified rules.
+                type: string
+                example: 3d411024-9db8-42d1-8ab8-6cee0e6cd841
+      responses:
+        200:
+          description: OK
+          schema:
+            title: DuplicateResponse
+            type: object
+            properties:
+              duplicatedIds:
+                description: A dictionary where the keys are the IDs of the rules which were successfully
+                  duplicated, and the values are the IDs of the new duplicate rules.
+                type: object
+                additionalProperties:
+                  type: string
+                example: 
+                  5c40ec55e0d6441168b4c543: 5c40ec55e0d6441168b4c545
+                  5c40ec55e0d6441168b4c544: 5c40ec55e0d6441168b4c546
+              failed:
+                description: The IDs of the rules which were failed to be duplicated.
+                  See *error* for why each rule failed to duplicate. Reasons include the
+                  rule could not be found or the caller is not authorized to create the rule.
+                type: array
+                items:
+                  type: string
+                example: [5c40ec55e0d6441168b4c541]
+              error:
+                $ref: '#/definitions/Error'
         401:
           $ref: '#/responses/Unauthorized'
         default:
