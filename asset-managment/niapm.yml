@@ -2063,6 +2063,10 @@ responses:
               description: String representing the unique identifier of an asset.
               type: string
               example: "29162;01B245D6;4243;0"
+            assetName:
+              description: String representing the name of an asset.
+              type: string
+              example: PCISlot2
             minionId:
               description: Identifier of the minion where the asset is located.
               type: string
@@ -2111,6 +2115,10 @@ responses:
               description: String representing the unique identifier of a system.
               type: string
               example: NI_PXIe-8135_Embedded_Controller--MAC-00-80-2F-23-52-65
+            systemName:
+              description: String representing the alias of a system.
+              type: string
+              example: PXIe Alias
             category:
               description: String representing the utilization task category.
               type: string
