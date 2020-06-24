@@ -300,6 +300,10 @@ paths:
           description: Filters the policy-templates by type. Can be a comma-separated list of types.
           type: string
         - in: query
+          name: builtIn
+          description: Filters the policy-templates by the builtIn flag.
+          type: boolean
+        - in: query
           name: id
           description: Filters the policy-templates by id. Can be a comma-separated list of ids.
           type: string
@@ -446,6 +450,9 @@ definitions:
       type:
         type: string
         description: The type of the policy template
+      builtIn:
+        type: boolean
+        description: Whether the policy template is built-in
       userId:
         type: string
         description: The user id
