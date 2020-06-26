@@ -149,6 +149,31 @@ paths:
       summary: List workspaces
       description: List the workspaces of an organization
       operationId: get-workspaces
+      parameters:
+        - in: query
+          name: name
+          description: Filters the workspaces by name
+          type: string
+        - in: query
+          name: skip
+          description: How many workspaces to skip in the result when paging.
+          type: integer
+        - in: query
+          name: take
+          description: How many workspaces to return in the result.
+          type: integer
+          default: 50
+          maximum: 100
+        - in: query
+          name: sortby
+          description: The field name for sorting the results
+          type: string
+          enum: [name]
+        - in: query
+          name: order
+          description: Sort by ascending or descending order
+          type: string
+          enum: [ascending, descending]
       responses:
         200:
           $ref: '#/responses/GetWorkspacesResponse'
@@ -362,61 +387,61 @@ parameters:
               The filter criteria for users, consisting of a string of queries composed using AND/OR operators.
               String values need to be enclosed in double quotes.
               Parenthesis can be used within the filter to better define the order of operations.
-              
-              
+
+
               Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
-              
-              
+
+
               Operators:
-              
+
               - Equals operator '='. Example: 'x = y'
-              
+
               - Not equal operator '!='. Example: 'x != y'
-              
+
               - Greater than operator '>'. Example: 'x > y'
-              
+
               - Greater than or equal operator '>='. Example: 'x >= y'
-              
+
               - Less than operator '<'. Example: 'x < y'
-              
+
               - Less than or equal operator '<='. Example: 'x <= y'
-              
+
               - Logical AND operator 'and'. Example: 'x and y'
-              
+
               - Logical OR operator 'or'. Example: 'x or y'
-              
+
               - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
-              
+
               - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
-              
+
               - String null or empty 'string.IsNullOrEmpty()', used to check whether a string is null or empty. Example: 'string.IsNullOrEmpty(x)'
-              
+
               - String is not null or empty '!string.IsNullOrEmpty()', used to check whether a string is not null or empty. Example: '!string.IsNullOrEmpty(x)'
-              
-              
+
+
               Valid user properties that can be used in the filter:
-              
+
               - id
-              
+
               - firstName
-              
+
               - lastName
-              
+
               - email
-              
+
               - niuaId
-              
+
               - login
-              
+
               - status
           type: string
           example: firstName.Contains("John") && status == "active"
         take:
           description: The maximum number of users to return
           type: integer
-          default: 100
+          default: 50
           minimum: 0
-          maximum: 1000
+          maximum: 100
           example: 10
         sortby:
           description: The field name for sorting the results
