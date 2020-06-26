@@ -541,6 +541,10 @@ definitions:
         type: string
         description: The Id of the workspace containing the webapp
         example: 0c80cf49-54e9-4e92-b117-3bfa574caa84
+      userId:
+        type: string
+        description: The Id of the user that created the webapp
+        example: d4f6b766-da45-4fe5-85c5-bd745c402cf9
       shared:
         type: string
         enum:
