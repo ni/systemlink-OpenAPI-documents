@@ -14,8 +14,6 @@ securityDefinitions:
     in: header
 security:
   - ApiKeyAuth: []
-schemes:
-  - https
 paths:
   '/orgs/{name}':
     get:
