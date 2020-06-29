@@ -17,27 +17,6 @@ security:
 schemes:
   - https
 paths:
-  '/orgs/{name}':
-    get:
-      tags:
-        - orgs
-      summary: 'Get organization'
-      operationId: get-org
-      description: Returns the organization with the given name
-      parameters:
-        - in: path
-          required: true
-          name: name
-          description: The org name, e.g. 'SystemLink Server'
-          type: string
-      responses:
-        200:
-          $ref: '#/responses/GetOrgResponse'
-        404:
-          $ref: '#/responses/NotFound'
-        default:
-          $ref: '#/responses/Error'
-
   '/users/query':
     post:
       tags:
