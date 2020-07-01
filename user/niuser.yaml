@@ -15,27 +15,6 @@ securityDefinitions:
 security:
   - ApiKeyAuth: []
 paths:
-  '/orgs/{name}':
-    get:
-      tags:
-        - orgs
-      summary: 'Get organization'
-      operationId: get-org
-      description: Returns the organization with the given name
-      parameters:
-        - in: path
-          required: true
-          name: name
-          description: The org name, e.g. 'SystemLink Server'
-          type: string
-      responses:
-        200:
-          $ref: '#/responses/GetOrgResponse'
-        404:
-          $ref: '#/responses/NotFound'
-        default:
-          $ref: '#/responses/Error'
-
   '/users/query':
     post:
       tags:
@@ -298,6 +277,27 @@ paths:
           description: Success
         401:
           $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+
+  '/orgs/{name}':
+    get:
+      tags:
+        - whitelisted operations
+      summary: 'Get organization'
+      operationId: get-org
+      description: Returns the organization with the given name. The caller needs a whitelisted API key to read organizations.
+      parameters:
+        - in: path
+          required: true
+          name: name
+          description: The org name, e.g. 'SystemLink Server'
+          type: string
+      responses:
+        200:
+          $ref: '#/responses/GetOrgResponse'
         404:
           $ref: '#/responses/NotFound'
         default:
