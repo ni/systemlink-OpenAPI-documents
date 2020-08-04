@@ -108,14 +108,14 @@ definitions:
   CreateExecutionOperation:
     title: Create Executions Operation
     description: Create Executions array object including export formats
-    allOf: 
+    allOf:
       - $ref: '#/definitions/Operation'
       - type: object
-        properties: 
-          exportFormats: 
-            description: List of export formats 
+        properties:
+          exportFormats:
+            description: List of export formats
             type: array
-            items: 
+            items:
               $ref: '#/definitions/NotebookExportFormat'
         example:
           exportFormats: [PDF, HTML]
@@ -389,7 +389,7 @@ definitions:
       filter:
         description: The query filter in Dynamic Linq
         type: string
-        example: (metadata.key1 == "value1") || ((parameters.key2 != "value2") && (updatedAt >= "2002-12-25T01:01:01.1234567Z"))
+        example: (metadata["key1"] == "value1") || ((parameters["key2"] != "value2") && (updatedAt >= "2002-12-25T01:01:01.1234567Z"))
       orderBy:
         $ref: '#/definitions/NotebookSortField'
       descending:
@@ -706,7 +706,7 @@ definitions:
       filter:
         description: The query filter in Dynamic Linq
         type: string
-        example: ((status == "SUCCEEDED") && (result.key1 == "value1")) || ((status == "FAILED") && (completedAt >= "2002-12-25T01:01:01.1234567Z"))
+        example: ((status == "SUCCEEDED") && (result["key1"] == "value1")) || ((status == "FAILED") && (completedAt >= "2002-12-25T01:01:01.1234567Z"))
       orderBy:
         $ref: '#/definitions/ExecutionSortField'
       descending:
@@ -969,7 +969,7 @@ paths:
   /:
     get:
       operationId: RootEndpoint
-      x-ni-request-all-privileges: true
+      x-ni-request-variables: [API_KEY]
       summary: API information
       description: Returns information about API versions and available operations.
       tags: [versioning]
@@ -995,7 +995,7 @@ paths:
       summary: API version 1 information
       description: Returns available operations for version 1 of the API.
       operationId: RootEndpointV1
-      x-ni-request-all-privileges: true
+      x-ni-request-variables: [API_KEY]
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -1014,7 +1014,7 @@ paths:
       summary: API version 2 information
       description: Returns available operations for version 2 of the API.
       operationId: RootEndpointV2
-      x-ni-request-all-privileges: true
+      x-ni-request-variables: [API_KEY]
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -1032,8 +1032,8 @@ paths:
       - $ref: '#/parameters/notebookPath'
     get:
       operationId: GetNotebook
+      x-ni-auth: true
       x-ni-operation: queryNotebooks
-      x-ni-privilege: Read
       x-ni-oldest-compatible-version: 1
       summary: Get information about the specified Jupyter notebook
       description: >-
@@ -1051,8 +1051,8 @@ paths:
   /v2/query-notebooks:
     post:
       operationId: QueryNotebooksV2
+      x-ni-auth: true
       x-ni-operation: queryNotebooks
-      x-ni-privilege: Read
       x-ni-request-variables: [REMOTE_USER]
       summary: Query Jupyter notebooks
       description: >-
@@ -1099,8 +1099,8 @@ paths:
         Downloads a notebook file in a single HTTP response. Use the inline parameter in the query
         string to control the download behavior.
       operationId: DownloadNotebook
+      x-ni-auth: true
       x-ni-operation: downloadNotebook
-      x-ni-privilege: Read
       x-ni-request-variables:
         - REMOTE_USER
         - REQUEST_METHOD
@@ -1137,8 +1137,8 @@ paths:
       - $ref: '#/parameters/executionId'
     get:
       operationId: GetExecution
+      x-ni-auth: true
       x-ni-operation: queryExecutions
-      x-ni-privilege: Read
       x-ni-oldest-compatible-version: 1
       summary: Get information on the specified execution of a Jupyter notebook
       description: >-
@@ -1156,7 +1156,6 @@ paths:
     delete:
       operationId: DeleteExecution
       x-ni-operation: deleteExecutions
-      x-ni-privilege: Write
       x-ni-oldest-compatible-version: 1
       summary: Delete the specified execution of a Jupyter notebook
       description: Deletes the execution of a Jupyter notebook specified by an execution ID.
@@ -1171,8 +1170,8 @@ paths:
   /v2/delete-executions:
     post:
       operationId: DeleteExecutions
+      x-ni-auth: true
       x-ni-operation: deleteExecutions
-      x-ni-privilege: Write
       x-ni-oldest-compatible-version: 1
       summary: Delete executions of Jupyter notebooks
       description: >-
@@ -1207,8 +1206,8 @@ paths:
   /v2/query-executions:
     post:
       operationId: QueryExecutionsV2
+      x-ni-auth: true
       x-ni-operation: queryExecutions
-      x-ni-privilege: Read
       summary: Query executions of Jupyter notebooks
       description: >-
         Queries the executions of Jupyter notebooks. If no sort order is specified,
@@ -1247,9 +1246,8 @@ paths:
   /v2/executions:
     post:
       operationId: CreateExecutions
+      x-ni-auth: true
       x-ni-operation: createExecutions
-      x-ni-privilege: Read
-      x-ni-request-all-privileges: true
       x-ni-request-variables: [REMOTE_USER]
       x-ni-oldest-compatible-version: 1
       summary: Create one or more executions of Jupyter notebooks
@@ -1288,8 +1286,8 @@ paths:
   /v2/cancel-executions:
     post:
       operationId: CancelExecutions
+      x-ni-auth: true
       x-ni-operation: cancelExecutions
-      x-ni-privilege: Write
       x-ni-oldest-compatible-version: 1
       summary: Cancel executions of Jupyter notebooks
       description: >-
@@ -1324,8 +1322,8 @@ paths:
   /v1/query-notebooks:
     post:
       operationId: QueryNotebooks
+      x-ni-auth: true
       x-ni-operation: queryNotebooks
-      x-ni-privilege: Read
       x-ni-request-variables: [REMOTE_USER]
       summary: Query Jupyter notebooks
       description: >-
@@ -1384,8 +1382,8 @@ paths:
   /v1/query-executions:
     post:
       operationId: QueryExecutions
+      x-ni-auth: true
       x-ni-operation: queryExecutions
-      x-ni-privilege: Read
       summary: Query executions of Jupyter notebooks
       description: >-
         Queries the executions of Jupyter notebooks. If no execution IDs or notebook paths are

@@ -59,8 +59,8 @@ definitions:
         items:
           $ref: '#/definitions/Error'
     example:
-      name: Skyline.OneOrMoreErrorsOccurred
-      code: -251040
+      name: TestMonitorErrorCodes.OneOrMoreErrorsOccurred
+      code: -252921
       message: >-
         One or more errors occurred. See the contained list for details of each
         error.
@@ -244,6 +244,7 @@ definitions:
       - PROPERTIES
       - FILE_IDS
       - STATUS_TYPE_SUMMARY
+      - WORKSPACE
     example:
       PROGRAM_NAME
   StepField:
@@ -267,6 +268,7 @@ definitions:
       - DATA_MODEL
       - DATA
       - HAS_CHILDREN
+      - WORKSPACE
     example:
       STEP_TYPE
   PathField:
@@ -348,7 +350,7 @@ definitions:
       id:
         description: ID of the product
         type: string
-        example: 0365cee9-0e5d-4802-b0f6-9fedb8f08800
+        example: 5e30931793cac80468509487
       partNumber:
         description: The part number of the product
         type: string
@@ -388,7 +390,7 @@ definitions:
         type: array
         items:
           type: string
-        example: [5ccb19ce5aa0a3348872c3e3]
+        example: [5e30934193cac8046851acb2]
   ProductUpdateRequestObject:
     title: Product Update Request
     type: object
@@ -396,7 +398,7 @@ definitions:
       id:
         description: ID of the product to update
         type: string
-        example: 0365cee9-0e5d-4802-b0f6-9fedb8f08800
+        example: 5e30931793cac80468509487
       name:
         description: The name of the product
         type: string
@@ -425,7 +427,7 @@ definitions:
         type: array
         items:
           type: string
-        example: [5ccb19ce5aa0a3348872c3e3]
+        example: [5e30934193cac8046851acb2]
   TestResultRequestObject:
     title: Test Result Request
     type: object
@@ -476,7 +478,7 @@ definitions:
         type: array
         items:
           type: string
-        example: [df1b63da-4fd8-4466-b721-5a28de036f56]
+        example: [5e30934193cac8046851acb2]
       startedAt:
         description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
@@ -488,6 +490,10 @@ definitions:
         format: double
         default: 0
         example: 29.9
+      workspace:
+        description: The workspace the test result belongs to
+        type: string
+        example: f94b178e-288c-4101-afb1-833992413aa7
   TestResultResponseObject:
     title: Test Result Response
     type: object
@@ -513,11 +519,11 @@ definitions:
       id:
         description: Id of the test result
         type: string
-        example: df1b63da-4fd8-4466-b721-5a28de036f56
+        example: 5e30938d93cac80468534720
       systemId:
         description: Id of the system
         type: string
-        example: 9c75f1b5-5882-490e-a2e2-1c14123d68b2
+        example: 5e30931993cac8046850a996
       hostName:
         description: Host name of the system
         type: string
@@ -568,6 +574,10 @@ definitions:
           format: int32
         example:
           FAILED: 5
+      workspace:
+        description: The workspace the test result belongs to
+        type: string
+        example: f94b178e-288c-4101-afb1-833992413aa7
   TestResultUpdateRequestObject:
     title: Test Result Update
     type: object
@@ -577,7 +587,7 @@ definitions:
       id:
         description: Test result id to update
         type: string
-        example: df1b63da-4fd8-4466-b721-5a28de036f56
+        example: 5e30938d93cac80468534720
       programName:
         description: Program name
         type: string
@@ -624,7 +634,7 @@ definitions:
         type: array
         items:
           type: string
-        example: [df1b63da-4fd8-4466-b721-5a28de036f56]
+        example: [5e30934193cac8046851acb2]
       startedAt:
         description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
@@ -636,6 +646,10 @@ definitions:
         format: double
         default: 0
         example: 29.9
+      workspace:
+        description: The workspace the test result belongs to
+        type: string
+        example: f94b178e-288c-4101-afb1-833992413aa7
   UpdateTestResultsRequest:
     title: Update Test Results Request
     type: object
@@ -662,11 +676,11 @@ definitions:
       type:
         $ref: '#/definitions/ValueType'
       min:
-        description: The minimum recorded value, if ValueType is "NUMBER."
+        description: The minimum recorded value, if `type` is "NUMBER."
         type: number
         example: 1.3
       max:
-        description: The maximum recorded value, if ValueType is "NUMBER."
+        description: The maximum recorded value, if `type` is "NUMBER."
         type: number
         example: 2.6
   PathResponseObject:
@@ -674,7 +688,9 @@ definitions:
     type: object
     properties:
       id:
-        description: The unique ID of this path.
+        description: >-
+          The unique ID of this path. Note that this value may change if
+          the collection is repaired.
         type: string
         example: 507f191e810c19729de860ea
       path:
@@ -763,7 +779,7 @@ definitions:
         type: integer
         format: int32
         default: 1000
-        minimum: 0
+        minimum: -1
         example: 1000
       continuationToken:
         description: >-
@@ -787,7 +803,7 @@ definitions:
       filter:
         description: The query filter in Dynamic Linq
         type: string
-        example: programName == "MyTests.seq" || product == "cRIO-9030"
+        example: programName == "MyTests.seq" || partNumber == "cRIO-9030"
       substitutions:
         description: >-
           Makes substitutions in the query filter expression. Substitutions for the query expression
@@ -823,7 +839,7 @@ definitions:
         type: integer
         format: int32
         default: 1000
-        minimum: 0
+        minimum: -1
         example: 1000
       continuationToken:
         description: >-
@@ -899,7 +915,7 @@ definitions:
         type: integer
         format: int32
         default: 1000
-        minimum: 0
+        minimum: -1
         example: 1000
       continuationToken:
         description: >-
@@ -980,7 +996,7 @@ definitions:
         type: integer
         format: int32
         default: 1000
-        minimum: 0
+        minimum: -1
         example: 1000
       continuationToken:
         description: >-
@@ -1101,10 +1117,10 @@ definitions:
     properties:
       stepId:
         type: string
-        example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+        example: 5e30934193cac8046851acb4
       resultId:
         type: string
-        example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+        example: 5e30938d93cac80468534720
   StepDataObject:
     title: Step Data
     description: Data returned by the test step
@@ -1125,9 +1141,16 @@ definitions:
           example:
             key1: value1
         example:
-          - key1: value1
-            key2: value2
-          - key1: value3
+          - name: Voltage
+            status: Passed
+            measurement: "3.725"
+            lowLimit: "3.65"
+            highLimit: "3.8"
+            nominalValue: "3.7"
+            units: volt
+            comparisonType: GELE
+          - nitmParameterType: ADDITIONAL_RESULTS
+            additionalProp: myValue
   TestStepsDeleteRequest:
     title: Test Steps Delete Request
     type: object
@@ -1154,7 +1177,7 @@ definitions:
       resultId:
         description: Result id
         type: string
-        example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+        example: 5e30938d93cac80468534720
       children:
         description: Nested child steps
         type: array
@@ -1236,7 +1259,7 @@ definitions:
       resultId:
         description: Result id
         type: string
-        example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+        example: 5e30938d93cac80468534720
       path:
         description: Step path
         type: string
@@ -1288,6 +1311,10 @@ definitions:
           that this step object is a leaf node.
         type: boolean
         example: false
+      workspace:
+        description: The workspace the test step belongs to
+        type: string
+        example: f94b178e-288c-4101-afb1-833992413aa7
 responses:
   Error:
     description: Error
@@ -1353,11 +1380,14 @@ responses:
           type: array
           items:
             type: string
+          example:
+            - 5e30931793cac80468509487
         failed:
           description: Array of product ids that failed to delete
           type: array
           items:
             type: string
+          example: []
         error:
           $ref: '#/definitions/Error'
   ProductsQueryResponse:
@@ -1621,7 +1651,6 @@ paths:
       summary: API information
       description: Returns information about API versions and available operations.
       operationId: root-endpoint
-      x-ni-request-all-privileges: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -1646,7 +1675,6 @@ paths:
       summary: API version 2 information
       description: Returns available operations for version 2 of the API.
       operationId: root-endpoint-v2
-      x-ni-request-all-privileges: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -1668,7 +1696,7 @@ paths:
         product. An empty request body queries all products.
       operationId: query-products-v2
       x-ni-operation: queryProducts
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody
@@ -1690,7 +1718,7 @@ paths:
       description: Gets a list of products.
       operationId: get-products-v2
       x-ni-operation: getProducts
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: query
           name: continuationToken
@@ -1706,7 +1734,7 @@ paths:
             The maximum number of products to return.
           type: integer
           format: int32
-          default: -1
+          default: 1000
           minimum: -1
         - in: query
           name: returnCount
@@ -1728,7 +1756,7 @@ paths:
       description: Creates new products from the supplied models. The server automatically generates the product ids.
       operationId: create-products-v2
       x-ni-operation: createProducts
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -1762,7 +1790,7 @@ paths:
       description: Gets a single product.
       operationId: get-product-v2
       x-ni-operation: getProducts
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: path
           name: productId
@@ -1784,7 +1812,7 @@ paths:
       description: Deletes the product with the specified id. The request succeeds for products that do not exist.
       operationId: delete-product-v2
       x-ni-operation: deleteProduct
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: path
           name: productId
@@ -1807,7 +1835,7 @@ paths:
         fields are `ID`, `PART_NUMBER`, `NAME`, `FAMILY`, and `UPDATED_AT`.
       operationId: query-product-values-v2
       x-ni-operation: queryProducts
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody
@@ -1829,7 +1857,7 @@ paths:
       description: Updates existing products by merging or replacing values.
       operationId: update-products-v2
       x-ni-operation: updateProducts
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -1865,7 +1893,7 @@ paths:
       description: Deletes multiple products in a single request.
       operationId: delete-products-v2
       x-ni-operation: deleteProducts
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -1883,7 +1911,7 @@ paths:
                 type: array
                 items:
                   type: string
-                  example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+                  example: 5e30931793cac80468509487
       responses:
         200:
           $ref: '#/responses/DeleteProductsResponse'
@@ -1903,7 +1931,7 @@ paths:
         results are returned. An empty request body queries all test results.
       operationId: query-results-v2
       x-ni-operation: queryResults
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody
@@ -1928,7 +1956,7 @@ paths:
       description: Gets a list of test results.
       operationId: get-results-v2
       x-ni-operation: getResults
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: query
           name: continuationToken
@@ -1944,7 +1972,7 @@ paths:
             The maximum number of results to return.
           type: integer
           format: int32
-          default: -1
+          default: 1000
           minimum: -1
         - in: query
           name: returnCount
@@ -1966,7 +1994,7 @@ paths:
       description: Creates new test results from the supplied models. The server automatically generates the result ids. The server will populate the start time if one is not provided.
       operationId: create-results-v2
       x-ni-operation: createResults
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -2000,7 +2028,7 @@ paths:
       description: Gets a single test result.
       operationId: get-result-v2
       x-ni-operation: getResults
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: path
           name: resultId
@@ -2022,7 +2050,7 @@ paths:
       description: Deletes the test result with the specified id. The request succeeds for result ids that do not exist.
       operationId: delete-result-v2
       x-ni-operation: deleteResult
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: path
           name: resultId
@@ -2049,10 +2077,10 @@ paths:
         Queries known values for an indexed, scalar result field. Supported
         fields are `ID`, `STARTED_AT`, `UPDATED_AT`, `PROGRAM_NAME`,
         `SYSTEM_ID`, `HOST_NAME`, `OPERATOR`, `SERIAL_NUMBER`, `PART_NUMBER`,
-        and `TOTAL_TIME_IN_SECONDS`.
+        `TOTAL_TIME_IN_SECONDS`, and `WORKSPACE`.
       operationId: query-result-values-v2
       x-ni-operation: queryResults
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody
@@ -2074,7 +2102,7 @@ paths:
       description: Updates existing test results by merging or replacing values.
       operationId: update-results-v2
       x-ni-operation: updateResults
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -2096,7 +2124,7 @@ paths:
       description: Deletes multiple test results in a single request.
       operationId: delete-results-v2
       x-ni-operation: deleteResults
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -2114,7 +2142,7 @@ paths:
                 type: array
                 items:
                   type: string
-                  example: 1f05c3c8-7a8c-4ebb-a87f-7a60d5dd8938
+                  example: 5e30938d93cac80468534720
               deleteSteps:
                 description: Indicates whether to delete the test steps associated with the test result
                 type: boolean
@@ -2138,7 +2166,7 @@ paths:
         steps are returned. An empty request body queries all test steps.
       operationId: query-steps-v2
       x-ni-operation: querySteps
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody
@@ -2163,7 +2191,7 @@ paths:
       description: Gets a list of test steps.
       operationId: get-steps-v2
       x-ni-operation: getSteps
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: query
           name: continuationToken
@@ -2179,7 +2207,7 @@ paths:
             The maximum number of steps to return.
           type: integer
           format: int32
-          default: -1
+          default: 1000
           minimum: -1
         - in: query
           name: returnCount
@@ -2201,7 +2229,7 @@ paths:
       description: Creates new test steps from the supplied models. The result associated with the step must exist prior to step creation. The server automatically generates step ids if not supplied.
       operationId: create-steps-v2
       x-ni-operation: createSteps
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -2225,7 +2253,7 @@ paths:
       description: Gets a single test step.
       operationId: get-step-v2
       x-ni-operation: getSteps
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: path
           name: resultId
@@ -2252,7 +2280,7 @@ paths:
       description: Deletes the test step with the specified id. The request succeeds for step ids that do not exist.
       operationId: delete-step-v2
       x-ni-operation: deleteStep
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: path
           name: resultId
@@ -2283,11 +2311,11 @@ paths:
       description: >-
         Queries known values for an indexed, scalar step field. Supported
         fields are `NAME`, `STEP_TYPE`, `STEP_ID`, `PARENT_ID`, `RESULT_ID`,
-        `PATH`, `TOTAL_TIME_IN_SECONDS`, `STARTED_AT`, `UPDATED_AT`, and
-        `DATA_MODEL`.
+        `PATH`, `TOTAL_TIME_IN_SECONDS`, `STARTED_AT`, `UPDATED_AT`,
+        `DATA_MODEL`, and `WORKSPACE`.
       operationId: query-step-values-v2
       x-ni-operation: querySteps
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody
@@ -2309,7 +2337,7 @@ paths:
       description: Updates existing steps by merging or replacing values.
       operationId: update-steps-v2
       x-ni-operation: updateSteps
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -2331,7 +2359,7 @@ paths:
       description: Deletes multiple test steps in a single request.
       operationId: delete-steps-v2
       x-ni-operation: deleteSteps
-      x-ni-privilege: Write
+      x-ni-auth: true
       parameters:
         - in: body
           name: requestBody
@@ -2360,7 +2388,7 @@ paths:
       description: Gets a list of paths.
       operationId: get-paths-v2
       x-ni-operation: queryPaths
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: query
           name: continuationToken
@@ -2399,7 +2427,7 @@ paths:
       description: Gets a single path.
       operationId: get-path-v2
       x-ni-operation: queryPaths
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: path
           name: pathId
@@ -2424,7 +2452,7 @@ paths:
         paths. An empty request body queries all paths.
       operationId: query-paths-v2
       x-ni-operation: queryPaths
-      x-ni-privilege: Read
+      x-ni-auth: true
       parameters:
         - in: body
           name: postBody

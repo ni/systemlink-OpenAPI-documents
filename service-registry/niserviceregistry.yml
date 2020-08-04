@@ -1,0 +1,116 @@
+swagger: '2.0'
+info:
+  version: '1'
+  title: Service Registry Web Service
+  description: View information about installed SystemLink services
+  contact:
+    name: National Instruments
+    url: 'https://www.ni.com/systemlink'
+    email: support@ni.com
+basePath: /niserviceregistry
+consumes:
+  - application/json
+produces:
+  - application/json
+definitions:
+  Statement:
+    description: Contains information about a statement
+    type: object
+    properties:
+      actions:
+        description: Contains information about actions that can be performed
+        type: array
+        items:
+          type: string
+        example: ['asset:*']
+      type:
+        description: Contains information about the resource type for which the statement applies
+        type: string
+        example: "asset"
+  Translation:
+    description: Contains translation information for a permission configuration
+    type: object
+    properties:
+      en-us:
+        description: The united states english permission name translation
+        type: string
+        example: "All"
+      zn-ch:
+        description: The traditional chinese permission name translation
+        type: string
+        example: "所有"
+      de:
+        description: The german permission name translation
+        type: string
+        example: "Alle"
+      ja:
+        description: The japanese permission name translation
+        type: string
+        example: "すべて"
+  Permission:
+    description: Contains information about a installed permission
+    type: object
+    properties:
+      id:
+        description: The ID of the permission
+        type: string
+        example: "1242342"
+      translation:
+        $ref: '#/definitions/Translation'
+      statements:
+        type: array
+        items:
+          $ref: '#/definitions/Statement'
+  Privilege:
+    description: Contains information about a installed privilege
+    type: object
+    properties:
+      id:
+        description: The ID of the privilege
+        type: string
+        example: "12314121"
+      show:
+        description: Specifies whether this privilege is user visible
+        type: boolean
+        example: true
+      showResource:
+        description: Specifies whether the resource specificity to be shown
+        type: boolean
+        example: false
+      permissions:
+        type: array
+        items:
+          $ref: '#/definitions/Permission'
+responses:
+  PrivilegeResponse:
+    description: Response containing a list of installed privileges
+    schema:
+      description: Response containing a list of installed privileges
+      title: Privilege Response
+      type: object
+      required:
+        - privileges
+      properties:
+        privileges:
+          description: Array of installed privilege information
+          type: array
+          items:
+            $ref: '#/definitions/Privilege'
+  Unauthorized:
+    description: Not authorized
+    headers:
+      WWW_Authenticate:
+        description: Information for how to authenticate
+        type: string
+paths:
+  /v1/privileges:
+    get:
+      tags: [privileges]
+      summary: Get installed SystemLink privilege configuration
+      description: Gets information about installed privileges
+      operationId: get-privileges
+      responses:
+        200:
+          $ref: '#/responses/PrivilegeResponse'
+        401:
+          $ref: '#/responses/Unauthorized'

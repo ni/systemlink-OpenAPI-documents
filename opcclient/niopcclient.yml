@@ -16,7 +16,7 @@ securityDefinitions:
   apiKeyAuth:
     type: apiKey
     name: x-ni-api-key
-    in: header        
+    in: header
   basicAuth:
     type: basic
   cookieAuth:
@@ -33,7 +33,6 @@ paths:
   /:
     get:
       operationId: HandleGetVersionInfo
-      x-ni-request-all-privileges: true
       summary: Gets API information
       tags: [versioning]
       description: Returns permissions and operations for the OpcClientService
@@ -62,7 +61,6 @@ paths:
         required: true
     get:
       operationId: RootEndpointWithVersion
-      x-ni-request-all-privileges: true
       summary: API version information
       description: Returns available operations for a single version of the API.
       tags: [versioning]
@@ -82,7 +80,7 @@ paths:
   /v1/client-certificate:
     get:
       operationId: HandleHttpGetClientCertificate
-      x-ni-privilege: Read
+      x-ni-auth: true
       tags: [certificate]
       summary: Gets SystemLink OPC UA client certificate
       description: Gets SystemLink OPC UA client certificate
@@ -100,7 +98,7 @@ paths:
   /v1/server-certificates:
     get:
       operationId: HandleHttpGetServerCertificates
-      x-ni-privilege: Read
+      x-ni-auth: true
       tags: [certificate]
       summary: Gets list of certificates from the application's trusted store
       description: Returns list of certificates from the application's trusted store
@@ -115,7 +113,7 @@ paths:
           $ref: '#/responses/Error'
     post:
       operationId: HandleHttpUploadServerCertificate
-      x-ni-privilege: Write
+      x-ni-auth: true
       tags: [certificate]
       summary: Uploads a certificate to application's trusted store
       description: Uploads the certificate file
@@ -137,7 +135,7 @@ paths:
   /v1/delete-server-certificates:
     post:
       operationId: HandleHttpDeleteServerCertificates
-      x-ni-privilege: Write
+      x-ni-auth: true
       tags: [certificate]
       summary: Deletes certificates from application's trusted store
       description: Deletes specified certificates
@@ -164,7 +162,7 @@ paths:
   /v1/endpoints:
     get:
       operationId: HandleHttpGetEndpoints
-      x-ni-privilege: Read
+      x-ni-auth: true
       tags: [sessions]
       summary: Gets OPC UA server endpoints
       description: Returns endpoints of an OPC UA server
@@ -187,7 +185,7 @@ paths:
   /v1/sessions:
     get:
       operationId: HandleHttpGetSessionsRequest
-      x-ni-privilege: Read
+      x-ni-auth: true
       tags: [sessions]
       summary: Gets existing OPC UA sessions
       description: Returns information about in-progress OPC UA sessions
@@ -202,7 +200,7 @@ paths:
           $ref: '#/responses/Error'
     post:
       operationId: HandleHttpCreateSessionRequest
-      x-ni-privilege: Write
+      x-ni-auth: true
       tags: [sessions]
       summary: Creates a new OPC UA session
       description: Connects to an OPC UA server to start a new session
@@ -223,7 +221,7 @@ paths:
   /v1/delete-sessions:
     post:
       operationId: HandleHttpDeleteSessionsRequest
-      x-ni-privilege: Write
+      x-ni-auth: true
       tags: [sessions]
       summary: Deletes existing OPC UA sessions
       description: Deletes existing OPC UA sessions
@@ -263,7 +261,7 @@ paths:
   /v1/update-sessions:
     post:
       operationId: HandleHttpUpdateSessionsRequest
-      x-ni-privilege: Write
+      x-ni-auth: true
       tags: [sessions]
       summary: Updates existing OPC UA sessions
       description: Modifies name and publishing interval of the existing session
@@ -295,7 +293,7 @@ paths:
   /v1/sessions/{id}/nodes/{path}:
     get:
       operationId: HandleHttpBrowseRequest
-      x-ni-privilege: Read
+      x-ni-auth: true
       tags: [browse]
       summary: Gets child nodes of a node
       description: Gets child nodes of the node specified by {path}
@@ -332,7 +330,7 @@ paths:
   /v1/sessions/{id}/attributes/{opcNodeId}:
     get:
       operationId: HandleHttpReadAttributesRequest
-      x-ni-privilege: Read
+      x-ni-auth: true
       tags: [read]
       summary: Reads attributes of a node
       description: Gets attributes for the node speicified by {opcNodeId}
@@ -358,7 +356,7 @@ paths:
   /v1/sessions/{id}/monitors:
     get:
       operationId: HandleHttpGetMonitorsRequest
-      x-ni-privilege: Read
+      x-ni-auth: true
       tags: [monitors]
       summary: Gets existing monitored items
       description: Creates SystemLink tags with specified display names
@@ -379,7 +377,7 @@ paths:
             $ref: '#/responses/Error'
     post:
       operationId: HandleHttpCreateMonitorsRequest
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-request-timeout: 50000
       tags: [monitors]
       summary: Creates new monitored items
@@ -415,7 +413,7 @@ paths:
   /v1/sessions/{id}/delete-monitors:
     post:
       operationId: HandleHttpDeleteMonitorRequest
-      x-ni-privilege: Write
+      x-ni-auth: true
       tags: [monitors]
       summary: Removes existing monitored items
       description: Removes OPC UA nodes from subscription to stop monitoring them. Can optionally remove the SystemLink tags
@@ -451,7 +449,7 @@ paths:
   /v1/sessions/{id}/pause-monitors:
     post:
       operationId: HandleHttpPauseMonitorRequest
-      x-ni-privilege: Write
+      x-ni-auth: true
       tags: [monitors]
       summary: Pauses existing monitored items
       description: Pauses to update tag history for the specified OPC UA variables. Doesn't remove the SystemLink tags.
@@ -483,7 +481,7 @@ paths:
   /v1/sessions/{id}/resume-monitors:
     post:
       operationId: HandleHttpResumeMonitorRequest
-      x-ni-privilege: Write
+      x-ni-auth: true
       tags: [monitors]
       summary: Resumes paused monitored items
       description: Resumes to update the tag history for the specified OPC UA variables.

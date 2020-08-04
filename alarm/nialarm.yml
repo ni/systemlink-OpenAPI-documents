@@ -42,11 +42,33 @@ definitions:
         type: array
         items:
           type: string
+      resourceType:
+        description: Type of resource associated with the error.
+          This field is only present for entries in *innerErrors*.
+        type: string
+        enum: [instanceId]
+      resourceId:
+        description: Identifier of the resource associated with the error.
+          This field is only present for entries in *innerErrors*.
+        type: string
+      innerErrors:
+        description: Array of individual errors when a request results in multiple errors.
+          This field is only present when *name* is 'Skyline.OneOrMoreErrorsOccurred'.
+        type: array
+        items:
+          $ref: '#/definitions/Error'
     example:
-      name: AlarmInstance.InstanceNotFound
-      code: -253006
-      message: An instance with instanceId '5c2cf7e0e0d64403b486fcb4' was not found.
+      name: Skyline.OneOrMoreErrorsOccurred
+      code: -251041
+      message: One or more errors occurred. See the contained list for details of each error.
       args: []
+      innerErrors:
+        - name: AlarmInstance.InstanceNotFound
+          code: -253006
+          message: An instance with instanceId '5c2cf7e0e0d64403b486fcb4' was not found.
+          resourceType: instanceId
+          resourceId: 5c2cf7e0e0d64403b486fcb4
+          args: [5c2cf7e0e0d64403b486fcb4]
   Operation:
     description: Operation provided by the API
     type: object
@@ -104,6 +126,11 @@ definitions:
           rule.
         type: string
         example: CRIO1.System.Health.DiskSpaceUsePercentage.Bdd9u!4aMd!$pYrf*CnaIZ2tbu$-Ct%?
+      workspace:
+        description: The ID of the workspace to which this alarm instance belongs. Added in version 3 of the
+          readAlarmInstances operation.
+        type: string
+        example: 3d411024-9db8-42d1-8ab8-6cee0e6cd841
       active:
         description: Whether or not the alarm instance is active. An active alarm deserves human or automated
           attention. Alarm instances always begin life with *active*/true. This field will be automatically
@@ -410,6 +437,16 @@ definitions:
         example:
           - keyword1
           - keyword2
+      workspaces:
+        type: array
+        description: Workspace query. The service will return instances whose *workspace* field is one of
+          the specified workspaces. By default, only instances in the default workspace are returned.
+          Specify an array containing a single value of *\** to query all workspaces. Added in version 3 of the
+          readAlarmInstances operation.
+        items:
+          type: string
+        example:
+          - '*'
   QueryRequest:
     title: Query Request
     description: Object describing the request body for an alarm instance query request
@@ -487,7 +524,6 @@ paths:
       summary: API information
       description: Returns information about API versions and available operations.
       operationId: RootEndpoint
-      x-ni-request-all-privileges: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -516,7 +552,6 @@ paths:
       summary: API version information
       description: Returns available operations for a single version of the API.
       operationId: RootEndpointWithVersion
-      x-ni-request-all-privileges: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -529,12 +564,81 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/Error'
-  /v1/acknowledge-instances:
+  /v1/acknowledge-instances-by-instance-id:
     post:
       tags: [alarm instances]
       summary: Acknowledge alarm instances
       description: Acknowledges one or more alarm instances, optionally forcing them clear and adding notes to
-        them.
+        them. Added in version 2 of the writeAlarmInstances operation.
+      operationId: AcknowledgeInstancesByInstanceId
+      x-ni-operation: writeAlarmInstances
+      parameters:
+        - in: body
+          name: Request body
+          required: true
+          schema:
+            type: object
+            title: AcknowledgeByInstanceIdRequestBody
+            required:
+              - instanceIds
+            properties:
+              instanceIds:
+                description: The *instanceId*s of the alarm instances which should be acknowledged.
+                type: array
+                items:
+                  type: string
+                example: [5c33c212e0d6444320d9a9f4, 5c2cf7e0e0d64403b486fcb4]
+              forceClear:
+                description: Whether or not the affected alarm instances should have their *clear* field set
+                  to true.
+                type: boolean
+                default: false
+              notes:
+                description: Notes which should be added to the alarm instances.
+                type: array
+                items:
+                  $ref: '#/definitions/AlarmNote'
+      responses:
+        200:
+          description: Success - Indicates the request to acknowledge was processed successfully.
+            If any instances failed to be acknowledged, the included *error* object will contain
+            an entry in the *innerErrors* array for each failed instance.
+          schema:
+            type: object
+            title: AcknowledgeByInstanceIdResponse
+            properties:
+              acknowledged:
+                description: The *instanceId*s of the alarm instances which were successfully acknowledged.
+                type: array
+                items:
+                  type: string
+                example: [5c33c212e0d6444320d9a9f4]
+              failed:
+                description: The *instanceId*s of the alarm instances which were not acknowledged.
+                  See *error* for why each instance failed to be acknowledged. Reasons include the instance
+                  could not be found, the instance was already acknowledged, or the caller is not authorized
+                  to acknowledge the instance.
+                type: array
+                items:
+                  type: string
+                example: [5c2cf7e0e0d64403b486fcb4]
+              error:
+                $ref: '#/definitions/Error'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/acknowledge-instances:
+    post:
+      tags: [deprecated]
+      deprecated: true
+      summary: Acknowledge alarm instances
+      description: As of version 2 of the writeAlarmInstances operation, this route is deprecated.
+        Instead, use the POST /v1/acknowledge-instances-by-instance-id route.
+
+
+        Acknowledges one or more alarm instances in the default workspace by alarm id,
+        optionally forcing them clear and adding notes to them.
       operationId: AcknowledgeInstances
       x-ni-operation: writeAlarmInstances
       parameters:
@@ -571,23 +675,23 @@ paths:
             title: AcknowledgeResponse
             properties:
               acknowledged:
-                description: The *alarmIds* which were successfully acknowledged.
+                description: The *alarmId*s which were successfully acknowledged.
                 type: array
                 items:
                   type: string
-                example: [5c40ec55e0d6441168b4c543, 5c40ec55e0d6441168b4c543]
+                example: [System1.Health.DiskSpaceAlarm, System2.Health.DiskSpaceAlarm]
               alreadyAcknowledged:
-                description: The *alarmIds* which had already been previously acknowledged.
+                description: The *alarmId*s which had already been previously acknowledged.
                 type: array
                 items:
                   type: string
-                example: [5c40ec55e0d6441168b4c541]
+                example: [System1.Health.DiskSpaceAlarm]
               notFound:
-                description: A collection of *alarmIds* for which no active alarm instances were found.
+                description: A collection of *alarmId*s for which no active alarm instances were found.
                 type: array
                 items:
                   type: string
-                example: [5c40ec55e0d6441168b4c549]
+                example: [System2.Health.DiskSpaceAlarm]
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -604,7 +708,7 @@ paths:
         - in: body
           name: Request body
           description: Container which holds data for the request. If an alarm instance is being updated, only
-            alarmId and transition are applied.
+            alarmId, workspace, and transition are applied.
           schema:
             type: object
             title: CreateOrUpdateInstanceRequest
@@ -614,11 +718,17 @@ paths:
             properties:
               alarmId:
                 description: A value meant to uniquely identify the particular process or condition tracked
-                  by a given alarm. For example, alarms created by the Tag Rule Engine Service have their
-                  alarmIds set to the concatenation of the path of the tag which caused the rule to be
-                  triggered and the ID of the rule.
+                  by a given alarm within a workspace. For example, alarms created by the Tag Rule Engine
+                  Service have their alarmIds set to the concatenation of the path of the tag which caused
+                  the rule to be triggered and the ID of the rule.
                 type: string
                 example: CRIO1.System.Health.DiskSpaceMeanUsePercentage.Bdd9u!4aMd!$pYrf*CnaIZ2tbu$-Ct%?
+              workspace:
+                description: The ID of the workspace in which to create or update the alarm. When not specified,
+                  the default workspace is used based on the requesting user. Added in version 2 of the
+                  writeAlarmInstances operation.
+                type: string
+                example: 3d411024-9db8-42d1-8ab8-6cee0e6cd841
               transition:
                 $ref: '#/definitions/AlarmTransition'
               createdBy:
@@ -760,7 +870,7 @@ paths:
       tags: [alarm instances]
       summary: Query alarm instances
       description: Queries for alarm instances. Specifying an empty JSON object in the request body will
-        result in all alarm instances being returned.
+        result in all alarm instances in the default workspace being returned.
       operationId: QueryInstances
       x-ni-operation: readAlarmInstances
       parameters:
@@ -798,10 +908,36 @@ paths:
                   type: string
                 example:
                   - 5c33c212e0d6444320d9a9f4
-                  - 5c33c212e0d6444320d9a9f5
+                  - 5c2cf7e0e0d64403b486fcb4
       responses:
+        200:
+          description: Partial Success - Indicates the request to delete was processed successfully,
+            but one or more instances failed to delete. The included *error* object will contain
+            an entry in the *innerErrors* array for each failed instance.
+          schema:
+            type: object
+            title: DeleteInstancesByInstanceIdPartialSuccess
+            properties:
+              deleted:
+                description: The *instanceId*s of the alarm instances that were successfully deleted.
+                type: array
+                items:
+                  type: string
+                example:
+                  - 5c33c212e0d6444320d9a9f4
+              failed:
+                description: The *instanceId*s of the alarm instances that were not deleted.
+                  See *error* for why each instance failed to delete. Reasons include the
+                  instance could not be found or the caller is not authorized to delete the instance.
+                type: array
+                items:
+                  type: string
+                example:
+                  - 5c2cf7e0e0d64403b486fcb4
+              error:
+                $ref: '#/definitions/Error'
         204:
-          description: No Content
+          description: Success - Indicates all requested instances were deleted successfully.
         401:
           $ref: '#/responses/Unauthorized'
         default:

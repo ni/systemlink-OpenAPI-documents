@@ -141,38 +141,46 @@ definitions:
         type: integer
         description: Number of values on the x axis. This determines the number of points that can be displayed.
         example: 1000
-        default: 0
+        default: null
         format: int32
       decimatey:
         type: integer
         description: Number of values on the y axis. This determines the number of points that can be displayed.
         example: 1000
-        default: 0
+        default: null
         format: int32
       xmin:
         type: number
-        default: 0
+        default: null
         format: double
         description: Minimum x value of the display x axis.
         example: -1
       xmax:
         type: number
-        default: 0
+        default: null
         format: double
         description: Maximum x value of the display x axis.
         example: 1
       ymin:
         type: number
-        default: 0
+        default: null
         format: double
         description: Minimum y value of the display y axis.
         example: -1
       ymax:
         type: number
-        default: 0
+        default: null
         format: double
         description: Maximum y value of the display y axis.
         example: 1
+      xlog:
+        type: boolean
+        default: false
+        description: Logrithmic X channel.
+      ylog:
+        type: boolean
+        default: false
+        description: Logrithmic Y channel.
       showLines:
         type: boolean
         description: Represent data as lines. When decimation is performed, the data returned represents the min and max values for that x-axis increment.
@@ -192,6 +200,85 @@ definitions:
           $ref: '#/definitions/OneChannelSpecifier'
         default: null
         description: Channels to use only to filter. Values from these channels are not returned.
+      function:
+        type: string
+        default: null
+        description: Function to perform on the channel data.
+        example: y0-y1
+      outputObjectNames:
+        type: array
+        items:
+          type: string
+        default: null
+        description: Transpose the returned data for the channels with the specified names.
+        example:
+          - name1
+          - name2
+      xminStringData:
+        description: >-
+          ISO-8601 formatted timestamp indicating the starting point for x data
+        type: string
+        example: '2018-05-09T15:07:42.527921Z'
+      xmaxStringData:
+        description: >-
+          ISO-8601 formatted timestamp indicating the ending point for x data
+        type: string
+        example: '2018-05-09T15:07:42.527921Z'
+      sort:
+        type: string
+        default: null
+        description: Specify how to sort values before returning them.
+        example: '-y0,x,s0'
+      sortChannels:
+        type: array
+        items:
+          $ref: '#/definitions/OneChannelSpecifier'
+        default: null
+        description: Channels to use only to sort. Values from these channels are not returned.
+      useWaveformProperties:
+        type: boolean
+        description: Look for specific properties in a channel that define the start and increment x values to use for each channel.
+        default: false
+      groupBy:
+        type: string
+        description: List of channels to group by.
+        default: null
+        example: 'y0,x'
+      groupStride:
+        type: integer
+        description: Number of samples per group.
+        default: null
+        format: int32
+        example: 100
+      groupChannels:
+        type: array
+        items:
+          $ref: '#/definitions/OneChannelSpecifier'
+        default: null
+        description: Channels to use only to group. Values from these channels are not returned.
+      maxGroupsToReturn:
+        type: integer
+        default: null
+        format: int32
+        description: Maximum number of groups to return when grouping.
+        example: 100
+      groupItemIndexStart:
+        type: integer
+        default: null
+        format: int32
+        description: Index of first item in each group to return.
+        example: 100
+      groupItemMaxCount:
+        type: integer
+        default: null
+        format: int32
+        description: Maximum number of items to return per group.
+        example: 100
+      ignoreXForDecimation:
+        type: boolean
+        default: null
+        description: If true, x is not used in decimation. Instead, indices are returend for x.
+        example: true
   OneChannelSpecifier:
     description: Specification for a channel of data
     properties:
@@ -209,8 +296,6 @@ definitions:
         example: Channel 1
     required: 
       - fileId
-      - groupName
-      - channelName
   ChannelSpecifications:
     description: Array of x-y channel groups.  The x channel of each grouping is optional.
     properties:
@@ -230,6 +315,22 @@ definitions:
               $ref: '#/definitions/DataWindow'
           required:
             - yChannels
+        minItems: 1
+    required:
+      - xyChannels
+  QueryChannelsRequest:
+    description: Object containing the channels to request metadata for.
+    properties:
+      channelSpecifications:
+        type: array
+        items:
+          $ref: '#/definitions/OneChannelSpecifier'
+      calculateChannelLength:
+        type: boolean
+        description: Determines whether or not to calculate the channel length
+        default: false
+    required:
+      - channelSpecifications
   OneChannelData:
     properties:
       dataType:
@@ -273,10 +374,22 @@ definitions:
       timeUtcOffsetHours:
         type: number
         description: Time zone offset applied to local time values
+      error:
+        $ref: '#/definitions/Error'
   QueryDataSpecifier:
     properties:
       channelSpecifications:
         $ref: '#/definitions/ChannelSpecifications'
+    required:
+      - channelSpecifications
+  CreateCalculatedResultSpecifier:
+    properties:
+      channelSpecifications:
+        $ref: '#/definitions/ChannelSpecifications'
+      workspaceId:
+        type: string
+    required:
+      - channelSpecifications
   ReturnedUniqueValues:
     properties:
       uniqueValues:
@@ -357,7 +470,6 @@ paths:
       summary: API information
       description: Returns information about API versions and available operations.
       operationId: RootEndpoint
-      x-ni-request-all-privileges: true
       security: []
       responses:
         200:
@@ -385,7 +497,6 @@ paths:
       summary: API version information
       description: Returns available operations for a single version of the API.
       operationId: RootEndpointWithVersion
-      x-ni-request-all-privileges: true
       security: []
       responses:
         200:
@@ -396,16 +507,19 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/Error'
-  /v1/files/{file-id}:
+  /v1/files/{fileId}:
     get:
       tags: [metadata]
       summary: Gets file, group, and channel information
       description: 'Gets all group names, channel names, channel information, and properties at all levels. This does not return channel data.'
       operationId: getAllFileInfo
+      x-ni-auth: true
+      x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
       produces:
         - application/json
       parameters:
-        - name: file-id
+        - name: fileId
           description: File ID
           in: path
           type: string
@@ -425,6 +539,9 @@ paths:
       summary: Gets file, group, and channel information
       description: 'Gets all group names, channel names, channel information, and properties at all levels. This does not return channel data.'
       operationId: getMultipleFileInfo
+      x-ni-auth: true
+      x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
       produces:
         - application/json
       parameters:
@@ -443,16 +560,46 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/Error'
-  /v1/files/{file-id}/groups:
+  /v1/query-channels:
+    post:
+      tags: [metadata]
+      summary: Gets channel information
+      description: 'Gets all channel names, channel information, and properties for the channel. This does not return channel data.'
+      operationId: queryChannels
+      x-ni-auth: true
+      x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
+      produces:
+        - application/json
+      parameters:
+        - name: QueryChannelsRequest
+          description: Channel request parameters
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/QueryChannelsRequest'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/FileInformation'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/files/{fileId}/groups:
     get:
       tags: [metadata]
       summary: Lists all groups in the file
       description: Lists all group names in the file.
       operationId: getChannelPropertiesCount
+      x-ni-auth: true
+      x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
       produces:
         - application/json
       parameters:
-        - name: file-id
+        - name: fileId
           description: File ID
           in: path
           required: true
@@ -481,21 +628,24 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/Error'
-  /v1/files/{file-id}/groups/{group-name}/channels:
+  /v1/files/{fileId}/groups/{groupName}/channels:
     get:
       tags: [metadata]
       summary: Lists all channels in the group
       description:  Lists all channel names for a group in a specific file.
       operationId: getChannels
+      x-ni-auth: true
+      x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
       produces:
         - application/json
       parameters:
-        - name: file-id
+        - name: fileId
           description: File ID
           in: path
           required: true
           type: string
-        - name: group-name
+        - name: groupName
           description: Group name
           in: path
           required: true
@@ -530,6 +680,9 @@ paths:
       summary: Returns data from channels.
       description: Queries files based on channel and window specifications and returns channel data that matches the query. The channel specifications select channels by group and channel relationships. Window specifications determine a bounding box of minimum and maximum x and y values, as well as specify the type of decimation performed on data within the window.
       operationId: queryData
+      x-ni-auth: true
+      x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
       produces:
         - application/json
       parameters:
@@ -554,6 +707,9 @@ paths:
       summary: Returns unique data from channels.
       description: Queries files based on channel specifications and returns unique channel data values. The channel specifications select channels by group and channel relationships. The maximum number of unique values to return is determined by MaxNumberOfUniqueValues. If there are more unique values, then the first MaxNumberOfUniqueValues + 1 values are returned.
       operationId: queryUniqueValues
+      x-ni-auth: true
+      x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
       produces:
         - application/json
       parameters:
@@ -563,6 +719,33 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/UniqueValuesSpecifier'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/ReturnedUniqueValues'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/create-calculated-result:
+    post:
+      tags: [data]
+      summary: Returns a calculated result channel.
+      description: Creates a channel based on values from other channels.
+      operationId: createCalculatedResult
+      x-ni-auth: true
+      x-ni-request-variables: [REMOTE_USER]
+      x-ni-request-timeout: 60000
+      produces:
+        - application/json
+      parameters:
+        - name: ChannelSpecifications
+          description: Channel specifications and window information
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CreateCalculatedResultSpecifier'
       responses:
         200:
           description: OK

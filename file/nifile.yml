@@ -27,6 +27,7 @@ security:
   - apiKeyAuth: []
   - basicAuth: []
   - cookieAuth: []
+
 x-ni-routing-key: Skyline.FileIngestion
 definitions:
   Link:
@@ -431,8 +432,7 @@ paths:
       tags: [versioning]
       summary: API information
       description: Returns information about API versions and available operations.
-      operationId: RootEndpoint
-      x-ni-request-all-privileges: true
+      operationId: RootEndpoint      
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -461,7 +461,6 @@ paths:
       summary: API version information
       description: Returns available operations for a single version of the API.
       operationId: RootEndpointWithVersion
-      x-ni-request-all-privileges: true
       # Explicitly mark security as an empty array - this route does not require any privileges.
       # Marking it this way prevents it from inheriting the top-level security settings.
       security: []
@@ -477,14 +476,13 @@ paths:
   /v1/service-groups:
     get:
       tags: [service groups]
-      summary: List service groups
+      summary: List service groups      
       description: >-
         Returns an array of File service group names. Each service group is a
         distinct collection of files.
       operationId: ListServiceGroups
+      x-ni-auth: true
       x-ni-operation: listFiles
-      x-ni-privilege: ViewMetadata
-      x-ni-request-all-privileges: true
       responses:
         200:
           description: OK
@@ -521,9 +519,8 @@ paths:
         The orderBy and orderByDescending fields can be used to manage sorting
         the list by metadata objects.
       operationId: ListAvailableFiles_GET
+      x-ni-auth: true
       x-ni-operation: listFiles
-      x-ni-privilege: ViewMetadata
-      x-ni-request-all-privileges: true
       parameters:
         - in: query
           name: skip
@@ -588,8 +585,8 @@ paths:
       summary: Delete file
       description: Deletes the file indicated by the resource ID.
       operationId: Delete
+      x-ni-auth: true
       x-ni-operation: deleteFiles
-      x-ni-privilege: DeleteFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       responses:
         204:
@@ -610,9 +607,9 @@ paths:
 
         Use the inline parameter in the query string to control the download
         behavior.
+      x-ni-auth: true
       operationId: ReceiveFile
       x-ni-operation: downloadData
-      x-ni-privilege: DownloadFiles
       x-ni-request-variables:
         - REQUEST_METHOD
       parameters:
@@ -658,8 +655,8 @@ paths:
         Use the replaceExisting element to determine the replace or merge
         behavior.
       operationId: UpdateMetadata
+      x-ni-auth: true
       x-ni-operation: updateMetadata
-      x-ni-privilege: ModifyFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       parameters:
         - in: body
@@ -709,8 +706,8 @@ paths:
         Deletes multiple files in a single API call. The request body contains
         an array of file ids to delete.
       operationId: DeleteMultiple
+      x-ni-auth: true
       x-ni-operation: deleteFiles
-      x-ni-privilege: DeleteFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       parameters:
         - in: body
@@ -757,9 +754,8 @@ paths:
 
         - propertiesQuery: a JSON array of query objects with string values.
       operationId: QueryAvailableFiles
+      x-ni-auth: true
       x-ni-operation: listFiles
-      x-ni-privilege: ViewMetadata
-      x-ni-request-all-privileges: true
       parameters:
         - in: query
           name: skip
@@ -818,8 +814,8 @@ paths:
         Uploads a file using multipart/form-data headers to send the file
         payload in the HTTP body.
       operationId: Upload
+      x-ni-auth: true
       x-ni-operation: uploadFiles
-      x-ni-privilege: UploadFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       consumes:
         - multipart/form-data
@@ -833,6 +829,19 @@ paths:
           name: metadata
           description: JSON Dictionary with key/value pairs
           type: string
+        - in: formData
+          name: id
+          description: >-
+            Optional field that allows the client to specify the ID of the file
+            once it is uploaded. An ID is expected to be a 24-digit hex string,
+            which is unique among all files.
+          type: string
+        - in: query
+          name: workspace
+          description: The id of the workspace the file belongs to
+          type: string
+          default: null
+          x-example: 1f2641dd-a5ac-4869-835e-5340b4cd386c
       responses:
         201:
           description: OK

@@ -193,6 +193,8 @@ definitions:
           timeout: 600
           refresh_minion_cache:
             grains: true
+      error:
+        $ref: '#/definitions/Error'
     required: [jid, tgt, fun]
 
   RegisterSystemsRequest:
@@ -210,6 +212,13 @@ definitions:
         description: Whether to activate the systems or not.
         default: false
         example: true
+      workspaces:
+        description: List containing the corresponding workspace for each system credential information.
+        type: array
+        items:
+          type: string
+          description: The ID of the workspace.
+          example: '5bc5e9092a4fa4c71cfa7197'
     required: [systemsCredentials]
 
   SystemCredentials:
@@ -243,6 +252,8 @@ definitions:
         description: The ID of the registration request.
         type: string
         example: '068530b9-b059-4c0e-9820-9e9cc4e0832c'
+      error:
+        $ref: '#/definitions/Error'
     required: [requestId]
 
   UnregisterSystemsRequest:
@@ -691,6 +702,10 @@ definitions:
         description: The alias of the system.
         type: string
         example: testVM
+      workspace:
+        type: string
+        description: The ID of the workspace.
+        example: '5bc5e9092a4fa4c71cfa7197'
       activation:
         description: Activation information.
         type: object
@@ -846,7 +861,7 @@ definitions:
             example:
               owner: admin
         required: [lastUpdatedTimestamp, data]
-    required: [id, createdTimestamp, lastUpdatedTimestamp, connected]
+    required: [id, createdTimestamp, lastUpdatedTimestamp, connected, workspace]
 
   ReportType:
     title: Report Type
@@ -1040,6 +1055,10 @@ definitions:
               type: string
               description: A string representing the public authorization key. If this field is specified, verification that the system ID is associated with this auth key will happen before the desired action is executed.
               example: -----BEGIN PUBLIC KEY-----↵MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFgEKiRwWBD/QSDHCpNQ↵Zml9q224YzIxG6reByDV16BNsQoH0lc2bT9LZ7o6xf6dTpQl7shIMc/abSAcl4/F↵VpKguH1yRmOG2Nhout/9wMP6kYBTlThzpop93rlxIo/I7nDkQDz07cMhNWYDvrut↵PVnjRg70xOCAzQRCHRy4GW3TLvfp2WAbCuoQ5oPHQLx+YBSRYDcgfo9jiW8vNzt4↵Bcg72c2PmHEJjGslzJeqcKdRjK0z4/VFgLYfMUBz4LCoy7DohU/uc9ZbHSlOy/BK↵1/S8O1vUyk8DEq+/kQumJWKh1Cl0SWcZGSDkdhQhoTiWqXGb1BBtU7vkxYgQoYjM↵rwIDAQAB↵-----END PUBLIC KEY-----
+            workspace:
+              type: string
+              description: The ID of the workspace.
+              example: '5bc5e9092a4fa4c71cfa7197'
           required: [id, action]
         required: [keyActions]
 
@@ -1068,7 +1087,42 @@ definitions:
         description: The new  alias of the system.
         type: string
         example: testVM
+      workspace:
+        type: string
+        description: The ID of the workspace.
+        example: '5bc5e9092a4fa4c71cfa7197'
+        
+  UpdateSystemsRequest:
+    description: List of systems and metadata to be updated.
+    title: Update Systems Request
+    type: object
+    properties:
+      SystemsUpdateInformation:
+        description: The list of system ids and changes.
+        type: array
+        items:
+          description: System ids and changes that need to be applied to the systems.
+          title: SystemUpdateInformation
+          type: object
+          properties:
+            systemId:
+              type: string
+              description: The system id.
+              example: 'VMware_Virtual_Platform--SN-VMware-56_4d_d2_08_ce_89_1b_70-e6_32_fc_21_6c_d0_d9_f9--MAC-00-0C-29-D0-D9-F9'
+            systemMetadata:
+              $ref: '#/definitions/SystemMetadata'
 
+  SystemMetadata:
+    description: System metadata to be updated.
+    title: SystemMetadata
+    x-ni-sparse: true
+    type: object
+    properties:
+      workspace:
+        type: string
+        description: The ID of the workspace.
+        example: '5bc5e9092a4fa4c71cfa7197'
+      
   QueryAvailablePackagesRequest:
     title: Get Available Packages Request
     description: Request to get the available packages from the feeds specified in the request.
@@ -1484,7 +1538,13 @@ definitions:
       projection:
         type: string
         example: 'new(id,grains,lastUpdatedTimestamp)'
-        description: Specifies the projection for resources. This field can be used if we don't want to receive the entire model but only certain properties of the model.
+        description: >-
+            Specifies the projection for resources. Use this field to receive specific properties of the model.
+
+            Examples:
+                - 'new(id,connected)'
+                - 'new(id,alias,grains.data.host as host)'
+                - 'new(id,lastUpdatedTimestamp,properties.data.location as location)'
       orderBy:
         type: string
         example: 'lastUpdatedTimestamp descending'
@@ -1576,7 +1636,13 @@ definitions:
       projection:
         type: string
         example: 'new(id,jid,state,lastUpdatedTimestamp,config.fun as fun)'
-        description: Specifies the projection for resources. This field can be used if we don't want to receive the entire model but only certain properties of the model.
+        description: >-
+            Specifies the projection for resources. Use this field to receive specific properties of the model.
+
+            Examples:
+                - 'new(id,jid,state)'
+                - 'new(id,jid,config.user as user)'
+                - 'new(id,jid,state,lastUpdatedTimestamp,metadata.queued as queued)'
       orderBy:
         type: string
         example: 'lastUpdatedTimestamp descending'
@@ -1626,7 +1692,6 @@ paths:
   /:
     get:
       operationId: HandleGetVersionInfo
-      x-ni-request-all-privileges: true
       summary: API information
       tags: [versioning]
       security: []
@@ -1649,7 +1714,6 @@ paths:
   /{version}:
     get:
       operationId: RootEndpointWithVersion
-      x-ni-request-all-privileges: true
       summary: API version information
       description: Returns available operations for a single version of the API.
       tags: [versioning]
@@ -1673,7 +1737,7 @@ paths:
   /v1/jobs:
     post:
       operationId: CreateJob
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: createOrCancelJobs
       x-ni-request-timeout: 300000
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
@@ -1700,7 +1764,7 @@ paths:
           $ref: '#/responses/Error'
     get:
       operationId: GetJobs
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getJobs
       x-ni-request-timeout: 120000
       tags: [jobs]
@@ -1741,7 +1805,7 @@ paths:
   /v1/systems:
     get:
       operationId: GetSystems
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       x-ni-request-timeout: 120000
       tags: [systems]
@@ -1769,7 +1833,7 @@ paths:
   /v1/register-systems:
     post:
       operationId: RegisterSystems
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: manageSystems
       tags: [systems]
       summary: Register systems
@@ -1795,9 +1859,10 @@ paths:
   /v1/remove-systems:
     post:
       operationId: UnregisterSystems
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-request-timeout: 180000
       x-ni-operation: manageSystems
+      x-ni-request-variables: [REMOTE_USER, USER_NAME]
       tags: [systems]
       summary: Unregister Systems
       description: Request to unregister systems.
@@ -1822,7 +1887,7 @@ paths:
   /v1/cancel-jobs:
     post:
       operationId: CancelJobs
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: createOrCancelJobs
       x-ni-request-timeout: 120000
       tags: [jobs]
@@ -1853,7 +1918,7 @@ paths:
   /v1/activate-systems:
     post:
       operationId: ActivateSystems
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: activateSystems
       x-ni-request-timeout: 120000
       tags: [systems]
@@ -1887,7 +1952,7 @@ paths:
   /v1/get-discovered-systems:
     get:
       operationId: GetDiscoveredSystems
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       tags: [systems]
       summary: Get discovered systems
@@ -1906,7 +1971,7 @@ paths:
   /v1/get-systems-summary:
     get:
       operationId: GetSystemsSummary
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       tags: [systems]
       summary: Get systems summary
@@ -1923,7 +1988,7 @@ paths:
   /v1/get-jobs-summary:
     get:
       operationId: GetJobsSummary
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getJobs
       tags: [jobs]
       summary: Get jobs summary
@@ -1940,7 +2005,7 @@ paths:
   /v1/configure-feeds:
     post:
       operationId: ConfigureAndUpdateMultipleFeeds
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-request-timeout: 360000
       x-ni-operation: manageFeeds
       tags: [feeds]
@@ -1967,7 +2032,7 @@ paths:
   /v1/get-discovered-systems-summary:
     get:
       operationId: GetDiscoveredSystemsSummary
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       tags: [systems]
       summary: Get discovered systems summary
@@ -1984,7 +2049,7 @@ paths:
   /v1/get-pending-systems-summary:
     get:
       operationId: GetPendingSystemsSummary
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       x-ni-request-timeout: 120000
       tags: [systems]
@@ -2002,7 +2067,7 @@ paths:
   /v1/generate-systems-report:
     post:
       operationId: GetSystemsReport
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       x-ni-request-timeout: 120000
       tags: [systems]
@@ -2015,9 +2080,6 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/SystemsReportRequest'
-      produces:
-        - text/csv
-        - application/json
       responses:
         200:
           description: OK.
@@ -2025,8 +2087,8 @@ paths:
             description: The file data
             type: file
           examples:
-            application/octet-stream:
-              File data
+            text/csv:
+              Systems report file data
         400:
           $ref: '#/responses/BadRequest'
         401:
@@ -2036,7 +2098,7 @@ paths:
   /v1/create-groups:
     post:
       operationId: CreateGroups
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: createOrUpdateGroups
       tags: [groups]
       summary: Create groups
@@ -2066,7 +2128,7 @@ paths:
   /v1/groups:
     get:
       operationId: GetGroups
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getGroups
       tags: [groups]
       summary: Get groups
@@ -2094,7 +2156,7 @@ paths:
   /v1/remove-groups:
     post:
       operationId: RemoveGroups
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: createOrUpdateGroups
       tags: [groups]
       summary: Remove groups
@@ -2125,7 +2187,7 @@ paths:
   /v1/add-systems-to-groups:
     post:
       operationId: AddSystemsToGroups
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: createOrUpdateGroups
       tags: [groups]
       summary: Add systems to groups
@@ -2153,7 +2215,7 @@ paths:
   /v1/remove-systems-from-groups:
     post:
       operationId: RemoveSystemsFromGroups
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: createOrUpdateGroups
       tags: [groups]
       summary: Remove systems from groups
@@ -2181,7 +2243,7 @@ paths:
   /v1/obtain-systems-info:
     post:
       operationId: GetSystemsInfo
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       tags: [systems]
       summary: Get systems info
@@ -2211,7 +2273,7 @@ paths:
   /v1/get-systems-keys:
     get:
       operationId: GetSystemsKeys
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-request-timeout: 120000
       tags: [systems]
       x-ni-operation: getSystems
@@ -2229,7 +2291,7 @@ paths:
   /v1/manage-systems-keys:
     post:
       operationId: ManageSystemsKeys
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-request-timeout: 300000
       x-ni-operation: manageSystems
       tags: [systems]
@@ -2258,7 +2320,7 @@ paths:
   /v1/systems/managed/{id}:
     patch:
       operationId: UpdateMetadata
-      x-ni-privilege: Write
+      x-ni-auth: true
       x-ni-operation: updateSystemMetadata
       consumes:
         - application/merge-patch+json
@@ -2291,10 +2353,34 @@ paths:
           $ref: '#/responses/NotFound'
         default:
           $ref: '#/responses/Error'
+  /v1/update-systems:
+    post:
+      operationId: UpdateSystemsMetadata
+      x-ni-auth: true
+      x-ni-operation: updateSystemMetadata
+      tags: [systems]
+      summary: Update systems metadata
+      description: Update metadata for a list of systems.
+      parameters:
+        - in: body
+          name: UpdateSystemsRequest
+          required: true
+          description: The new metadata associated with a list of systems.
+          schema:
+            $ref: '#/definitions/UpdateSystemsRequest'
+      responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
   /v1/query-available-packages:
     post:
       operationId: GetAvailablePackagesByQuery
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-request-timeout: 300000
       x-ni-operation: manageFeeds
       tags: [feeds]
@@ -2325,7 +2411,7 @@ paths:
   /v1/query-jobs:
     post:
       operationId: GetJobsByQuery
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getJobs
       x-ni-request-timeout: 120000
       tags: [jobs]
@@ -2354,7 +2440,7 @@ paths:
   /v1/query-systems:
     post:
       operationId: GetSystemsByQuery
-      x-ni-privilege: Read
+      x-ni-auth: true
       x-ni-operation: getSystems
       x-ni-request-timeout: 120000
       tags: [systems]
