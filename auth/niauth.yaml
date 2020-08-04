@@ -14,8 +14,6 @@ securityDefinitions:
     in: header
 security:
   - ApiKeyAuth: []
-schemes:
-  - https
 paths:
   /auth:
     get:
@@ -27,25 +25,6 @@ paths:
       responses:
         200:
           $ref: '#/responses/AuthResponse'
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-
-  /session-keys:
-    post:
-      tags:
-        - keys
-      summary: Creates temporary API Keys
-      description: Create a temporary session key which is valid for 1 hour. The caller needs a whitelisted API key to issue session keys.
-      operationId: create-session-key
-      parameters:
-        - $ref: '#/parameters/CreateSessionKeyRequest'
-      responses:
-        200:
-          $ref: '#/responses/CreateSessionKeyResponse'
-        400:
-          $ref: '#/responses/ValidationError'
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -408,6 +387,25 @@ paths:
           $ref: '#/responses/Unauthorized'
         404:
           $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+
+  /session-keys:
+    post:
+      tags:
+        - whitelisted operations
+      summary: Creates temporary API Keys
+      description: Create a temporary session key which is valid for 1 hour. The caller needs a whitelisted API key to issue session keys.
+      operationId: create-session-key
+      parameters:
+        - $ref: '#/parameters/CreateSessionKeyRequest'
+      responses:
+        200:
+          $ref: '#/responses/CreateSessionKeyResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
 

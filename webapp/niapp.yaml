@@ -1,0 +1,682 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: SystemLink WebApp Service
+basePath: /niapp/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  ApiKeyAuth:
+    type: apiKey
+    name: x-ni-api-key
+    in: header
+security:
+  - ApiKeyAuth: []
+paths:
+  '/webapps/{id}':
+    get:
+      tags:
+        - metadata
+      summary: Get webapp metadata by Id
+      description: Get webapp metadata by Id
+      operationId: get-webapp
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+      responses:
+        200:
+          $ref: '#/responses/GetWebAppResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+    put:
+      tags:
+        - metadata
+      summary: Update webapp metadata by Id
+      description: Update existing webapp metadata
+      operationId: update-webapp
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+        - $ref: '#/parameters/UpdateWebAppRequest'
+      responses:
+        200:
+          $ref: '#/responses/UpdateWebAppResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags:
+        - metadata
+      summary: Delete webapp by Id
+      description: Delete existing webapp metadata and content
+      operationId: delete-webapp
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  '/webapps':
+    get:
+      tags:
+        - metadata
+      summary: List the webapps
+      description: List the webapps
+      operationId: list-webapps
+      parameters:
+        - in: query
+          name: name
+          description: Filters the webapps by name
+          type: string
+        - in: query
+          name: type
+          description: Filters the webapps by type
+          type: string
+          enum:
+          - Dashboard
+          - DashboardTemplate
+          - WebVI
+        - in: query
+          name: userId
+          description: Filters the webapps by the user Id of the owner
+          type: string
+        - in: query
+          name: workspace
+          description: Filters the webapps by workspace Id
+          type: string
+        - in: query
+          name: continuationToken
+          description: The continuation token can be used to paginate through the webapp list results. Provide a token to continue a previous listing.
+          type: string
+        - in: query
+          name: take
+          description: The maximum number of webapps to return
+          type: integer
+          default: 100
+          minimum: 0
+          maximum: 1000
+      responses:
+        200:
+          $ref: '#/responses/ListWebAppsResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    post:
+      tags:
+        - metadata
+      summary: Create a new webapp
+      description: Create a new webapp
+      operationId: create-webapp
+      parameters:
+        - $ref: '#/parameters/CreateWebAppRequest'
+      responses:
+        200:
+          $ref: '#/responses/CreateWebAppResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  '/webapps/query':
+    post:
+      tags:
+        - metadata
+      summary: Query the webapps
+      description: >-
+        Use the Dynamic Linq query language to specify filters for webapps.
+        An empty request body queries all webapps.
+      operationId: query
+      parameters:
+        - in: body
+          name: postBody
+          description: Query filter
+          required: false
+          schema:
+            $ref: '#/definitions/WebAppsAdvancedQuery'
+      responses:
+        200:
+          $ref: '#/responses/ListWebAppsResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  '/webapps/{id}/sharing':
+    put:
+      tags:
+        - metadata
+      summary: Update sharing settings of the webapp
+      description: Update sharing settings of the webapp
+      operationId: update-webapp-sharing
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+        - $ref: '#/parameters/UpdateWebAppSharingRequest'
+      responses:
+        200:
+          $ref: '#/responses/UpdateWebAppSharingResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  '/webapps/shared-emails':
+    get:
+      tags:
+        - metadata
+      summary: List the emails with which the user has shared webapps
+      description: List the emails with which the user has shared webapps
+      operationId: list-shared-emails
+      responses:
+        200:
+          $ref: '#/responses/SharedEmailsResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  '/webapps/import':
+    post:
+      tags:
+        - metadata
+      summary: Import webapp metadata
+      description: >-
+        Import a list of webapp metadata.
+
+        The webapp Id, created timestamp, and updated timestamp are optional. These fields will be generated by the service if they are not provided in the request.
+      operationId: import-webapps
+      parameters:
+        - $ref: '#/parameters/ImportWebAppsRequest'
+      responses:
+        200:
+          $ref: '#/responses/ImportWebAppsResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  '/webapps/{id}/content':
+    get:
+      tags:
+        - content
+      summary: Get webapp content
+      description: Get the content of a webapp. ContentType varies from JSON for dashboards and templates or redirect to main HTML for WebVIs
+      operationId: get-content-index
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+      responses:
+        200:
+          description: The webapp's content. JSON for Dashboards, HTML for WebVIs
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+    put:
+      tags:
+        - content
+      summary: Upload content for an existing webapp
+      description: Upload content for an existing webapp
+      operationId: update-content
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+        - in: body
+          required: true
+          name: content
+          description: The webapp content to upload
+          schema:
+            $ref: '#/definitions/WebAppContent'
+      responses:
+        200:
+          description: Success
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  '/webapps/{id}/content/{path}':
+    get:
+      tags:
+        - content
+      summary: Get webapp content by path
+      description: Get the webapp content at a path. This applies to webapps with multiple files, such as WebVIs.
+      operationId: get-content
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+        - $ref: '#/parameters/WebAppContentPath'
+      responses:
+        200:
+          $ref: '#/definitions/WebAppContent'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+
+  '/webapps/{sourceId}/duplicate':
+    post:
+      tags:
+        - content
+      summary: Duplicate webapp
+      description: Duplicate a webapp by creating new webapp metadata with the specified name and duplicating existing content into the new webapp.
+      operationId: duplicate-webapp
+      parameters:
+        - in: path
+          type: string
+          required: true
+          name: sourceId
+          description: The Id of the source webapp to copy content from
+        - $ref: '#/parameters/DuplicateWebAppRequest'
+      responses:
+        200:
+          $ref: '#/responses/CreateWebAppResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  '/webapps/{id}/duplicate/{sourceId}':
+    post:
+      tags:
+        - content
+      summary: Duplicate webapp content
+      description: Duplicate webapp content
+      operationId: duplicate-content
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+        - in: path
+          type: string
+          required: true
+          name: sourceId
+          description: The Id of the source webapp to copy content from
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+
+parameters:
+  WebAppId:
+    in: path
+    name: id
+    description: The webapp identifier
+    type: string
+    required: true
+  WebAppContentPath:
+    in: path
+    name: path
+    description: Path to webapp content
+    type: string
+    required: true
+  CreateWebAppRequest:
+    in: body
+    name: CreateWebAppRequest
+    description: Create WebApp Request
+    schema:
+      type: object
+      title: Create WebApp Request
+      properties:
+        name:
+          type: string
+          description: The webapp's name
+          example: My webapp
+        workspace:
+          type: string
+          description: The workspace Id for the webapp. If this is not specified, the webapp will be created in the default workspace.
+          example: 0c80cf49-54e9-4e92-b117-3bfa574caa84
+        policyIds:
+          type: array
+          items:
+            type: string
+            example: "asdsad-17a6-45323-b64b-65325287372d"
+          description: List of policy Ids associated with the webapp, which give it access to the user's resources"
+        properties:
+          type: object
+          description: A map of key value properties associated with the webapp
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+  UpdateWebAppRequest:
+    in: body
+    name: UpdateWebAppRequest
+    description: Update WebApp Request
+    schema:
+      type: object
+      title: Update WebApp Request
+      properties:
+        name:
+          type: string
+          description: The webapp's name
+          example: My webapp
+        workspace:
+          type: string
+          description: The workspace Id for the webapp. If this is not specified, the webapp will remain in its existing workspace.
+          example: 0c80cf49-54e9-4e92-b117-3bfa574caa84
+        policyIds:
+          type: array
+          items:
+            type: string
+            example: "asdsad-17a6-45323-b64b-65325287372d"
+          description: List of policy Ids associated with the webapp, which give it access to the user's resources"
+        properties:
+          type: object
+          description: A map of key value properties associated with the webapp
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+  UpdateWebAppSharingRequest:
+    in: body
+    name: UpdateWebAppSharingRequest
+    description: Update WebApp Sharing Request
+    schema:
+      type: object
+      title: Update WebApp Sharing Request
+      properties:
+        shared:
+          type: string
+          enum:
+            - private
+            - direct
+            - public
+          example: direct
+          description: The webapp's sharing option
+        sharedEmails:
+          type: array
+          items:
+            type: string
+            example: john.doe@email.com
+          description: List of emails of users to share the webapp with. Applies when "shared" option is "direct"
+  ImportWebAppsRequest:
+    in: body
+    name: ImportWebAppsRequest
+    description: Import WebApp Metadata Request
+    schema:
+      type: object
+      title: Import WebApp Metadata Request
+      properties:
+        webapps:
+          description: List of webapps to import
+          type: array
+          items:
+            $ref: '#/definitions/WebApp'
+  DuplicateWebAppRequest:
+    in: body
+    name: DuplicateWebAppRequest
+    description: Duplicate WebApp Request
+    schema:
+      type: object
+      title: Duplicate WebApp Request
+      properties:
+        name:
+          type: string
+          description: The name of the new webapp created during the duplication
+          example: My webapp name
+        workspace:
+          type: string
+          description: The Id of the workspace in which to create the new webapp. If no workspace is specified, the new webapp will be put in the default workspace.
+          example: 0c80cf49-54e9-4e92-b117-3bfa574caa84
+
+responses:
+  Error:
+    description: Error
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  Unauthorized:
+    description: API Key is missing or invalid
+  NotFound:
+    description: The resource was not found.
+  ValidationError:
+    description: Invalid input data
+  GetWebAppResponse:
+    description: Get WebApp Response
+    schema:
+      $ref: '#/definitions/WebApp'
+  CreateWebAppResponse:
+    description: Create WebApp Response
+    schema:
+      $ref: '#/definitions/WebApp'
+  ImportWebAppsResponse:
+    description: Import WebApps Response
+    schema:
+      title: Import WebApps Response
+      type: object
+      properties:
+        webapps:
+          description: List of webapps that were imported
+          type: array
+          items:
+            $ref: '#/definitions/WebApp'
+  UpdateWebAppResponse:
+    description: Update WebApp Response
+    schema:
+      $ref: '#/definitions/WebApp'
+  UpdateWebAppSharingResponse:
+    description: Update WebApp Sharing Response
+    schema:
+      $ref: '#/definitions/WebApp'
+  ListWebAppsResponse:
+    description: List WebApps Response
+    schema:
+      title: List WebApps Response
+      type: object
+      properties:
+        webapps:
+          description: List of webapps
+          type: array
+          items:
+            $ref: '#/definitions/WebApp'
+        continuationToken:
+          description: The continuation token can be used to paginate through the webapp list results. Provide this token in the next list webapps call.
+          type: string
+          example: token
+  SharedEmailsResponse:
+    description: Shared Emails Response
+    schema:
+      title: Shared Emails Response
+      type: array
+      items:
+        type: string
+        example: john.doe@email.com
+
+definitions:
+  WebApp:
+    type: object
+    title: WebApp Metadata
+    properties:
+      id :
+        type: string
+        description: The webapp Id
+        example: "asdsad-17a6-45323-b64b-65325287372d"
+      type:
+        type: string
+        enum:
+          - Dashboard
+          - TileDashboard
+          - DashboardTemplate
+          - WebVI
+          - Visualization
+          - VisualizationTemplate
+        description: The webapp type
+      name:
+        type: string
+        description: The webapp name
+        example: My webapp
+      workspace:
+        type: string
+        description: The Id of the workspace containing the webapp
+        example: 0c80cf49-54e9-4e92-b117-3bfa574caa84
+      userId:
+        type: string
+        description: The Id of the user that created the webapp
+        example: d4f6b766-da45-4fe5-85c5-bd745c402cf9
+      shared:
+        type: string
+        enum:
+          - private
+          - direct
+          - public
+        description: The webapp's sharing option
+      sharedEmails:
+        type: array
+        items:
+          type: string
+          example: john.doe@ni.com
+        description: List of emails of users to share the webapp with. Applies when "shared" option is "direct"
+      policyIds:
+        type: array
+        items:
+          type: string
+          example: asdsad-17a6-45323-b64b-65325287372d
+        description: List of policy Ids associated with the webapp, which give it access to the user's resources"
+      created:
+        type: string
+        format: date-time
+        description: The created timestamp (iso8601 format)
+        example: "2019-12-02T15:31:45.379Z"
+      updated:
+        type: string
+        format: date-time
+        description: The last updated timestamp (iso8601 format)
+        example: "2019-12-02T15:31:45.379Z"
+      properties:
+        type: object
+        description: A map of key value properties associated with the webapp
+  WebAppContent:
+    type: string
+    format: binary
+    title: WebApp Content
+    description: The webapp binary content. Depending on the webapp's type it can be a dashboard, template or *.nipkg file exported from LabVIEW NXG
+  WebAppsAdvancedQuery:
+    type: object
+    title: Advanced Query Object for WebApps
+    properties:
+      filter:
+        description: >-
+            The filter criteria for webapps, consisting of a string of queries composed using AND/OR operators.
+            String values need to be enclosed in double quotes.
+            Parenthesis can be used within the filter to better define the order of operations.
+
+
+            Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+
+            Operators:
+
+            - Equals operator '='. Example: 'x = y'
+
+            - Not equal operator '!='. Example: 'x != y'
+
+            - Greater than operator '>'. Example: 'x > y'
+
+            - Greater than or equal operator '>='. Example: 'x >= y'
+
+            - Less than operator '<'. Example: 'x < y'
+
+            - Less than or equal operator '<='. Example: 'x <= y'
+
+            - Logical AND operator 'and'. Example: 'x and y'
+
+            - Logical OR operator 'or'. Example: 'x or y'
+
+            - Starts with operator '.StartsWith()', used to check whether a string starts with another string. Example: 'x.StartsWith(y)'
+
+            - Does not start with operator '!.StartsWith()', used to check whether a string does not start with another string. Example: '!x.StartsWith(y)'
+
+            - String null or empty 'string.IsNullOrEmpty()', used to check whether a string is null or empty. Example: 'string.IsNullOrEmpty(x)'
+
+            - String is not null or empty '!string.IsNullOrEmpty()', used to check whether a string is not null or empty. Example: '!string.IsNullOrEmpty(x)'
+
+
+            Valid webapp properties that can be used in the filter:
+
+            - id
+
+            - name
+
+            - properties.embedLocation
+
+            - shared
+
+            - type
+
+            - workspace
+        type: string
+        example: name.StartsWith("myWebApp") || type == "WebVI"
+      take:
+        description: The maximum number of webapps to return
+        type: integer
+        default: 100
+        minimum: 0
+        maximum: 1000
+        example: 10
+      continuationToken:
+        description: The continuation token can be used to paginate through the webapp query results. Provide this token in the next query webapps call.
+        type: string
+        example: token
+  Error:
+    description: Contains error information
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+      message:
+        description: Complete error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+      innerErrors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+    example:
+      name: Skyline.OneOrMoreErrorsOccurred
+      code: -251041
+      message: >-
+        One or more errors occurred. See the contained list for details of each
+        error.
+      args: []
+      innerErrors:
+        - name: DocumentManager.NotFound
+          code: -252520
+          message: The specified document was not found.
+          args: []
