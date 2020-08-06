@@ -369,6 +369,8 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Feed'
+      systemImage:
+          $ref: '#/definitions/SystemImage'
       packages:
         type: array
         items:
@@ -404,6 +406,8 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Feed'
+      systemImage:
+        $ref: '#/definitions/SystemImage'
       packages:
         type: array
         items:
@@ -456,6 +460,8 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Feed'
+      systemImage:
+        $ref: '#/definitions/SystemImage'
       packages:
         type: array
         items:
@@ -545,6 +551,22 @@ definitions:
       url: ni.com
       compressed: true
 
+  SystemImage:
+    description: Object defining a system image containing the name and version.
+    type: object
+    properties:
+      name:
+        type: string
+        description: Name of the system image.
+      version:
+        type: string
+        description: Version of the system image. Defaults to the latest available version.
+    required:
+      - name
+    example:
+      name: dist-nilrt-grub
+      version: '20.5.0'
+
   Package:
     description: Object defining a package containing the name and version.
     type: object
@@ -554,7 +576,7 @@ definitions:
         description: Name of the package.
       version:
         type: string
-        description: Version of the package.
+        description: Version of the package. Defaults to the latest available version
       installRecommends:
         type: boolean
         description: A boolean variable whose value controls the installation of the recommended packages. This property is available starting with version 2 of the getStates and createOrUpdateStates operations.

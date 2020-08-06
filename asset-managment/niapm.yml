@@ -189,6 +189,7 @@ definitions:
           date: '2018-05-07T18:58:05.000Z'
           recommendedInterval: 12
           nextRecommendedDate: '2019-05-07T18:58:05.000Z'
+          nextCustomDueDate: '2019-06-07T18:58:05.000Z'
           comments: 'This is a comment.'
           entryType: MANUAL
           operator:
@@ -365,6 +366,11 @@ definitions:
         type: string
         format: date-time
         example: '2019-05-07T18:58:05.219692Z'
+      nextCustomDueDate:
+        description: ISO-8601 formatted timestamp specifying the date for the next external calibration.
+        type: string
+        format: date-time
+        example: '2019-06-07T18:58:05.219692Z'
       comments:
         description: Calibration comments provided by an operator.
         type: string
@@ -377,6 +383,7 @@ definitions:
       date: '2018-05-07T18:58:05.000Z'
       recommendedInterval: 12
       nextRecommendedDate: '2019-05-07T18:58:05.000Z'
+      nextCustomDueDate: '2019-06-07T18:58:05.000Z'
       comments: 'This is a comment.'
   ExternalCalibrationModel:
     title: External Calibration
@@ -397,6 +404,7 @@ definitions:
           date: '2018-05-07T18:58:05.000Z'
           recommendedInterval: 12
           nextRecommendedDate: '2019-05-07T18:58:05.000Z'
+          nextCustomDueDate: '2019-06-07T18:58:05.000Z'
           comments: 'This is a comment.'
           entryType: MANUAL
           operator:
@@ -421,6 +429,7 @@ definitions:
           date: '2018-05-07T18:58:05.000Z'
           recommendedInterval: 12
           nextRecommendedDate: '2019-05-07T18:58:05.000Z'
+          nextCustomDueDate: '2019-06-07T18:58:05.000Z'
           comments: 'This is a comment.'
           entryType: MANUAL
           operator:
@@ -1032,14 +1041,14 @@ parameters:
   ExternalCalibrationRequestBody:
     in: body
     name: externalCalibrationRequestBody
-    description: Request body containing data to create a new external calibration entry for a third-party asset.
+    description: Request body containing data to create a new external calibration entry for an asset.
     schema:
       title: Post External Calibration Request
-      description: Request body containing data to create a new external calibration entry for a third-party asset.
+      description: Request body containing data to create a new external calibration entry for an asset.
       type: object
       properties:
         externalCalibration:
-          $ref: '#/definitions/ExternalCalibrationBaseModel'
+          $ref: '#/definitions/ExternalCalibrationWithChecksumModel'
   UpdateMetadata:
     in: body
     name: updateMetadata
@@ -2542,12 +2551,13 @@ paths:
         default:
           $ref: '#/responses/Error'
     post:
-      tags: [assets]
+      tags: [deprecated]
       summary: Creates a new calibration history entry for an asset
-      description: Creates a new calibration history entry for a third-party asset.
+      description: Deprecated. Creates a new calibration history entry for an asset. Use /v1/update-assets.
       operationId: post-asset-calibration-history
       x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
+      deprecated: true
       parameters:
         - $ref: '#/parameters/AssetId'
         - $ref: '#/parameters/ExternalCalibrationRequestBody'
