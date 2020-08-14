@@ -552,7 +552,7 @@ definitions:
       compressed: true
 
   SystemImage:
-    description: Object defining a system image containing the name and version.
+    description: Object defining a system image containing the name, version and optionally if the image should be reinstalled if it is already installed.
     type: object
     properties:
       name:
@@ -561,6 +561,10 @@ definitions:
       version:
         type: string
         description: Version of the system image.
+      reinstall:
+        type: boolean
+        description: Whether the image should be reinstalled if it is already installed.
+        default: false
     required:
       - name
       - version
