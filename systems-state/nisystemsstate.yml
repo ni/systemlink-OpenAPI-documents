@@ -560,9 +560,10 @@ definitions:
         description: Name of the system image.
       version:
         type: string
-        description: Version of the system image. Defaults to the latest available version.
+        description: Version of the system image.
     required:
       - name
+      - version
     example:
       name: dist-nilrt-grub
       version: '20.5.0'
@@ -576,13 +577,14 @@ definitions:
         description: Name of the package.
       version:
         type: string
-        description: Version of the package. Defaults to the latest available version
+        description: Version of the package.
       installRecommends:
         type: boolean
         description: A boolean variable whose value controls the installation of the recommended packages. This property is available starting with version 2 of the getStates and createOrUpdateStates operations.
         default: true
     required:
       - name
+      - version
     example:
       name: vim
       version: '7.1'
