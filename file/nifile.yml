@@ -362,6 +362,15 @@ parameters:
     x-example: '4afb2ce3741fe11d88838cc9'
 
 responses:
+  PartialSuccess:
+    description: Partial Success in the case when only a part of the request body metadata information was processed successfully.
+    schema:
+      title: PartialSuccessResponse
+      description: Partial success response containing error information.
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
   Query:
     description: OK
     schema:
@@ -728,6 +737,8 @@ paths:
                   example: '5afb2ce3741fe11d88838cc9'
             required: [ids]
       responses:
+        200:
+          $ref: '#/responses/PartialSuccess'
         204:
           description: No content
         401:
