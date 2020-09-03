@@ -688,7 +688,10 @@ paths:
                 type: integer
                 format: int32
               properties:
-                description: The properties to set
+                description: >-
+                  The properties to set. A map of key value properties containing the metadata to be attached.
+                  Predefined:
+                  - Name: This is an optional property for renaming the file. When specified, the file will be renamed.
                 type: object
                 additionalProperties:
                   type: string
