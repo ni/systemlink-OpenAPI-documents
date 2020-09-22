@@ -474,6 +474,10 @@ definitions:
             description: Whether the asset supports external calibration.
             type: boolean
             example: true
+          customCalibrationInterval:
+            description: The interval represented in months used for computing calibration due date. If not set, the recommended calibration interval from the calibration model is used.
+            type: integer
+            example: 24
           selfCalibration:
             $ref: '#/definitions/SelfCalibrationModel'
           isNIAsset:
@@ -1190,6 +1194,8 @@ parameters:
 
             - SupportsExternalCalibration: Boolean flag specifying whether the asset supports external calibration.
 
+            - CustomCalibrationInterval: Integer representing the custom calibration interval, in months.
+
             - CalibrationStatus: String enumeration representing the calibration status of an asset. Possible values are: OK, APPROACHING_RECOMMENDED_DUE_DATE, PAST_RECOMMENDED_DUE_DATE.
 
             - ExternalCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was externally-calibrated. Example: "2018-05-20T00:00:00Z"
@@ -1345,6 +1351,8 @@ parameters:
               - SelfCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was self-calibrated. Example: "2018-05-20T00:00:00Z"
               
               - SupportsExternalCalibration: Boolean flag specifying whether the asset supports external calibration.
+
+              - CustomCalibrationInterval: Integer representing the custom calibration interval, in months.
               
               - CalibrationStatus: String enumeration representing the calibration status of an asset. Possible values are: OK, APPROACHING_RECOMMENDED_DUE_DATE, PAST_RECOMMENDED_DUE_DATE.
 
@@ -1493,6 +1501,8 @@ parameters:
               - SelfCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was self-calibrated. Example: "2018-05-20T00:00:00Z"
               
               - SupportsExternalCalibration: Boolean flag specifying whether the asset supports external calibration.
+
+              - CustomCalibrationInterval: Integer representing the custom calibration interval, in months.
               
               - CalibrationStatus: String enumeration representing the calibration status of an asset. Possible values are: OK, APPROACHING_RECOMMENDED_DUE_DATE, PAST_RECOMMENDED_DUE_DATE.
 
@@ -1656,6 +1666,8 @@ parameters:
               - SelfCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was self-calibrated. Example: "2018-05-20T00:00:00Z"
 
               - SupportsExternalCalibration: Boolean flag specifying whether the asset supports external calibration.
+
+              - CustomCalibrationInterval: Integer representing the custom calibration interval, in months.
               
               - CalibrationStatus: String enumeration representing the calibration status of an asset. Possible values are: OK, APPROACHING_RECOMMENDED_DUE_DATE, PAST_RECOMMENDED_DUE_DATE.
 
