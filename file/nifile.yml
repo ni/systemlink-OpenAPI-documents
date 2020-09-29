@@ -120,6 +120,10 @@ definitions:
         description: The file's ID within the service group
         type: string
         example: '5afb2ce3741fe11d88838cc9'
+      path:
+        description: The path to the file on the server.  This field is returned only if the user has associated privileges to view file paths.
+        type: string
+        example: 'C:\temp\4afb2ce3741fe11d88838cc9.txt'
       properties:
         description: The file's properties
         type: object
