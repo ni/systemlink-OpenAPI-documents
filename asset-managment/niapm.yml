@@ -484,6 +484,10 @@ definitions:
             description: Whether this asset is an NI asset (true) or a third-party asset (false).
             type: boolean
             example: true
+          workspace:
+            type: string
+            description: The ID of the workspace containing the asset.
+            example: '5bc5e9092a4fa4c71cfa7197'
   AssetCreateModel:
     title: Asset Create Model
     description: >-
@@ -502,10 +506,6 @@ definitions:
             $ref: '#/definitions/AssetLocationWithPresenceModel'
           externalCalibration:
             $ref: '#/definitions/ExternalCalibrationWithChecksumModel'
-          workspace:
-            type: string
-            description: The ID of the workspace containing the asset.
-            example: '5bc5e9092a4fa4c71cfa7197'
   AssetUpdateModel:
     title: Asset Update Model
     description: >-
@@ -547,10 +547,6 @@ definitions:
             example: true
           externalCalibration:
             $ref: '#/definitions/ExternalCalibrationModel'
-          workspace:
-            type: string
-            description: The ID of the workspace containing the asset.
-            example: '5bc5e9092a4fa4c71cfa7197'
           properties:
             description: Key-value-pair metadata associated with an asset.
             type: object
