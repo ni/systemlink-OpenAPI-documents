@@ -252,6 +252,7 @@ definitions:
       - ARM
       - X64
       - X86
+      - ANY
     example: ARM
 
   StateDistribution:
@@ -262,6 +263,7 @@ definitions:
       - NI_LINUXRT
       - NI_LINUXRT_NXG
       - WINDOWS
+      - ANY
     example: NI_LINUXRT
 
   StateMetadata:
