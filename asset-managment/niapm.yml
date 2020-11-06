@@ -108,6 +108,13 @@ definitions:
             $ref: '#/definitions/Operation'
           deleteAssets:
             $ref: '#/definitions/Operation'
+  DiscoveryType:
+    title: Discovery Type
+    description: Indicates how the asset was discovered. "Automatic" indicates that SystemLink discovered the asset. "Manual" indicates that the asset was discovered using other methods.
+    type: string
+    enum:
+      - Automatic
+      - Manual
   BusType:
     title: Bus Type
     description: All supported bus types for an asset.
@@ -547,6 +554,8 @@ definitions:
             example: true
           externalCalibration:
             $ref: '#/definitions/ExternalCalibrationModel'
+          discoveryType:
+            $ref: '#/definitions/DiscoveryType'
           properties:
             description: Key-value-pair metadata associated with an asset.
             type: object
