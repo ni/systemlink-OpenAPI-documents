@@ -513,6 +513,19 @@ definitions:
             $ref: '#/definitions/AssetLocationWithPresenceModel'
           externalCalibration:
             $ref: '#/definitions/ExternalCalibrationWithChecksumModel'
+          properties:
+            description: Key-value-pair metadata associated with an asset.
+            type: object
+            additionalProperties:
+              type: string
+            example:
+              Key1: Value1
+          keywords:
+            description: Words or phrases associated with an asset.
+            type: array
+            items:
+              type: string
+              example: Keyword1
   AssetUpdateModel:
     title: Asset Update Model
     description: >-
@@ -533,6 +546,19 @@ definitions:
             $ref: '#/definitions/AssetLocationWithPresenceModel'
           externalCalibration:
             $ref: '#/definitions/ExternalCalibrationWithChecksumModel'
+          properties:
+            description: Key-value-pair metadata associated with an asset.
+            type: object
+            additionalProperties:
+              type: string
+            example:
+              Key1: Value1
+          keywords:
+            description: Words or phrases associated with an asset.
+            type: array
+            items:
+              type: string
+              example: Keyword1
   AssetModel:
     title: Asset Model
     description: An object describing an asset with all of its properties.
