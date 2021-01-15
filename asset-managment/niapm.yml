@@ -1016,6 +1016,28 @@ parameters:
           type: array
           items:
             $ref: '#/definitions/AvailabilityTimeInterval'
+  QueryAssetsAvailabilityReportRequestBody:
+    in: body
+    name: queryAssetsAvailabilityReport
+    description: Request body containing a list of asset identifiers and a list of time intervals.
+    schema:
+      title: Query Assets Availability Report Request Body
+      type: object
+      required:
+        - ids
+        - intervals
+      properties:
+        ids:
+          description: Multiple asset identifiers for which the availability data is retrieved.
+          type: array
+          items:
+            type: string
+          example: ["29162;01B245D6;4243;0", "29162;01B245D6;4243;1"]
+        intervals:
+          description: Time intervals for which the availability data is retrieved.
+          type: array
+          items:
+            $ref: '#/definitions/AvailabilityTimeInterval'
   DeleteAssetsRequestBody:
     in: body
     name: deleteAssets
@@ -1149,7 +1171,7 @@ parameters:
 
             - It determines the type of the report. When true, the file will be a calibration report. If this is false, the file will be an asset report. 
             
-            - If asset ids are in the request, this property will not be used for filtering. If no asset ids are in the request, setting this property to true will generate a report only for the calibrated assets.
+            - If asset IDs are in the request, this property will not be used for filtering. If no asset IDs are in the request, setting this property to true will generate a report only for the calibrated assets.
           
           type: boolean
           default: false
@@ -1887,10 +1909,10 @@ responses:
           type: integer
           example: 17
   DeleteAssetsResponse:
-    description: Delete Assets Response containing the ids of the assets which were deleted, the ids of the assets which failed to be deleted and any errors encountered.
+    description: Delete Assets Response containing the IDs of the assets which were deleted, the IDs of the assets which failed to be deleted and any errors encountered.
     schema:
       title: Delete Assets Response
-      description: Delete Assets Response containing the ids of the assets which were deleted, the ids of the assets which failed to be deleted and any errors encountered.
+      description: Delete Assets Response containing the IDs of the assets which were deleted, the IDs of the assets which failed to be deleted and any errors encountered.
       type: object
       required:
         - ids
@@ -2500,7 +2522,7 @@ paths:
     post:
       tags: [assets]
       summary: Query assets
-      description: Returns the assets satisfying the provided filtering criteria. If the the caller requests a JSON inline response, the returned assets are filtered based on the filter string and the ids and calibratableOnly properties are not taken into consideration. When the caller requests a CSV response, the filter is not taken into consideration, but the ids and calibratableOnly properties are used to filter the assets from the response.
+      description: Returns the assets satisfying the provided filtering criteria. If the the caller requests a JSON inline response, the returned assets are filtered based on the filter string and the IDs and calibratableOnly properties are not taken into consideration. When the caller requests a CSV response, the filter is not taken into consideration, but the IDs and calibratableOnly properties are used to filter the assets from the response.
       operationId: query-assets
       x-ni-auth: true
       parameters:
@@ -2821,7 +2843,7 @@ paths:
         - $ref: '#/parameters/QueryAssetsAvailabilityRequestBody'
       responses:
         200:
-          description: Query assets availability response containing information about the availability of the assets specified by their ids during the given time intervals.
+          description: Query Assets Availability response containing information about the availability of the assets specified by their IDs during the given time intervals.
           schema:
             title: Query Assets Availability Response
             description: Query assets availability response containing availability history for the requested assets. If availability history could not be resolved for some assets, the response contains error information on the assets which could not be resolved.
@@ -2839,6 +2861,33 @@ paths:
                   example: [ "13562;01B245D6;4243;0" ]
               error:
                 $ref: '#/definitions/Error'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/history/report/query-assets-availability:
+    post:
+      tags: [reports]
+      summary: Gets an asset availability history report for multiple assets.
+      description: Gets a CSV file report conatining asset availability history for multiple assets based on the specified timespans.
+      operationId: query-assets-availability-report
+      x-ni-auth: true
+      parameters:
+        - $ref: '#/parameters/QueryAssetsAvailabilityReportRequestBody'
+      responses:
+        200:
+          description: A CSV file report conatining the asset availability history of the assets specified by their IDs during the given time intervals.
+          schema:
+            type: file
+            example: "Asset Id,Asset Name,Start Date,End Date,System Alias,Availability Percentage\n0030b58e-4e1a-47ea-9e1e-d60ba3341551,PXI3Slot7,2020-11-10 00:00:00Z,2021-01-06 00:00:00Z,NI_PXIe-8133_Embedded_Controller--MAC-00-80-2F-14-2C-06,0.0815299529054917"
+          headers:
+            X-Not-Found-Resources:
+              description: The IDs of the resources that were not found.
+              type: array
+              items:
+                type: string
         400:
           $ref: '#/responses/BadRequest'
         401:
