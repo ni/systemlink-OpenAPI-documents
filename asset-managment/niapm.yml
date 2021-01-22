@@ -2051,7 +2051,7 @@ responses:
     description: Asset summary response containing the count of active assets, inactive assets and the total number of assets.
     schema:
       title: Asset Summary Response
-      description: Asset summary response containing the total number of assets, the number of assets which are active, i.e. present in a connected system, and the number of assets which are not active.
+      description: Response containing the total number of assets, the number of assets which are active (present in a connected system), and the number of assets which are not active. Also returns the number of assets that are in use and the number of assets that are not in use.
       type: object
       properties:
         active:
@@ -2066,6 +2066,14 @@ responses:
           description: Total number of managed assets.
           type: integer
           example: 17
+        inUse:
+          description: Total number of used assets.
+          type: integer
+          example: 10
+        notInUse:
+          description: Total number of unused assets.
+          type: integer
+          example: 7
   DeleteAssetsResponse:
     description: Delete Assets Response containing the IDs of the assets which were deleted, the IDs of the assets which failed to be deleted and any errors encountered.
     schema:
