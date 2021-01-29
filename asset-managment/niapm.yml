@@ -884,15 +884,14 @@ definitions:
     x-example: 0
   Take:
     description:
-      How many resources to return in the result, or -1 to use a default
-      defined by the service. The maximum value for Take is 1000.
+      How many resources to return in the result, or -1 to take all.
+      The default is 1000.
       For example, a list of 100 resources with a take value of 25 will return
       entries 1 through 25.
     type: integer
     default: 1000
     example: 1000
     x-example: 1000
-    maximum: 1000
   UtilizationTimeIntervalModel:
     title:  Utilization Time Interval
     description: Time interval for which to retrieve asset/system utilization.
@@ -949,14 +948,13 @@ parameters:
     in: query
     name: take
     description:
-      How many resources to return in the result, or -1 to use a default
-      defined by the service. The maximum value for Take is 1000.
+      How many resources to return in the result, or -1 to take all.
+      The default is 1000.
       For example, a list of 100 resources with a take value of 25 will return
       entries 1 through 25.
     type: integer
     default: 1000
     x-example: 1000
-    maximum: 1000
   AssetAvailabilityComparison:
     in: body
     name: compareAvailability
