@@ -513,6 +513,8 @@ definitions:
             $ref: '#/definitions/AssetLocationWithPresenceModel'
           externalCalibration:
             $ref: '#/definitions/ExternalCalibrationWithChecksumModel'
+          discoveryType:
+            $ref: '#/definitions/DiscoveryType'
           properties:
             description: Key-value-pair metadata associated with an asset.
             type: object
