@@ -117,7 +117,10 @@ definitions:
       setPoints:
         description: Values compared against the tag's current value to determine whether or not the condition
           is true. Conditions associated with the IN_RANGE and OUT_OF_RANGE comparators will have two set
-          points. All other conditions should have only one set point.
+          points. All other conditions should have only one set point. For tags of the DATE_TIME type, a timespan
+          (for example, "01:00:00") is a valid value and represents a time interval relative to the server's current
+          time when the rule is evaluated. Positive timespans represent times in the future, and negative timespans
+          represent times in the past.
         type: array
         items:
           type: string
