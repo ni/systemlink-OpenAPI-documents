@@ -113,8 +113,8 @@ definitions:
     description: Indicates how the asset was discovered. "Automatic" indicates that SystemLink discovered the asset. "Manual" indicates that the asset was discovered using other methods.
     type: string
     enum:
-      - Automatic
       - Manual
+      - Automatic
   BusType:
     title: Bus Type
     description: All supported bus types for an asset.
