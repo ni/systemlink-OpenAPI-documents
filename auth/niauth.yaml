@@ -409,6 +409,21 @@ paths:
         default:
           $ref: '#/responses/Error'
 
+  /user:
+    get:
+      tags:
+        - user
+      summary: Authenticates API Keys
+      description: Authenticates the given x-ni-api-key and returns information about the caller
+      operationId: user
+      responses:
+        200:
+          $ref: '#/responses/UserResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+
 definitions:
   AuthStatement:
     type: object
@@ -728,6 +743,36 @@ definitions:
       message: There has been an error with your request
       args: []
       innerErrors: []
+      
+  UserPolicy:
+    type: object
+    title: User Policy
+    description: A policy defines what a user or device is allowed to do
+    properties:
+      id: 
+        description: The identifier of a policy
+        type: string
+      name:
+        description: The policy name
+        type: string
+      templateId: 
+        description: The identifier of a policy template
+        type: string
+      workspaceId: 
+        description: The identifier of a workspace
+        type: string
+      
+  UserPolicyTemplate:
+    type: object
+    title: User Policy Template
+    description: A policy template defines what a user or device is allowed to do but is not bound to a workspace. When the template is referenced by a policy, the connection between the actions and the workspace is created.
+    properties:
+      id: 
+        description: The identifier of a policy template
+        type: string
+      name:
+        description: The policy template name
+        type: string
 
 parameters:
   KeyId:
@@ -1113,3 +1158,26 @@ responses:
     description: Update Policy Template Response
     schema:
       $ref: '#/definitions/PolicyTemplate'
+
+  UserResponse:
+    description: User Response
+    schema:
+      type: object
+      title: User Response
+      properties:
+        user:
+          $ref: '#/definitions/User'
+        org:
+          $ref: '#/definitions/Org'
+        workspaces:
+          type: array
+          items:
+            $ref: '#/definitions/Workspace'
+        policies:
+          type: array
+          items:
+            $ref: '#/definitions/UserPolicy'
+        policyTemplates:
+          type: array
+          items:
+            $ref: '#/definitions/UserPolicyTemplate'
