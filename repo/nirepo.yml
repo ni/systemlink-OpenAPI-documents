@@ -936,7 +936,7 @@ paths:
           description: The request encountered an error.
         default:
           $ref: '#/definitions/Error'
-  /v1/files:
+  /v1/files/{pathToFile}:
     parameters:
       - in: path
         name: pathToFile
