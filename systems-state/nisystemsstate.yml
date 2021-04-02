@@ -252,6 +252,7 @@ definitions:
       - ARM
       - X64
       - X86
+      - ANY
     example: ARM
 
   StateDistribution:
@@ -262,6 +263,7 @@ definitions:
       - NI_LINUXRT
       - NI_LINUXRT_NXG
       - WINDOWS
+      - ANY
     example: NI_LINUXRT
 
   StateMetadata:
@@ -369,6 +371,8 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Feed'
+      systemImage:
+          $ref: '#/definitions/SystemImage'
       packages:
         type: array
         items:
@@ -404,6 +408,8 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Feed'
+      systemImage:
+        $ref: '#/definitions/SystemImage'
       packages:
         type: array
         items:
@@ -456,6 +462,8 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Feed'
+      systemImage:
+        $ref: '#/definitions/SystemImage'
       packages:
         type: array
         items:
@@ -545,6 +553,27 @@ definitions:
       url: ni.com
       compressed: true
 
+  SystemImage:
+    description: Object defining a system image containing the name, version and optionally if the image should be reinstalled if it is already installed.
+    type: object
+    properties:
+      name:
+        type: string
+        description: Name of the system image.
+      version:
+        type: string
+        description: Version of the system image.
+      reinstall:
+        type: boolean
+        description: Whether the image should be reinstalled if it is already installed.
+        default: false
+    required:
+      - name
+      - version
+    example:
+      name: dist-nilrt-grub
+      version: '20.5.0'
+
   Package:
     description: Object defining a package containing the name and version.
     type: object
@@ -561,6 +590,7 @@ definitions:
         default: true
     required:
       - name
+      - version
     example:
       name: vim
       version: '7.1'
