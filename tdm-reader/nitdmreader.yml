@@ -426,43 +426,46 @@ definitions:
         description: Total number of names. This might be more than the number of names in the list.
         example: 1
   FileInformation:
+    type: object
+    properties:
+      fileId:
+        type: string
+        description: File ID
+        example: "5b8453dba8808c22b0f99023"
+      properties:
+        $ref: '#/definitions/Properties'
+      groups:
+        type: array
+        items:
+          properties:
+            name:
+              type: string
+              description: Group name
+              example: Group 1
+            properties:
+              $ref: '#/definitions/Properties'
+            channels:
+              type: array
+              items:
+                properties:
+                  name:
+                    type: string
+                    description: Channel name
+                    example: Channel 1
+                  dataCount:
+                    type: number
+                    description: Number of data points in the channel
+                    example: 1
+                  dataType:
+                    type: string
+                    description: Data type of this channel
+                    example: String
+                  properties:
+                    $ref: '#/definitions/Properties'
+  FileInformationList:
     type: array
     items:
-      properties:
-        fileId:
-          type: string
-          description: File ID
-          example: "5b8453dba8808c22b0f99023"
-        properties:
-          $ref: '#/definitions/Properties'
-        groups:
-          type: array
-          items:
-            properties:
-              name:
-                type: string
-                description: Group name
-                example: Group 1
-              properties:
-                $ref: '#/definitions/Properties'
-              channels:
-                type: array
-                items:
-                  properties:
-                    name:
-                      type: string
-                      description: Channel name
-                      example: Channel 1
-                    dataCount:
-                      type: number
-                      description: Number of data points in the channel
-                      example: 1
-                    dataType:
-                      type: string
-                      description: Data type of this channel
-                      example: String
-                    properties:
-                      $ref: '#/definitions/Properties'
+      $ref: '#/definitions/FileInformation'
 paths:
   /:
     get:
@@ -555,7 +558,7 @@ paths:
         200:
           description: OK
           schema:
-            $ref: '#/definitions/FileInformation'
+            $ref: '#/definitions/FileInformationList'
         default:
           description: Error
           schema:
@@ -582,7 +585,7 @@ paths:
         200:
           description: OK
           schema:
-            $ref: '#/definitions/FileInformation'
+            $ref: '#/definitions/FileInformationList'
         default:
           description: Error
           schema:
