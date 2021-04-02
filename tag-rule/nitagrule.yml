@@ -117,7 +117,10 @@ definitions:
       setPoints:
         description: Values compared against the tag's current value to determine whether or not the condition
           is true. Conditions associated with the IN_RANGE and OUT_OF_RANGE comparators will have two set
-          points. All other conditions should have only one set point.
+          points. All other conditions should have only one set point. For tags of the DATE_TIME type, a timespan
+          (for example, "01:00:00") is a valid value and represents a time interval relative to the server's current
+          time when the rule is evaluated. Positive timespans represent times in the future, and negative timespans
+          represent times in the past. The expected timespan format is `[-]d.hh:mm:ss.ff`.
         type: array
         items:
           type: string
@@ -156,9 +159,11 @@ definitions:
   TagDataType:
     title: Tag Data Type
     description: The data type of the tags which a rule applies to. Rules are only evaluated
-      against tags whose data type matches their *tagDataType*.
+      against tags whose data type matches their *tagDataType*. For the TAG_TIME type, rules are
+      evaluated against a tag's last updated time rather than its value. These rules will match tags
+      of any data type.
     type: string
-    enum: [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME]
+    enum: [DOUBLE, INT, STRING, BOOLEAN, U_INT64, DATE_TIME, TAG_TIME]
     example: DOUBLE
   Conditions:
     description: Array containing one or more conditions which control when a rule creates or clears alarms.

@@ -772,6 +772,17 @@ definitions:
           dictParam:
             key1: val1
             key2: val2
+      metadata:
+        description: >-
+          Metadata associated with the notebook, at time of execution.
+        type: object
+        additionalProperties:
+          type: object
+        example:
+          metadataString: 'my metadata string value'
+          metadataDict:
+            key1: val1
+            key2: val2
       executionHash:
         description: >-
           Execution hashes are used internally to identify a distinct execution, where if this

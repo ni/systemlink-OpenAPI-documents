@@ -108,6 +108,13 @@ definitions:
             $ref: '#/definitions/Operation'
           deleteAssets:
             $ref: '#/definitions/Operation'
+  DiscoveryType:
+    title: Discovery Type
+    description: Indicates how the asset was discovered. "Automatic" indicates that SystemLink discovered the asset. "Manual" indicates that the asset was discovered using other methods.
+    type: string
+    enum:
+      - Manual
+      - Automatic
   BusType:
     title: Bus Type
     description: All supported bus types for an asset.
@@ -189,6 +196,7 @@ definitions:
           date: '2018-05-07T18:58:05.000Z'
           recommendedInterval: 12
           nextRecommendedDate: '2019-05-07T18:58:05.000Z'
+          nextCustomDueDate: '2019-06-07T18:58:05.000Z'
           comments: 'This is a comment.'
           entryType: MANUAL
           operator:
@@ -365,6 +373,11 @@ definitions:
         type: string
         format: date-time
         example: '2019-05-07T18:58:05.219692Z'
+      nextCustomDueDate:
+        description: ISO-8601 formatted timestamp specifying the date for the next external calibration.
+        type: string
+        format: date-time
+        example: '2019-06-07T18:58:05.219692Z'
       comments:
         description: Calibration comments provided by an operator.
         type: string
@@ -377,6 +390,7 @@ definitions:
       date: '2018-05-07T18:58:05.000Z'
       recommendedInterval: 12
       nextRecommendedDate: '2019-05-07T18:58:05.000Z'
+      nextCustomDueDate: '2019-06-07T18:58:05.000Z'
       comments: 'This is a comment.'
   ExternalCalibrationModel:
     title: External Calibration
@@ -397,6 +411,7 @@ definitions:
           date: '2018-05-07T18:58:05.000Z'
           recommendedInterval: 12
           nextRecommendedDate: '2019-05-07T18:58:05.000Z'
+          nextCustomDueDate: '2019-06-07T18:58:05.000Z'
           comments: 'This is a comment.'
           entryType: MANUAL
           operator:
@@ -421,6 +436,7 @@ definitions:
           date: '2018-05-07T18:58:05.000Z'
           recommendedInterval: 12
           nextRecommendedDate: '2019-05-07T18:58:05.000Z'
+          nextCustomDueDate: '2019-06-07T18:58:05.000Z'
           comments: 'This is a comment.'
           entryType: MANUAL
           operator:
@@ -465,12 +481,20 @@ definitions:
             description: Whether the asset supports external calibration.
             type: boolean
             example: true
+          customCalibrationInterval:
+            description: The interval represented in months used for computing calibration due date. If not set, the recommended calibration interval from the calibration model is used.
+            type: integer
+            example: 24
           selfCalibration:
             $ref: '#/definitions/SelfCalibrationModel'
           isNIAsset:
             description: Whether this asset is an NI asset (true) or a third-party asset (false).
             type: boolean
             example: true
+          workspace:
+            type: string
+            description: The ID of the workspace containing the asset.
+            example: '5bc5e9092a4fa4c71cfa7197'
   AssetCreateModel:
     title: Asset Create Model
     description: >-
@@ -489,6 +513,21 @@ definitions:
             $ref: '#/definitions/AssetLocationWithPresenceModel'
           externalCalibration:
             $ref: '#/definitions/ExternalCalibrationWithChecksumModel'
+          discoveryType:
+            $ref: '#/definitions/DiscoveryType'
+          properties:
+            description: Key-value-pair metadata associated with an asset.
+            type: object
+            additionalProperties:
+              type: string
+            example:
+              Key1: Value1
+          keywords:
+            description: Words or phrases associated with an asset.
+            type: array
+            items:
+              type: string
+              example: Keyword1
   AssetUpdateModel:
     title: Asset Update Model
     description: >-
@@ -509,6 +548,19 @@ definitions:
             $ref: '#/definitions/AssetLocationWithPresenceModel'
           externalCalibration:
             $ref: '#/definitions/ExternalCalibrationWithChecksumModel'
+          properties:
+            description: Key-value-pair metadata associated with an asset.
+            type: object
+            additionalProperties:
+              type: string
+            example:
+              Key1: Value1
+          keywords:
+            description: Words or phrases associated with an asset.
+            type: array
+            items:
+              type: string
+              example: Keyword1
   AssetModel:
     title: Asset Model
     description: An object describing an asset with all of its properties.
@@ -530,10 +582,8 @@ definitions:
             example: true
           externalCalibration:
             $ref: '#/definitions/ExternalCalibrationModel'
-          workspace:
-            type: string
-            description: The ID of the workspace.
-            example: '5bc5e9092a4fa4c71cfa7197'
+          discoveryType:
+            $ref: '#/definitions/DiscoveryType'
           properties:
             description: Key-value-pair metadata associated with an asset.
             type: object
@@ -836,15 +886,14 @@ definitions:
     x-example: 0
   Take:
     description:
-      How many resources to return in the result, or -1 to use a default
-      defined by the service. The maximum value for Take is 1000.
+      How many resources to return in the result, or -1 to take all.
+      The default is 1000.
       For example, a list of 100 resources with a take value of 25 will return
       entries 1 through 25.
     type: integer
-    default: -1
-    example: -1
-    x-example: -1
-    maximum: 1000
+    default: 1000
+    example: 1000
+    x-example: 1000
   UtilizationTimeIntervalModel:
     title:  Utilization Time Interval
     description: Time interval for which to retrieve asset/system utilization.
@@ -901,14 +950,13 @@ parameters:
     in: query
     name: take
     description:
-      How many resources to return in the result, or -1 to use a default
-      defined by the service. The maximum value for Take is 1000.
+      How many resources to return in the result, or -1 to take all.
+      The default is 1000.
       For example, a list of 100 resources with a take value of 25 will return
       entries 1 through 25.
     type: integer
-    default: -1
-    x-example: -1
-    maximum: 1000
+    default: 1000
+    x-example: 1000
   AssetAvailabilityComparison:
     in: body
     name: compareAvailability
@@ -952,6 +1000,28 @@ parameters:
     description: Request body containing a list of asset identifiers and a list of time intervals.
     schema:
       title: Query Assets Availability Request Body
+      type: object
+      required:
+        - ids
+        - intervals
+      properties:
+        ids:
+          description: Multiple asset identifiers for which the availability data is retrieved.
+          type: array
+          items:
+            type: string
+          example: ["29162;01B245D6;4243;0", "29162;01B245D6;4243;1"]
+        intervals:
+          description: Time intervals for which the availability data is retrieved.
+          type: array
+          items:
+            $ref: '#/definitions/AvailabilityTimeInterval'
+  QueryAssetsAvailabilityReportRequestBody:
+    in: body
+    name: queryAssetsAvailabilityReport
+    description: Request body containing a list of asset identifiers and a list of time intervals.
+    schema:
+      title: Query Assets Availability Report Request Body
       type: object
       required:
         - ids
@@ -1032,14 +1102,14 @@ parameters:
   ExternalCalibrationRequestBody:
     in: body
     name: externalCalibrationRequestBody
-    description: Request body containing data to create a new external calibration entry for a third-party asset.
+    description: Request body containing data to create a new external calibration entry for an asset.
     schema:
       title: Post External Calibration Request
-      description: Request body containing data to create a new external calibration entry for a third-party asset.
+      description: Request body containing data to create a new external calibration entry for an asset.
       type: object
       properties:
         externalCalibration:
-          $ref: '#/definitions/ExternalCalibrationBaseModel'
+          $ref: '#/definitions/ExternalCalibrationWithChecksumModel'
   UpdateMetadata:
     in: body
     name: updateMetadata
@@ -1068,6 +1138,164 @@ parameters:
             type: string
           example:
             Key1: Value1
+  QueryInUseAssetsRequest:
+    in: body
+    name: queryInUseAssets
+    description: Request body consisting of filters to apply when retrieving assets currently being utilized.
+    schema:
+      title: Query In Use Assets Request
+      description: Object containing filters to apply when retrieving utilized assets.
+      type: object
+      properties:
+        assetFilter:
+          description: >-
+            The filter criteria for assets. Consists of a string of queries composed using AND/OR operators.
+            String values and date strings need to be enclosed in double quotes.
+            Parenthesis can be used around filters to better define the order of operations.
+
+            Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+
+
+            Operators:
+
+            - Equals operator '='. Example: 'x = y'
+
+            - Not equal operator '!='. Example: 'x != y'
+
+            - Greater than operator '>'. Example: 'x > y'
+
+            - Greater than or equal operator '>='. Example: 'x >= y'
+
+            - Less than operator '<'. Example: 'x < y'
+
+            - Less than or equal operator '<='. Example: 'x <= y'
+
+            - Logical AND operator 'and'. Example: 'x and y'
+
+            - Logical OR operator 'or'. Example: 'x or y'
+
+            - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
+
+            - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
+
+
+            Valid asset properties that can be used in the filter:
+
+            - AssetIdentifier: String representing the unique identifier of an asset.
+
+            - SerialNumber: String representing the serial number of an asset.
+
+            - ModelName: String representing the model name of an asset.
+
+            - ModelNumber: Unsigned integer representing the model number of an asset.
+
+            - VendorName: String representing the vendor name of an asset.
+
+            - VendorNumber: Unsigned integer representing the vendor number of an asset.
+
+            - AssetName: String representing the asset name.
+
+            - FirmwareVersion: String representing the firmware version of an asset.
+
+            - HardwareVersion: String representing the hardware version of an asset.
+
+            - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE.
+
+            - IsNIAsset: Boolean flag specifying whether the asset is an NI asset or a third-party asset.
+
+            - Keywords: Collection of string values representing asset metadata keywords. Example: 'Keywords=["keyword1", "keyword2"]'.
+
+            - Properties: Collection of key-value pairs, each key-value pair representing an asset metadata property. Example: 'Properties=["key1":"value1", "key2":"value2"]'.
+
+            - Location.MinionId: String representing the identifier of the minion in which the asset is located in.
+
+            - Location.SystemName: String representing the name of the system that the asset is located in.
+
+            - Location.SlotNumber: Unsigned integer representing the slot number the asset is located in.
+
+            - Location.AssetState.SystemConnection: String enumeration representing the connection state of the system the asset is currently located in. Possible values are: APPROVED, DISCONNECTED, CONNECTED_UPDATE_PENDING, CONNECTED_UPDATE_SUCCESSFUL, CONNECTED_UPDATE_FAILED, UNSUPPORTED, ACTIVATED.
+
+            - Location.AssetState.AssetPresence: String enumeration representing the present status of an asset in a system. Possible values are: INITIALIZING, UNKNOWN, NOT_PRESENT, PRESENT.
+
+            - SupportsSelfCalibration: Boolean flag specifying whether the asset supports self-calibration.
+
+            - SelfCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was self-calibrated. Example: "2018-05-20T00:00:00Z"
+
+            - SupportsExternalCalibration: Boolean flag specifying whether the asset supports external calibration.
+
+            - CustomCalibrationInterval: Integer representing the custom calibration interval, in months.
+
+            - CalibrationStatus: String enumeration representing the calibration status of an asset. Possible values are: OK, APPROACHING_RECOMMENDED_DUE_DATE, PAST_RECOMMENDED_DUE_DATE.
+
+            - ExternalCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was externally-calibrated. Example: "2018-05-20T00:00:00Z"
+
+            - ExternalCalibration.NextRecommendedDate: ISO-8601 formatted timestamp string specifying the recommended date for the next external calibration. Example: "2018-05-20T00:00:00Z"
+
+            - ExternalCalibration.RecommendedInterval: Integer representing the manufacturer-recommended calibration interval, in months.
+
+            - ExternalCalibration.Comments: String representing any external calibration comments.
+
+            - ExternalCalibration.IsLimited: Boolean flag specifying whether the last external calibration was a limited calibration.
+
+            - ExternalCalibration.Operator.DisplayName: String representing the name of the operator which performed an external calibration on a third-party asset.
+          type: string
+          example: IsSystemController = True
+        utilizationFilter:
+          description: >-
+            The filter criteria for asset utilization. Consists of a string of queries composed using AND/OR operators.
+            String values and date strings need to be enclosed in double quotes.
+            Parenthesis can be used around filters to better define the order of operations.
+
+            Filter syntax: '[property name][operator][operand] and [property name][operator][operand]'
+
+
+            Operators:
+
+            - Equals operator '='. Example: 'x = y'
+
+            - Not equal operator '!='. Example: 'x != y'
+
+            - Greater than operator '>'. Example: 'x > y'
+
+            - Greater than or equal operator '>='. Example: 'x >= y'
+
+            - Less than operator '<'. Example: 'x < y'
+
+            - Less than or equal operator '<='. Example: 'x <= y'
+
+            - Logical AND operator 'and'. Example: 'x and y'
+
+            - Logical OR operator 'or'. Example: 'x or y'
+
+            - Contains operator '.Contains()', used to check whether a string contains another string. Example: 'x.Contains(y)'
+
+            - Does not contain operator '!.Contains()', used to check whether a string does not contain another string. Example: '!x.Contains(y)'
+
+
+            Valid asset utilization properties that can be used in the filter:
+
+            - MinionId:  String representing the identifier of a minion in which an asset might be located in.
+
+            - Category: String representing the utilization task category.
+
+            - UserName: : String representing the name of the operator who utilized the asset.
+          type: string
+          example: Category = "Test"
+        skip:
+          description:
+            The number of resources to skip in the result when paging.
+            For example, a list of 100 resources with a skip value of 50 will return
+            entries 51 through 100.
+          type: integer
+          default: 0
+          example: 0
+        take:
+          description: The maximum number of asset utilization history records to return.
+          type: integer
+          format: int32
+          default: 1000
+          minimum: 0
+          example: 1000
   QueryAssetsRequest:
     in: body
     name: queryAssets
@@ -1101,7 +1329,7 @@ parameters:
 
             - It determines the type of the report. When true, the file will be a calibration report. If this is false, the file will be an asset report. 
             
-            - If asset ids are in the request, this property will not be used for filtering. If no asset ids are in the request, setting this property to true will generate a report only for the calibrated assets.
+            - If asset IDs are in the request, this property will not be used for filtering. If no asset IDs are in the request, setting this property to true will generate a report only for the calibrated assets.
           
           type: boolean
           default: false
@@ -1181,6 +1409,8 @@ parameters:
 
             - SupportsExternalCalibration: Boolean flag specifying whether the asset supports external calibration.
 
+            - CustomCalibrationInterval: Integer representing the custom calibration interval, in months.
+
             - CalibrationStatus: String enumeration representing the calibration status of an asset. Possible values are: OK, APPROACHING_RECOMMENDED_DUE_DATE, PAST_RECOMMENDED_DUE_DATE.
 
             - ExternalCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was externally-calibrated. Example: "2018-05-20T00:00:00Z"
@@ -1195,7 +1425,7 @@ parameters:
 
             - ExternalCalibration.Operator.DisplayName: String representing the name of the operator which performed an external calibration on a third-party asset.
           type: string
-          example: IsSystemController = true
+          example: IsSystemController = True
   QueryHistoryRequestBody:
     in: body
     name: queryHistory
@@ -1336,6 +1566,8 @@ parameters:
               - SelfCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was self-calibrated. Example: "2018-05-20T00:00:00Z"
               
               - SupportsExternalCalibration: Boolean flag specifying whether the asset supports external calibration.
+
+              - CustomCalibrationInterval: Integer representing the custom calibration interval, in months.
               
               - CalibrationStatus: String enumeration representing the calibration status of an asset. Possible values are: OK, APPROACHING_RECOMMENDED_DUE_DATE, PAST_RECOMMENDED_DUE_DATE.
 
@@ -1484,6 +1716,8 @@ parameters:
               - SelfCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was self-calibrated. Example: "2018-05-20T00:00:00Z"
               
               - SupportsExternalCalibration: Boolean flag specifying whether the asset supports external calibration.
+
+              - CustomCalibrationInterval: Integer representing the custom calibration interval, in months.
               
               - CalibrationStatus: String enumeration representing the calibration status of an asset. Possible values are: OK, APPROACHING_RECOMMENDED_DUE_DATE, PAST_RECOMMENDED_DUE_DATE.
 
@@ -1647,6 +1881,8 @@ parameters:
               - SelfCalibration.CalibrationDate: ISO-8601 formatted timestamp string specifying the last date the asset was self-calibrated. Example: "2018-05-20T00:00:00Z"
 
               - SupportsExternalCalibration: Boolean flag specifying whether the asset supports external calibration.
+
+              - CustomCalibrationInterval: Integer representing the custom calibration interval, in months.
               
               - CalibrationStatus: String enumeration representing the calibration status of an asset. Possible values are: OK, APPROACHING_RECOMMENDED_DUE_DATE, PAST_RECOMMENDED_DUE_DATE.
 
@@ -1815,7 +2051,7 @@ responses:
     description: Asset summary response containing the count of active assets, inactive assets and the total number of assets.
     schema:
       title: Asset Summary Response
-      description: Asset summary response containing the total number of assets, the number of assets which are active, i.e. present in a connected system, and the number of assets which are not active.
+      description: Response containing the total number of assets, the number of assets which are active (present in a connected system), and the number of assets which are not active. Also returns the number of assets that are in use and the number of assets that are not in use.
       type: object
       properties:
         active:
@@ -1830,11 +2066,19 @@ responses:
           description: Total number of managed assets.
           type: integer
           example: 17
+        inUse:
+          description: Total number of used assets.
+          type: integer
+          example: 10
+        notInUse:
+          description: Total number of unused assets.
+          type: integer
+          example: 7
   DeleteAssetsResponse:
-    description: Delete Assets Response containing the ids of the assets which were deleted, the ids of the assets which failed to be deleted and any errors encountered.
+    description: Delete Assets Response containing the IDs of the assets which were deleted, the IDs of the assets which failed to be deleted and any errors encountered.
     schema:
       title: Delete Assets Response
-      description: Delete Assets Response containing the ids of the assets which were deleted, the ids of the assets which failed to be deleted and any errors encountered.
+      description: Delete Assets Response containing the IDs of the assets which were deleted, the IDs of the assets which failed to be deleted and any errors encountered.
       type: object
       required:
         - ids
@@ -1955,7 +2199,7 @@ responses:
         error:
           $ref: '#/definitions/Error'
   SendToFileIngestionOrDownloadResponse:
-    description: Response for the query operation that consists either in the file information for when the result was sent to the file ingestion service or the report file content for download. In the latter case, the name of the file is provided in the header of the resonse with key='Filename'.
+    description: Response for the query operation that consists either in the file information for when the result was sent to the file ingestion service or the report file content for download. In the latter case, the name of the file is provided in the header of the response with key='Filename'.
     schema:
       title: Send to File Ingestion Or Download Response
       description: Response for the query that consists in the file information for when the result was sent to the file ingestion service or the CSV file content for download.
@@ -2294,7 +2538,7 @@ paths:
       tags: [assets]
       summary: Gets assets
       description: >-
-        Gets a list of assets. Calibrated assets can be obtained by setting calibratableOnly=true. To obtain a report of the assets, reponseFormat=csv&destination=download should be sent as query parameters.
+        Gets a list of assets. Calibrated assets can be obtained by setting calibratableOnly=true. To obtain a report of the assets, responseFormat=csv&destination=download should be sent as query parameters.
 
 
         Currently, the valid combinations of ResponseFormat and Destination are [JSON;INLINE], [CSV;DOWNLOAD], [CSV;FILE_SERVICE].
@@ -2444,11 +2688,29 @@ paths:
     post:
       tags: [assets]
       summary: Query assets
-      description: Returns the assets satisfying the provided filtering criteria. If the the caller requests a JSON inline response, the returned assets are filtered based on the filter string and the ids and calibratableOnly properties are not taken into consideration. When the caller requests a CSV response, the filter is not taken into consideration, but the ids and calibratableOnly properties are used to filter the assets from the response.
+      description: Returns the assets satisfying the provided filtering criteria. If the the caller requests a JSON inline response, the returned assets are filtered based on the filter string and the IDs and calibratableOnly properties are not taken into consideration. When the caller requests a CSV response, the filter is not taken into consideration, but the IDs and calibratableOnly properties are used to filter the assets from the response.
       operationId: query-assets
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/QueryAssetsRequest'
+      responses:
+        200:
+          $ref: '#/responses/AssetsResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/query-in-use-assets:
+    post:
+      tags: [assets]
+      summary: Query assets that are currently in use
+      description: Returns the assets that are currently marked as being in use by a utilization entry and that satisfy the provided filtering criteria. The caller can filter based on asset properties as well as utilization properties.
+      operationId: query-in-use-assets
+      x-ni-auth: true
+      parameters: 
+        - $ref: '#/parameters/QueryInUseAssetsRequest'
       responses:
         200:
           $ref: '#/responses/AssetsResponse'
@@ -2542,12 +2804,13 @@ paths:
         default:
           $ref: '#/responses/Error'
     post:
-      tags: [assets]
+      tags: [deprecated]
       summary: Creates a new calibration history entry for an asset
-      description: Creates a new calibration history entry for a third-party asset.
+      description: Deprecated. Creates a new calibration history entry for an asset. Use /v1/update-assets.
       operationId: post-asset-calibration-history
       x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
+      deprecated: true
       parameters:
         - $ref: '#/parameters/AssetId'
         - $ref: '#/parameters/ExternalCalibrationRequestBody'
@@ -2661,7 +2924,7 @@ paths:
       tags: [utilization]
       summary: Stores assets utilization start
       description: >- 
-          Stores information related to assets utilization start. The operation is succesful when utilization information can be stored for all asset identifiers provided in the request.
+          Stores information related to assets utilization start. The operation is successful when utilization information can be stored for all asset identifiers provided in the request.
           It will return a partial success when storing the utilization start information failed for one or more assets.
       operationId: start-multiple-asset-utilization
       x-ni-auth: true
@@ -2681,7 +2944,7 @@ paths:
       tags: [utilization]
       summary: Stores assets utilization end
       description: >-
-          Stores information related to assets utilization end. The operation is succesful and will return No Content when end utilization information can be stored for all utilization identifiers provided in the request.
+          Stores information related to assets utilization end. The operation is successful and will return No Content when end utilization information can be stored for all utilization identifiers provided in the request.
           It will return a partial success when end utilization information can be stored for only a subset of the utilization identifiers provided in the request.
           It will return a not found response when no stored utilizations matched the provided utilization identifiers.
       operationId: end-multiple-asset-utilization
@@ -2702,7 +2965,7 @@ paths:
       tags: [utilization]
       summary: Stores asset utilization heartbeats
       description: >-
-          Stores information related to ongoing asset utilizations. The operation is succesful and will return No Content when utilization heartbeat information can be stored for all utilization identifiers provided in the request.
+          Stores information related to ongoing asset utilizations. The operation is successful and will return No Content when utilization heartbeat information can be stored for all utilization identifiers provided in the request.
           It will return a partial success when utilization heartbeat information can be stored for only a subset of the utilization identifiers provided in the request.
           It will return a not found response when no stored utilizations matched the provided utilization identifiers.
       operationId: asset-utilization-multiple-heartbeats
@@ -2764,7 +3027,7 @@ paths:
         - $ref: '#/parameters/QueryAssetsAvailabilityRequestBody'
       responses:
         200:
-          description: Query assets availability response containing information about the availability of the assets specified by their ids during the given time intervals.
+          description: Query Assets Availability response containing information about the availability of the assets specified by their IDs during the given time intervals.
           schema:
             title: Query Assets Availability Response
             description: Query assets availability response containing availability history for the requested assets. If availability history could not be resolved for some assets, the response contains error information on the assets which could not be resolved.
@@ -2782,6 +3045,33 @@ paths:
                   example: [ "13562;01B245D6;4243;0" ]
               error:
                 $ref: '#/definitions/Error'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/history/report/query-assets-availability:
+    post:
+      tags: [reports]
+      summary: Gets an asset availability history report for multiple assets.
+      description: Gets a CSV file report conatining asset availability history for multiple assets based on the specified timespans.
+      operationId: query-assets-availability-report
+      x-ni-auth: true
+      parameters:
+        - $ref: '#/parameters/QueryAssetsAvailabilityReportRequestBody'
+      responses:
+        200:
+          description: A CSV file report conatining the asset availability history of the assets specified by their IDs during the given time intervals.
+          schema:
+            type: file
+            example: "Asset Id,Asset Name,Start Date,End Date,System Alias,Availability Percentage\n0030b58e-4e1a-47ea-9e1e-d60ba3341551,PXI3Slot7,2020-11-10 00:00:00Z,2021-01-06 00:00:00Z,NI_PXIe-8133_Embedded_Controller--MAC-00-80-2F-14-2C-06,0.0815299529054917"
+          headers:
+            X-Not-Found-Resources:
+              description: The IDs of the resources that were not found.
+              type: array
+              items:
+                type: string
         400:
           $ref: '#/responses/BadRequest'
         401:
