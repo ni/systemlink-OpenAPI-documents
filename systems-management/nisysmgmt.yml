@@ -1937,8 +1937,6 @@ paths:
       responses:
         200:
           $ref: '#/responses/PartialSuccess'
-        204:
-          description: No Content.
         400:
           $ref: '#/responses/BadRequest'
         401:
