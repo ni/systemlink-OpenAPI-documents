@@ -572,7 +572,7 @@ parameters:
       properties:
         type:
           type: string
-          enum: [user, windows-group, windows-user, ldap-group, ldap-attribute, ldap-user]
+          enum: [user, windows-group, windows-user, ldap-group, ldap-attribute, ldap-user, oidc-claim]
           description: The Auth Mapping type
         policyId:
           type: string
@@ -605,7 +605,7 @@ parameters:
       properties:
         type:
           type: string
-          enum: [user, windows-group, windows-user, ldap-group, ldap-attribute, ldap-user]
+          enum: [user, windows-group, windows-user, ldap-group, ldap-attribute, ldap-user, oidc-claim]
           description: The Auth Mapping type
         policyId:
           type: string
