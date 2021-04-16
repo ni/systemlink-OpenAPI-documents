@@ -608,6 +608,12 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+      parameters:
+        - in: query
+          name: force
+          description: Whether the deletion of a file will be forced
+          type: boolean
+          default: false
   /v1/service-groups/Default/files/{id}/data:
     parameters:
       - $ref: '#/parameters/id'
@@ -726,6 +732,11 @@ paths:
       x-ni-operation: deleteFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       parameters:
+        - in: query
+          name: force
+          description: Whether the deletion of files will be forced
+          type: boolean
+          default: false
         - in: body
           name: files
           description: The description of files to delete
