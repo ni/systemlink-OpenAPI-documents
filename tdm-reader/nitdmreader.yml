@@ -595,7 +595,7 @@ paths:
       tags: [metadata]
       summary: Lists all groups in the file
       description: Lists all group names in the file.
-      operationId: getChannelPropertiesCount
+      operationId: getGroups
       x-ni-auth: true
       x-ni-request-variables: [REMOTE_USER]
       x-ni-request-timeout: 60000
