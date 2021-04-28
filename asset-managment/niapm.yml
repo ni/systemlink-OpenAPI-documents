@@ -1138,6 +1138,22 @@ parameters:
             type: string
           example:
             Key1: Value1
+  LinkFiles:
+    in: body
+    name: linkFiles
+    description: Link files to an asset.
+    required: true
+    schema:
+      title: Link Files Request
+      description: Link files to an asset
+      type: object
+      properties:
+        fileIds:
+          description: File IDs to be linked to an asset.
+          type: array
+          items:
+            type: string
+            example: 607fffe41e4564dda3593eb0
   QueryInUseAssetsRequest:
     in: body
     name: queryInUseAssets
@@ -2272,6 +2288,46 @@ responses:
               resourceId: BadKeyword1
               message: 'Invalid keyword value: BadKeyword1.'
               args: [BadKeyword1]
+  LinkFilesPartialSuccessResponse:
+    description: Link Files Partial Success Response
+    schema:
+      description: Link Files Partial Success Response
+      title: LinkFilesPartialSuccessResponse
+      type: object
+      required:
+        - succeeded
+      properties:
+        succeeded:
+          description: File IDs that are valid.
+          type: array
+          items:
+            type: string
+            example: 607fffe41e4564dda3593eb0
+        failed:
+          description: File IDs that are not valid.
+          type: array
+          items:
+            type: string
+            example: invalid
+        error:
+          $ref: '#/definitions/Error'
+      example:
+        succeeded: [ 607fffe41e4564dda3593eb0 ]
+        failed: [ invalidId ]
+        error:
+          name: Skyline.OneOrMoreErrorsOccurred
+          code: -251040
+          message: >-
+            One or more errors occurred. See the contained list for details of each
+            error.
+          args: []
+          innerErrors:
+            - name: AssetPerformanceManagement.InvalidFileId
+              code: -254806
+              resourceType: Asset
+              resourceId: invalidId
+              message: 'The operation failed because an invalid file id was given: invalidId.'
+              args: [invalidId]
   UtilizationWithPercentageResponse:
     description: Utilization response containing the collection of utilizations matching the provided filters, in a specific time interval. Besides a time interval, each element contains an asset identifier, a minion id, an utilization category, and a percentage of time that the asset was utilized in the time interval.
     schema:
@@ -2909,6 +2965,31 @@ paths:
       responses:
         200:
           $ref: '#/responses/UpdateAssetMetadataPartialSuccessResponse'
+        204:
+          description: No Content
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/{assetId}/file:
+    post:
+      tags: [assets]
+      summary: Link files
+      description: Performs a request to link files to an asset.
+      operationId: link-files
+      x-ni-auth: true
+      consumes:
+        - application/merge-patch+json
+      parameters:
+        - $ref: '#/parameters/AssetId'
+        - $ref: '#/parameters/LinkFiles'
+      responses:
+        200:
+          $ref: '#/responses/LinkFilesPartialSuccessResponse'
         204:
           description: No Content
         400:
