@@ -167,6 +167,17 @@ definitions:
       - UNKNOWN
       - NOT_PRESENT
       - PRESENT
+  AssetPresenceUpdateStatus:
+    title: Asset Presence Update Status
+    description: The status update of an asset's presence in a system.
+    type: string
+    default: NOT_PRESENT
+    enum:
+      - INITIALIZING
+      - UNKNOWN
+      - NOT_PRESENT
+      - PRESENT
+      - REMOVED
   CalibrationHistoryModel:
     title: Calibration History
     description: The calibration history for an asset.
@@ -236,6 +247,15 @@ definitions:
     properties:
       assetPresence:
         $ref: '#/definitions/AssetPresenceStatus'
+  AssetPresenceUpdateModel:
+    title: Asset Presence Update Model
+    description: The presence update of an asset. Wraps the AssetPresenceUpdateStatus into an object.
+    type: object
+    required:
+      - assetPresence
+    properties:
+      assetPresence:
+        $ref: '#/definitions/AssetPresenceUpdateStatus'
   AssetPresenceWithSystemConnectionModel:
     title: Asset Presence With System Connection Model
     description: The presence of an asset and the connection of the system in which it resides.
@@ -286,13 +306,22 @@ definitions:
         example: 2
   AssetLocationWithPresenceModel:
     title: Asset Location With Presence Model
-    description: Information about the asset location and presence. Used in create or update operations.
+    description: Information about the asset location and presence. Used in create operations.
     allOf:
       - $ref: '#/definitions/BaseAssetLocationModel'
       - type: object
         properties:
           state:
             $ref: '#/definitions/AssetPresenceModel'
+  AssetLocationWithPresenceUpdateModel:
+    title: Asset Location With Presence Update Model
+    description: Information about the asset location and presence update. Used in update operations.
+    allOf:
+      - $ref: '#/definitions/BaseAssetLocationModel'
+      - type: object
+        properties:
+          state:
+            $ref: '#/definitions/AssetPresenceUpdateModel'
   AssetLocationModel:
     title: Asset Location Model
     description: Information about the asset location, presence and the connection status of the system in which it resides.
@@ -551,7 +580,7 @@ definitions:
             type: string
             example: "123;01BB877A;4244;0"
           location:
-            $ref: '#/definitions/AssetLocationWithPresenceModel'
+            $ref: '#/definitions/AssetLocationWithPresenceUpdateModel'
           externalCalibration:
             $ref: '#/definitions/ExternalCalibrationWithChecksumModel'
           properties:
