@@ -495,6 +495,12 @@ definitions:
             type: string
             description: The ID of the workspace containing the asset.
             example: '5bc5e9092a4fa4c71cfa7197'
+          fileIds:
+            description: The file IDs linked to the asset.
+            type: array
+            items:
+                type: string
+                example: '608a5684800e325b48837c2a'
   AssetCreateModel:
     title: Asset Create Model
     description: >-
