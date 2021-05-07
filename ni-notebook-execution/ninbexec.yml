@@ -274,6 +274,15 @@ definitions:
     enum:
       - HTML
       - PDF
+  NotebookExportOptions:
+    title: Notebook Export Options
+    description: Configures the notebook execution export.
+    type: object
+    properties:
+      excludeCodeInput:
+        description: Exclude the source code cell inputs of the notebook from the export.
+        type: boolean
+        default: false
   NotebookSortDefinitionObject:
     title: Notebook Sort Definition
     description: Defines the field and direction for sorting notebooks.
@@ -523,6 +532,11 @@ definitions:
           specifies an export format and a resultCachePeriod, the export format would be honored
           and resultCachePeriod will be ignored. The file will be exported to the File Ingestion Service.
         $ref: '#/definitions/NotebookExportFormat'
+      exportOptions:
+        description: >-
+          Configures the rendered output of the executed notebook. This will be ignored if no export
+          is created.
+        $ref: '#/definitions/NotebookExportOptions'
   ExecutionHashInformation:
     title: Execution Hash Information
     description: >-
