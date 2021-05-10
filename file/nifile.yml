@@ -338,7 +338,9 @@ definitions:
 
           - downloadData: The ability to download file data
 
-          - listFiles: The ability to query and list available files and service groups
+          - listFiles: The ability to list available files and service groups
+
+          - queryFiles: The ability to query available files and service groups
 
           - updateMetadata: The ability to update file metadata properties
 
@@ -350,6 +352,8 @@ definitions:
           downloadData:
             $ref: '#/definitions/Operation'
           listFiles:
+            $ref: '#/definitions/Operation'
+          queryFiles:
             $ref: '#/definitions/Operation'
           updateMetadata:
             $ref: '#/definitions/Operation'
@@ -803,6 +807,12 @@ paths:
           default: 1000
           minimum: 0
           maximum: 1000
+        - in: query
+          name: workspace
+          description: Limit the query to the workspace with the given id.  New in version 4 of this operation.
+          type: string
+          default: null
+          x-example: 1f2641dd-a5ac-4869-835e-5340b4cd386c
         - in: body
           name: query
           description: The queries used to filter the result
