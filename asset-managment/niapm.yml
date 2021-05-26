@@ -971,6 +971,13 @@ parameters:
     type: string
     required: true
     x-example: "29162;01B245D6;4243;0"
+  FileId:
+    in: path
+    name: fileId
+    description: The identifier of a file.
+    type: string
+    required: true
+    x-example: "607fffe41e4564dda3593eb0"
   Skip:
     in: query
     name: skip
@@ -3029,6 +3036,27 @@ paths:
           description: No Content
         400:
           $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/{assetId}/files/{fileId}:
+    delete:
+      tags: [assets]
+      summary: Unlink files
+      description: Performs a request to unlink a file from an asset.
+      operationId: unlink-files
+      x-ni-auth: true
+      consumes:
+        - application/merge-patch+json
+      parameters:
+        - $ref: '#/parameters/AssetId'
+        - $ref: '#/parameters/FileId'
+      responses:
+        204:
+          description: No Content
         401:
           $ref: '#/responses/Unauthorized'
         404:
