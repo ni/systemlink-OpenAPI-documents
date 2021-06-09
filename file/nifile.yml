@@ -792,7 +792,7 @@ paths:
       parameters:
         - in: query
           name: skip
-          description: How many files to skip in the result when paging.  New in version 2 of this operation.
+          description: How many files to skip in the result when paging.  New in version 2 of the list-files operation.
           type: integer
           format: int32
           default: 0
@@ -800,7 +800,7 @@ paths:
         - in: query
           name: take
           description: >-
-            How many files to return in the result.  New in version 2 of this operation.
+            How many files to return in the result.  New in version 2 of the list-files operation.
             The default value is defined by the service.
           type: integer
           format: int32
@@ -809,7 +809,7 @@ paths:
           maximum: 1000
         - in: query
           name: workspace
-          description: Limit the query to the workspace with the given id.  New in version 4 of this operation.
+          description: Limit the query to the workspace with the given id.  New in version 2 of this operation.
           type: string
           default: null
           x-example: 1f2641dd-a5ac-4869-835e-5340b4cd386c
