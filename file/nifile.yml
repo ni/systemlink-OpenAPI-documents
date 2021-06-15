@@ -615,7 +615,7 @@ paths:
       parameters:
         - in: query
           name: force
-          description: Whether the deletion of a file will be forced
+          description: Whether the deletion of a file will be forced.  New in version 2 of this operation.
           type: boolean
           default: false
   /v1/service-groups/Default/files/{id}/data:
@@ -738,7 +738,7 @@ paths:
       parameters:
         - in: query
           name: force
-          description: Whether the deletion of files will be forced
+          description: Whether the deletion of files will be forced.  New in version 2 of this operation.
           type: boolean
           default: false
         - in: body
