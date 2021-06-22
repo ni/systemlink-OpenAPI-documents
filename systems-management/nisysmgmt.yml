@@ -1510,7 +1510,7 @@ definitions:
 
           - grains.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system grains were updated.
 
-          - grains.data: Dictionary of string to object representing general information about the system. Example: grains.data.os == "Windows"
+          - grains.data: Dictionary of string to object representing general information about the system. Example: grains.data.os == "Windows" or DateTime(grains.data.boottime) > "2021-06-01T08:20:09.512Z"
 
           - packages.lastUpdatedTimestamp: ISO-8601 formatted timestamp string specifying the last date the system installed packages were updated.
 
