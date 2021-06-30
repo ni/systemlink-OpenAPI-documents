@@ -2132,6 +2132,22 @@ responses:
           description: Total number of unused assets.
           type: integer
           example: 7
+        withAlarms:
+          description: Total number of assets with associated alarms.
+          type: integer
+          example: 3
+        approachingRecommendedDueDate:
+          description: Number of assets approaching calibration date.
+          type: integer
+          example: 3
+        pastRecommendedDueDate:
+          description: Number of assets past their calibration date.
+          type: integer
+          example: 4
+        totalCalibrated:
+          description: Total number of assets supporting calibration.
+          type: integer
+          example: 7
   DeleteAssetsResponse:
     description: Delete Assets Response containing the IDs of the assets which were deleted, the IDs of the assets which failed to be deleted and any errors encountered.
     schema:
