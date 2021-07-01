@@ -338,7 +338,9 @@ definitions:
 
           - downloadData: The ability to download file data
 
-          - listFiles: The ability to query and list available files and service groups
+          - listFiles: The ability to list available files and service groups
+
+          - queryFiles: The ability to query available files and service groups
 
           - updateMetadata: The ability to update file metadata properties
 
@@ -350,6 +352,8 @@ definitions:
           downloadData:
             $ref: '#/definitions/Operation'
           listFiles:
+            $ref: '#/definitions/Operation'
+          queryFiles:
             $ref: '#/definitions/Operation'
           updateMetadata:
             $ref: '#/definitions/Operation'
@@ -608,6 +612,12 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
+      parameters:
+        - in: query
+          name: force
+          description: Whether the deletion of a file will be forced.  New in version 2 of this operation.
+          type: boolean
+          default: false
   /v1/service-groups/Default/files/{id}/data:
     parameters:
       - $ref: '#/parameters/id'
@@ -726,6 +736,11 @@ paths:
       x-ni-operation: deleteFiles
       x-ni-request-variables: [REMOTE_USER, USER_NAME]
       parameters:
+        - in: query
+          name: force
+          description: Whether the deletion of files will be forced.  New in version 2 of this operation.
+          type: boolean
+          default: false
         - in: body
           name: files
           description: The description of files to delete
@@ -777,7 +792,7 @@ paths:
       parameters:
         - in: query
           name: skip
-          description: How many files to skip in the result when paging.  New in version 2 of this operation.
+          description: How many files to skip in the result when paging.  New in version 2 of the list-files operation.
           type: integer
           format: int32
           default: 0
@@ -785,13 +800,19 @@ paths:
         - in: query
           name: take
           description: >-
-            How many files to return in the result.  New in version 2 of this operation.
+            How many files to return in the result.  New in version 2 of the list-files operation.
             The default value is defined by the service.
           type: integer
           format: int32
           default: 1000
           minimum: 0
           maximum: 1000
+        - in: query
+          name: workspace
+          description: Limit the query to the workspace with the given id.  New in version 2 of this operation.
+          type: string
+          default: null
+          x-example: 1f2641dd-a5ac-4869-835e-5340b4cd386c
         - in: body
           name: query
           description: The queries used to filter the result

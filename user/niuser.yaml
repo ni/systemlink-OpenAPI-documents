@@ -221,6 +221,10 @@ paths:
           type: integer
           default: 50
           maximum: 100
+        - in: query
+          name: type
+          description: Filters the auth mappings by type (multiple types can be specified with comma separator)
+          type: string
       responses:
         200:
           $ref: '#/responses/GetAuthMappingsResponse'
@@ -575,7 +579,7 @@ parameters:
       properties:
         type:
           type: string
-          enum: [user, windows-group, windows-user, ldap-group, ldap-attribute, ldap-user, oidc-claim]
+          enum: [user, windows-group, windows-user, ldap-group, ldap-attribute, ldap-user, oidc-claim, user-id]
           description: The Auth Mapping type
         policyId:
           type: string
@@ -608,7 +612,7 @@ parameters:
       properties:
         type:
           type: string
-          enum: [user, windows-group, windows-user, ldap-group, ldap-attribute, ldap-user, oidc-claim]
+          enum: [user, windows-group, windows-user, ldap-group, ldap-attribute, ldap-user, oidc-claim, user-id]
           description: The Auth Mapping type
         policyId:
           type: string
