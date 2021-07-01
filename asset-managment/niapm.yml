@@ -167,6 +167,17 @@ definitions:
       - UNKNOWN
       - NOT_PRESENT
       - PRESENT
+  AssetPresenceUpdateStatus:
+    title: Asset Presence Update Status
+    description: The status update of an asset's presence in a system.
+    type: string
+    default: NOT_PRESENT
+    enum:
+      - INITIALIZING
+      - UNKNOWN
+      - NOT_PRESENT
+      - PRESENT
+      - REMOVED
   CalibrationHistoryModel:
     title: Calibration History
     description: The calibration history for an asset.
@@ -236,6 +247,15 @@ definitions:
     properties:
       assetPresence:
         $ref: '#/definitions/AssetPresenceStatus'
+  AssetPresenceUpdateModel:
+    title: Asset Presence Update Model
+    description: The presence update of an asset. Wraps the AssetPresenceUpdateStatus into an object.
+    type: object
+    required:
+      - assetPresence
+    properties:
+      assetPresence:
+        $ref: '#/definitions/AssetPresenceUpdateStatus'
   AssetPresenceWithSystemConnectionModel:
     title: Asset Presence With System Connection Model
     description: The presence of an asset and the connection of the system in which it resides.
@@ -286,13 +306,22 @@ definitions:
         example: 2
   AssetLocationWithPresenceModel:
     title: Asset Location With Presence Model
-    description: Information about the asset location and presence. Used in create or update operations.
+    description: Information about the asset location and presence. Used in create operations.
     allOf:
       - $ref: '#/definitions/BaseAssetLocationModel'
       - type: object
         properties:
           state:
             $ref: '#/definitions/AssetPresenceModel'
+  AssetLocationWithPresenceUpdateModel:
+    title: Asset Location With Presence Update Model
+    description: Information about the asset location and presence update. Used in update operations.
+    allOf:
+      - $ref: '#/definitions/BaseAssetLocationModel'
+      - type: object
+        properties:
+          state:
+            $ref: '#/definitions/AssetPresenceUpdateModel'
   AssetLocationModel:
     title: Asset Location Model
     description: Information about the asset location, presence and the connection status of the system in which it resides.
@@ -495,6 +524,12 @@ definitions:
             type: string
             description: The ID of the workspace containing the asset.
             example: '5bc5e9092a4fa4c71cfa7197'
+          fileIds:
+            description: The file IDs linked to the asset.
+            type: array
+            items:
+                type: string
+                example: '608a5684800e325b48837c2a'
   AssetCreateModel:
     title: Asset Create Model
     description: >-
@@ -545,7 +580,7 @@ definitions:
             type: string
             example: "123;01BB877A;4244;0"
           location:
-            $ref: '#/definitions/AssetLocationWithPresenceModel'
+            $ref: '#/definitions/AssetLocationWithPresenceUpdateModel'
           externalCalibration:
             $ref: '#/definitions/ExternalCalibrationWithChecksumModel'
           properties:
@@ -936,6 +971,13 @@ parameters:
     type: string
     required: true
     x-example: "29162;01B245D6;4243;0"
+  FileId:
+    in: path
+    name: fileId
+    description: The identifier of a file.
+    type: string
+    required: true
+    x-example: "607fffe41e4564dda3593eb0"
   Skip:
     in: query
     name: skip
@@ -1138,6 +1180,22 @@ parameters:
             type: string
           example:
             Key1: Value1
+  LinkFiles:
+    in: body
+    name: linkFiles
+    description: Link files to an asset.
+    required: true
+    schema:
+      title: Link Files Request
+      description: Link files to an asset
+      type: object
+      properties:
+        fileIds:
+          description: File IDs to be linked to an asset.
+          type: array
+          items:
+            type: string
+            example: 607fffe41e4564dda3593eb0
   QueryInUseAssetsRequest:
     in: body
     name: queryInUseAssets
@@ -2074,6 +2132,22 @@ responses:
           description: Total number of unused assets.
           type: integer
           example: 7
+        withAlarms:
+          description: Total number of assets with associated alarms.
+          type: integer
+          example: 3
+        approachingRecommendedDueDate:
+          description: Number of assets approaching calibration date.
+          type: integer
+          example: 3
+        pastRecommendedDueDate:
+          description: Number of assets past their calibration date.
+          type: integer
+          example: 4
+        totalCalibrated:
+          description: Total number of assets supporting calibration.
+          type: integer
+          example: 7
   DeleteAssetsResponse:
     description: Delete Assets Response containing the IDs of the assets which were deleted, the IDs of the assets which failed to be deleted and any errors encountered.
     schema:
@@ -2272,6 +2346,46 @@ responses:
               resourceId: BadKeyword1
               message: 'Invalid keyword value: BadKeyword1.'
               args: [BadKeyword1]
+  LinkFilesPartialSuccessResponse:
+    description: Link Files Partial Success Response
+    schema:
+      description: Link Files Partial Success Response
+      title: LinkFilesPartialSuccessResponse
+      type: object
+      required:
+        - succeeded
+      properties:
+        succeeded:
+          description: File IDs that are valid.
+          type: array
+          items:
+            type: string
+            example: 607fffe41e4564dda3593eb0
+        failed:
+          description: File IDs that are not valid.
+          type: array
+          items:
+            type: string
+            example: invalid
+        error:
+          $ref: '#/definitions/Error'
+      example:
+        succeeded: [ 607fffe41e4564dda3593eb0 ]
+        failed: [ invalidId ]
+        error:
+          name: Skyline.OneOrMoreErrorsOccurred
+          code: -251040
+          message: >-
+            One or more errors occurred. See the contained list for details of each
+            error.
+          args: []
+          innerErrors:
+            - name: AssetPerformanceManagement.InvalidFileId
+              code: -254806
+              resourceType: Asset
+              resourceId: invalidId
+              message: 'The operation failed because an invalid file id was given: invalidId.'
+              args: [invalidId]
   UtilizationWithPercentageResponse:
     description: Utilization response containing the collection of utilizations matching the provided filters, in a specific time interval. Besides a time interval, each element contains an asset identifier, a minion id, an utilization category, and a percentage of time that the asset was utilized in the time interval.
     schema:
@@ -2913,6 +3027,52 @@ paths:
           description: No Content
         400:
           $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/{assetId}/file:
+    post:
+      tags: [assets]
+      summary: Link files
+      description: Performs a request to link files to an asset.
+      operationId: link-files
+      x-ni-auth: true
+      consumes:
+        - application/merge-patch+json
+      parameters:
+        - $ref: '#/parameters/AssetId'
+        - $ref: '#/parameters/LinkFiles'
+      responses:
+        200:
+          $ref: '#/responses/LinkFilesPartialSuccessResponse'
+        204:
+          description: No Content
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  /v1/assets/{assetId}/files/{fileId}:
+    delete:
+      tags: [assets]
+      summary: Unlink files
+      description: Performs a request to unlink a file from an asset.
+      operationId: unlink-files
+      x-ni-auth: true
+      consumes:
+        - application/merge-patch+json
+      parameters:
+        - $ref: '#/parameters/AssetId'
+        - $ref: '#/parameters/FileId'
+      responses:
+        204:
+          description: No Content
         401:
           $ref: '#/responses/Unauthorized'
         404:
