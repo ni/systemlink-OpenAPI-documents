@@ -941,7 +941,7 @@ definitions:
       filter:
         description: The step query filter in Dynamic Linq
         type: string
-        example: (operator == "user1") || ((programName != "MyProgram") && (totalTimeInSeconds < @0))
+        example: (stepType == "NumericLimitTest") && (totalTimeInSeconds > @0)
       substitutions:
         description: >-
           Makes substitutions in the query filter expression. Substitutions for the query expression
