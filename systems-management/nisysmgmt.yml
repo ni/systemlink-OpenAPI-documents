@@ -1435,7 +1435,7 @@ definitions:
             $ref: '#/definitions/Operation'
 
   QuerySystemsRequest:
-    description: Request for querying resources. More info here -> https://github.com/StefH/System.Linq.Dynamic.Core/wiki/Dynamic-Expressions and https://stefh.github.io/System.Linq.Dynamic.Core/html/144078bd-d1ad-bece-4daa-7fdd3a7ed7dc.htm
+    description: Request for querying systems resources. Dynamic LINQ is used for query syntax. More info can be found here: https://dynamic-linq.net
     title: Query Systems Request
     properties:
       skip:
@@ -1551,7 +1551,7 @@ definitions:
         description: The order in which data returns.
 
   QueryJobsRequest:
-    description: Request for querying jobs resources. More info here -> https://github.com/StefH/System.Linq.Dynamic.Core/wiki/Dynamic-Expressions and https://stefh.github.io/System.Linq.Dynamic.Core/html/144078bd-d1ad-bece-4daa-7fdd3a7ed7dc.htm
+    description: Request for querying jobs resources. Dynamic LINQ is used for query syntax. More info can be found here: https://dynamic-linq.net
     title: Query Jobs Request
     properties:
       skip:
