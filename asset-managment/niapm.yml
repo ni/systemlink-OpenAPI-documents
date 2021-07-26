@@ -530,6 +530,14 @@ definitions:
             items:
                 type: string
                 example: '608a5684800e325b48837c2a'
+          supportsSelfTest:
+            description: Whether the asset supports self-test.
+            type: boolean
+            example: true
+          supportsReset:
+            description: Whether the asset supports reset.
+            type: boolean
+            example: true
   AssetCreateModel:
     title: Asset Create Model
     description: >-
