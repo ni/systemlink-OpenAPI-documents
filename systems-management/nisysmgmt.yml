@@ -1551,7 +1551,7 @@ definitions:
         description: The order in which data returns.
 
   QueryJobsRequest:
-    description: Request for querying jobs resources. Dynamic LINQ is used for query syntax. More info can be found here: https://dynamic-linq.net
+    description: Request for querying jobs resources. Dynamic LINQ is used for query syntax. More info can be found at https://dynamic-linq.net
     title: Query Jobs Request
     properties:
       skip:
