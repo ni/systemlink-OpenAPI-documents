@@ -1435,7 +1435,7 @@ definitions:
             $ref: '#/definitions/Operation'
 
   QuerySystemsRequest:
-    description: Request for querying systems resources. Dynamic LINQ is used for query syntax. More info can be found here: https://dynamic-linq.net
+    description: Request for querying systems resources. Dynamic LINQ is used for query syntax. More info can be found at https://dynamic-linq.net
     title: Query Systems Request
     properties:
       skip:
