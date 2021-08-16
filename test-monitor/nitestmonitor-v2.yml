@@ -757,7 +757,14 @@ definitions:
         example:
           - "cRIO"
       orderBy:
-        $ref: '#/definitions/ProductField'
+        description: An enumeration of all fields that Products can be ordered by.
+        type: string
+        enum:
+          - ID
+          - PART_NUMBER
+          - NAME
+          - FAMILY
+          - UPDATED_AT
       descending:
         description: ->
           Whether to return the products in descending order.
@@ -817,7 +824,13 @@ definitions:
         example:
           - 2.5
       orderBy:
-        $ref: '#/definitions/PathField'
+        description: An enumeration of all fields that Paths can be ordered by.
+        type: string
+        enum:
+          - ID
+          - PROGRAM_NAME
+          - PART_NUMBER
+          - PATH
       descending:
         description: ->
           Whether to return the paths in descending order.
@@ -893,7 +906,20 @@ definitions:
         example:
           - cRIO
       orderBy:
-        $ref: '#/definitions/ResultField'
+        description: An enumeration of all fields that Results can be ordered by.
+        type: string
+        enum:
+          - ID
+          - STARTED_AT
+          - UPDATED_AT
+          - PROGRAM_NAME
+          - SYSTEM_ID
+          - HOST_NAME
+          - OPERATOR
+          - SERIAL_NUMBER
+          - PART_NUMBER
+          - PRODUCT
+          - TOTAL_TIME_IN_SECONDS
       descending:
         description: ->
           Whether to return the results in descending order.
@@ -974,7 +1000,19 @@ definitions:
         example:
           - user1
       orderBy:
-        $ref: '#/definitions/StepField'
+        description: An enumeration of all fields that Steps can be ordered by.
+        type: string
+        enum:
+          - NAME
+          - STEP_TYPE
+          - STEP_ID
+          - PARENT_ID
+          - RESULT_ID
+          - PATH
+          - TOTAL_TIME_IN_SECONDS
+          - STARTED_AT
+          - UPDATED_AT
+          - DATA_MODEL
       descending:
         description: ->
           Whether to return the steps in descending order.
@@ -2077,7 +2115,7 @@ paths:
         Queries known values for an indexed, scalar result field. Supported
         fields are `ID`, `STARTED_AT`, `UPDATED_AT`, `PROGRAM_NAME`,
         `SYSTEM_ID`, `HOST_NAME`, `OPERATOR`, `SERIAL_NUMBER`, `PART_NUMBER`,
-        `TOTAL_TIME_IN_SECONDS`, and `WORKSPACE`.
+        and `TOTAL_TIME_IN_SECONDS`.
       operationId: query-result-values-v2
       x-ni-operation: queryResults
       x-ni-auth: true
@@ -2311,8 +2349,8 @@ paths:
       description: >-
         Queries known values for an indexed, scalar step field. Supported
         fields are `NAME`, `STEP_TYPE`, `STEP_ID`, `PARENT_ID`, `RESULT_ID`,
-        `PATH`, `TOTAL_TIME_IN_SECONDS`, `STARTED_AT`, `UPDATED_AT`,
-        `DATA_MODEL`, and `WORKSPACE`.
+        `PATH`, `TOTAL_TIME_IN_SECONDS`, `STARTED_AT`, `UPDATED_AT`, and
+        `DATA_MODEL`.
       operationId: query-step-values-v2
       x-ni-operation: querySteps
       x-ni-auth: true
