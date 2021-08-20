@@ -738,6 +738,9 @@ definitions:
           myMeasurement: {}
   ProductsAdvancedQuery:
     title: Advanced Query Object for Products
+    description: >-
+      Product fields that the response can be ordered by are 
+      `ID`, `PART_NUMBER`, `NAME`, `FAMILY`, and `UPDATED_AT`.
     type: object
     properties:
       filter:
@@ -798,6 +801,9 @@ definitions:
         example: false
   PathsAdvancedQuery:
     title: Advanced Query Object for Paths
+    description: >-
+      Path fields that the response can be ordered by are 
+      `ID`, `PROGRAM_NAME`, `PART_NUMBER`, and `PATH`.
     type: object
     properties:
       filter:
@@ -858,6 +864,11 @@ definitions:
         example: false
   ResultsAdvancedQuery:
     title: Advanced Query Object for Test Results
+    description: >-
+      Test Result fields that the response can be ordered by are
+      `ID`, `STARTED_AT`, `UPDATED_AT`, `PROGRAM_NAME`, `SYSTEM_ID`, 
+      `HOST_NAME`, `OPERATOR`, `SERIAL_NUMBER`, `PART_NUMBER`, 
+      `PRODUCT`, and `TOTAL_TIME_IN_SECONDS`.
     type: object
     properties:
       filter:
@@ -936,6 +947,11 @@ definitions:
         $ref: '#/definitions/ResponseFormat'
   StepsAdvancedQuery:
     title: Advanced Query Object for Test Steps
+    description: >-
+      Test Step fields that the response can be ordered by are 
+      `NAME`, `STEP_TYPE`, `STEP_ID`, `PARENT_ID`, `RESULT_ID`, 
+      `PATH`, `TOTAL_TIME_IN_SECONDS`, `STARTED_AT`, `UPDATED_AT`,
+      and `DATA_MODEL`.
     type: object
     properties:
       filter:
@@ -2077,7 +2093,7 @@ paths:
         Queries known values for an indexed, scalar result field. Supported
         fields are `ID`, `STARTED_AT`, `UPDATED_AT`, `PROGRAM_NAME`,
         `SYSTEM_ID`, `HOST_NAME`, `OPERATOR`, `SERIAL_NUMBER`, `PART_NUMBER`,
-        `TOTAL_TIME_IN_SECONDS`, and `WORKSPACE`.
+        and `TOTAL_TIME_IN_SECONDS`.
       operationId: query-result-values-v2
       x-ni-operation: queryResults
       x-ni-auth: true
@@ -2311,8 +2327,8 @@ paths:
       description: >-
         Queries known values for an indexed, scalar step field. Supported
         fields are `NAME`, `STEP_TYPE`, `STEP_ID`, `PARENT_ID`, `RESULT_ID`,
-        `PATH`, `TOTAL_TIME_IN_SECONDS`, `STARTED_AT`, `UPDATED_AT`,
-        `DATA_MODEL`, and `WORKSPACE`.
+        `PATH`, `TOTAL_TIME_IN_SECONDS`, `STARTED_AT`, `UPDATED_AT`, and
+        `DATA_MODEL`.
       operationId: query-step-values-v2
       x-ni-operation: querySteps
       x-ni-auth: true
