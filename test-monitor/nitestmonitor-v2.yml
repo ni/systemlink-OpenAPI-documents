@@ -868,7 +868,7 @@ definitions:
       Test Result fields that the response can be ordered by are
       `ID`, `STARTED_AT`, `UPDATED_AT`, `PROGRAM_NAME`, `SYSTEM_ID`, 
       `HOST_NAME`, `OPERATOR`, `SERIAL_NUMBER`, `PART_NUMBER`, 
-      `PRODUCT`, and `TOTAL_TIME_IN_SECONDS`.
+      and `TOTAL_TIME_IN_SECONDS`.
     type: object
     properties:
       filter:
