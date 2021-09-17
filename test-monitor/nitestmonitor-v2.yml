@@ -431,6 +431,7 @@ definitions:
   TestResultRequestObject:
     title: Test Result Request
     type: object
+    required: [programName, status]
     properties:
       programName:
         description: Program name
