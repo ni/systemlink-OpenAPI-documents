@@ -1122,6 +1122,13 @@ definitions:
         type: string
         description: The ID of the workspace.
         example: '5bc5e9092a4fa4c71cfa7197'
+      properties:
+        type: object
+        description: The new properties (key-value pairs).
+        additionalProperties:
+          type: string
+        example:
+          owner: admin
       
   QueryAvailablePackagesRequest:
     title: Get Available Packages Request
