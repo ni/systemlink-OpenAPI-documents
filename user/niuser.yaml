@@ -2,6 +2,11 @@ swagger: '2.0'
 info:
   version: '1.0'
   title: SystemLink User Service
+  description: 'Manage users, workspaces, and permissions for a SystemLink server.'
+  contact:
+    name: NI
+    url: https://www.ni.com/systemlink
+    email: support@ni.com
 basePath: /niuser/v1
 consumes:
   - application/json
