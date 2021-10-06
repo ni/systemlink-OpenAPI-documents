@@ -2,6 +2,11 @@ swagger: '2.0'
 info:
   version: '1.0'
   title: SystemLink Auth Service
+  description: Manage authorization policies for a SystemLink server.
+  contact:
+    name: NI
+    url: https://www.ni.com/systemlink
+    email: support@ni.com
 basePath: /niauth/v1
 consumes:
   - application/json
@@ -746,31 +751,31 @@ definitions:
       message: There has been an error with your request
       args: []
       innerErrors: []
-      
+
   UserPolicy:
     type: object
     title: User Policy
     description: A policy defines what a user or device is allowed to do
     properties:
-      id: 
+      id:
         description: The identifier of a policy
         type: string
       name:
         description: The policy name
         type: string
-      templateId: 
+      templateId:
         description: The identifier of a policy template
         type: string
-      workspaceId: 
+      workspaceId:
         description: The identifier of a workspace
         type: string
-      
+
   UserPolicyTemplate:
     type: object
     title: User Policy Template
     description: A policy template defines what a user or device is allowed to do but is not bound to a workspace. When the template is referenced by a policy, the connection between the actions and the workspace is created.
     properties:
-      id: 
+      id:
         description: The identifier of a policy template
         type: string
       name:
