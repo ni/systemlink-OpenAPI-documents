@@ -4,7 +4,7 @@ info:
   title: Service Registry Web Service
   description: View information about installed SystemLink services
   contact:
-    name: National Instruments
+    name: NI
     url: 'https://www.ni.com/systemlink'
     email: support@ni.com
 basePath: /niserviceregistry

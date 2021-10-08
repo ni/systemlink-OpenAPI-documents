@@ -4,7 +4,7 @@ info:
   title: SystemLink File Service
   description: Upload and download files from a SystemLink server
   contact:
-    name: National Instruments
+    name: NI
     url: https://www.ni.com/systemlink
     email: support@ni.com
 basePath: /nifile

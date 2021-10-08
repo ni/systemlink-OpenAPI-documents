@@ -4,7 +4,7 @@ info:
   version: '2'
   title: SystemLink Tag Service
   contact:
-    name: National Instruments
+    name: NI
     url: 'https://www.ni.com/systemlink'
     email: support@ni.com
 basePath: /nitag

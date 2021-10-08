@@ -4,7 +4,7 @@ info:
   version: '1'
   title: 'SystemLink Systems Management'
   contact:
-    name: National Instruments
+    name: NI
     url: https://www.ni.com/systemlink
     email: support@ni.com
 basePath: '/nisysmgmt'
@@ -442,7 +442,7 @@ definitions:
       vendorName:
         description: System vendor name.
         type: string
-        example: National Instruments
+        example: NI
       version:
         description: Salt version.
         type: string
@@ -761,7 +761,7 @@ definitions:
               displayname: NI Package Manager Upgrader
               displayversion: 19.5.0
               url: http://www.ni.com
-              packager: National Instruments <support@ni.com>
+              packager: NI <support@ni.com>
               priority: required
               group: Infrastructure
               version: 19.5.0.28-0+d28
@@ -770,7 +770,7 @@ definitions:
               displayname: System Package for 64-Bit Windows OS
               displayversion: 19.5.0
               url: http://www.ni.com
-              packager: National Instruments <support@ni.com>
+              packager: NI <support@ni.com>
               priority: standard
               group: Infrastructure
               version: 19.5.0.28-0+d28
@@ -1247,7 +1247,7 @@ definitions:
       maintainer:
         type: string
         description: The maintainer of this package.
-        example: "National Instruments <support@ni.com>"
+        example: "NI <support@ni.com>"
       name:
         type: string
         description: The name of the package.

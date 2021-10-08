@@ -4,7 +4,7 @@ info:
   title: Asset Performance Management Rule Web Service
   description: Create and manage calibration rules for assets.
   contact:
-    name: National Instruments
+    name: NI
     url: 'https://www.ni.com/systemlink'
     email: support@ni.com
 basePath: /niapmrule

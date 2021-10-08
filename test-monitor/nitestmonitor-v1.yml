@@ -4,7 +4,7 @@ info:
   title: Test Monitor Web Service
   description: Test Monitor HTTP API
   contact:
-    name: National Instruments
+    name: NI
     url: 'https://www.ni.com/systemlink'
     email: support@ni.com
 basePath: /nitestmonitor

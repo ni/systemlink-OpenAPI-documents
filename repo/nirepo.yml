@@ -4,7 +4,7 @@ info:
   title: "Package Repository Service"
   description: "Manages a repository of packages"
   contact:
-    name: National Instruments
+    name: NI
     url: https://www.ni.com/systemlink
     email: support@ni.com
 basePath: "/nirepo"
@@ -754,7 +754,7 @@ definitions:
       maintainer:
         type: string
         description: The maintainer of this package.
-        example: "National Instruments <support@ni.com>"
+        example: "NI <support@ni.com>"
       predepends:
         type: array
         description: An array containing information about other packages this package predepends.
@@ -823,7 +823,7 @@ definitions:
           Filename: 71e47fbf-2782-4c10-873e-dba414213dc9.nipkg
           Homepage: http://www.ni.com
           MD5Sum: 672a667ca32b6915ae9a968c55f80825
-          Maintainer: National Instruments <support@ni.com>
+          Maintainer: NI <support@ni.com>
           Package: ni-securityupdate-kb67l8lcqw-killbits
           Priority: standard
           Section: Infrastructure

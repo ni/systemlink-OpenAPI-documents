@@ -4,7 +4,7 @@ info:
   title: Tag Historian Web Service
   description: SystemLink Tag Historian Service HTTP API.
   contact:
-    name: National Instruments
+    name: NI
     url: 'https://www.ni.com/systemlink'
     email: support@ni.com
 basePath: /nitaghistorian
