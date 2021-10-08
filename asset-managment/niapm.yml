@@ -4,7 +4,7 @@ info:
   title: Asset Performance Management Web Service
   description: Asset Performance Management HTTP API
   contact:
-    name: National Instruments
+    name: NI
     url: 'https://www.ni.com/systemlink'
     email: support@ni.com
 basePath: /niapm
@@ -889,7 +889,7 @@ definitions:
       vendorName:
         description: Vendor name of the asset.
         type: string
-        example: National Instruments
+        example: NI
       vendorNumber:
         description: Vendor number of the asset.
         type: integer

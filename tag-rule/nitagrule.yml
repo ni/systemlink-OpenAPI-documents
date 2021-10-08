@@ -4,7 +4,7 @@ info:
   title: Tag Rule Engine Web Service
   description: SystemLink Tag Rule Engine Service HTTP API. Only available on SystemLink Server.
   contact:
-    name: National Instruments
+    name: NI
     url: 'https://www.ni.com/systemlink'
     email: support@ni.com
 basePath: /nitagrule

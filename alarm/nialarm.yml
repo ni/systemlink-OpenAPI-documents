@@ -4,7 +4,7 @@ info:
   title: Alarm Web Service
   description: SystemLink Alarm Service HTTP API. Only available on SystemLink Server.
   contact:
-    name: National Instruments
+    name: NI
     url: 'https://www.ni.com/systemlink'
     email: support@ni.com
 basePath: /nialarm
