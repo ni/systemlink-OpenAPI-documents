@@ -1395,7 +1395,7 @@ parameters:
 
             - It determines the type of the report. When true, the file will be a calibration report. If this is false, the file will be an asset report. 
             
-            - If asset IDs are in the request, this property will not be used for filtering. If no asset IDs are in the request, setting this property to true will generate a report only for the calibrated assets.
+            - If asset IDs property or the filter string are in the request, this property will not be used for filtering. If no asset IDs are in the request and the filter string is unspecified, setting this property to true will generate a report only for the calibrated assets.
           
           type: boolean
           default: false
@@ -2810,7 +2810,7 @@ paths:
     post:
       tags: [assets]
       summary: Query assets
-      description: Returns the assets satisfying the provided filtering criteria. If the the caller requests a JSON inline response, the returned assets are filtered based on the filter string and the IDs and calibratableOnly properties are not taken into consideration. When the caller requests a CSV response, the filter is not taken into consideration, but the IDs and calibratableOnly properties are used to filter the assets from the response.
+      description: Returns the assets satisfying the provided filtering criteria. If the the caller requests a JSON inline response, the returned assets are filtered based on the filter string and the IDs and calibratableOnly properties are not taken into consideration. When the caller requests a CSV response, the IDs property has higher precedence than the filter string when used to filter the assets from the response.
       operationId: query-assets
       x-ni-auth: true
       parameters:
