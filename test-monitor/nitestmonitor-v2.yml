@@ -69,7 +69,7 @@ definitions:
         - name: TestMonitor.InvalidId
           code: -253700
           resourceType: TestResult
-          resourceId: 4afb2ce3741fe11d88838cc9
+          resourceId: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
           message: Invalid Id.
           args: []
   Operation:
@@ -350,7 +350,7 @@ definitions:
       id:
         description: ID of the product
         type: string
-        example: 5e30931793cac80468509487
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
       partNumber:
         description: The part number of the product
         type: string
@@ -398,7 +398,7 @@ definitions:
       id:
         description: ID of the product to update
         type: string
-        example: 5e30931793cac80468509487
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
       name:
         description: The name of the product
         type: string
@@ -520,7 +520,7 @@ definitions:
       id:
         description: Id of the test result
         type: string
-        example: 5e30938d93cac80468534720
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
       systemId:
         description: Id of the system
         type: string
@@ -588,7 +588,7 @@ definitions:
       id:
         description: Test result id to update
         type: string
-        example: 5e30938d93cac80468534720
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
       programName:
         description: Program name
         type: string
@@ -693,7 +693,7 @@ definitions:
           The unique ID of this path. Note that this value may change if
           the collection is repaired.
         type: string
-        example: 507f191e810c19729de860ea
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
       path:
         description: >-
           Identifies the steps that this path is representative of.
@@ -1134,10 +1134,10 @@ definitions:
     properties:
       stepId:
         type: string
-        example: 5e30934193cac8046851acb4
+        example: bd9126f5-b0b1-446a-8b08-dc6460047377
       resultId:
         type: string
-        example: 5e30938d93cac80468534720
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
   StepDataObject:
     title: Step Data
     description: Data returned by the test step
@@ -1194,7 +1194,7 @@ definitions:
       resultId:
         description: Result id
         type: string
-        example: 5e30938d93cac80468534720
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
       children:
         description: Nested child steps
         type: array
@@ -1276,7 +1276,7 @@ definitions:
       resultId:
         description: Result id
         type: string
-        example: 5e30938d93cac80468534720
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
       path:
         description: Step path
         type: string
@@ -1398,7 +1398,7 @@ responses:
           items:
             type: string
           example:
-            - 5e30931793cac80468509487
+            - 02600cf8-c2bb-4ff9-a139-031e943fb0c0
         failed:
           description: Array of product ids that failed to delete
           type: array
@@ -1928,7 +1928,7 @@ paths:
                 type: array
                 items:
                   type: string
-                  example: 5e30931793cac80468509487
+                  example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
       responses:
         200:
           $ref: '#/responses/DeleteProductsResponse'
@@ -2159,7 +2159,7 @@ paths:
                 type: array
                 items:
                   type: string
-                  example: 5e30938d93cac80468534720
+                  example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
               deleteSteps:
                 description: Indicates whether to delete the test steps associated with the test result
                 type: boolean
