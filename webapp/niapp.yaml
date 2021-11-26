@@ -334,6 +334,17 @@ paths:
       operationId: list-versions
       parameters:
         - $ref: '#/parameters/WebAppId'
+        - in: query
+          name: continuationToken
+          description: The continuation token can be used to paginate through the webapp version list results. Provide a token to continue a previous listing.
+          type: string
+        - in: query
+          name: take
+          description: The maximum number of webapp versions to return
+          type: integer
+          default: 100
+          minimum: 0
+          maximum: 1000
       responses:
         200:
           $ref: '#/responses/ListWebAppVersionsResponse'
