@@ -325,11 +325,143 @@ paths:
         default:
           $ref: '#/responses/Error'
 
+  '/webapps/{id}/history':
+    get:
+      tags:
+        - history
+      summary: List the versions of an existing webapp
+      description: List the versions of an existing webapp
+      operationId: list-versions
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+      responses:
+        200:
+          $ref: '#/responses/ListWebAppVersionsResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+    post:
+      tags:
+        - history
+      summary: Upload content for a new version of an existing webapp
+      description: Upload content for a new version of an existing webapp
+      operationId: create-version
+      consumes:
+        - multipart/form-data
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+        - in: formData
+          required: true
+          name: content
+          description: The webapp binary content. Depending on the webapp's type it can be a dashboard, template or *.nipkg file exported from LabVIEW NXG
+          type: file
+        - in: formData
+          name: description
+          description: The description of the change
+          type: string
+      responses:
+        200:
+          $ref: '#/responses/CreateWebAppVersionResponse'
+        400:
+          $ref: '#/responses/ValidationError'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  '/webapps/{id}/history/{versionId}':
+    get:
+      tags:
+        - history
+      summary: Get webapp version of an existing webapp by Id
+      description: Get webapp version of an existing webapp by Id
+      operationId: get-version
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+        - $ref: '#/parameters/WebAppVersionId'
+      responses:
+        200:
+          $ref: '#/responses/GetWebAppVersionResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  '/webapps/{id}/history/{versionId}/content':
+    get:
+      tags:
+        - history
+      summary: Get webapp version content
+      description: Get the content of a webapp version. ContentType varies from JSON for dashboards and templates or redirect to main HTML for WebVIs
+      operationId: get-version-content-index
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+        - $ref: '#/parameters/WebAppVersionId'
+      responses:
+        200:
+          description: The webapp's content. JSON for Dashboards, HTML for WebVIs
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  '/webapps/{id}/history/{versionId}/content/{path}':
+    get:
+      tags:
+        - history
+      summary: Get webapp version content by path
+      description: Get the webapp version content at a path. This applies to webapps with multiple files, such as WebVIs.
+      operationId: get-version-content
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+        - $ref: '#/parameters/WebAppVersionId'
+        - $ref: '#/parameters/WebAppContentPath'
+      responses:
+        200:
+          $ref: '#/definitions/WebAppContent'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+  '/webapps/{id}/history/{versionId}/rollback':
+    post:
+      tags:
+        - history
+      summary: Revert the content of a webapp to a certain version
+      description: Revert the content of a webapp to a certain version. This operation will create a new version of the webapp and the content will be the same as in specified version.
+      operationId: rollback-version
+      parameters:
+        - $ref: '#/parameters/WebAppId'
+        - $ref: '#/parameters/WebAppVersionId'
+      responses:
+        200:
+          $ref: '#/responses/CreateWebAppVersionResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        default:
+          $ref: '#/responses/Error'
+
 parameters:
   WebAppId:
     in: path
     name: id
     description: The webapp identifier
+    type: string
+    required: true
+  WebAppVersionId:
+    in: path
+    name: versionId
+    description: The webapp version identifier
     type: string
     required: true
   WebAppContentPath:
@@ -468,10 +600,18 @@ responses:
     description: Get WebApp Response
     schema:
       $ref: '#/definitions/WebApp'
+  GetWebAppVersionResponse:
+    description: Get WebApp Version Response
+    schema:
+      $ref: '#/definitions/WebAppVersion'
   CreateWebAppResponse:
     description: Create WebApp Response
     schema:
       $ref: '#/definitions/WebApp'
+  CreateWebAppVersionResponse:
+    description: Create WebApp Version Response
+    schema:
+      $ref: '#/definitions/WebAppVersion'
   ImportWebAppsResponse:
     description: Import WebApps Response
     schema:
@@ -504,6 +644,21 @@ responses:
             $ref: '#/definitions/WebApp'
         continuationToken:
           description: The continuation token can be used to paginate through the webapp list results. Provide this token in the next list webapps call.
+          type: string
+          example: token
+  ListWebAppVersionsResponse:
+    description: List WebApps Versions Response
+    schema:
+      title: List WebApps Versions Response
+      type: object
+      properties:
+        history:
+          description: List of webapp versions
+          type: array
+          items:
+            $ref: '#/definitions/WebAppVersion'
+        continuationToken:
+          description: The continuation token can be used to paginate through the webapp version list results. Provide this token in the next list webapp versions call.
           type: string
           example: token
   SharedEmailsResponse:
@@ -578,6 +733,27 @@ definitions:
       properties:
         type: object
         description: A map of key value properties associated with the webapp
+  WebAppVersion:
+    type: object
+    title: WebApp Version
+    properties:
+      versionId:
+        type: string
+        description: The webapp version Id
+        example: "asdsad-17a6-45323-b64b-65325287372d"
+      author:
+        type: string
+        description: The Id of the user that made the change
+        example: d4f6b766-da45-4fe5-85c5-bd745c402cf9
+      description:
+        type: string
+        description: The description of the change
+        example: A simple change
+      created:
+        type: string
+        format: date-time
+        description: The created timestamp (iso8601 format) of the change
+        example: "2019-12-02T15:31:45.379Z"
   WebAppContent:
     type: string
     format: binary
