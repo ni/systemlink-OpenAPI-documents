@@ -1475,6 +1475,27 @@ responses:
             $ref: '#/definitions/TestResultRequestObject'
         error:
           $ref: '#/definitions/Error'
+  ResultsUpdatePartialSuccessResponse:
+    description: Test Results Update Partial Success Response
+    schema:
+      description: Test Results Update Partial Success Response
+      title: ResultsUpdatePartialSuccessResponse
+      type: object
+      required:
+        - results
+      properties:
+        results:
+          description: Array of test results
+          type: array
+          items:
+            $ref: '#/definitions/TestResultResponseObject'
+        failed:
+          description: Array of test result update requests that failed
+          type: array
+          items:
+            $ref: '#/definitions/TestResultUpdateRequestObject'
+        error:
+          $ref: '#/definitions/Error'
   DeleteResultsResponse:
     description: Delete Test Results Response
     schema:
@@ -2129,7 +2150,7 @@ paths:
             $ref: '#/definitions/UpdateTestResultsRequest'
       responses:
         200:
-          $ref: '#/responses/ResultsPartialSuccessResponse'
+          $ref: '#/responses/ResultsUpdatePartialSuccessResponse'
         401:
           $ref: '#/responses/Unauthorized'
         default:
