@@ -575,8 +575,8 @@ definitions:
         type: object
         additionalProperties:
           type: string
-          example:
-            key1: value1
+        example:
+          key1: value1
       updatedAtQuery:
         description: Time query object for the test result's last updated timestamp
         type: array
