@@ -4,7 +4,7 @@ info:
   title: Alarm Web Service
   description: SystemLink Alarm Service HTTP API. Only available on SystemLink Server.
   contact:
-    name: National Instruments
+    name: NI
     url: 'https://www.ni.com/systemlink'
     email: support@ni.com
 basePath: /nialarm
@@ -189,6 +189,13 @@ definitions:
         description: The number of transitions which overflowed a given alarm instance's *transition's* field
         type: integer
         example: 0
+      notificationStrategyIds:
+        description: The IDs of the notification strategies which should be triggered if this request results
+          in an alarm instance being created or transitioning to a new highest severity
+        type: array
+        items:
+          type: string
+        example: []
       currentSeverityLevel:
         description: The current severity level of a given alarm instance
         type: integer
@@ -291,13 +298,6 @@ definitions:
         example: 2
         default: 2
         minimum: -1
-      notificationStrategyIds:
-        description: The IDs of the notification strategies which should be triggered if this request results
-          in an alarm instance being created or transitioning to a new highest severity
-        type: array
-        items:
-          type: string
-        example: []
       condition:
         description: A description of the condition associated with the transition
         type: string
@@ -731,6 +731,13 @@ paths:
                 example: 3d411024-9db8-42d1-8ab8-6cee0e6cd841
               transition:
                 $ref: '#/definitions/AlarmTransition'
+              notificationStrategyIds:
+                description: The IDs of the notification strategies which should be triggered if this request results
+                  in an alarm instance being created or transitioning to a new highest severity
+                type: array
+                items:
+                  type: string
+                example: []
               createdBy:
                 description: An identifier for who or what created a given alarm instance. This is usually
                   used to identify the particular rule engine which requested that a given alarm be created.

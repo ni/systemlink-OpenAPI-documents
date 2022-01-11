@@ -4,7 +4,7 @@ info:
   version: "1"
   title: "SystemLink Systems State Manager"
   contact:
-    name: National Instruments
+    name: NI
     url: https://www.ni.com/systemlink
     email: support@ni.com
 basePath: "/nisystemsstate"

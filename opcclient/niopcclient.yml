@@ -4,7 +4,7 @@ info:
   title: OpcClientService HTTP APIs
   description: OpcClientService HTTP APIs
   contact:
-    name: National Instruments
+    name: NI
     url: https://www.ni.com/systemlink
     email: support@ni.com
 basePath: /niopcclient

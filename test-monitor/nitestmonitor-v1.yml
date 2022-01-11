@@ -4,7 +4,7 @@ info:
   title: Test Monitor Web Service
   description: Test Monitor HTTP API
   contact:
-    name: National Instruments
+    name: NI
     url: 'https://www.ni.com/systemlink'
     email: support@ni.com
 basePath: /nitestmonitor
@@ -69,7 +69,7 @@ definitions:
         - name: TestMonitor.InvalidId
           code: -253700
           resourceType: TestResult
-          resourceId: 4afb2ce3741fe11d88838cc9
+          resourceId: bd9126f5-b0b1-446a-8b08-dc6460047377
           message: Invalid Id.
           args: []
   Operation:
@@ -386,7 +386,7 @@ definitions:
       id:
         description: Id of the test result
         type: string
-        example: 5e30938d93cac80468534720
+        example: bd9126f5-b0b1-446a-8b08-dc6460047377
       systemId:
         description: Id of the system
         type: string
@@ -450,7 +450,7 @@ definitions:
       id:
         description: Test result id to update
         type: string
-        example: 5e30938d93cac80468534720
+        example: bd9126f5-b0b1-446a-8b08-dc6460047377
       programName:
         description: Program name
         type: string
@@ -519,7 +519,7 @@ definitions:
         items:
           type: string
         example:
-          - 5e30938d93cac80468534720
+          - bd9126f5-b0b1-446a-8b08-dc6460047377
       programNames:
         description: Array of program names
         type: array
@@ -575,8 +575,8 @@ definitions:
         type: object
         additionalProperties:
           type: string
-          example:
-            key1: value1
+        example:
+          key1: value1
       updatedAtQuery:
         description: Time query object for the test result's last updated timestamp
         type: array
@@ -616,10 +616,10 @@ definitions:
     properties:
       stepId:
         type: string
-        example: 5e30934193cac8046851acb4
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
       resultId:
         type: string
-        example: 5e30938d93cac80468534720
+        example: bd9126f5-b0b1-446a-8b08-dc6460047377
   StepDataObject:
     title: Step Data
     description: Data returned by the test step
@@ -683,14 +683,14 @@ definitions:
         items:
           type: string
         example:
-          - 5e30934193cac8046851acb4
+          - bd9126f5-b0b1-446a-8b08-dc6460047377
       resultIds:
         description: Array of result ids
         type: array
         items:
           type: string
         example:
-          - 5e30938d93cac80468534720
+          - 02600cf8-c2bb-4ff9-a139-031e943fb0c0
       path:
         description: Step path
         type: string
@@ -701,8 +701,8 @@ definitions:
         items:
           type: string
         example:
-          - 5e30934193cac8046851acb2
-          - 5e30931993cac8046850a996
+          - 4e303cdd-efc5-477f-a331-932dcbdd1ca8
+          - 5bb6aa1a-4e88-4e50-ada4-4aa20b4e82b3
       statuses:
         description: Array of step statuses
         type: array
@@ -782,7 +782,7 @@ definitions:
       resultId:
         description: Result id
         type: string
-        example: 5e30938d93cac80468534720
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
       children:
         description: Nested child steps
         type: array
@@ -860,7 +860,7 @@ definitions:
       resultId:
         description: Result id
         type: string
-        example: 5e30938d93cac80468534720
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
       path:
         description: Step path
         type: string
@@ -1282,7 +1282,7 @@ paths:
                 type: array
                 items:
                   type: string
-                  example: 5e30938d93cac80468534720
+                  example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
               deleteSteps:
                 description: Indicates whether to delete the test steps associated with the test result
                 type: boolean

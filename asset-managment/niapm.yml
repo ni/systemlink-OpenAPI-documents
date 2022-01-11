@@ -4,7 +4,7 @@ info:
   title: Asset Performance Management Web Service
   description: Asset Performance Management HTTP API
   contact:
-    name: National Instruments
+    name: NI
     url: 'https://www.ni.com/systemlink'
     email: support@ni.com
 basePath: /niapm
@@ -530,6 +530,14 @@ definitions:
             items:
                 type: string
                 example: '608a5684800e325b48837c2a'
+          supportsSelfTest:
+            description: Whether the asset supports self-test.
+            type: boolean
+            example: true
+          supportsReset:
+            description: Whether the asset supports reset.
+            type: boolean
+            example: true
   AssetCreateModel:
     title: Asset Create Model
     description: >-
@@ -881,7 +889,7 @@ definitions:
       vendorName:
         description: Vendor name of the asset.
         type: string
-        example: National Instruments
+        example: NI
       vendorNumber:
         description: Vendor number of the asset.
         type: integer
@@ -1387,7 +1395,7 @@ parameters:
 
             - It determines the type of the report. When true, the file will be a calibration report. If this is false, the file will be an asset report. 
             
-            - If asset IDs are in the request, this property will not be used for filtering. If no asset IDs are in the request, setting this property to true will generate a report only for the calibrated assets.
+            - If asset IDs property or the filter string are in the request, this property will not be used for filtering. If no asset IDs are in the request and the filter string is unspecified, setting this property to true will generate a report only for the calibrated assets.
           
           type: boolean
           default: false
@@ -2802,7 +2810,7 @@ paths:
     post:
       tags: [assets]
       summary: Query assets
-      description: Returns the assets satisfying the provided filtering criteria. If the the caller requests a JSON inline response, the returned assets are filtered based on the filter string and the IDs and calibratableOnly properties are not taken into consideration. When the caller requests a CSV response, the filter is not taken into consideration, but the IDs and calibratableOnly properties are used to filter the assets from the response.
+      description: Returns the assets satisfying the provided filtering criteria. If the the caller requests a JSON inline response, the returned assets are filtered based on the filter string and the IDs and calibratableOnly properties are not taken into consideration. When the caller requests a CSV response, the IDs property has higher precedence than the filter string when used to filter the assets from the response.
       operationId: query-assets
       x-ni-auth: true
       parameters:
@@ -3215,14 +3223,14 @@ paths:
     post:
       tags: [reports]
       summary: Gets an asset availability history report for multiple assets.
-      description: Gets a CSV file report conatining asset availability history for multiple assets based on the specified timespans.
+      description: Gets a CSV file report containing asset availability history for multiple assets based on the specified timespans.
       operationId: query-assets-availability-report
       x-ni-auth: true
       parameters:
         - $ref: '#/parameters/QueryAssetsAvailabilityReportRequestBody'
       responses:
         200:
-          description: A CSV file report conatining the asset availability history of the assets specified by their IDs during the given time intervals.
+          description: A CSV file report containing the asset availability history of the assets specified by their IDs during the given time intervals.
           schema:
             type: file
             example: "Asset Id,Asset Name,Start Date,End Date,System Alias,Availability Percentage\n0030b58e-4e1a-47ea-9e1e-d60ba3341551,PXI3Slot7,2020-11-10 00:00:00Z,2021-01-06 00:00:00Z,NI_PXIe-8133_Embedded_Controller--MAC-00-80-2F-14-2C-06,0.0815299529054917"

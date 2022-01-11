@@ -4,7 +4,7 @@ info:
   title: Notebook Execution Service
   description: Execute Jupyter notebooks.
   contact:
-    name: National Instruments
+    name: NI
     url: https://www.ni.com/systemlink
     email: support@ni.com
 basePath: /ninbexec

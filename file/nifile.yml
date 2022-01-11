@@ -4,7 +4,7 @@ info:
   title: SystemLink File Service
   description: Upload and download files from a SystemLink server
   contact:
-    name: National Instruments
+    name: NI
     url: https://www.ni.com/systemlink
     email: support@ni.com
 basePath: /nifile
@@ -155,6 +155,11 @@ definitions:
         description: The workspace the file belongs to
         type: string
         example: MyWorkspace
+      lastUpdatedTimestamp:
+        description: The date and time the file was last updated in the file service
+        type: string
+        format: date-time
+        example: '2018-05-15T18:54:27.519Z'
   ServiceGroup:
     type: object
     properties:
@@ -571,6 +576,7 @@ paths:
             - created
             - id
             - size
+            - lastUpdatedTimestamp
         - in: query
           name: orderByDescending
           description: >-
