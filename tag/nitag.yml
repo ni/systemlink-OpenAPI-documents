@@ -17,11 +17,8 @@ securityDefinitions:
     type: apiKey
     name: x-ni-api-key
     in: header
-  basicAuth:
-    type: basic
 security:
   - apiKeyAuth: []
-  - basicAuth: []
 
 responses:
   Unauthorized:
@@ -310,28 +307,6 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/tags-rpc/subscriptions/heartbeat:
-    post:
-        tags:
-          - subscriptions
-        summary: Update the heartbeat timer of multiple subscriptions
-        description: Updates the heartbeat timers of multiple subscriptions. This route is deprecated in favor of /v2/refresh-subscriptions.
-        operationId: RpcUpdateSubscriptionHeartbeats
-        deprecated: true
-        parameters:
-          - in: body
-            name: subscriptionIds
-            description: IDs of the subscriptions whose heartbeat timers you want to update.
-            required: true
-            schema:
-              $ref: '#/definitions/SubscriptionIds'
-        responses:
-          200:
-            $ref: '#/responses/UpdateSubscriptionsHeartbeatResponse'
-          401:
-            $ref: '#/responses/Unauthorized'
-          default:
-            $ref: '#/responses/Error'
   /v2/refresh-subscriptions:
     post:
       tags:
@@ -353,28 +328,6 @@ paths:
           $ref: '#/responses/Unauthorized'
         default:
           $ref: '#/responses/Error'
-  /v1/tags-rpc/subscriptions/query-values:
-    post:
-      tags:
-      - subscriptions
-      summary: Get the current values for the tags from multiple subscriptions
-      description: Returns tag values from multiple subscriptions. This route is deprecated in favor of /v2/query-subscription-values.
-      operationId: RpcGetSubscriptionsTagValues
-      deprecated: true
-      parameters:
-        - in: body
-          name: subscriptionIds
-          description: IDs of the subscriptions whose heartbeat timers should be updated.
-          required: true
-          schema:
-            $ref: '#/definitions/SubscriptionIds'
-      responses:
-        200:
-          $ref: '#/responses/V1GetSubscriptionUpdatesResponse'
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
   /v2/query-subscription-values:
     post:
       tags:
@@ -391,38 +344,6 @@ paths:
       responses:
         200:
           $ref: '#/responses/V2GetSubscriptionUpdatesResponse'
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-  /v1/tags-rpc/subscriptions/delete:
-    post:
-      tags:
-        - subscriptions
-      summary: Delete multiple subscriptions
-      description: Deletes one or more subscriptions you specify. This route is deprecated in favor of /v2/delete-subscriptions.
-      operationId: RpcDeleteSubscriptions
-      deprecated: true
-      parameters:
-        - in: body
-          name: subscriptionIds
-          description: IDs of the subscriptions whose heartbeat timers should be updated.
-          required: true
-          schema:
-            $ref: '#/definitions/SubscriptionIds'
-      responses:
-        200:
-          description: Success
-          schema:
-            description: Response for deleting subscriptions.
-            type: object
-            title: Delete Subscriptions Response
-            properties:
-              invalidSubscriptionIds:
-                description: List of invalid subscription IDs.
-                type: array
-                items:
-                  type: string
         401:
           $ref: '#/responses/Unauthorized'
         default:
@@ -1220,9 +1141,8 @@ paths:
           name: tagValue
           description: A timestamped tag value.
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/TimestampedTagValue'
+            type: object
+            $ref: '#/definitions/TimestampedTagValue'
       responses:
         202:
           description: Accepted
@@ -1472,34 +1392,6 @@ paths:
           description: Success
         204:
           description: No content (Sent only from SystemLink Server)
-        401:
-          $ref: '#/responses/Unauthorized'
-        default:
-          $ref: '#/responses/Error'
-  /v1/tags-rpc/update-current-values:
-    post:
-      tags:
-        - tags
-      summary: Update the current values of multiple tags
-      description: Updates multiple tags to their current value. This route is deprecated in favor of /v2/update-current-values.
-      operationId: RpcUpdateTagCurrentValues
-      deprecated: true
-      parameters:
-        - in: body
-          name: updates
-          description: Updates
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/TagUpdate'
-          required: true
-      responses:
-        200:
-          description: Success
-        202:
-          description: Accepted (Sent only from SystemLink Server)
-        400:
-          description: Bad Request
         401:
           $ref: '#/responses/Unauthorized'
         default:
