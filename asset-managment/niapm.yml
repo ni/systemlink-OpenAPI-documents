@@ -136,6 +136,7 @@ definitions:
       - ACCESSORY
       - CAN
       - SWITCH_BLOCK_DEVICE
+      - SLSC
   AssetType:
     title: Asset Type
     description: All supported asset types.
@@ -1265,7 +1266,7 @@ parameters:
 
             - HardwareVersion: String representing the hardware version of an asset.
 
-            - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE.
+            - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE, SLSC.
 
             - IsNIAsset: Boolean flag specifying whether the asset is an NI asset or a third-party asset.
 
@@ -1451,7 +1452,7 @@ parameters:
 
             - HardwareVersion: String representing the hardware version of an asset.
 
-            - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE.
+            - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE, SLSC.
 
             - IsNIAsset: Boolean flag specifying whether the asset is an NI asset or a third-party asset.
 
@@ -1609,7 +1610,7 @@ parameters:
 
               - HardwareVersion: String representing the hardware version of an asset.
 
-              - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE.
+              - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE, SLSC.
 
               - IsNIAsset: Boolean flag specifying whether the asset is an NI asset or a third-party asset.
 
@@ -1759,7 +1760,7 @@ parameters:
 
               - HardwareVersion: String representing the hardware version of an asset.
 
-              - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE.
+              - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE, SLSC.
 
               - IsNIAsset: Boolean flag specifying whether the asset is an NI asset or a third-party asset.
 
@@ -1924,7 +1925,7 @@ parameters:
 
               - HardwareVersion: String representing the hardware version of an asset.
 
-              - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE.
+              - BusType: String enumeration representing the bus type of an asset. Possible values are: BUILT_IN_SYSTEM, PCI_PXI, USB, GPIB, VXI, SERIAL, TCP_IP, CRIO, SCXI, CDAQ, SWITCH_BLOCK, SCC, FIRE_WIRE, ACCESSORY, CAN, SWITCH_BLOCK_DEVICE, SLSC.
 
               - IsNIAsset: Boolean flag specifying whether the asset is an NI asset or a third-party asset.
 
