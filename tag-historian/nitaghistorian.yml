@@ -609,6 +609,39 @@ definitions:
         description: The workspace ID for the tag. If this is not specified, the default workspace will be used.
         type: string
         example: 0c80cf49-54e9-4e92-b117-3bfa574caa84
+  UpdateMetadata:
+    title: Update Metadata
+    description: Defines metadata values to update on a tag.
+    type: object
+    required:
+      - path
+      - type
+      - retention
+    properties:
+      path:
+        description: The path of the tag for which to update metadata.
+        type: string
+        example: system1.tag1
+      type:
+        description: Tag Data Type
+        type: string
+        enum: [BOOLEAN, INT, U_INT64, DATE_TIME, DOUBLE, STRING]
+      retention:
+        description: Retention period for tag values
+        type: string
+        enum: [COUNT, DURATION, PERMANENT, NONE]
+      maxHistoryCount:
+        description: For COUNT retention, it indicates the maximum number of tag istoric values that should be stored
+        type: integer
+        minimum: 0
+      historyTTLDays:
+        description: For DURATION retention, it indicates the maximum number of days the tag values should be stored
+        type: integer
+        minimum: 0
+      workspace:
+        description: The workspace ID of the tag. If not specified, the default workspace will be used.
+        type: string
+        example: 0c80cf49-54e9-4e92-b117-3bfa574caa84
 responses:
   Error:
     description: Error
@@ -901,6 +934,35 @@ paths:
       responses:
         200:
           description: OK
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/tags/update-metadata:
+    post:
+      tags: [history]
+      summary: Update metadata
+      description: Updates metadata for the specified tag. If the tag metadata does not exist it will be created.
+      operationId: UpdateMetadata
+      x-ni-operation: updateMetadata
+      parameters:
+        - in: body
+          name: Metadata
+          required: true
+          description: Defines the tag metadata to update.
+          schema:
+            description: Defines the tag metadata to update.
+            type: object
+            title: Update Metadata Request
+            properties:
+              metadata:
+                description: The metadata to update
+                type: array
+                items:
+                  $ref: '#/definitions/UpdateMetadata'
+      responses:
+        204:
+          description: No Content
         401:
           $ref: '#/responses/Unauthorized'
         default:
