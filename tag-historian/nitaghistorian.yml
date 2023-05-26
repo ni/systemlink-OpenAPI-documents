@@ -17,11 +17,8 @@ securityDefinitions:
     type: apiKey
     name: x-ni-api-key
     in: header
-  basicAuth:
-    type: basic
 security:
   - apiKeyAuth: []
-  - basicAuth: []
 definitions:
   Error:
     description: Contains error information
