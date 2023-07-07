@@ -6,7 +6,9 @@ info:
   contact:
     name: NI
     url: https://www.ni.com/systemlink
-    email: support@ni.com
+externalDocs:
+  description: Technical Support
+  url: https://ni.com/support
 basePath: "/nisystemsstate"
 x-ni-routing-key: 'Skyline.SystemsStateManager'
 x-ni-privilege-application: 'niws.nisysmgmt'
