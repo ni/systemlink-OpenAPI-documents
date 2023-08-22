@@ -67,6 +67,10 @@ responses:
           type: array
           items:
             $ref: '#/definitions/TagWithValue'
+        totalCount:
+          description: The total number of tags that matched the filter query.
+          type: number
+          example: 10
       required: [tagsWithValues]
   GetTagsResponse:
     description: List of tags, excluding current and aggregate values
