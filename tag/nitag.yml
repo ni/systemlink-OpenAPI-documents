@@ -68,7 +68,7 @@ responses:
           items:
             $ref: '#/definitions/TagWithValue'
         totalCount:
-          description: The total number of tags that matched the filter query.
+          description: The total number of tags that matched the query filter.
           type: number
           example: 10
       required: [tagsWithValues]
