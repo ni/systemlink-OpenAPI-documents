@@ -17,16 +17,8 @@ securityDefinitions:
     type: apiKey
     name: x-ni-api-key
     in: header
-  basicAuth:
-    type: basic
-  cookieAuth:
-    type: apiKey
-    in: header
-    name: Cookie
 security:
   - apiKeyAuth: []
-  - basicAuth: []
-  - cookieAuth: []
 x-ni-routing-key: Skyline.TestMonitor
 definitions:
   Error:
@@ -131,6 +123,8 @@ definitions:
         properties:
           getResults:
             $ref: '#/definitions/Operation'
+          getResultsPropertyKeys:
+            $ref: '#/definitions/Operation'
           queryResults:
             $ref: '#/definitions/Operation'
           createResults:
@@ -209,6 +203,40 @@ definitions:
         description: The value
         type: object
         example: 1.3
+  OrderByComparisonType:
+    tile: Order By Comparison Type
+    description: >-
+        An enumeration of comparison types that can be used for ordered queries.
+        For non-DEFAULT comparisons, values that cannot be converted will be considered the smallest value.
+    type: string
+    enum:
+      - DEFAULT
+      - LEXICOGRAPHIC
+      - NUMERIC
+  ProductValuesQueryField: 
+    title: Product Values Query Field
+    description: An enumeration of product fields for which the values can be queried for.
+    type: string
+    enum:
+      - ID
+      - PART_NUMBER
+      - NAME
+      - FAMILY
+      - UPDATED_AT
+    example:
+      FAMILY
+  ProductQueryOrderByField: 
+    title: Product Query OrderBy Field
+    description: An enumeration of fields by which products can be ordered.
+    type: string
+    enum:
+      - ID
+      - PART_NUMBER
+      - NAME
+      - FAMILY
+      - UPDATED_AT
+    example:
+      FAMILY
   ProductField:
     title: Product Field
     description: An enumeration of all fields in a Product.
@@ -224,6 +252,41 @@ definitions:
       - FILE_IDS
     example:
       FAMILY
+  ResultValuesQueryField:
+    title: Result Values Query Field
+    description: An enumeration of result fields for which the values can be queried for.
+    type: string
+    enum:
+      - ID
+      - STARTED_AT
+      - UPDATED_AT
+      - PROGRAM_NAME
+      - SYSTEM_ID
+      - HOST_NAME
+      - OPERATOR
+      - SERIAL_NUMBER
+      - PART_NUMBER
+      - TOTAL_TIME_IN_SECONDS
+    example:
+      PROGRAM_NAME
+  ResultQueryOrderByField:
+    title: Result Query OrderBy Field
+    description: An enumeration of fields by which results can be ordered.
+    type: string
+    enum:
+      - ID
+      - STARTED_AT
+      - UPDATED_AT
+      - PROGRAM_NAME
+      - SYSTEM_ID
+      - HOST_NAME
+      - OPERATOR
+      - SERIAL_NUMBER
+      - PART_NUMBER
+      - PROPERTIES
+      - TOTAL_TIME_IN_SECONDS
+    example:
+      PROGRAM_NAME
   ResultField:
     title: Result Field
     description: An enumeration of all fields in a Result.
@@ -243,10 +306,45 @@ definitions:
       - KEYWORDS
       - PROPERTIES
       - FILE_IDS
+      - DATA_TABLE_IDS
       - STATUS_TYPE_SUMMARY
       - WORKSPACE
     example:
       PROGRAM_NAME
+  StepValuesQueryField:
+    title: Step Values Query Field
+    description: An enumeration of step fields for which the values can be queried for.
+    type: string
+    enum:
+      - NAME
+      - STEP_TYPE
+      - STEP_ID
+      - PARENT_ID
+      - RESULT_ID
+      - PATH
+      - TOTAL_TIME_IN_SECONDS
+      - STARTED_AT
+      - UPDATED_AT
+      - DATA_MODEL
+    example:
+      STEP_TYPE
+  StepQueryOrderByField:
+    title: Step Query OrderBy Field
+    description: An enumeration of fields by which steps can be ordered.
+    type: string
+    enum:
+      - NAME
+      - STEP_TYPE
+      - STEP_ID
+      - PARENT_ID
+      - RESULT_ID
+      - PATH
+      - TOTAL_TIME_IN_SECONDS
+      - STARTED_AT
+      - UPDATED_AT
+      - DATA_MODEL
+    example:
+      STEP_TYPE
   StepField:
     title: Step Field
     description: An enumeration of all fields in a Step.
@@ -269,8 +367,21 @@ definitions:
       - DATA
       - HAS_CHILDREN
       - WORKSPACE
+      - KEYWORDS
+      - PROPERTIES
     example:
       STEP_TYPE
+  PathQueryOrderByField:
+    title: Path Query OrderBy Field
+    description: An enumeration of fields by which paths can be ordered.
+    type: string
+    enum:
+      - ID
+      - PROGRAM_NAME
+      - PART_NUMBER
+      - PATH
+    example:
+      PROGRAM_NAME
   PathField:
     title: Path Field
     description: An enumeration of all fields in a Path.
@@ -338,7 +449,7 @@ definitions:
         example:
           key1: value1
       fileIds:
-        description: Array of file IDs attached to the product
+        description: Array of file IDs attached to the product. This API does not verify that the file IDs included exist.
         type: array
         items:
           type: string
@@ -386,7 +497,7 @@ definitions:
         example:
           key1: value1
       fileIds:
-        description: Array of file IDs attached to the product
+        description: Array of file IDs attached to the product. This API does not verify that the file IDs included exist.
         type: array
         items:
           type: string
@@ -423,7 +534,7 @@ definitions:
         example:
           key1: value1
       fileIds:
-        description: Array of file IDs attached to the product
+        description: Array of file IDs attached to the product. This API does not verify that the file IDs included exist.
         type: array
         items:
           type: string
@@ -475,11 +586,17 @@ definitions:
         type: string
         example: cRIO-9030
       fileIds:
-        description: Array of file ids attached to the test result
+        description: Array of file ids attached to the test result. This API does not verify that the file IDs included exist.
         type: array
         items:
           type: string
         example: [5e30934193cac8046851acb2]
+      dataTableIds:
+        description: Array of data table ids attached to the test result. This API does not verify that the data table IDs included exist.
+        type: array
+        items:
+          type: string
+        example: [62333547f7521f2f2f4615e5]
       startedAt:
         description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
@@ -562,7 +679,13 @@ definitions:
         example:
           key1: value1
       fileIds:
-        description: Array of file ids attached to the test result
+        description: Array of file ids attached to the test result. This API does not verify that the file IDs included exist.
+        type: array
+        items:
+          type: string
+        example: []
+      dataTableIds:
+        description: Array of data table ids attached to the test result. This API does not verify that the data table IDs included exist.
         type: array
         items:
           type: string
@@ -629,11 +752,17 @@ definitions:
         type: string
         example: cRIO-9030
       fileIds:
-        description: Array of file ids attached to the test result
+        description: Array of file ids attached to the test result. This API does not verify that the file IDs included exist.
         type: array
         items:
           type: string
         example: [5e30934193cac8046851acb2]
+      dataTableIds:
+        description: Array of data table ids attached to the test result. This API does not verify that the data table IDs included exist.
+        type: array
+        items:
+          type: string
+        example: [62333547f7521f2f2f4615e5]
       startedAt:
         description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
@@ -701,11 +830,17 @@ definitions:
         type: string
         example: cRIO-9030
       fileIds:
-        description: Array of file ids attached to the test result
+        description: Array of file ids attached to the test result. This API does not verify that the file IDs included exist.
         type: array
         items:
           type: string
         example: [5e30934193cac8046851acb2]
+      dataTableIds:
+        description: Array of data table ids attached to the test result. This API does not verify that the data table IDs included exist.
+        type: array
+        items:
+          type: string
+        example: [62333547f7521f2f2f4615e5]
       startedAt:
         description: ISO-8601 formatted timestamp indicating when the test result began
         type: string
@@ -723,7 +858,6 @@ definitions:
         example: f94b178e-288c-4101-afb1-833992413aa7
   UpdateTestResultsRequest:
     title: Update Test Results Request
-    type: object
     required:
       - results
     properties:
@@ -812,7 +946,6 @@ definitions:
     description: >-
       Product fields that the response can be ordered by are 
       `ID`, `PART_NUMBER`, `NAME`, `FAMILY`, and `UPDATED_AT`.
-    type: object
     properties:
       filter:
         description: The query filter in Dynamic Linq
@@ -831,7 +964,7 @@ definitions:
         example:
           - "cRIO"
       orderBy:
-        $ref: '#/definitions/ProductField'
+        $ref: '#/definitions/ProductQueryOrderByField'
       descending:
         description: ->
           Whether to return the products in descending order.
@@ -875,7 +1008,6 @@ definitions:
     description: >-
       Path fields that the response can be ordered by are 
       `ID`, `PROGRAM_NAME`, `PART_NUMBER`, and `PATH`.
-    type: object
     properties:
       filter:
         description: The query filter in Dynamic Linq
@@ -894,7 +1026,7 @@ definitions:
         example:
           - 2.5
       orderBy:
-        $ref: '#/definitions/PathField'
+        $ref: '#/definitions/PathQueryOrderByField'
       descending:
         description: ->
           Whether to return the paths in descending order.
@@ -935,12 +1067,7 @@ definitions:
         example: false
   ResultsAdvancedQuery:
     title: Advanced Query Object for Test Results
-    description: >-
-      Test Result fields that the response can be ordered by are
-      `ID`, `STARTED_AT`, `UPDATED_AT`, `PROGRAM_NAME`, `SYSTEM_ID`, 
-      `HOST_NAME`, `OPERATOR`, `SERIAL_NUMBER`, `PART_NUMBER`, 
-      and `TOTAL_TIME_IN_SECONDS`.
-    type: object
+    description: Results advanced query request object.
     properties:
       filter:
         description: The result query filter in Dynamic Linq
@@ -975,13 +1102,21 @@ definitions:
         example:
           - cRIO
       orderBy:
-        $ref: '#/definitions/ResultField'
+        $ref: '#/definitions/ResultQueryOrderByField'
       descending:
-        description: ->
+        description: >-
           Whether to return the results in descending order.
         type: boolean
         default: false
         example: false
+      orderByKey:
+        description: >-
+          The property name to order by when ordering by PROPERTIES. Results that do not contain the orderByKey
+          will be considered the smallest value.
+        type: string
+        example: null
+      orderByComparisonType:
+        $ref: '#/definitions/OrderByComparisonType'
       projection:
         description: >-
           Specifies the result fields to project. When a field value is given here,
@@ -1023,7 +1158,6 @@ definitions:
       `NAME`, `STEP_TYPE`, `STEP_ID`, `PARENT_ID`, `RESULT_ID`, 
       `PATH`, `TOTAL_TIME_IN_SECONDS`, `STARTED_AT`, `UPDATED_AT`,
       and `DATA_MODEL`.
-    type: object
     properties:
       filter:
         description: The step query filter in Dynamic Linq
@@ -1061,7 +1195,7 @@ definitions:
         example:
           - user1
       orderBy:
-        $ref: '#/definitions/StepField'
+        $ref: '#/definitions/StepQueryOrderByField'
       descending:
         description: ->
           Whether to return the steps in descending order.
@@ -1104,12 +1238,11 @@ definitions:
         $ref: '#/definitions/ResponseFormat'
   ProductValuesQuery:
     title: Product Values Query
-    type: object
     required:
     - field
     properties:
       field:
-        $ref: '#/definitions/ProductField'
+        $ref: '#/definitions/ProductValuesQueryField'
       filter:
         description: >-
           A Dynamic Linq query which specifies the products to consider when
@@ -1135,12 +1268,11 @@ definitions:
         example: cR
   ResultValuesQuery:
     title: Result Values Query
-    type: object
     required:
     - field
     properties:
       field:
-        $ref: '#/definitions/ResultField'
+        $ref: '#/definitions/ResultValuesQueryField'
       filter:
         description: >-
           A Dynamic Linq query which specifies the results to consider when
@@ -1166,12 +1298,11 @@ definitions:
         example: op
   StepValuesQuery:
     title: Step Values Query
-    type: object
     required:
     - field
     properties:
       field:
-        $ref: '#/definitions/StepField'
+        $ref: '#/definitions/StepValuesQueryField'
       filter:
         description: >-
           A Dynamic Linq query which specifies the steps to consider when
@@ -1240,7 +1371,6 @@ definitions:
             additionalProp: myValue
   TestStepsDeleteRequest:
     title: Test Steps Delete Request
-    type: object
     required:
       - steps
     properties:
@@ -1308,9 +1438,23 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/NamedValueObject'
-  TestStepCreateOrUpdateRequestObject:
+      keywords:
+        description: Words or phrases associated with the step
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      properties:
+        description: Test step properties
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+  TestStepCreateRequestObject:
     title: Test Step Create or Update Request
-    type: object
     required:
       - steps
     properties:
@@ -1321,6 +1465,28 @@ definitions:
           $ref: '#/definitions/TestStepRequestObject'
       updateResultTotalTime:
         description: Determine test result total time from the test step total times.
+        type: boolean
+        default: false
+  TestStepUpdateRequestObject:
+    title: Test Step Create or Update Request
+    required:
+      - steps
+    properties:
+      steps:
+        description: Array of test steps to create
+        type: array
+        items:
+          $ref: '#/definitions/TestStepRequestObject'
+      updateResultTotalTime:
+        description: Determine test result total time from the test step total times.
+        type: boolean
+        default: false
+      replaceKeywords:
+        description: Replace with existing keywords instead of merging them
+        type: boolean
+        default: false
+      replaceProperties:
+        description: Replace with existing properties instead of merging them
         type: boolean
         default: false
   TestStepResponseObject:
@@ -1402,6 +1568,21 @@ definitions:
         description: The workspace the test step belongs to
         type: string
         example: f94b178e-288c-4101-afb1-833992413aa7
+      keywords:
+        description: Words or phrases associated with the test step
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      properties:
+        description: Test step properties
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
 responses:
   Error:
     description: Error
@@ -1873,7 +2054,6 @@ paths:
           schema:
             description: Array of products to create
             title: CreateProductsRequest
-            type: object
             required:
               - products
             properties:
@@ -1974,7 +2154,6 @@ paths:
           schema:
             description: Array of products to update
             title: UpdateProductsRequest
-            type: object
             required:
               - products
             properties:
@@ -2010,7 +2189,6 @@ paths:
           schema:
             description: Array of products
             title: DeleteProductsRequest
-            type: object
             required:
               - ids
             properties:
@@ -2111,7 +2289,6 @@ paths:
           schema:
             description: Array of test results to create
             title: CreateTestResultsRequest
-            type: object
             required:
               - results
             properties:
@@ -2241,7 +2418,6 @@ paths:
           schema:
             description: Array of test result ids
             title: DeleteResultsRequest
-            type: object
             required:
               - ids
             properties:
@@ -2344,7 +2520,7 @@ paths:
           description: Test step object
           required: true
           schema:
-            $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
+            $ref: '#/definitions/TestStepCreateRequestObject'
       responses:
         200:
           $ref: '#/responses/StepsPartialSuccessResponse'
@@ -2452,7 +2628,7 @@ paths:
           description: Array of test steps
           required: true
           schema:
-            $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
+            $ref: '#/definitions/TestStepUpdateRequestObject'
       responses:
         200:
           $ref: '#/responses/StepsPartialSuccessResponse'
