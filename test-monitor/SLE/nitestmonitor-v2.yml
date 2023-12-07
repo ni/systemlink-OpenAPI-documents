@@ -204,7 +204,7 @@ definitions:
         type: object
         example: 1.3
   OrderByComparisonType:
-    tile: Order By Comparison Type
+    title: Order By Comparison Type
     description: >-
         An enumeration of comparison types that can be used for ordered queries.
         For non-DEFAULT comparisons, values that cannot be converted will be considered the smallest value.
