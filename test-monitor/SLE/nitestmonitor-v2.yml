@@ -367,8 +367,6 @@ definitions:
       - DATA
       - HAS_CHILDREN
       - WORKSPACE
-      - KEYWORDS
-      - PROPERTIES
     example:
       STEP_TYPE
   PathQueryOrderByField:
@@ -1438,22 +1436,7 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/NamedValueObject'
-      keywords:
-        description: Words or phrases associated with the step
-        type: array
-        items:
-          type: string
-        example:
-          - keyword1
-          - keyword2
-      properties:
-        description: Test step properties
-        type: object
-        additionalProperties:
-          type: string
-        example:
-          key1: value1
-  TestStepCreateRequestObject:
+  TestStepCreateOrUpdateRequestObject:
     title: Test Step Create or Update Request
     required:
       - steps
@@ -1465,28 +1448,6 @@ definitions:
           $ref: '#/definitions/TestStepRequestObject'
       updateResultTotalTime:
         description: Determine test result total time from the test step total times.
-        type: boolean
-        default: false
-  TestStepUpdateRequestObject:
-    title: Test Step Create or Update Request
-    required:
-      - steps
-    properties:
-      steps:
-        description: Array of test steps to create
-        type: array
-        items:
-          $ref: '#/definitions/TestStepRequestObject'
-      updateResultTotalTime:
-        description: Determine test result total time from the test step total times.
-        type: boolean
-        default: false
-      replaceKeywords:
-        description: Replace with existing keywords instead of merging them
-        type: boolean
-        default: false
-      replaceProperties:
-        description: Replace with existing properties instead of merging them
         type: boolean
         default: false
   TestStepResponseObject:
@@ -1568,21 +1529,6 @@ definitions:
         description: The workspace the test step belongs to
         type: string
         example: f94b178e-288c-4101-afb1-833992413aa7
-      keywords:
-        description: Words or phrases associated with the test step
-        type: array
-        items:
-          type: string
-        example:
-          - keyword1
-          - keyword2
-      properties:
-        description: Test step properties
-        type: object
-        additionalProperties:
-          type: string
-        example:
-          key1: value1
 responses:
   Error:
     description: Error
@@ -2520,7 +2466,7 @@ paths:
           description: Test step object
           required: true
           schema:
-            $ref: '#/definitions/TestStepCreateRequestObject'
+            $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
       responses:
         200:
           $ref: '#/responses/StepsPartialSuccessResponse'
@@ -2628,7 +2574,7 @@ paths:
           description: Array of test steps
           required: true
           schema:
-            $ref: '#/definitions/TestStepUpdateRequestObject'
+            $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
       responses:
         200:
           $ref: '#/responses/StepsPartialSuccessResponse'
