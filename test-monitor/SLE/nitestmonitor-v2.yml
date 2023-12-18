@@ -1,0 +1,2699 @@
+﻿swagger: '2.0'
+info:
+  version: '2'
+  title: Test Monitor Web Service
+  description: Test Monitor HTTP API
+  contact:
+    name: NI
+    url: 'https://www.ni.com/systemlink'
+    email: support@ni.com
+basePath: /nitestmonitor
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  apiKeyAuth:
+    type: apiKey
+    name: x-ni-api-key
+    in: header
+security:
+  - apiKeyAuth: []
+x-ni-routing-key: Skyline.TestMonitor
+definitions:
+  Error:
+    description: Contains error information
+    type: object
+    properties:
+      name:
+        description: String error code
+        type: string
+      code:
+        description: Numeric error code
+        type: integer
+        format: int32
+      resourceType:
+        description: Type of resource associated with the error
+        type: string
+      resourceId:
+        description: Identifier of the resource associated with the error
+        type: string
+      message:
+        description: Complete error message
+        type: string
+      args:
+        description: Positional argument values for the error code
+        type: array
+        items:
+          type: string
+      innerErrors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+    example:
+      name: TestMonitorErrorCodes.OneOrMoreErrorsOccurred
+      code: -252921
+      message: >-
+        One or more errors occurred. See the contained list for details of each
+        error.
+      args: []
+      innerErrors:
+        - name: TestMonitor.InvalidId
+          code: -253700
+          resourceType: TestResult
+          resourceId: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
+          message: Invalid Id.
+          args: []
+  Operation:
+    description: Operation provided by the API
+    type: object
+    properties:
+      available:
+        type: boolean
+        description: Whether the operation is available to the caller
+      version:
+        type: integer
+        format: int32
+        description: Version of the available operation
+    required: [available]
+    example:
+      available: true
+      version: 1
+  V1Operations:
+    title: V1 Operations
+    description: V1 operations
+    type: object
+    properties:
+      operations:
+        description: Available operations in the v1 version of the API.
+        type: object
+        properties:
+          getResults:
+            $ref: '#/definitions/Operation'
+          queryResults:
+            $ref: '#/definitions/Operation'
+          createResults:
+            $ref: '#/definitions/Operation'
+          updateResults:
+            $ref: '#/definitions/Operation'
+          deleteResult:
+            $ref: '#/definitions/Operation'
+          deleteManyResults:
+            $ref: '#/definitions/Operation'
+          getSteps:
+            $ref: '#/definitions/Operation'
+          querySteps:
+            $ref: '#/definitions/Operation'
+          createSteps:
+            $ref: '#/definitions/Operation'
+          updateSteps:
+            $ref: '#/definitions/Operation'
+          deleteStep:
+            $ref: '#/definitions/Operation'
+          deleteManySteps:
+            $ref: '#/definitions/Operation'
+  V2Operations:
+    title: V2 Operations
+    description: V2 operations
+    type: object
+    properties:
+      operations:
+        description: Available operations in the v2 version of the API.
+        type: object
+        properties:
+          getResults:
+            $ref: '#/definitions/Operation'
+          getResultsPropertyKeys:
+            $ref: '#/definitions/Operation'
+          queryResults:
+            $ref: '#/definitions/Operation'
+          createResults:
+            $ref: '#/definitions/Operation'
+          updateResults:
+            $ref: '#/definitions/Operation'
+          deleteResult:
+            $ref: '#/definitions/Operation'
+          deleteManyResults:
+            $ref: '#/definitions/Operation'
+          getSteps:
+            $ref: '#/definitions/Operation'
+          querySteps:
+            $ref: '#/definitions/Operation'
+          createSteps:
+            $ref: '#/definitions/Operation'
+          updateSteps:
+            $ref: '#/definitions/Operation'
+          deleteStep:
+            $ref: '#/definitions/Operation'
+          deleteManySteps:
+            $ref: '#/definitions/Operation'
+          getProducts:
+            $ref: '#/definitions/Operation'
+          queryProducts:
+            $ref: '#/definitions/Operation'
+          createProducts:
+            $ref: '#/definitions/Operation'
+          updateProducts:
+            $ref: '#/definitions/Operation'
+          deleteProducts:
+            $ref: '#/definitions/Operation'
+          deleteManyProducts:
+            $ref: '#/definitions/Operation'
+          queryPaths:
+            $ref: '#/definitions/Operation'
+  StatusObject:
+    title: Status Object
+    description: Status object comprised of a type and display name
+    type: object
+    required:
+      - statusType
+    properties:
+      statusType:
+        description: Status type enum
+        type: string
+        enum:
+          - LOOPING
+          - SKIPPED
+          - CUSTOM
+          - DONE
+          - PASSED
+          - FAILED
+          - RUNNING
+          - WAITING
+          - TERMINATED
+          - ERRORED
+          - TIMED_OUT
+        example: PASSED
+      statusName:
+        description: Status name
+        type: string
+        example: Passed
+  NamedValueObject:
+    title: Named Value
+    description: Represents a named value or parameter
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        description: The name of the value
+        type: string
+        example: Voltage
+      value:
+        description: The value
+        type: object
+        example: 1.3
+  OrderByComparisonType:
+    title: Order By Comparison Type
+    description: >-
+        An enumeration of comparison types that can be used for ordered queries.
+        For non-DEFAULT comparisons, values that cannot be converted will be considered the smallest value.
+    type: string
+    enum:
+      - DEFAULT
+      - LEXICOGRAPHIC
+      - NUMERIC
+  ProductValuesQueryField: 
+    title: Product Values Query Field
+    description: An enumeration of product fields for which the values can be queried for.
+    type: string
+    enum:
+      - ID
+      - PART_NUMBER
+      - NAME
+      - FAMILY
+      - UPDATED_AT
+    example:
+      FAMILY
+  ProductQueryOrderByField: 
+    title: Product Query OrderBy Field
+    description: An enumeration of fields by which products can be ordered.
+    type: string
+    enum:
+      - ID
+      - PART_NUMBER
+      - NAME
+      - FAMILY
+      - UPDATED_AT
+    example:
+      FAMILY
+  ProductField:
+    title: Product Field
+    description: An enumeration of all fields in a Product.
+    type: string
+    enum:
+      - ID
+      - PART_NUMBER
+      - NAME
+      - FAMILY
+      - UPDATED_AT
+      - KEYWORDS
+      - PROPERTIES
+      - FILE_IDS
+    example:
+      FAMILY
+  ResultValuesQueryField:
+    title: Result Values Query Field
+    description: An enumeration of result fields for which the values can be queried for.
+    type: string
+    enum:
+      - ID
+      - STARTED_AT
+      - UPDATED_AT
+      - PROGRAM_NAME
+      - SYSTEM_ID
+      - HOST_NAME
+      - OPERATOR
+      - SERIAL_NUMBER
+      - PART_NUMBER
+      - TOTAL_TIME_IN_SECONDS
+    example:
+      PROGRAM_NAME
+  ResultQueryOrderByField:
+    title: Result Query OrderBy Field
+    description: An enumeration of fields by which results can be ordered.
+    type: string
+    enum:
+      - ID
+      - STARTED_AT
+      - UPDATED_AT
+      - PROGRAM_NAME
+      - SYSTEM_ID
+      - HOST_NAME
+      - OPERATOR
+      - SERIAL_NUMBER
+      - PART_NUMBER
+      - PROPERTIES
+      - TOTAL_TIME_IN_SECONDS
+    example:
+      PROGRAM_NAME
+  ResultField:
+    title: Result Field
+    description: An enumeration of all fields in a Result.
+    type: string
+    enum:
+      - ID
+      - STATUS
+      - STARTED_AT
+      - UPDATED_AT
+      - PROGRAM_NAME
+      - SYSTEM_ID
+      - HOST_NAME
+      - OPERATOR
+      - SERIAL_NUMBER
+      - PART_NUMBER
+      - TOTAL_TIME_IN_SECONDS
+      - KEYWORDS
+      - PROPERTIES
+      - FILE_IDS
+      - DATA_TABLE_IDS
+      - STATUS_TYPE_SUMMARY
+      - WORKSPACE
+    example:
+      PROGRAM_NAME
+  StepValuesQueryField:
+    title: Step Values Query Field
+    description: An enumeration of step fields for which the values can be queried for.
+    type: string
+    enum:
+      - NAME
+      - STEP_TYPE
+      - STEP_ID
+      - PARENT_ID
+      - RESULT_ID
+      - PATH
+      - TOTAL_TIME_IN_SECONDS
+      - STARTED_AT
+      - UPDATED_AT
+      - DATA_MODEL
+    example:
+      STEP_TYPE
+  StepQueryOrderByField:
+    title: Step Query OrderBy Field
+    description: An enumeration of fields by which steps can be ordered.
+    type: string
+    enum:
+      - NAME
+      - STEP_TYPE
+      - STEP_ID
+      - PARENT_ID
+      - RESULT_ID
+      - PATH
+      - TOTAL_TIME_IN_SECONDS
+      - STARTED_AT
+      - UPDATED_AT
+      - DATA_MODEL
+    example:
+      STEP_TYPE
+  StepField:
+    title: Step Field
+    description: An enumeration of all fields in a Step.
+    type: string
+    enum:
+      - NAME
+      - STEP_TYPE
+      - STEP_ID
+      - PARENT_ID
+      - RESULT_ID
+      - PATH
+      - PATH_IDS
+      - STATUS
+      - TOTAL_TIME_IN_SECONDS
+      - STARTED_AT
+      - UPDATED_AT
+      - INPUTS
+      - OUTPUTS
+      - DATA_MODEL
+      - DATA
+      - HAS_CHILDREN
+      - WORKSPACE
+    example:
+      STEP_TYPE
+  PathQueryOrderByField:
+    title: Path Query OrderBy Field
+    description: An enumeration of fields by which paths can be ordered.
+    type: string
+    enum:
+      - ID
+      - PROGRAM_NAME
+      - PART_NUMBER
+      - PATH
+    example:
+      PROGRAM_NAME
+  PathField:
+    title: Path Field
+    description: An enumeration of all fields in a Path.
+    type: string
+    enum:
+      - ID
+      - PROGRAM_NAME
+      - PART_NUMBER
+      - PATH
+      - PATH_NAMES
+      - INPUTS
+      - OUTPUTS
+      - MEASUREMENTS
+    example:
+      PROGRAM_NAME
+  ValueType:
+    title: Value Type
+    description: An enumeration of the possible types of variant values.
+    type: string
+    enum:
+      - MIXED
+      - NULL
+      - BOOLEAN
+      - NUMBER
+      - STRING
+      - ARRAY
+      - OBJECT
+  ResponseFormat:
+    title: Response Format
+    description: Enum indicating the expected response format (CSV or JSON). If unspecified, JSON is the default.
+    type: string
+    enum:
+      - JSON
+      - CSV
+    default: 'JSON'
+  ProductRequestObject:
+    title: Product Request
+    type: object
+    properties:
+      partNumber:
+        description: The part number of the product
+        type: string
+        example: 156502A-11L
+      name:
+        description: The name of the product
+        type: string
+        example: cRIO-9030
+      family:
+        description: The family of the product
+        type: string
+        example: cRIO
+      keywords:
+        description: Words or phrases associated with the product
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      properties:
+        description: Key-value pairs associated with the product
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      fileIds:
+        description: Array of file IDs attached to the product. This API does not verify that the file IDs included exist.
+        type: array
+        items:
+          type: string
+        example: [5ccb19ce5aa0a3348872c3e3]
+  ProductResponseObject:
+    title: Product Response
+    type: object
+    properties:
+      id:
+        description: ID of the product
+        type: string
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
+      partNumber:
+        description: The part number of the product
+        type: string
+        example: 156502A-11L
+      name:
+        description: The name of the product
+        type: string
+        example: cRIO-9030
+      family:
+        description: The family of the product
+        type: string
+        example: cRIO
+      updatedAt:
+        description: >-
+          ISO-8601 formatted timestamp indicating when the product
+          was last updated.
+        type: string
+        format: date-time
+        example: '2018-05-09T15:07:42.527921Z'
+      keywords:
+        description: Words or phrases associated with the product
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      properties:
+        description: Key-value pairs associated with the product
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      fileIds:
+        description: Array of file IDs attached to the product. This API does not verify that the file IDs included exist.
+        type: array
+        items:
+          type: string
+        example: [5e30934193cac8046851acb2]
+  ProductUpdateRequestObject:
+    title: Product Update Request
+    type: object
+    properties:
+      id:
+        description: ID of the product to update
+        type: string
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
+      name:
+        description: The name of the product
+        type: string
+        example: cRIO-9030
+      family:
+        description: The family of the product
+        type: string
+        example: cRIO
+      keywords:
+        description: Words or phrases associated with the product
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      properties:
+        description: Key-value pairs associated with the product
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      fileIds:
+        description: Array of file IDs attached to the product. This API does not verify that the file IDs included exist.
+        type: array
+        items:
+          type: string
+        example: [5e30934193cac8046851acb2]
+  TestResultRequestObject:
+    title: Test Result Request
+    type: object
+    required: [programName, status]
+    properties:
+      programName:
+        description: Program name
+        type: string
+        example: My Program Name
+      status:
+        $ref: '#/definitions/StatusObject'
+      systemId:
+        description: System id
+        type: string
+        example: my-system
+      hostName:
+        description: Host name
+        type: string
+        example: My-Host
+      properties:
+        description: Test result properties
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      keywords:
+        description: Words or phrases associated with the test result
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      serialNumber:
+        description: Serial number
+        type: string
+        example: 123-456
+      operator:
+        description: Operator
+        type: string
+        example: admin
+      partNumber:
+        description: The part number of the device under test.
+        type: string
+        example: cRIO-9030
+      fileIds:
+        description: Array of file ids attached to the test result. This API does not verify that the file IDs included exist.
+        type: array
+        items:
+          type: string
+        example: [5e30934193cac8046851acb2]
+      dataTableIds:
+        description: Array of data table ids attached to the test result. This API does not verify that the data table IDs included exist.
+        type: array
+        items:
+          type: string
+        example: [62333547f7521f2f2f4615e5]
+      startedAt:
+        description: ISO-8601 formatted timestamp indicating when the test result began
+        type: string
+        format: date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      totalTimeInSeconds:
+        description: Total run-time of the test in seconds
+        type: number
+        format: double
+        default: 0
+        example: 29.9
+      workspace:
+        description: The workspace the test result belongs to
+        type: string
+        example: f94b178e-288c-4101-afb1-833992413aa7
+  TestResultResponseObject:
+    title: Test Result Response
+    type: object
+    required:
+      - id
+    properties:
+      status:
+        $ref: '#/definitions/StatusObject'
+      startedAt:
+        description: ISO-8601 formatted timestamp indicating when the test result began
+        type: string
+        format: date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      updatedAt:
+        description: ISO-8601 formatted timestamp indicating when the result was last updated
+        type: string
+        format: date-time
+        example: '2018-05-09T15:07:42.527921Z'
+      programName:
+        description: Program name
+        type: string
+        example: My test program
+      id:
+        description: Id of the test result
+        type: string
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
+      systemId:
+        description: Id of the system
+        type: string
+        example: 5e30931993cac8046850a996
+      hostName:
+        description: Host name of the system
+        type: string
+        example: My-Host
+      operator:
+        description: Name of the operator running the test
+        type: string
+        example: admin
+      partNumber:
+        description: The part number of the device under test.
+        type: string
+        example: cRIO-9030
+      serialNumber:
+        description: Sequential number of the device under test
+        type: string
+        example: abc-123
+      totalTimeInSeconds:
+        description: Total run-time of the test in seconds
+        type: number
+        format: double
+        example: 29.9
+      keywords:
+        description: Words or phrases associated with the test result
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      properties:
+        description: Test result properties
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      fileIds:
+        description: Array of file ids attached to the test result. This API does not verify that the file IDs included exist.
+        type: array
+        items:
+          type: string
+        example: []
+      dataTableIds:
+        description: Array of data table ids attached to the test result. This API does not verify that the data table IDs included exist.
+        type: array
+        items:
+          type: string
+        example: []
+      statusTypeSummary:
+        description: Status type summary
+        type: object
+        additionalProperties:
+          type: integer
+          format: int32
+        example:
+          FAILED: 5
+      workspace:
+        description: The workspace the test result belongs to
+        type: string
+        example: f94b178e-288c-4101-afb1-833992413aa7
+  TestResultUpdateFailureObject:
+    title: Test Result Update Failure Object
+    type: object
+    properties:
+      id:
+        description: Test result id to update
+        type: string
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
+      programName:
+        description: Program name
+        type: string
+        example: My Program Name
+      status:
+        $ref: '#/definitions/StatusObject'
+      systemId:
+        description: System id
+        type: string
+        example: my-system
+      hostName:
+        description: Host name
+        type: string
+        example: My-Host
+      properties:
+        description: Test result properties
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      keywords:
+        description: Words or phrases associated with the test result
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      serialNumber:
+        description: Serial number
+        type: string
+        example: 123-456
+      operator:
+        description: Operator
+        type: string
+        example: admin
+      partNumber:
+        description: The part number of the device under test.
+        type: string
+        example: cRIO-9030
+      fileIds:
+        description: Array of file ids attached to the test result. This API does not verify that the file IDs included exist.
+        type: array
+        items:
+          type: string
+        example: [5e30934193cac8046851acb2]
+      dataTableIds:
+        description: Array of data table ids attached to the test result. This API does not verify that the data table IDs included exist.
+        type: array
+        items:
+          type: string
+        example: [62333547f7521f2f2f4615e5]
+      startedAt:
+        description: ISO-8601 formatted timestamp indicating when the test result began
+        type: string
+        format: date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      totalTimeInSeconds:
+        description: Total run-time of the test in seconds
+        type: number
+        format: double
+        default: 0
+        example: 29.9
+      workspace:
+        description: The workspace the test result belongs to
+        type: string
+        example: f94b178e-288c-4101-afb1-833992413aa7
+  TestResultUpdateRequestObject:
+    title: Test Result Update
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        description: Test result id to update
+        type: string
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
+      programName:
+        description: Program name
+        type: string
+        example: My Program Name
+      status:
+        $ref: '#/definitions/StatusObject'
+      systemId:
+        description: System id
+        type: string
+        example: my-system
+      hostName:
+        description: Host name
+        type: string
+        example: My-Host
+      properties:
+        description: Test result properties
+        type: object
+        additionalProperties:
+          type: string
+        example:
+          key1: value1
+      keywords:
+        description: Words or phrases associated with the test result
+        type: array
+        items:
+          type: string
+        example:
+          - keyword1
+          - keyword2
+      serialNumber:
+        description: Serial number
+        type: string
+        example: 123-456
+      operator:
+        description: Operator
+        type: string
+        example: admin
+      partNumber:
+        description: The part number of the device under test.
+        type: string
+        example: cRIO-9030
+      fileIds:
+        description: Array of file ids attached to the test result. This API does not verify that the file IDs included exist.
+        type: array
+        items:
+          type: string
+        example: [5e30934193cac8046851acb2]
+      dataTableIds:
+        description: Array of data table ids attached to the test result. This API does not verify that the data table IDs included exist.
+        type: array
+        items:
+          type: string
+        example: [62333547f7521f2f2f4615e5]
+      startedAt:
+        description: ISO-8601 formatted timestamp indicating when the test result began
+        type: string
+        format: date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      totalTimeInSeconds:
+        description: Total run-time of the test in seconds
+        type: number
+        format: double
+        default: 0
+        example: 29.9
+      workspace:
+        description: The workspace the test result belongs to
+        type: string
+        example: f94b178e-288c-4101-afb1-833992413aa7
+  UpdateTestResultsRequest:
+    title: Update Test Results Request
+    required:
+      - results
+    properties:
+      results:
+        description: Array of test results to update
+        type: array
+        items:
+          $ref: '#/definitions/TestResultUpdateRequestObject'
+      replace:
+        description: Replace the existing fields instead of merging them
+        type: boolean
+        default: false
+      determineStatusFromSteps:
+        description: Determine test result status from the test step statuses
+        type: boolean
+        default: false
+  ValueSummaryObject:
+    title: Value Summary
+    type: object
+    properties:
+      type:
+        $ref: '#/definitions/ValueType'
+      min:
+        description: The minimum recorded value, if `type` is "NUMBER."
+        type: number
+        example: 1.3
+      max:
+        description: The maximum recorded value, if `type` is "NUMBER."
+        type: number
+        example: 2.6
+  PathResponseObject:
+    title: Path Response Object
+    type: object
+    properties:
+      id:
+        description: >-
+          The unique ID of this path. Note that this value may change if
+          the collection is repaired.
+        type: string
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
+      path:
+        description: >-
+          Identifies the steps that this path is representative of.
+        type: string
+        example: MainSequence Callback
+          
+          My Step Name
+      programName:
+        description: The program name for which this path is defined.
+        type: string
+        example: MyProgram.seq
+      partNumber:
+        description: The part number for which this path is defined.
+        type: string
+        example: 156502A-11L
+      pathNames:
+        description: >-
+          The list of all ancestor step names for any step which corresponds
+          to this path.
+        type: array
+        items:
+          type: string
+        example: ['MainSequence Callback', 'VoltageTest']
+      inputs:
+        description: >-
+          The set of inputs that steps which correspond to this path may take.
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/ValueSummaryObject'
+      outputs:
+        description: >-
+          The set of outputs that steps which correspond to this path may log.
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/ValueSummaryObject'
+      measurements:
+        description: >-
+          The set of measurements that steps which correspond to this path may take.
+        type: object
+        additionalProperties:
+          type: object
+        example:
+          myMeasurement: {}
+  ProductsAdvancedQuery:
+    title: Advanced Query Object for Products
+    description: >-
+      Product fields that the response can be ordered by are 
+      `ID`, `PART_NUMBER`, `NAME`, `FAMILY`, and `UPDATED_AT`.
+    properties:
+      filter:
+        description: The query filter in Dynamic Linq
+        type: string
+        example: (name != "cRIO-9030") && (family == @0)
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - "cRIO"
+      orderBy:
+        $ref: '#/definitions/ProductQueryOrderByField'
+      descending:
+        description: ->
+          Whether to return the products in descending order.
+        type: boolean
+        default: false
+        example: false
+      projection:
+        description: >-
+          Specifies the product fields to project. When a field value is given here,
+          the corresponding field will be present in all returned products, and all
+          unspecified fields will be excluded. If no projection is specified,
+          all product fields will be returned.
+        type: array
+        items:
+          $ref: '#/definitions/ProductField'
+      take:
+        description: >-
+          The maximum number of products to return.
+        type: integer
+        format: int32
+        default: 1000
+        minimum: -1
+        example: 1000
+      continuationToken:
+        description: >-
+          A token which allows the user to resume a query at the next item in
+          the matching product set. When querying for products, a token will
+          be returned if a query may be continued. To obtain the next page of
+          products, pass the token to the service on a subsequent request.
+        type: string
+        example: token
+      returnCount:
+        description: >-
+          Whether to return the total number of products which match the
+          provided filter, disregarding the take value.
+        type: boolean
+        default: false
+        example: false
+  PathsAdvancedQuery:
+    title: Advanced Query Object for Paths
+    description: >-
+      Path fields that the response can be ordered by are 
+      `ID`, `PROGRAM_NAME`, `PART_NUMBER`, and `PATH`.
+    properties:
+      filter:
+        description: The query filter in Dynamic Linq
+        type: string
+        example: programName == "MyTests.seq" || partNumber == "cRIO-9030"
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
+      orderBy:
+        $ref: '#/definitions/PathQueryOrderByField'
+      descending:
+        description: ->
+          Whether to return the paths in descending order.
+        type: boolean
+        default: false
+        example: false
+      projection:
+        description: >-
+          Specifies the path fields to project. When a field value is given here,
+          the corresponding field will be present in all returned paths, and all
+          unspecified fields will be excluded. If no projection is specified,
+          all path fields will be returned.
+        type: array
+        items:
+          $ref: '#/definitions/PathField'
+      take:
+        description: >-
+          The maximum number of paths to return.
+        type: integer
+        format: int32
+        default: 1000
+        minimum: -1
+        example: 1000
+      continuationToken:
+        description: >-
+          A token which allows the user to resume a query at the next item in
+          the matching path set. When querying for paths, a token will
+          be returned if a query may be continued. To obtain the next page of
+          paths, pass the token to the service on a subsequent request.
+        type: string
+        example: token
+      returnCount:
+        description: >-
+          Whether to return the total number of paths which match the
+          provided filter, disregarding the take value.
+        type: boolean
+        default: false
+        example: false
+  ResultsAdvancedQuery:
+    title: Advanced Query Object for Test Results
+    description: Results advanced query request object.
+    properties:
+      filter:
+        description: The result query filter in Dynamic Linq
+        type: string
+        example: (operator == "user1") || ((programName != "MyProgram") && (totalTimeInSeconds < @0))
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
+      productFilter:
+        description: The product query filter in Dynamic Linq
+        type: string
+        example: (name != "cRIO-9030") && (family == @0)
+      productSubstitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - cRIO
+      orderBy:
+        $ref: '#/definitions/ResultQueryOrderByField'
+      descending:
+        description: >-
+          Whether to return the results in descending order.
+        type: boolean
+        default: false
+        example: false
+      orderByKey:
+        description: >-
+          The property name to order by when ordering by PROPERTIES. Results that do not contain the orderByKey
+          will be considered the smallest value.
+        type: string
+        example: null
+      orderByComparisonType:
+        $ref: '#/definitions/OrderByComparisonType'
+      projection:
+        description: >-
+          Specifies the result fields to project. When a field value is given here,
+          the corresponding field will be present in all returned results, and all
+          unspecified fields will be excluded. If no projection is specified,
+          all result fields will be returned.
+        type: array
+        items:
+          $ref: '#/definitions/ResultField'
+      take:
+        description: >-
+          The maximum number of products to return.
+        type: integer
+        format: int32
+        default: 1000
+        minimum: -1
+        example: 1000
+      continuationToken:
+        description: >-
+          A token which allows the user to resume a query at the next item in
+          the matching product set. When querying for products, a token will
+          be returned if a query may be continued. To obtain the next page of
+          products, pass the token to the service on a subsequent request.
+        type: string
+        example: token
+      returnCount:
+        description: >-
+          Whether to return the total number of products which match the
+          provided filter, disregarding the take value.
+        type: boolean
+        default: false
+        example: false
+      responseFormat:
+        $ref: '#/definitions/ResponseFormat'
+  StepsAdvancedQuery:
+    title: Advanced Query Object for Test Steps
+    description: >-
+      Test Step fields that the response can be ordered by are 
+      `NAME`, `STEP_TYPE`, `STEP_ID`, `PARENT_ID`, `RESULT_ID`, 
+      `PATH`, `TOTAL_TIME_IN_SECONDS`, `STARTED_AT`, `UPDATED_AT`,
+      and `DATA_MODEL`.
+    properties:
+      filter:
+        description: The step query filter in Dynamic Linq
+        type: string
+        example: (stepType == "NumericLimitTest") && (totalTimeInSeconds > @0)
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
+      resultFilter:
+        description: >-
+          The result query filter in Dynamic Linq.
+        type: string
+        example: (programName != "mySequence.seq") && (operator == @0)
+      resultSubstitutions:
+        description: >-
+          Makes substitutions in the query filter expression for results.
+          Substitutions for the query expression are indicated by non-negative
+          integers that are prefixed with the "at" symbol. Each substitution in
+          the given expression will be replaced by the element at the
+          corresponding index (zero-based) in this list. For example, "@0" in
+          the filter expression will be replaced with the element at the zeroth
+          index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - user1
+      orderBy:
+        $ref: '#/definitions/StepQueryOrderByField'
+      descending:
+        description: ->
+          Whether to return the steps in descending order.
+        type: boolean
+        default: false
+        example: false
+      projection:
+        description: >-
+          Specifies the step fields to project. When a field value is given here,
+          the corresponding field will be present in all returned steps, and all
+          unspecified fields will be excluded. If no projection is specified,
+          all step fields will be returned.
+        type: array
+        items:
+          $ref: '#/definitions/StepField'
+      take:
+        description: >-
+          The maximum number of steps to return.
+        type: integer
+        format: int32
+        default: 1000
+        minimum: -1
+        example: 1000
+      continuationToken:
+        description: >-
+          A token which allows the user to resume a query at the next item in
+          the matching step set. When querying for steps, a token will
+          be returned if a query may be continued. To obtain the next page of
+          steps, pass the token to the service on a subsequent request.
+        type: string
+        example: token
+      returnCount:
+        description: >-
+          Whether to return the total number of steps which match the
+          provided filter, disregarding the take value.
+        type: boolean
+        default: false
+        example: false
+      responseFormat:
+        $ref: '#/definitions/ResponseFormat'
+  ProductValuesQuery:
+    title: Product Values Query
+    required:
+    - field
+    properties:
+      field:
+        $ref: '#/definitions/ProductValuesQueryField'
+      filter:
+        description: >-
+          A Dynamic Linq query which specifies the products to consider when
+          getting values.
+        type: string
+        example: name != "cRIO-9030"
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
+      startsWith:
+        description: >-
+          Only return string values prefixed by this value (case sensitive).
+        type: string
+        example: cR
+  ResultValuesQuery:
+    title: Result Values Query
+    required:
+    - field
+    properties:
+      field:
+        $ref: '#/definitions/ResultValuesQueryField'
+      filter:
+        description: >-
+          A Dynamic Linq query which specifies the results to consider when
+          getting values.
+        type: string
+        example: programName != "MyProgram"
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
+      startsWith:
+        description: >-
+          Only return string values prefixed by this value (case sensitive).
+        type: string
+        example: op
+  StepValuesQuery:
+    title: Step Values Query
+    required:
+    - field
+    properties:
+      field:
+        $ref: '#/definitions/StepValuesQueryField'
+      filter:
+        description: >-
+          A Dynamic Linq query which specifies the steps to consider when
+          getting values.
+        type: string
+        example: stepType != "NumericLimitTest"
+      substitutions:
+        description: >-
+          Makes substitutions in the query filter expression. Substitutions for the query expression
+          are indicated by non-negative integers that are prefixed with the "at" symbol. Each
+          substitution in the given expression will be replaced by the element at the corresponding
+          index (zero-based) in this list. For example, "@0" in the filter expression will be replaced with
+          the element at the zeroth index of the substitutions list.
+        type: array
+        items:
+          type: object
+        example:
+          - 2.5
+      startsWith:
+        description: >-
+          Only return string values prefixed by this value (case sensitive).
+        type: string
+        example: op
+  StepIdResultIdPair:
+    title: Step Id / Result Id Pair
+    type: object
+    required:
+      - stepId
+      - resultId
+    properties:
+      stepId:
+        type: string
+        example: bd9126f5-b0b1-446a-8b08-dc6460047377
+      resultId:
+        type: string
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
+  StepDataObject:
+    title: Step Data
+    description: Data returned by the test step
+    type: object
+    properties:
+      text:
+        description: Text string describing the output data
+        type: string
+        example: My output string
+      parameters:
+        description: Array of properties objects
+        type: array
+        items:
+          description: Dictionary of key-value property pairs
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+        example:
+          - name: Voltage
+            status: Passed
+            measurement: "3.725"
+            lowLimit: "3.65"
+            highLimit: "3.8"
+            nominalValue: "3.7"
+            units: volt
+            comparisonType: GELE
+          - nitmParameterType: ADDITIONAL_RESULTS
+            additionalProp: myValue
+  TestStepsDeleteRequest:
+    title: Test Steps Delete Request
+    required:
+      - steps
+    properties:
+      steps:
+        description: Array of test step id and result id pairs to delete
+        type: array
+        items:
+          $ref: '#/definitions/StepIdResultIdPair'
+  TestStepRequestObject:
+    title: Test Step Request
+    type: object
+    properties:
+      stepId:
+        description: Step id
+        type: string
+        example: Step1
+      parentId:
+        description: Parent step id
+        type: string
+        example: root
+      resultId:
+        description: Result id
+        type: string
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
+      children:
+        description: Nested child steps
+        type: array
+        items:
+          $ref: '#/definitions/TestStepRequestObject'
+        example: []
+      data:
+        $ref: '#/definitions/StepDataObject'
+      dataModel:
+        description: Data model for the step
+        type: string
+        example: TestStand
+      name:
+        description: Step name
+        type: string
+        example: My Step
+      startedAt:
+        description: ISO-8601 formatted timestamp indicating when the test result began
+        type: string
+        format: date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      status:
+        $ref: '#/definitions/StatusObject'
+      stepType:
+        description: Step type
+        type: string
+        example: NumericLimitTest
+      totalTimeInSeconds:
+        description: Total number of seconds the step took to execute
+        type: number
+        format: double
+        default: 0
+        example: 29.9
+      inputs:
+        description: Inputs and their values passed to the test
+        type: array
+        items:
+          $ref: '#/definitions/NamedValueObject'
+      outputs:
+        description: Outputs and their values logged by the test
+        type: array
+        items:
+          $ref: '#/definitions/NamedValueObject'
+  TestStepCreateOrUpdateRequestObject:
+    title: Test Step Create or Update Request
+    required:
+      - steps
+    properties:
+      steps:
+        description: Array of test steps to create
+        type: array
+        items:
+          $ref: '#/definitions/TestStepRequestObject'
+      updateResultTotalTime:
+        description: Determine test result total time from the test step total times.
+        type: boolean
+        default: false
+  TestStepResponseObject:
+    title: Test Step Response
+    type: object
+    properties:
+      name:
+        description: Step name
+        type: string
+        example: My Step Name
+      stepType:
+        description: Step type
+        type: string
+        example: NumericLimitTest
+      stepId:
+        description: Step id
+        type: string
+        example: Step1
+      parentId:
+        description: Parent step id
+        type: string
+        example: root
+      resultId:
+        description: Result id
+        type: string
+        example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
+      path:
+        description: Step path
+        type: string
+        example: root.My Step Name
+      pathIds:
+        description: Ids of the steps in the path
+        type: array
+        items:
+          type: string
+        example:
+          - root
+          - Step1
+      status:
+        $ref: '#/definitions/StatusObject'
+      totalTimeInSeconds:
+        description: Total number of seconds the step took to execute
+        type: number
+        format: double
+        example: 0
+      startedAt:
+        description: ISO-8601 formatted timestamp indicating when the test result began
+        type: string
+        format: date-time
+        example: '2018-05-07T18:58:05.219692Z'
+      updatedAt:
+        description: ISO-8601 formatted timestamp indicating when the result was last updated
+        type: string
+        format: date-time
+        example: '2018-05-09T15:07:42.527921Z'
+      inputs:
+        description: Inputs and their values passed to the test
+        type: array
+        items:
+          $ref: '#/definitions/NamedValueObject'
+      outputs:
+        description: Outputs and their values logged by the test
+        type: array
+        items:
+          $ref: '#/definitions/NamedValueObject'
+      dataModel:
+        description: Custom string defining the model of the data object
+        type: string
+        example: TestStand
+      data:
+        $ref: '#/definitions/StepDataObject'
+      hasChildren:
+        description: >-
+          Whether this step object has any children step objects. When false, this means
+          that this step object is a leaf node.
+        type: boolean
+        example: false
+      workspace:
+        description: The workspace the test step belongs to
+        type: string
+        example: f94b178e-288c-4101-afb1-833992413aa7
+responses:
+  Error:
+    description: Error
+    schema:
+      description: Error response
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/definitions/Error'
+  Unauthorized:
+    description: Not authorized
+    headers:
+      WWW_Authenticate:
+        description: Information for how to authenticate
+        type: string
+  ProductsSuccessResponse:
+    description: Products Success Response
+    schema:
+      description: Products Success Response
+      title: ProductsSuccessResponse
+      type: object
+      required:
+        - products
+      properties:
+        products:
+          description: Array of products
+          type: array
+          items:
+            $ref: '#/definitions/ProductResponseObject'
+  ProductsPartialSuccessResponse:
+    description: Products Partial Success Response
+    schema:
+      description: Products Partial Success Response
+      title: ProductsPartialSuccessResponse
+      type: object
+      required:
+        - products
+      properties:
+        products:
+          description: Array of products
+          type: array
+          items:
+            $ref: '#/definitions/ProductResponseObject'
+        failed:
+          description: Array of product requests that failed
+          type: array
+          items:
+            $ref: '#/definitions/ProductRequestObject'
+        error:
+          $ref: '#/definitions/Error'
+  DeleteProductsResponse:
+    description: Delete Products Response
+    schema:
+      description: Delete Products Response
+      title: DeleteProductsResponse
+      type: object
+      required:
+        - ids
+      properties:
+        ids:
+          description: Array of product ids to delete
+          type: array
+          items:
+            type: string
+          example:
+            - 02600cf8-c2bb-4ff9-a139-031e943fb0c0
+        failed:
+          description: Array of product ids that failed to delete
+          type: array
+          items:
+            type: string
+          example: []
+        error:
+          $ref: '#/definitions/Error'
+  ProductsQueryResponse:
+    description: Products Query Response
+    schema:
+      description: Products Query Response
+      title: ProductsQueryResponse
+      type: object
+      x-ni-sparse: true
+      required:
+        - products
+      properties:
+        products:
+          description: Array of products
+          type: array
+          items:
+            $ref: '#/definitions/ProductResponseObject'
+        continuationToken:
+          description: >-
+            A token which allows the user to resume this query at the next item
+            in the matching product set. In order to continue paginating a
+            query, pass this token to the service on a subsequent request. The
+            service will respond with a new continuation token. To paginate a
+            set of products, continue sending requests with the newest
+            continuation token provided by the service, until this value is
+            null.
+          type: string
+          example: "token"
+        totalCount:
+          description: >-
+            The number of matching products, if returnCount is true.
+            This value is not present if returnCount is false.
+          type: integer
+          format: int64
+          example: 1
+  ResultsSuccessResponse:
+    description: Test Results Success Response
+    schema:
+      description: Test Results Success Response
+      title: ResultsSuccessResponse
+      type: object
+      required:
+        - results
+      properties:
+        results:
+          description: Array of test results
+          type: array
+          items:
+            $ref: '#/definitions/TestResultResponseObject'
+  ResultsPartialSuccessResponse:
+    description: Test Results Partial Success Response
+    schema:
+      description: Test Results Partial Success Response
+      title: ResultsPartialSuccessResponse
+      type: object
+      required:
+        - results
+      properties:
+        results:
+          description: Array of test results
+          type: array
+          items:
+            $ref: '#/definitions/TestResultResponseObject'
+        failed:
+          description: Array of test result requests that failed
+          type: array
+          items:
+            $ref: '#/definitions/TestResultRequestObject'
+        error:
+          $ref: '#/definitions/Error'
+  ResultsUpdatePartialSuccessResponse:
+    description: Test Results Update Partial Success Response
+    schema:
+      description: Test Results Update Partial Success Response
+      title: ResultsUpdatePartialSuccessResponse
+      type: object
+      required:
+        - results
+      properties:
+        results:
+          description: Array of test results
+          type: array
+          items:
+            $ref: '#/definitions/TestResultResponseObject'
+        failed:
+          description: Array of test result update requests that failed
+          type: array
+          items:
+            $ref: '#/definitions/TestResultUpdateFailureObject'
+        error:
+          $ref: '#/definitions/Error'
+  DeleteResultsResponse:
+    description: Delete Test Results Response
+    schema:
+      description: Delete Test Results Response
+      title: DeleteResultsResponse
+      type: object
+      required:
+        - ids
+      properties:
+        ids:
+          description: Array of test result ids to delete
+          type: array
+          items:
+            type: string
+        failed:
+          description: Array of test result ids that failed to delete
+          type: array
+          items:
+            type: string
+        error:
+          $ref: '#/definitions/Error'
+  ResultsQueryResponse:
+    description: Test Results Query Response
+    schema:
+      description: Test Results Query Response
+      title: ResultsQueryResponse
+      type: object
+      x-ni-sparse: true
+      required:
+        - results
+      properties:
+        results:
+          description: Array of test results
+          type: array
+          items:
+            $ref: '#/definitions/TestResultResponseObject'
+        continuationToken:
+          description: >-
+            A token which allows the user to resume this query at the next item
+            in the matching result set. In order to continue paginating a
+            query, pass this token to the service on a subsequent request. The
+            service will respond with a new continuation token. To paginate a
+            set of results, continue sending requests with the newest
+            continuation token provided by the service, until this value is
+            null.
+          type: string
+          example: "token"
+        totalCount:
+          description: >-
+            The number of matching test results, if returnCount is true.
+            This value is not present if returnCount is false.
+          type: integer
+          format: int64
+          example: 1
+  StepsSuccessResponse:
+    description: Test Steps Success Response
+    schema:
+      description: Test Steps Success Response
+      title: StepsSuccessResponse
+      type: object
+      required:
+        - steps
+      properties:
+        steps:
+          description: Array of test steps
+          type: array
+          items:
+            $ref: '#/definitions/TestStepResponseObject'
+  StepsPartialSuccessResponse:
+    description: Test Steps Partial Success Response
+    schema:
+      description: Test Steps Partial Success Response
+      title: StepsPartialSuccessResponse
+      type: object
+      required:
+        - steps
+      properties:
+        steps:
+          description: Array of test steps
+          type: array
+          items:
+            $ref: '#/definitions/TestStepResponseObject'
+        failed:
+          description: Array of test step requests that failed
+          type: array
+          items:
+            $ref: '#/definitions/TestStepRequestObject'
+        error:
+          $ref: '#/definitions/Error'
+  StepsQueryResponse:
+    description: Test Steps Query Response
+    schema:
+      description: Test Steps Query Response
+      title: StepsQueryResponse
+      type: object
+      x-ni-sparse: true
+      required:
+        - steps
+      properties:
+        steps:
+          description: Array of test steps
+          type: array
+          items:
+            $ref: '#/definitions/TestStepResponseObject'
+        continuationToken:
+          description: >-
+            A token which allows the user to resume this query at the next item
+            in the matching step set. In order to continue paginating a
+            query, pass this token to the service on a subsequent request. The
+            service will respond with a new continuation token. To paginate a
+            set of steps, continue sending requests with the newest
+            continuation token provided by the service, until this value is
+            null.
+          type: string
+          example: "token"
+        totalCount:
+          description: >-
+            The number of matching test steps, if returnCount is true.
+            This value is not present if returnCount is false.
+          type: integer
+          format: int64
+          example: 1
+  StepsDeletePartialSuccessResponse:
+    description: Delete Test Steps Partial Success Response
+    schema:
+      description: Delete Test Steps Partial Success Response
+      title: StepsDeletePartialSuccessResponse
+      type: object
+      required:
+        - steps
+      properties:
+        steps:
+          description: Array of test step id result id pairs that were deleted
+          type: array
+          items:
+            $ref: '#/definitions/StepIdResultIdPair'
+        failed:
+          description: Array of test step id result id pairs that failed to delete
+          type: array
+          items:
+            $ref: '#/definitions/StepIdResultIdPair'
+        error:
+          $ref: '#/definitions/Error'
+  ValuesResponse:
+    description: Values Response
+    schema:
+      description: Values Response
+      title: ValuesResponse
+      type: array
+      items:
+        type: string
+      example:
+      - operator1
+      - operator2
+  PathsQueryResponse:
+    description: Paths Query Response
+    schema:
+      description: Paths Query Response
+      title: PathsQueryResponse
+      type: object
+      x-ni-sparse: true
+      required:
+        - paths
+      properties:
+        paths:
+          description: An array of path objects.
+          type: array
+          items:
+            $ref: '#/definitions/PathResponseObject'
+        continuationToken:
+          description: >-
+            A token which allows the user to resume this query at the next item
+            in the matching path set. In order to continue paginating a
+            query, pass this token to the service on a subsequent request. The
+            service will respond with a new continuation token. To paginate a
+            set of paths, continue sending requests with the newest
+            continuation token provided by the service, until this value is
+            null.
+          type: string
+          example: "token"
+        totalCount:
+          description: >-
+            The number of matching paths, if returnCount is true.
+            This value is not present if returnCount is false.
+          type: integer
+          format: int64
+paths:
+  /:
+    get:
+      tags: [versioning]
+      summary: API information
+      description: Returns information about API versions and available operations.
+      operationId: root-endpoint
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            description: Version information
+            title: RootEndpointResponse
+            type: object
+            properties:
+              v1:
+                $ref: '#/definitions/V1Operations'
+              v2:
+                $ref: '#/definitions/V2Operations'
+              version:
+                description: Implementation version of the web service
+                type: string
+  /v2:
+    get:
+      tags: [versioning]
+      summary: API version 2 information
+      description: Returns available operations for version 2 of the API.
+      operationId: root-endpoint-v2
+      # Explicitly mark security as an empty array - this route does not require any privileges.
+      # Marking it this way prevents it from inheriting the top-level security settings.
+      security: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/V2Operations'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+  /v2/query-products:
+    post:
+      tags: [products]
+      summary: Queries products
+      description: >-
+        Uses the Dynamic Linq query language to specify a filter and return
+        product. An empty request body queries all products.
+      operationId: query-products-v2
+      x-ni-operation: queryProducts
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: postBody
+          description: Query filter
+          required: false
+          schema:
+            $ref: '#/definitions/ProductsAdvancedQuery'
+      responses:
+        200:
+          $ref: '#/responses/ProductsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/products:
+    get:
+      tags: [products]
+      summary: Gets products
+      description: Gets a list of products.
+      operationId: get-products-v2
+      x-ni-operation: getProducts
+      x-ni-auth: true
+      parameters:
+        - in: query
+          name: continuationToken
+          description: >-
+            A token which allows the user to resume a query at the next item in
+            the matching product set. When querying for products, a token will
+            be returned if a query may be continued. To obtain the next page of
+            products, pass the token to the service on a subsequent request.
+          type: string
+        - in: query
+          name: take
+          description: >-
+            The maximum number of products to return.
+          type: integer
+          format: int32
+          default: 1000
+          minimum: -1
+        - in: query
+          name: returnCount
+          description: >-
+            Whether to return the total number of products,
+            disregarding the take value.
+          type: boolean
+          default: false
+      responses:
+        200:
+          $ref: '#/responses/ProductsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    post:
+      tags: [products]
+      summary: Creates new products
+      description: Creates new products from the supplied models. The server automatically generates the product ids.
+      operationId: create-products-v2
+      x-ni-operation: createProducts
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: requestBody
+          description: Product object
+          required: true
+          schema:
+            description: Array of products to create
+            title: CreateProductsRequest
+            required:
+              - products
+            properties:
+              products:
+                description: Array of products to create
+                type: array
+                items:
+                  $ref: '#/definitions/ProductRequestObject'
+      responses:
+        200:
+          $ref: '#/responses/ProductsPartialSuccessResponse'
+        201:
+          $ref: '#/responses/ProductsSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/products/{productId}:
+    get:
+      tags: [products]
+      summary: Gets a product
+      description: Gets a single product.
+      operationId: get-product-v2
+      x-ni-operation: getProducts
+      x-ni-auth: true
+      parameters:
+        - in: path
+          name: productId
+          description: The id of the product to get.
+          type: string
+          required: true
+      responses:
+        200:
+          description: Get Product Response
+          schema:
+            $ref: '#/definitions/ProductResponseObject'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags: [products]
+      summary: Deletes a product
+      description: Deletes the product with the specified id. The request succeeds for products that do not exist.
+      operationId: delete-product-v2
+      x-ni-operation: deleteProduct
+      x-ni-auth: true
+      parameters:
+        - in: path
+          name: productId
+          description: Id of the product to delete
+          type: string
+          required: true
+      responses:
+        204:
+          description: The resource was deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/query-product-values:
+    post:
+      tags: [products]
+      summary: Queries values for a product field
+      description: >-
+        Queries known values for an indexed, scalar product field. Supported
+        fields are `ID`, `PART_NUMBER`, `NAME`, `FAMILY`, and `UPDATED_AT`.
+      operationId: query-product-values-v2
+      x-ni-operation: queryProducts
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: postBody
+          description: Query parameters
+          required: true
+          schema:
+            $ref: '#/definitions/ProductValuesQuery'
+      responses:
+        200:
+          $ref: '#/responses/ValuesResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/update-products:
+    post:
+      tags: [products]
+      summary: Updates existing products
+      description: Updates existing products by merging or replacing values.
+      operationId: update-products-v2
+      x-ni-operation: updateProducts
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: requestBody
+          description: Array of products to update
+          required: true
+          schema:
+            description: Array of products to update
+            title: UpdateProductsRequest
+            required:
+              - products
+            properties:
+              products:
+                description: Array of products to update
+                type: array
+                items:
+                  $ref: '#/definitions/ProductUpdateRequestObject'
+              replace:
+                description: Replace the existing fields instead of merging them
+                type: boolean
+                default: false
+      responses:
+        200:
+          $ref: '#/responses/ProductsPartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/delete-products:
+    post:
+      tags: [products]
+      summary: Deletes products
+      description: Deletes multiple products in a single request.
+      operationId: delete-products-v2
+      x-ni-operation: deleteProducts
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: requestBody
+          description: Array of products
+          required: true
+          schema:
+            description: Array of products
+            title: DeleteProductsRequest
+            required:
+              - ids
+            properties:
+              ids:
+                description: Array of product ids to delete
+                type: array
+                items:
+                  type: string
+                  example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
+      responses:
+        200:
+          $ref: '#/responses/DeleteProductsResponse'
+        204:
+          description: The resources were deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/query-results:
+    post:
+      tags: [results]
+      summary: Queries test results
+      description: >-
+        Uses the Dynamic Linq query language to specify filters for results.
+        Both result and product filters can be specified and matching test
+        results are returned. An empty request body queries all test results.
+      operationId: query-results-v2
+      x-ni-operation: queryResults
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: postBody
+          description: Query filter
+          required: false
+          schema:
+            $ref: '#/definitions/ResultsAdvancedQuery'
+      produces:
+        - application/json
+        - text/csv
+      responses:
+        200:
+          $ref: '#/responses/ResultsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/results:
+    get:
+      tags: [results]
+      summary: Gets test results
+      description: Gets a list of test results.
+      operationId: get-results-v2
+      x-ni-operation: getResults
+      x-ni-auth: true
+      parameters:
+        - in: query
+          name: continuationToken
+          description: >-
+            A token which allows the user to resume a query at the next item in
+            the matching result set. When querying for results, a token will
+            be returned if a query may be continued. To obtain the next page of
+            results, pass the token to the service on a subsequent request.
+          type: string
+        - in: query
+          name: take
+          description: >-
+            The maximum number of results to return.
+          type: integer
+          format: int32
+          default: 1000
+          minimum: -1
+        - in: query
+          name: returnCount
+          description: >-
+            Whether to return the total number of results,
+            disregarding the take value.
+          type: boolean
+          default: false
+      responses:
+        200:
+          $ref: '#/responses/ResultsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    post:
+      tags: [results]
+      summary: Creates new test results
+      description: Creates new test results from the supplied models. The server automatically generates the result ids. The server will populate the start time if one is not provided.
+      operationId: create-results-v2
+      x-ni-operation: createResults
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: requestBody
+          description: Result object
+          required: true
+          schema:
+            description: Array of test results to create
+            title: CreateTestResultsRequest
+            required:
+              - results
+            properties:
+              results:
+                description: Array of test results to create
+                type: array
+                items:
+                  $ref: '#/definitions/TestResultRequestObject'
+      responses:
+        200:
+          $ref: '#/responses/ResultsPartialSuccessResponse'
+        201:
+          $ref: '#/responses/ResultsSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/results/{resultId}:
+    get:
+      tags: [results]
+      summary: Gets a test result
+      description: Gets a single test result.
+      operationId: get-result-v2
+      x-ni-operation: getResults
+      x-ni-auth: true
+      parameters:
+        - in: path
+          name: resultId
+          description: The id of the result to get.
+          type: string
+          required: true
+      responses:
+        200:
+          description: Get Test Result Response
+          schema:
+            $ref: '#/definitions/TestResultResponseObject'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags: [results]
+      summary: Deletes a test result
+      description: Deletes the test result with the specified id. The request succeeds for result ids that do not exist.
+      operationId: delete-result-v2
+      x-ni-operation: deleteResult
+      x-ni-auth: true
+      parameters:
+        - in: path
+          name: resultId
+          description: Id of the test result to delete
+          type: string
+          required: true
+        - in: query
+          name: deleteSteps
+          description: Indicates whether to delete the test steps associated with the test result
+          type: boolean
+          default: true
+      responses:
+        204:
+          description: The resource was deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/query-result-values:
+    post:
+      tags: [results]
+      summary: Queries values for a result field
+      description: >-
+        Queries known values for an indexed, scalar result field. Supported
+        fields are `ID`, `STARTED_AT`, `UPDATED_AT`, `PROGRAM_NAME`,
+        `SYSTEM_ID`, `HOST_NAME`, `OPERATOR`, `SERIAL_NUMBER`, `PART_NUMBER`,
+        and `TOTAL_TIME_IN_SECONDS`.
+      operationId: query-result-values-v2
+      x-ni-operation: queryResults
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: postBody
+          description: Query parameters
+          required: true
+          schema:
+            $ref: '#/definitions/ResultValuesQuery'
+      responses:
+        200:
+          $ref: '#/responses/ValuesResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/update-results:
+    post:
+      tags: [results]
+      summary: Updates existing test results
+      description: Updates existing test results by merging or replacing values.
+      operationId: update-results-v2
+      x-ni-operation: updateResults
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: requestBody
+          description: Array of test results to update
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateTestResultsRequest'
+      responses:
+        200:
+          $ref: '#/responses/ResultsUpdatePartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/delete-results:
+    post:
+      tags: [results]
+      summary: Deletes test results
+      description: Deletes multiple test results in a single request.
+      operationId: delete-results-v2
+      x-ni-operation: deleteResults
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: requestBody
+          description: Array of test result ids
+          required: true
+          schema:
+            description: Array of test result ids
+            title: DeleteResultsRequest
+            required:
+              - ids
+            properties:
+              ids:
+                description: Array of test result ids to delete
+                type: array
+                items:
+                  type: string
+                  example: 02600cf8-c2bb-4ff9-a139-031e943fb0c0
+              deleteSteps:
+                description: Indicates whether to delete the test steps associated with the test result
+                type: boolean
+                default: true
+      responses:
+        200:
+          $ref: '#/responses/DeleteResultsResponse'
+        204:
+          description: The resources were deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/query-steps:
+    post:
+      tags: [steps]
+      summary: Queries test steps
+      description: >-
+        Uses the Dynamic Linq query language to specify filters for steps.
+        Both step and result filters can be specified and matching test
+        steps are returned. An empty request body queries all test steps.
+      operationId: query-steps-v2
+      x-ni-operation: querySteps
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: postBody
+          description: Query filter
+          required: false
+          schema:
+            $ref: '#/definitions/StepsAdvancedQuery'
+      produces:
+        - application/json
+        - text/csv
+      responses:
+        200:
+          $ref: '#/responses/StepsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/steps:
+    get:
+      tags: [steps]
+      summary: Gets test steps
+      description: Gets a list of test steps.
+      operationId: get-steps-v2
+      x-ni-operation: getSteps
+      x-ni-auth: true
+      parameters:
+        - in: query
+          name: continuationToken
+          description: >-
+            A token which allows the user to resume a query at the next item in
+            the matching step set. When querying for steps, a token will
+            be returned if a query may be continued. To obtain the next page of
+            steps, pass the token to the service on a subsequent request.
+          type: string
+        - in: query
+          name: take
+          description: >-
+            The maximum number of steps to return.
+          type: integer
+          format: int32
+          default: 1000
+          minimum: -1
+        - in: query
+          name: returnCount
+          description: >-
+            Whether to return the total number of results,
+            disregarding the take value.
+          type: boolean
+          default: false
+      responses:
+        200:
+          $ref: '#/responses/StepsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    post:
+      tags: [steps]
+      summary: Creates new test steps
+      description: Creates new test steps from the supplied models. The result associated with the step must exist prior to step creation. The server automatically generates step ids if not supplied.
+      operationId: create-steps-v2
+      x-ni-operation: createSteps
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: requestBody
+          description: Test step object
+          required: true
+          schema:
+            $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
+      responses:
+        200:
+          $ref: '#/responses/StepsPartialSuccessResponse'
+        201:
+          $ref: '#/responses/StepsSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/results/{resultId}/steps/{stepId}:
+    get:
+      tags: [steps]
+      summary: Gets a test step
+      description: Gets a single test step.
+      operationId: get-step-v2
+      x-ni-operation: getSteps
+      x-ni-auth: true
+      parameters:
+        - in: path
+          name: resultId
+          description: The resultId of the step to get.
+          type: string
+          required: true
+        - in: path
+          name: stepId
+          description: The stepId of the step to get.
+          type: string
+          required: true
+      responses:
+        200:
+          description: Get Test Step Response
+          schema:
+            $ref: '#/definitions/TestStepResponseObject'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+    delete:
+      tags: [steps]
+      summary: Deletes a test step
+      description: Deletes the test step with the specified id. The request succeeds for step ids that do not exist.
+      operationId: delete-step-v2
+      x-ni-operation: deleteStep
+      x-ni-auth: true
+      parameters:
+        - in: path
+          name: resultId
+          description: Id of the test result the step belongs to
+          type: string
+          required: true
+        - in: path
+          name: stepId
+          description: Id of the test step to delete
+          type: string
+          required: true
+        - in: query
+          name: updateResultTotalTime
+          description: Determine test result total time from the test step total times.
+          type: boolean
+          default: false
+      responses:
+        204:
+          description: The resource was deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/query-step-values:
+    post:
+      tags: [steps]
+      summary: Queries values for a step field
+      description: >-
+        Queries known values for an indexed, scalar step field. Supported
+        fields are `NAME`, `STEP_TYPE`, `STEP_ID`, `PARENT_ID`, `RESULT_ID`,
+        `PATH`, `TOTAL_TIME_IN_SECONDS`, `STARTED_AT`, `UPDATED_AT`, and
+        `DATA_MODEL`.
+      operationId: query-step-values-v2
+      x-ni-operation: querySteps
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: postBody
+          description: Query parameters
+          required: true
+          schema:
+            $ref: '#/definitions/StepValuesQuery'
+      responses:
+        200:
+          $ref: '#/responses/ValuesResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/update-steps:
+    post:
+      tags: [steps]
+      summary: Updates existing test steps
+      description: Updates existing steps by merging or replacing values.
+      operationId: update-steps-v2
+      x-ni-operation: updateSteps
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: requestBody
+          description: Array of test steps
+          required: true
+          schema:
+            $ref: '#/definitions/TestStepCreateOrUpdateRequestObject'
+      responses:
+        200:
+          $ref: '#/responses/StepsPartialSuccessResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/delete-steps:
+    post:
+      tags: [steps]
+      summary: Deletes test steps
+      description: Deletes multiple test steps in a single request.
+      operationId: delete-steps-v2
+      x-ni-operation: deleteSteps
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: requestBody
+          description: Delete steps request
+          required: true
+          schema:
+            $ref: '#/definitions/TestStepsDeleteRequest'
+        - in: query
+          name: updateResultTotalTime
+          description: Determine test result total time from the test step total times.
+          type: boolean
+          default: false
+      responses:
+        200:
+          $ref: '#/responses/StepsDeletePartialSuccessResponse'
+        204:
+          description: The resources were deleted successfully.
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/paths:
+    get:
+      tags: [paths]
+      summary: Gets paths
+      description: Gets a list of paths.
+      operationId: get-paths-v2
+      x-ni-operation: queryPaths
+      x-ni-auth: true
+      parameters:
+        - in: query
+          name: continuationToken
+          description: >-
+            A token which allows the user to resume a query at the next item in
+            the matching path set. When querying for paths, a token will
+            be returned if a query may be continued. To obtain the next page of
+            paths, pass the token to the service on a subsequent request.
+          type: string
+        - in: query
+          name: take
+          description: >-
+            The maximum number of paths to return.
+          type: integer
+          format: int32
+          default: 1000
+          minimum: -1
+        - in: query
+          name: returnCount
+          description: >-
+            Whether to return the total number of paths,
+            disregarding the take value.
+          type: boolean
+          default: false
+      responses:
+        200:
+          $ref: '#/responses/PathsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/paths/{pathId}:
+    get:
+      tags: [paths]
+      summary: Gets a path
+      description: Gets a single path.
+      operationId: get-path-v2
+      x-ni-operation: queryPaths
+      x-ni-auth: true
+      parameters:
+        - in: path
+          name: pathId
+          description: The ID of the path to get.
+          type: string
+          required: true
+      responses:
+        200:
+          description: Get Path Response
+          schema:
+            $ref: '#/definitions/PathResponseObject'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
+  /v2/query-paths:
+    post:
+      tags: [paths]
+      summary: Queries paths
+      description: >-
+        Uses the Dynamic Linq query language to specify a filter and return
+        paths. An empty request body queries all paths.
+      operationId: query-paths-v2
+      x-ni-operation: queryPaths
+      x-ni-auth: true
+      parameters:
+        - in: body
+          name: postBody
+          description: Query filter
+          required: false
+          schema:
+            $ref: '#/definitions/PathsAdvancedQuery'
+      responses:
+        200:
+          $ref: '#/responses/PathsQueryResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        default:
+          $ref: '#/responses/Error'
