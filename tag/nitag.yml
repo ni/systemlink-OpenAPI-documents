@@ -1663,6 +1663,7 @@ definitions:
         path: foo
         type: DOUBLE
         keywords: [fooKeyword, barKeyword]
+        last_updated: 1696579890
       current:
         value:
           type: DOUBLE
@@ -2015,6 +2016,10 @@ definitions:
         type: boolean
       workspace:
         type: string
+      lastUpdated:
+        description: Timestamp associated with the value.
+        type: string
+        format: date-time
     example:
       type: DOUBLE
       properties:
@@ -2024,6 +2029,7 @@ definitions:
       keywords: [fooKeyword, barKeyword]
       collectAggregates: true
       workspace: "10e020d7-64df-45e9-b717-c537f374ca2f"
+      lastUpdated: '2023-10-06T11:45:08Z'
   TagUpdate:
     description: Object containing a tag's path, and one or more values to update the tag with at times you specify.
     type: object
